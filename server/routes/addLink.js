@@ -1,6 +1,4 @@
-const User = require('../../models/user');
 const Link = require('../../models/link');
-const jwt = require('jsonwebtoken');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -11,15 +9,8 @@ module.exports = async (req, res) => {
     name,
     url,
     type,
-    isParent,
-    token
+    isParent
   } = req.body;
-
-  if (!token) {
-    return res.json({
-      message: 'Unauthorized.'
-    });
-  }
 
   if (!name || !url) {
     return res.json({
@@ -28,28 +19,17 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    const userId = decoded.user.id;
 
-    const user = await User.findById(userId);
-
-    if (user.role === 'Administrator') {
-      const link = await Link.create({
-        name,
-        url,
-        type,
-        isParent
-      });
-
-      return res.json({
-        link: link.toObject()
-      });
-    }
+    const link = await Link.create({
+      name,
+      url,
+      type,
+      isParent
+    });
 
     return res.json({
-      message: 'You do not have the correct permissions.'
-    })
-
+      link: link.toObject()
+    });
   } catch (error) {
     console.log(error);
 

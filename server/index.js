@@ -11,6 +11,8 @@ const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
 const addLink = require('./routes/addLink');
 
+const checkPermissionsMiddleware = require('./middlewares/checkPermissions');
+
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
   const cors = require('cors');
