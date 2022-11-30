@@ -7,9 +7,9 @@ import {
   Navigate
 } from 'react-router-dom';
 import './index.css';
-import AdminLayout from './views/admin';
-import ClientLayout from './views/client';
-import Login from './views/login';
+import AdminPage from './pages/admin';
+import HomePage from './pages/home';
+import LoginPage from './pages/login';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -17,12 +17,12 @@ root.render(
   <React.StrictMode>
     <Router>
       <Routes>
-        <Route path="login" element={<Login />} />
-        <Route path="admin/*" element={<AdminLayout />}>
+        <Route path="login" element={<LoginPage />} />
+        <Route path="admin/*" element={<AdminPage />}>
 
         </Route>
 
-        <Route path='home/*' element={<ClientLayout />}>
+        <Route path='home/*' element={<HomePage />}>
 
         </Route>
 
