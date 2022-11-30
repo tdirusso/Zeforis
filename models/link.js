@@ -17,17 +17,15 @@ const Link = new Schema(
       enum: ['Default', 'Google', 'Word'],
       default: 'Default'
     },
-    isParent: {
-      type: Boolean,
-      default: false,
+    folderId: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'folders',
       required: true
-    },
-
-    color: String
+    }
   },
   {
     versionKey: false
   }
 );
 
-module.exports = mongoose.model('Link', Link);
+module.exports = mongoose.model('links', Link);

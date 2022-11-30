@@ -1,27 +1,24 @@
-import { useState } from "react"
+import { useState } from "react";
+import { addUser } from "../../api/user";
+import CreateLink from "../../components/admin/createLink";
+import LogoutButton from "../../components/global/logoutButton";
+import useAuth from "../../hooks/useAuth";
 
 export default function AdminPage() {
+  const { user } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const createUser = async () => {
-    const response = await fetch(`${process.env.REACT_APP_DOMAIN}/api/addUser`, {
-      method: 'POST',
-      body: JSON.stringify({
-        firstName,
-        lastName,
-        password,
-        email,
-        role: 'Administrator'
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    const result = await addUser({
+      firstName,
+      lastName,
+      password,
+      email,
+      role: 'Administrator'
     });
-
-    const result = await response.json();
 
     console.log(result);
   };
@@ -41,6 +38,10 @@ export default function AdminPage() {
       <input type="text" onChange={(e) => setPassword(e.target.value)}></input>
       <br></br>
       <button onClick={createUser}>Add Administrator user</button>
+      <LogoutButton />
+      <br></br>
+      <br></br>
+      <CreateLink />
     </div>
   )
 };

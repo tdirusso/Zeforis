@@ -7,11 +7,15 @@ const Client = new Schema(
       type: String,
       required: true
     },
-    color: String
+    brandColor: String,
+    folders: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: 'folders'
+    }
   },
   {
     versionKey: false
   }
 );
 
-module.exports = mongoose.model('Client', Client);
+module.exports = mongoose.model('clients', Client);
