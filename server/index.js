@@ -10,6 +10,9 @@ const addUser = require('./routes/addUser');
 const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
 const addLink = require('./routes/addLink');
+const addClient = require('./routes/addClient');
+const getAllClients = require('./routes/getAllClients');
+const getClient = require('./routes/getClient');
 
 const checkPermissionsMiddleware = require('./middlewares/checkPermissions');
 
@@ -38,10 +41,13 @@ const boot = async () => {
 
   await Mongoose.connect(dbUri);
 
-  app.post('/api/addUser', addUser);
+  app.post('/api/addUser', checkPermissionsMiddleware, addUser);
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
-  app.post('/api/addLink', addLink);
+  app.post('/api/addLink', checkPermissionsMiddleware, addLink);
+  app.post('/api/addClient', checkPermissionsMiddleware, addClient);
+  app.get('/api/getAllClients', checkPermissionsMiddleware, getAllClients);
+  app.get('/api/getClient', checkPermissionsMiddleware, getClient);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

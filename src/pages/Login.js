@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { login } from "../../api/auth";
+import { login as loginService } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
@@ -7,9 +7,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const tryLogin = async () => {
-    const result = await login({ email, password });
-    
+  const login = async () => {
+    const result = await loginService({ email, password });
+
     if (result.success) {
       navigate(result.navTo);
     } else {
@@ -25,7 +25,7 @@ export default function LoginPage() {
       Password
       <input type="text" onChange={(e) => setPassword(e.target.value)}></input>
       <br></br>
-      <button onClick={tryLogin}>Login</button>
+      <button onClick={login}>Login</button>
     </div>
   )
 };

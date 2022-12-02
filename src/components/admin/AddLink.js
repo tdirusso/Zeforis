@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { addLink as addLinkService } from "../../api/link";
 
-export default function CreateLink() {
+export default function AddLink() {
 
   const [type, setType] = useState('Default');
   const [name, setName] = useState('');

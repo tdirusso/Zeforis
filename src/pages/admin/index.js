@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { addUser } from "../../api/user";
-import CreateLink from "../../components/admin/createLink";
-import LogoutButton from "../../components/global/logoutButton";
+import AddLink from "../../components/admin/AddLink";
+import LogoutButton from "../../components/global/LogoutButton";
 import useAuth from "../../hooks/useAuth";
+import AddClient from "./AddCliient";
+import { Outlet } from "react-router-dom";
+import BackButton from "../../components/global/BackButton";
 
-export default function AdminPage() {
+export default function Admin() {
   const { user } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  //console.log(user)
 
   const createUser = async () => {
     const result = await addUser({
@@ -20,12 +25,15 @@ export default function AdminPage() {
       role: 'Administrator'
     });
 
+
     console.log(result);
   };
 
   return (
     <div>
-      First
+      <BackButton/>
+      <br></br>
+      {/* First
       <input type="text" onChange={(e) => setFirstName(e.target.value)}></input>
       <br></br>
       Last
@@ -41,7 +49,12 @@ export default function AdminPage() {
       <LogoutButton />
       <br></br>
       <br></br>
-      <CreateLink />
+      <AddLink />
+      <br></br>
+      <br></br>
+      <AddClient /> */}
+      layout
+      <Outlet />
     </div>
   )
 };
