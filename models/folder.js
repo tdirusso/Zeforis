@@ -8,11 +8,11 @@ const Folder = new Schema(
       required: true
     },
     clientId: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: 'clients'
+      type: String,
+      required: true
     },
     parentFolderId: {
-      type: mongoose.SchemaTypes.ObjectId,
+      type: String,
       ref: 'folders'
     }
   },

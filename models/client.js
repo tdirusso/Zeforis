@@ -7,11 +7,7 @@ const Client = new Schema(
       type: String,
       required: true
     },
-    brandColor: String,
-    folders: {
-      type: [mongoose.SchemaTypes.ObjectId],
-      ref: 'folders'
-    }
+    brandColor: String
   },
   {
     versionKey: false

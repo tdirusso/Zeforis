@@ -1,9 +1,7 @@
-import axios from 'axios';
-
-const domain = process.env.REACT_APP_DOMAIN;
+import request from '../lib/request';
 
 const login = async (payload) => {
-  const { data } = await axios.post(`${domain}/api/login`, payload);
+  const { data } = await request.post(`login`, payload);
 
   if (data.token) {
     localStorage.setItem('token', data.token);
@@ -26,7 +24,7 @@ const logout = () => {
 };
 
 const authenticateUser = async (token) => {
-  const { data } = await axios.post(`${domain}/api/authenticate`, { token });
+  const { data } = await request.post(`authenticate`, { token });
 
   if (data.user) {
     if (data.user.role !== 'Administrator' && window.location.pathname.includes('admin')) {

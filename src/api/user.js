@@ -1,9 +1,7 @@
-import axios from 'axios';
-
-const domain = process.env.REACT_APP_DOMAIN;
+import request from '../lib/request';
 
 const addUser = async (payload) => {
-  const { data } = await axios.post(`${domain}/api/addUser`, payload);
+  const { data } = await request.post(`addUser`, payload);
   return data;
 };
 

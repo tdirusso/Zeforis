@@ -18,8 +18,7 @@ const Link = new Schema(
       default: 'Default'
     },
     folderId: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: 'folders',
+      type: String,
       required: true
     }
   },

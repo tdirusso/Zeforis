@@ -19,12 +19,11 @@ module.exports = async (req, res) => {
       brandColor
     });
 
-    const rootFolder = await Folder.create({
+    await Folder.create({
       name: 'root',
-      clientId: client._id,
+      clientId: client._id.toString(),
     });
 
-    client.folders = [rootFolder._id];
     await client.save();
 
     return res.json({

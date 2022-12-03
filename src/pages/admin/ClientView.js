@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getClient as getClientService } from "../../api/client";
+import { getClientTree as getClientTreeService } from "../../api/client";
 
 export default function ClientView() {
   const [loading, setLoading] = useState(true);
@@ -9,16 +9,17 @@ export default function ClientView() {
   const [error, setError] = useState('');
 
   const locationData = useLocation();
+  const { clientId } = locationData.state;
+
   const navigate = useNavigate();
-  const clientId = locationData.state.clientId;
 
   if (!clientId) {
     navigate('/admin');
   }
 
   useEffect(() => {
-    async function getClient() {
-      const result = await getClientService(clientId);
+    async function getClientTree() {
+      const result = await getClientTreeService(clientId);
 
       console.log(result);
       if (result.client) {
@@ -30,7 +31,7 @@ export default function ClientView() {
       setLoading(false);
     }
 
-    getClient();
+    getClientTree();
   }, []);
 
   return (
@@ -38,7 +39,7 @@ export default function ClientView() {
       {
         loading ? <div>loading...</div> :
           <div>
-            {client.name}
+            {clientId}
           </div>
       }
     </div>
