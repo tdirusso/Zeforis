@@ -13,7 +13,6 @@ const Folder = new Schema(
     },
     parentFolderId: {
       type: String,
-      ref: 'folders'
     }
   },
   {

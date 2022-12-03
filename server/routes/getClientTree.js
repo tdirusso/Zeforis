@@ -12,47 +12,55 @@ module.exports = async (req, res) => {
   }
 
   try {
-
     const folders = await Folder.find({ clientId }).lean();
-
     const folderIds = folders.map(folder => folder._id.toString());
 
     const links = await Link.find({ folderId: { $in: folderIds } }).lean();
 
-    const tree = {};
+    const folderToLinksMap = { root: [] };
 
-    const rootFolder = folders.find(folder => folder.name === 'root');
+    links.forEach(link => {
+      const parentFolderId = link.parentFolderId;
 
-
-    function toTree(arr) {
-      let arrMap = new Map(arr.map(item => [item.id, item]));
-      let tree = [];
-
-      for (let i = 0; i < arr.length; i++) {
-        let item = arr[i];
-
-        if (item.pid) {
-          let parentItem = arrMap.get(item.pid);
-
-          if (parentItem) {
-            let { children } = parentItem;
-
-            if (children) {
-              parentItem.children.push(item);
-            } else {
-              parentItem.children = [item];
-            }
-          }
+      if (!parentFolderId) {
+        folderToLinksMap.root.push(link);
+      } else {
+        if (folderToLinksMap[parentFolderId]) {
+          folderToLinksMap[parentFolderId].push(link);
         } else {
-          tree.push(item);
+          folderToLinksMap[parentFolderId] = [link];
         }
       }
+    });
 
-      return tree;
-    }
+    const foldersMap = new Map(folders.map(folder => [folder._id.toString(), folder]));
 
+    const clientTree = {};
+    
+    folders.forEach(folder => {
+      const parentFolderId = folder.parentFolderId;
 
-    return res.json({ folders, links });
+      if (folder.parentFolderId) {
+        folder.links = folderToLinksMap[parentFolderId] || [];
+
+        const parentFolder = foldersMap.get(folder.parentFolderId);
+
+        if (parentFolder) {
+          const childFolders = parentFolder.folders;
+
+          if (childFolders) {
+            parentFolder.folders.push(folder);
+          } else {
+            parentFolder.folders = [folder];
+          }
+        }
+      } else {
+        folder.links = folderToLinksMap.root;
+        clientTree.root = folder;
+      }
+    });
+
+    return res.json({ clientTree });
 
   } catch (error) {
     console.log(error);

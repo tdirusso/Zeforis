@@ -8,8 +8,8 @@ export default function AddFolder() {
   const addFolder = async () => {
     const result = await addFolderService({
       name
-    });
-
+    }); 
+ 
     console.log(result);
   };
 

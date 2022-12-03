@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
     await Folder.create({
       name: 'root',
       clientId: client._id.toString(),
+      parentFolderId: ''
     });
 
     await client.save();

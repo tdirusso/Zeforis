@@ -8,17 +8,20 @@ export default function ClientList() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-
+ 
     async function getClients() {
-      const result = await getAllClients();
+      try {
+        const { clients, message } = await getAllClients();
 
-      if (result.clients) {
-        setClients(result.clients);
-      } else {
-        setError(result.message);
+        if (clients) {
+          setClients(clients);
+        } else {
+          setError(message);
+        }
+        setLoading(false);
+      } catch (er) {
+        console.log(er)
       }
-
-      setLoading(false);
     }
 
     getClients();

@@ -17,10 +17,10 @@ export default function useAuth() {
     }
 
     async function authenticate() {
-      const result = await authenticateUser(token);
+      const { user } = await authenticateUser(token);
 
-      if (result.user) {
-        setUser(result.user);
+      if (user) {
+        setUser(user);
       } else {
         navigate('/login');
       }

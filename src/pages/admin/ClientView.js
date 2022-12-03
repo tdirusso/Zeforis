@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getClientTree as getClientTreeService } from "../../api/client";
+import { getClientTree } from "../../api/client";
 
 export default function ClientView() {
   const [loading, setLoading] = useState(true);
@@ -16,22 +16,26 @@ export default function ClientView() {
   if (!clientId) {
     navigate('/admin');
   }
-
+  
   useEffect(() => {
-    async function getClientTree() {
-      const result = await getClientTreeService(clientId);
+    async function fetchClientTree() {
+      try {
+        const result = await getClientTree(clientId);
 
-      console.log(result);
-      if (result.client) {
-        setClient(result.client);
-      } else {
-        setError(result.message);
+        console.log(result);
+        if (result.client) {
+          setClient(result.client);
+        } else {
+          setError(result.message);
+        }
+
+        setLoading(false);
+      } catch ({ message }) {
+        setError(message);
       }
-
-      setLoading(false);
     }
 
-    getClientTree();
+    fetchClientTree();
   }, []);
 
   return (

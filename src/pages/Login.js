@@ -8,12 +8,12 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const login = async () => {
-    const result = await loginService({ email, password });
+    const { success, message, navTo } = await loginService({ email, password });
 
-    if (result.success) {
-      navigate(result.navTo);
+    if (success) {
+      navigate(navTo);
     } else {
-      console.log(result.message);
+      console.log(message);
     }
   };
 
