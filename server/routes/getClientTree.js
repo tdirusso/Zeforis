@@ -17,18 +17,18 @@ module.exports = async (req, res) => {
 
     const links = await Link.find({ folderId: { $in: folderIds } }).lean();
 
-    const folderToLinksMap = { root: [] };
+    const folderIdToLinksMap = { root: [] };
 
     links.forEach(link => {
       const parentFolderId = link.parentFolderId;
 
       if (!parentFolderId) {
-        folderToLinksMap.root.push(link);
+        folderIdToLinksMap.root.push(link);
       } else {
-        if (folderToLinksMap[parentFolderId]) {
-          folderToLinksMap[parentFolderId].push(link);
+        if (folderIdToLinksMap[parentFolderId]) {
+          folderIdToLinksMap[parentFolderId].push(link);
         } else {
-          folderToLinksMap[parentFolderId] = [link];
+          folderIdToLinksMap[parentFolderId] = [link];
         }
       }
     });
@@ -36,12 +36,12 @@ module.exports = async (req, res) => {
     const foldersMap = new Map(folders.map(folder => [folder._id.toString(), folder]));
 
     const clientTree = {};
-    
+
     folders.forEach(folder => {
       const parentFolderId = folder.parentFolderId;
 
       if (folder.parentFolderId) {
-        folder.links = folderToLinksMap[parentFolderId] || [];
+        folder.links = folderIdToLinksMap[parentFolderId] || [];
 
         const parentFolder = foldersMap.get(folder.parentFolderId);
 
@@ -55,7 +55,8 @@ module.exports = async (req, res) => {
           }
         }
       } else {
-        folder.links = folderToLinksMap.root;
+        folder.links = folderIdToLinksMap.root;
+        if (!folder.folders) folder.folders = [];
         clientTree.root = folder;
       }
     });

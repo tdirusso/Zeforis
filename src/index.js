@@ -13,26 +13,79 @@ import LoginPage from './pages/Login';
 import AdminMain from './pages/Admin/Main';
 import AddClient from './pages/Admin/AddCliient';
 import ClientView from './pages/Admin/ClientView';
+import FolderView from './components/global/FolderView';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#267ffd'
+    }
+  },
+  typography: {
+    fontSize: 16,
+  },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        disableRipple: true
+      },
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          boxShadow: 'none',
+          fontWeight: 400,
+          borderRadius: '6px',
+          transitionDuration: '0s',
+          '&:hover': {
+            boxShadow: 'none'
+          }
+        }
+      }
+    },
+    MuiTextField: {
+      defaultProps: {
+        InputLabelProps: {
+          sx: {
+            fontWeight: 300
+          }
+        },
+        inputProps: {
+          sx: {
+            fontWeight: 300
+          }
+        }
+      }
+    }
+  }
+});
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
-    <Router>
-      <Routes>
-        <Route path="login" element={<LoginPage />} />
-        <Route path="admin/*" element={<AdminPage />}>
-          <Route index element={<AdminMain />} />
-          <Route path="addClient" element={<AddClient />} />
-          <Route path="client/*" element={<ClientView />} />
-        </Route>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <Routes>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="admin/*" element={<AdminPage />}>
+            <Route index element={<AdminMain />} />
+            <Route path="addClient" element={<AddClient />} />
 
-        <Route path='home/*' element={<HomePage />}>
+            <Route exact path="client/:clientName/" element={<ClientView />}>
+              <Route path='folders/*' element={<FolderView />} />
+            </Route>
 
-        </Route>
+          </Route>
 
-        <Route path="*" element={<Navigate to="login" />} />
-      </Routes>
-    </Router>
+          <Route path='home/*' element={<HomePage />}>
+
+          </Route>
+
+          <Route path="*" element={<Navigate to="login" />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   </React.StrictMode>
 );

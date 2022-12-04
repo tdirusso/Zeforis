@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { addFolder as addFolderService } from "../../api/folder";
 
-export default function AddFolder() {
-
+export default function AddFolder({ parentFolderId, clientId }) {
   const [name, setName] = useState('');
 
   const addFolder = async () => {
     const result = await addFolderService({
-      name
-    }); 
- 
+      name,
+      parentFolderId,
+      clientId
+    });
+
     console.log(result);
   };
 

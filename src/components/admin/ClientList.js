@@ -8,7 +8,7 @@ export default function ClientList() {
   const [error, setError] = useState('');
 
   useEffect(() => {
- 
+
     async function getClients() {
       try {
         const { clients, message } = await getAllClients();
@@ -35,7 +35,7 @@ export default function ClientList() {
             <div key={client._id}>
               <Link
                 to={`client/${client.name}`}
-                state={{ clientId: client._id }}>
+                state={{ clientId: client._id, clientName: client.name }}>
                 {client.name}
               </Link>
             </div>

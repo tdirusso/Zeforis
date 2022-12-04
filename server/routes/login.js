@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
 
   if (!email || !password) {
     return res.json({
-      error: 'Missing credentials, please try again.'
+      message: 'Missing credentials, please try again.'
     });
   }
 
@@ -62,5 +62,9 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
+    return res.json({
+      message: error.message
+    })
   }
 };

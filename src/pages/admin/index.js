@@ -31,28 +31,8 @@ export default function Admin() {
 
   return (
     <div>
-      <BackButton/>
+      <BackButton />
       <br></br>
-      {/* First
-      <input type="text" onChange={(e) => setFirstName(e.target.value)}></input>
-      <br></br>
-      Last
-      <input type="text" onChange={(e) => setLastName(e.target.value)}></input>
-      <br></br>
-      Email
-      <input type="text" onChange={(e) => setEmail(e.target.value)}></input>
-      <br></br>
-      Password
-      <input type="text" onChange={(e) => setPassword(e.target.value)}></input>
-      <br></br>
-      <button onClick={createUser}>Add Administrator user</button>
-      <LogoutButton />
-      <br></br>
-      <br></br>
-      <AddLink />
-      <br></br>
-      <br></br>
-      <AddClient /> */}
       layout
       <Outlet />
     </div>
