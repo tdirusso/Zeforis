@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Routes, Route, Outlet } from "react-router-dom";
 import { getClientTree } from "../../api/client";
 import AddFolder from "../../components/admin/AddFolder";
-import FolderSection from "../../components/global/FolderSection";
+import FolderSection from "../../components/core/FolderSection";
 
 export default function ClientView() {
   const [loading, setLoading] = useState(true);

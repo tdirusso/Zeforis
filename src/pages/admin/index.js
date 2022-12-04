@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { addUser } from "../../api/user";
-import AddLink from "../../components/admin/AddLink";
-import LogoutButton from "../../components/global/LogoutButton";
+import LogoutButton from "../../components/core/LogoutButton";
 import useAuth from "../../hooks/useAuth";
-import AddClient from "./AddCliient";
 import { Outlet } from "react-router-dom";
-import BackButton from "../../components/global/BackButton";
+import BackButton from "../../components/core/BackButton";
+import SideNav from "../../components/core/SideNav";
+import './admin.css';
 
 export default function Admin() {
   const { user } = useAuth();
@@ -31,10 +31,11 @@ export default function Admin() {
 
   return (
     <div>
+      <SideNav />
       <BackButton />
-      <br></br>
-      layout
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
     </div>
   )
 };

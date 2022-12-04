@@ -13,7 +13,7 @@ import LoginPage from './pages/Login';
 import AdminMain from './pages/Admin/Main';
 import AddClient from './pages/Admin/AddCliient';
 import ClientView from './pages/Admin/ClientView';
-import FolderView from './components/global/FolderView';
+import FolderView from './components/core/FolderView';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -54,6 +54,13 @@ const theme = createTheme({
           sx: {
             fontWeight: 300
           }
+        }
+      },
+    },
+    MuiAlertTitle: {
+      defaultProps: {
+        sx: {
+          fontWeight: 300
         }
       }
     }

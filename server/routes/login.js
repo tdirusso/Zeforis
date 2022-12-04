@@ -53,18 +53,18 @@ module.exports = async (req, res) => {
       }
 
       return res.json({
-        message: 'The username or password are incorrect.  Please try again.'
+        message: 'Incorrect username or password.  Please try again.'
       });
     }
 
     return res.json({
-      message: `The username or password are incorrect.  Please try again.`
+      message: `Incorrect username or password.  Please try again.`
     });
   } catch (error) {
     console.log(error);
 
     return res.json({
       message: error.message
-    })
+    });
   }
 };
