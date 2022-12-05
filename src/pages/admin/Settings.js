@@ -1,8 +1,11 @@
 import { Divider, Typography } from "@mui/material";
+import { useOutletContext } from "react-router-dom";
 import ClientMenu from "../../components/admin/ClientMenu";
 import './styles/settings.css';
 
-export default function Settings({client}) {
+export default function Settings() {
+
+  const { client } = useOutletContext();
 
   return (
     <div className="Settings">
@@ -11,7 +14,7 @@ export default function Settings({client}) {
       <Typography variant="h6" gutterBottom>Clients</Typography>
       <div className="flex current-client">
         <Typography variant="body1" mr={1}>Currently viewing &ndash;</Typography>
-        <ClientMenu />
+        <ClientMenu client={client} />
       </div>
     </div>
   )

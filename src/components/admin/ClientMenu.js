@@ -5,14 +5,13 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
-export default function ClientMenu({client}) {
+export default function ClientMenu({ client, parentHandler }) {
   const [loading, setLoading] = useState(true);
   const [clients, setClients] = useState(null);
   const [error, setError] = useState('');
   const [clientId, setClientId] = useState(client?._id || '');
 
   useEffect(() => {
-
     async function getClients() {
       try {
         const { clients, message } = await getAllClients();
@@ -29,20 +28,28 @@ export default function ClientMenu({client}) {
     }
 
     getClients();
-  }, [])
+  }, []);
+
+  const thisHandleChange = e => {
+    setClientId(e.target.value);
+
+    if (parentHandler) {
+      const selectedClientObject = clients.find(client => client._id === e.target.value);
+      parentHandler(selectedClientObject);
+    }
+  };
 
   return (
-    <div style={{width: '30%'}}>
+    <>
       {
         loading ? <div><CircularProgress /></div> :
           (<FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Client</InputLabel>
+            <InputLabel id="client-label">Client</InputLabel>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="client-label"
               value={clientId}
               label="Client"
-              onChange={() => { }}>
+              onChange={thisHandleChange}>
               {
                 clients.map(client => {
                   return (
@@ -57,6 +64,6 @@ export default function ClientMenu({client}) {
             </Select>
           </FormControl>)
       }
-    </div >
+    </>
   )
 };

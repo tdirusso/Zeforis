@@ -9,27 +9,16 @@ import './admin.css';
 import Header from "../../components/core/Header";
 import { Paper } from "@mui/material";
 import './styles/index.css';
+import SelectClientModal from "../../components/admin/SelectClientModal";
 
 export default function Admin() {
   const { user } = useAuth();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const client = localStorage.getItem('client');
+  const [client, setClient] = useState(JSON.parse(localStorage.getItem('client') || null));
 
-  const createUser = async () => {
-    const result = await addUser({
-      firstName,
-      lastName,
-      password,
-      email,
-      role: 'Administrator'
-    });
-
-
-    console.log(result);
+  const changeClient = (clientObject) => {
+    localStorage.setItem('client', JSON.stringify(clientObject));
+    setClient(clientObject);
   };
 
   return (
@@ -38,8 +27,9 @@ export default function Admin() {
       <main>
         <Header />
         <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
-          {/* <BackButton /> */}
-          <Outlet client={client} />
+          {
+            client ? <Outlet context={{ client }} /> : <SelectClientModal selectHandler={changeClient} />
+          }
         </Paper>
       </main>
     </div>
