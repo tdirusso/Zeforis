@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import ClientList from "../../components/admin/ClientList";
+import ClientList from "../../components/admin/ClientMenu";
 
-export default function AdminMain() {
+export default function Dashboard() {
   return (
     <div>
       <ClientList />

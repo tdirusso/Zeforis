@@ -12,7 +12,7 @@
 }
 
 .Sidenav .container {
-  padding: 40px 15px 40px 15px;
+  padding: 30px 15px 40px 15px;
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
@@ -48,16 +48,22 @@
   margin-right: 15px;
 }
 
-.Sidenav .menu li:hover {
+.Sidenav .menu li:hover,
+.Sidenav .menu .active li {
   background-color: var(--colors-primary);
   color: white;
 }
 
-.Sidenav .menu li:hover svg {
+.Sidenav .menu li:hover svg,
+.Sidenav .menu .active svg {
   color: white;
 }
 
 .Sidenav .buttons {
   width: 85%;
   margin-bottom: 25px;
+}
+
+.Sidenav a:visited {
+  color: inherit;
 }

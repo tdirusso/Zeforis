@@ -10,10 +10,11 @@ import './index.css';
 import AdminPage from './pages/Admin';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
-import AdminMain from './pages/Admin/Main';
+import AdminDashboard from './pages/Admin/Dashboard';
 import AddClient from './pages/Admin/AddCliient';
 import ClientView from './pages/Admin/ClientView';
 import FolderView from './components/core/FolderView';
+import AdminSettings from './pages/Admin/Settings';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -67,7 +68,6 @@ const theme = createTheme({
   }
 });
 
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
@@ -77,7 +77,8 @@ root.render(
         <Routes>
           <Route path="login" element={<LoginPage />} />
           <Route path="admin/*" element={<AdminPage />}>
-            <Route index element={<AdminMain />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="settings" element={<AdminSettings />} />
             <Route path="addClient" element={<AddClient />} />
 
             <Route exact path="client/:clientName/" element={<ClientView />}>

@@ -8,7 +8,7 @@ const login = async (payload) => {
   }
 
   const success = data.token ? true : false;
-  const navTo = data.role === 'Administrator' ? '/admin' : '/home';
+  const navTo = data.role === 'Administrator' ? '/admin/dashboard' : '/home/dashboard';
   const message = data.message;
 
   return {

@@ -1,0 +1,25 @@
+.Header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Header .search-btn {
+  cursor: pointer;
+  padding: 6px 8px;
+  background: #f3f6f9;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+}
+
+.Header .search-btn span {
+  margin-left: 10px;
+  margin-right: 200px;
+  color: #3e5060;
+}
+
+.Header .search-btn:hover {
+  background: #e7ebf0b3;
+  border-color: #cdd2d7;
+}

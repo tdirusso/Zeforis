@@ -6,6 +6,9 @@ import { Outlet } from "react-router-dom";
 import BackButton from "../../components/core/BackButton";
 import SideNav from "../../components/core/SideNav";
 import './admin.css';
+import Header from "../../components/core/Header";
+import { Paper } from "@mui/material";
+import './styles/index.css';
 
 export default function Admin() {
   const { user } = useAuth();
@@ -14,7 +17,7 @@ export default function Admin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  //console.log(user)
+  const client = localStorage.getItem('client');
 
   const createUser = async () => {
     const result = await addUser({
@@ -32,9 +35,12 @@ export default function Admin() {
   return (
     <div>
       <SideNav />
-      <BackButton />
       <main>
-        <Outlet />
+        <Header />
+        <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
+          {/* <BackButton /> */}
+          <Outlet client={client} />
+        </Paper>
       </main>
     </div>
   )
