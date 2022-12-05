@@ -28,7 +28,7 @@ export default function Admin() {
         <Header />
         <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
           {
-            client ? <Outlet context={{ client }} /> : <SelectClientModal selectHandler={changeClient} />
+            client ? <Outlet context={{ client, changeClient }} /> : <SelectClientModal selectHandler={changeClient} />
           }
         </Paper>
       </main>
