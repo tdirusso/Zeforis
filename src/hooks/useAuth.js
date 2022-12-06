@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authenticateUser } from "../api/auth";
+import { authenticateUser, getToken } from "../api/auth";
 
 export default function useAuth() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
 
     if (!token) {
       navigate('/login');

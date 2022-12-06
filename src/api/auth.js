@@ -43,8 +43,13 @@ const authenticateUser = async (token) => {
   }
 };
 
+const getToken = () => {
+  return localStorage.getItem('token');
+}
+
 export {
   login,
   logout,
-  authenticateUser
+  authenticateUser,
+  getToken
 };

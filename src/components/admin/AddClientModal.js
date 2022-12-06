@@ -10,9 +10,9 @@ import { TwitterPicker } from 'react-color';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addClient } from '../../api/client';
+import { addClient, setActiveClient } from '../../api/client';
 
-export default function AddClientModal({ open, setOpen }) {
+export default function AddClientModal({ open, setOpen, hideCancel }) {
 
   const [name, setName] = useState('');
   const [brandColor, setBrandColor] = useState('#267ffd');
@@ -42,9 +42,12 @@ export default function AddClientModal({ open, setOpen }) {
         });
 
         if (client) {
-          console.log(client);
+          setActiveClient(client);
           openSnackBar('Client created.', 'success');
-          handleClose();
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+
         } else {
           openSnackBar(message, 'error');
         }
@@ -95,10 +98,12 @@ export default function AddClientModal({ open, setOpen }) {
             </Box>
           </Box>
           <DialogActions>
-            <Button
-              onClick={handleClose}>
-              Cancel
-            </Button>
+            {
+              hideCancel ? '' : <Button
+                onClick={handleClose}>
+                Cancel
+              </Button>
+            }
             <LoadingButton
               variant='contained'
               onClick={handleCreateClient}

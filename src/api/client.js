@@ -18,7 +18,7 @@ const getClientTree = async (clientId) => {
 
 const updateClient = async (payload) => {
   const { data } = await request.patch(`updateClient`, payload);
-  
+
   if (data.client) {
     localStorage.setItem('client', JSON.stringify(data.client));
   }
@@ -26,9 +26,19 @@ const updateClient = async (payload) => {
   return data;
 };
 
+const setActiveClient = (clientObject) => {
+  localStorage.setItem('client', JSON.stringify(clientObject));
+};
+
+const getActiveClient = () => {
+  return JSON.parse(localStorage.getItem('client') || null);
+}
+
 export {
   addClient,
   getAllClients,
   getClientTree,
-  updateClient
+  updateClient,
+  setActiveClient,
+  getActiveClient
 };

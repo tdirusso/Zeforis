@@ -1,7 +1,8 @@
 const theme = {
   palette: {
     primary: {
-      main: '#267ffd'
+      main: '#267ffd',
+      contrastText: '#ffffff'
     }
   },
   typography: {

@@ -7,11 +7,29 @@ import { useState } from "react";
 import AddClientModal from "../../components/admin/AddClientModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditClientModal from "../../components/admin/EditClientModal";
+import { setActiveClient } from "../../api/client";
+import useSnackbar from "../../hooks/useSnackbar";
+import Snackbar from "../../components/core/Snackbar";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const { client, changeClient } = useOutletContext();
+  const { client } = useOutletContext();
+
+  const {
+    isOpen,
+    openSnackBar,
+    type,
+    message
+  } = useSnackbar();
+
+  const changeClient = (clientObject) => {
+    setActiveClient(clientObject)
+    openSnackBar('Loading client...', 'info');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
 
   return (
     <div className="Settings">
@@ -44,15 +62,25 @@ export default function Settings() {
         </Button>
       </Box>
       <Divider sx={{ mt: 4, mb: 4 }} />
+      <Typography variant="h6" gutterBottom>Users</Typography>
+      <Divider sx={{ mt: 4, mb: 4 }} />
+      <Typography variant="h6" gutterBottom>Account</Typography>
 
       <AddClientModal
         open={createClientModalOpen}
-        setOpen={setCreateClientModalOpen} />
+        setOpen={setCreateClientModalOpen} 
+        />
 
       <EditClientModal
         open={editClientModalOpen}
         setOpen={setEditClientModalOpen}
         clientToUpdate={client}
+      />
+
+      <Snackbar
+        isOpen={isOpen}
+        type={type}
+        message={message}
       />
     </div>
   )

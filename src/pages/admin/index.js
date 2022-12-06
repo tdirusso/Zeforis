@@ -5,16 +5,20 @@ import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import './admin.css';
 import Header from "../../components/core/Header";
-import { createTheme, Paper } from "@mui/material";
+import { Box, CircularProgress, createTheme, Paper } from "@mui/material";
 import './styles/index.css';
 import SelectClientModal from "../../components/admin/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import themeConfig from "../../theme";
+import { getActiveClient, getAllClients } from "../../api/client";
+import AddClientModal from "../../components/admin/AddClientModal";
 
 export default function Admin({ theme, setTheme }) {
   const { user } = useAuth();
-  const [client] = useState(JSON.parse(localStorage.getItem('client') || null));
+  const [client] = useState(getActiveClient());
+  const [clients, setClients] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   const {
     isOpen,
@@ -24,6 +28,27 @@ export default function Admin({ theme, setTheme }) {
   } = useSnackbar();
 
   useEffect(() => {
+    async function getClients() {
+      try {
+        const { clients, message } = await getAllClients();
+
+        if (clients) {
+          setClients(clients);
+          setLoading(false);
+        } else {
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+      }
+    }
+
+    if (user) {
+      getClients();
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (client) {
       themeConfig.palette.primary.main = client.brandColor;
       setTheme(createTheme(themeConfig));
@@ -31,13 +56,35 @@ export default function Admin({ theme, setTheme }) {
     }
   }, []);
 
-  const changeClient = (clientObject) => {
-    localStorage.setItem('client', JSON.stringify(clientObject));
-    openSnackBar('Loading client...', 'info');
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
+  if (isLoading) {
+    return (
+      <Box className="flex-centered" sx={{ height: '100%' }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (clients.length === 0) {
+    return (
+      <Box className="flex-centered" sx={{ height: '100%' }}>
+        <AddClientModal
+          open={true}
+          setOpen={() => { }}
+          hideCancel={true}
+        />
+      </Box>
+    )
+  }
+
+  if (client) {
+    const clientExists = clients.some(({ _id }) => client._id === _id);
+
+    if (!clientExists) {
+      <Box className="flex-centered" sx={{ height: '100%' }}>
+        <SelectClientModal />
+      </Box>
+    }
+  }
 
   return (
     <div>
@@ -46,7 +93,7 @@ export default function Admin({ theme, setTheme }) {
         <Header />
         <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
           {
-            client ? <Outlet context={{ client, changeClient }} /> : <SelectClientModal selectHandler={changeClient} />
+            client ? <Outlet context={{ client }} /> : <SelectClientModal />
           }
         </Paper>
       </main>
