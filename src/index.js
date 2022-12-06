@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   BrowserRouter as Router,
@@ -14,96 +14,38 @@ import AdminDashboard from './pages/Admin/Dashboard';
 import ClientView from './pages/Admin/ClientView';
 import FolderView from './components/core/FolderView';
 import AdminSettings from './pages/Admin/Settings';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#267ffd'
-    }
-  },
-  typography: {
-    fontSize: 16,
-  },
-  components: {
-    MuiButton: {
-      defaultProps: {
-        disableRipple: true
-      },
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          boxShadow: 'none',
-          fontWeight: 400,
-          borderRadius: '6px',
-          transitionDuration: '0s',
-          '&:hover': {
-            boxShadow: 'none'
-          }
-        }
-      }
-    },
-    MuiLoadingButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          boxShadow: 'none',
-          fontWeight: 400,
-          borderRadius: '6px',
-          transitionDuration: '0s',
-          '&:hover': {
-            boxShadow: 'none'
-          }
-        }
-      }
-    },
-    MuiTextField: {
-      defaultProps: {
-        InputLabelProps: {
-          sx: {
-            fontWeight: 300
-          }
-        },
-        inputProps: {
-          sx: {
-            fontWeight: 300
-          }
-        }
-      },
-    },
-    MuiAlertTitle: {
-      defaultProps: {
-        sx: {
-          fontWeight: 300
-        }
-      }
-    }
-  }
-});
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import themeConfig from './theme';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-root.render(
-  <ThemeProvider theme={theme}>
-    <Router>
-      <Routes>
-        <Route path="login" element={<LoginPage />} />
-        <Route path="admin/*" element={<AdminPage />}>
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="settings" element={<AdminSettings />} />
+function App() {
+  const [theme, setTheme] = useState(createTheme(themeConfig));
 
-          <Route exact path="client/:clientName/" element={<ClientView />}>
-            <Route path='folders/*' element={<FolderView />} />
+  return (
+    <ThemeProvider theme={theme}>
+      <Router>
+        <Routes>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="admin/*" element={<AdminPage setTheme={setTheme} />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="settings" element={<AdminSettings />} />
+
+            <Route exact path="client/:clientName/" element={<ClientView />}>
+              <Route path='folders/*' element={<FolderView />} />
+            </Route>
+
           </Route>
 
-        </Route>
+          <Route path='home/*' element={<HomePage />}>
 
-        <Route path='home/*' element={<HomePage />}>
+          </Route>
 
-        </Route>
+          <Route path="*" element={<Navigate to="login" />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
+  )
+}
 
-        <Route path="*" element={<Navigate to="login" />} />
-      </Routes>
-    </Router>
-  </ThemeProvider>
-);
+root.render(<App />);

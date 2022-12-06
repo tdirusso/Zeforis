@@ -27,7 +27,7 @@ export default function SideNav() {
         />
         <div className="menu">
           <ul>
-            <NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>
+            <NavLink to="/admin/dashboard">
               <li> <GridViewIcon />Dashboard</li>
             </NavLink>
             <NavLink to="/admin/tasks">

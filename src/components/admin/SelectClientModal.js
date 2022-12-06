@@ -10,8 +10,8 @@ export default function SelectClientModal({ selectHandler }) {
   const [open, setOpen] = useState(true);
 
   const handleChange = (clientObject) => {
-    selectHandler(clientObject);
     setOpen(false);
+    selectHandler(clientObject);
   };
 
   return (

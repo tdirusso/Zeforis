@@ -48,6 +48,9 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
         if (client) {
           openSnackBar('Client updated.', 'success');
           setOpen(false);
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         } else {
           openSnackBar(message, 'error');
         }
