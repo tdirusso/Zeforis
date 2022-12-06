@@ -14,6 +14,7 @@ const addClient = require('./routes/addClient');
 const getAllClients = require('./routes/getAllClients');
 const getClientTree = require('./routes/getClientTree');
 const addFolder = require('./routes/addFolder');
+const updateClient = require('./routes/updateClient');
 
 const checkPermissionsMiddleware = require('./middlewares/checkPermissions');
 
@@ -50,6 +51,7 @@ const boot = async () => {
   app.get('/api/getAllClients', checkPermissionsMiddleware, getAllClients);
   app.get('/api/getClientTree', checkPermissionsMiddleware, getClientTree);
   app.post('/api/addFolder', checkPermissionsMiddleware, addFolder);
+  app.patch('/api/updateClient', checkPermissionsMiddleware, updateClient);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

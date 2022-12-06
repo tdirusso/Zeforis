@@ -11,6 +11,8 @@ export default function ClientMenu({ client, parentHandler }) {
   const [error, setError] = useState('');
   const [clientId, setClientId] = useState(client?._id || '');
 
+  const label = clientId ? 'Current Client' : 'Client';
+
   useEffect(() => {
     async function getClients() {
       try {
@@ -44,11 +46,11 @@ export default function ClientMenu({ client, parentHandler }) {
       {
         loading ? <div><CircularProgress /></div> :
           (<FormControl fullWidth>
-            <InputLabel id="client-label">Client</InputLabel>
+            <InputLabel id="client-label">{label}</InputLabel>
             <Select
               labelId="client-label"
               value={clientId}
-              label="Client"
+              label={label}
               onChange={thisHandleChange}>
               {
                 clients.map(client => {

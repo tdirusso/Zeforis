@@ -10,6 +10,7 @@ import { TwitterPicker } from 'react-color';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
+import { addClient } from '../../api/client';
 
 export default function AddClientModal({ open, setOpen }) {
 
@@ -25,18 +26,40 @@ export default function AddClientModal({ open, setOpen }) {
   } = useSnackbar();
 
   const handleCreateClient = () => {
+
+    if (!name) {
+      openSnackBar('Please enter a name for the new client.', 'error');
+      return;
+    }
+
     setLoading(true);
 
-    setTimeout(() => {
-      openSnackBar('Client created.', 'success');
-      handleClose();
+    setTimeout(async () => {
+      try {
+        const { client, message } = await addClient({
+          name,
+          brandColor
+        });
+
+        if (client) {
+          console.log(client);
+          openSnackBar('Client created.', 'success');
+          handleClose();
+        } else {
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }, 1000);
   };
 
   const handleClose = () => {
+    setOpen(false);
     setLoading(false);
     setName('');
-    setOpen(false);
+    setBrandColor('#267ffd');
   };
 
   return (
@@ -47,15 +70,16 @@ export default function AddClientModal({ open, setOpen }) {
           <DialogContentText>
             Please enter the client name and select a brand color below.
           </DialogContentText>
-          <Box sx={{ mt: 2, mb: 2 }}>
+          <Box sx={{ mt: 3, mb: 3 }}>
             <TextField
               label="Client Name"
               fullWidth
               autoFocus
-              disabled={isLoading}>
+              disabled={isLoading}
+              onChange={e => setName(e.target.value)}>
             </TextField>
           </Box>
-          <Box sx={{ mb: 2, mt: 2, display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ mb: 3, mt: 3, display: 'flex', alignItems: 'center' }}>
             <TwitterPicker
               color={brandColor}
               onChange={color => setBrandColor(color.hex)} />

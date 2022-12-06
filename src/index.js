@@ -11,7 +11,6 @@ import AdminPage from './pages/Admin';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import AdminDashboard from './pages/Admin/Dashboard';
-import AddClient from './pages/Admin/AddCliient';
 import ClientView from './pages/Admin/ClientView';
 import FolderView from './components/core/FolderView';
 import AdminSettings from './pages/Admin/Settings';
@@ -31,6 +30,20 @@ const theme = createTheme({
       defaultProps: {
         disableRipple: true
       },
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          boxShadow: 'none',
+          fontWeight: 400,
+          borderRadius: '6px',
+          transitionDuration: '0s',
+          '&:hover': {
+            boxShadow: 'none'
+          }
+        }
+      }
+    },
+    MuiLoadingButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
@@ -71,27 +84,26 @@ const theme = createTheme({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path="login" element={<LoginPage />} />
-          <Route path="admin/*" element={<AdminPage />}>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="settings" element={<AdminSettings />} />
-            <Route path="addClient" element={<AddClient />} />
+  <ThemeProvider theme={theme}>
+    <Router>
+      <Routes>
+        <Route path="login" element={<LoginPage />} />
+        <Route path="admin/*" element={<AdminPage />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="settings" element={<AdminSettings />} />
 
-            <Route exact path="client/:clientName/" element={<ClientView />}>
-              <Route path='folders/*' element={<FolderView />} />
-            </Route>
-
+          <Route exact path="client/:clientName/" element={<ClientView />}>
+            <Route path='folders/*' element={<FolderView />} />
           </Route>
 
-          <Route path='home/*' element={<HomePage />}>
+        </Route>
 
-          </Route>
+        <Route path='home/*' element={<HomePage />}>
 
-          <Route path="*" element={<Navigate to="login" />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+        </Route>
+
+        <Route path="*" element={<Navigate to="login" />} />
+      </Routes>
+    </Router>
+  </ThemeProvider>
 );

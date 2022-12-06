@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { addUser } from "../../api/user";
 import LogoutButton from "../../components/core/LogoutButton";
 import useAuth from "../../hooks/useAuth";
 import { Outlet } from "react-router-dom";
