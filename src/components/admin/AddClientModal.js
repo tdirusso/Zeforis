@@ -2,7 +2,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, TextField } from '@mui/material';
@@ -14,8 +14,10 @@ import { addClient, setActiveClient } from '../../api/client';
 
 export default function AddClientModal({ open, setOpen, hideCancel }) {
 
-  const [name, setName] = useState('');
+  const name = useRef();
   const [brandColor, setBrandColor] = useState('#267ffd');
+  const [logoSrc, setLogoSrc] = useState('');
+  const [logoFile, setLogoFile] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -26,8 +28,9 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
   } = useSnackbar();
 
   const handleCreateClient = () => {
+    const nameVal = name.current.value;
 
-    if (!name) {
+    if (!nameVal) {
       openSnackBar('Please enter a name for the new client.', 'error');
       return;
     }
@@ -36,10 +39,12 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
 
     setTimeout(async () => {
       try {
-        const { client, message } = await addClient({
-          name,
-          brandColor
-        });
+        const fd = new FormData();
+        fd.append('logoFile', logoFile);
+        fd.append('name', nameVal);
+        fd.append('brandColor', brandColor);
+
+        const { client, message } = await addClient(fd);
 
         if (client) {
           setActiveClient(client);
@@ -47,9 +52,9 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
           setTimeout(() => {
             window.location.reload();
           }, 500);
-
         } else {
           openSnackBar(message, 'error');
+          setLoading(false);
         }
       } catch (error) {
         openSnackBar(error.message, 'error');
@@ -61,13 +66,31 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
   const handleClose = () => {
     setOpen(false);
     setLoading(false);
-    setName('');
     setBrandColor('#267ffd');
+    setLogoSrc('');
+    setLogoFile(null);
+    name.current.value = '';
+  };
+
+  const handleLogoChange = e => {
+    const imageFile = e.target.files[0];
+
+    if (!imageFile) {
+      return;
+    };
+
+    setLogoSrc(URL.createObjectURL(imageFile));
+    setLogoFile(imageFile);
+  };
+
+  const handleLogoClear = () => {
+    setLogoSrc('');
+    setLogoFile(null);
   };
 
   return (
     <div>
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create New Client</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -79,7 +102,8 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
               fullWidth
               autoFocus
               disabled={isLoading}
-              onChange={e => setName(e.target.value)}>
+              inputRef={name}
+            >
             </TextField>
           </Box>
           <Box sx={{ mb: 3, mt: 3, display: 'flex', alignItems: 'center' }}>
@@ -96,6 +120,35 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
                 ml: 4
               }}>
             </Box>
+          </Box>
+          <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
+            <Button 
+            variant='outlined' 
+            component='label'
+             sx={{ mr: 1 }}
+             disabled={isLoading}>
+              Upload Logo
+              <input
+                hidden
+                accept="image/png,image/jpeg"
+                type="file"
+                onChange={handleLogoChange}
+                disabled={isLoading}
+              />
+            </Button>
+            <Button
+              sx={{
+                display: logoSrc ? 'block' : 'none',
+                mr: 4
+              }}
+              onClick={handleLogoClear}
+              disabled={isLoading}>
+              Clear
+            </Button>
+            <img
+              src={logoSrc}
+              alt=""
+              width={125} />
           </Box>
           <DialogActions>
             {
@@ -118,6 +171,6 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
         type={type}
         message={message}
       />
-    </div>
+    </div >
   );
 };

@@ -1,18 +1,20 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
 import './styles/SideNav.css';
-import appleLogo from '../../assets/apple-logo.svg';
 import GridViewIcon from '@mui/icons-material/GridView';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
 
-export default function SideNav() {
+export default function SideNav({ client }) {
   return (
     <Box className="Sidenav">
       <div className="flex-centered container">
-        <img src={appleLogo} alt="" width={45} />
-        <Typography variant="body1" mt={1}>Apple</Typography>
+        <img 
+        //src={client.logoUrl} 
+        alt="[[pic here]]" width={45} 
+        />
+        <Typography variant="body1" mt={1}>{client.name}</Typography>
         <Typography variant="body1" mt={2} color="primary">
           <strong>Your Digital Dashboard</strong>
         </Typography>

@@ -7,7 +7,11 @@ const Client = new Schema(
       type: String,
       required: true
     },
-    brandColor: String
+    brandColor: String,
+    logoUrl: {
+      type: String,
+      default: ''
+    }
   },
   {
     versionKey: false

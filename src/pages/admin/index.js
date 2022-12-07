@@ -49,7 +49,7 @@ export default function Admin({ theme, setTheme }) {
   }, [user]);
 
   useEffect(() => {
-    if (client) {
+    if (client && client.brandColor) {
       themeConfig.palette.primary.main = client.brandColor;
       setTheme(createTheme(themeConfig));
       document.documentElement.style.setProperty('--colors-primary', client.brandColor);
@@ -61,7 +61,7 @@ export default function Admin({ theme, setTheme }) {
       <Box className="flex-centered" sx={{ height: '100%' }}>
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
   if (clients.length === 0) {
@@ -73,28 +73,29 @@ export default function Admin({ theme, setTheme }) {
           hideCancel={true}
         />
       </Box>
-    )
+    );
   }
 
+  let clientExists = false;
   if (client) {
-    const clientExists = clients.some(({ _id }) => client._id === _id);
+    clientExists = clients.some(({ _id }) => client._id === _id);
+  }
 
-    if (!clientExists) {
+  if (!clientExists) {
+    return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
         <SelectClientModal />
       </Box>
-    }
+    );
   }
 
   return (
     <div>
-      <SideNav theme={theme} />
+      <SideNav theme={theme} client={client} />
       <main>
         <Header />
         <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
-          {
-            client ? <Outlet context={{ client }} /> : <SelectClientModal />
-          }
+          <Outlet context={{ client }} />
         </Paper>
       </main>
 
@@ -104,5 +105,5 @@ export default function Admin({ theme, setTheme }) {
         message={message}
       />
     </div>
-  )
+  );
 };

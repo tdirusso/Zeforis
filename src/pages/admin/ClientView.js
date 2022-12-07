@@ -6,7 +6,7 @@ import AddFolder from "../../components/admin/AddFolder";
 import FolderSection from "../../components/core/FolderSection";
 
 export default function ClientView() {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [clientTree, setClientTree] = useState(null);
   const [error, setError] = useState('');
 
@@ -82,7 +82,7 @@ export default function ClientView() {
   return (
     <div>
       {
-        loading ? <div>loading...</div> :
+        isLoading ? <div>loading...</div> :
           <div>
             <br></br>
             {clientName}

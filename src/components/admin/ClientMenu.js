@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
 export default function ClientMenu({ client, parentHandler }) {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [clients, setClients] = useState(null);
   const [error, setError] = useState('');
   const [clientId, setClientId] = useState(client?._id || '');
@@ -44,7 +44,7 @@ export default function ClientMenu({ client, parentHandler }) {
   return (
     <>
       {
-        loading ? <div><CircularProgress /></div> :
+        isLoading ? <div><CircularProgress /></div> :
           (<FormControl fullWidth>
             <InputLabel id="client-label">{label}</InputLabel>
             <Select

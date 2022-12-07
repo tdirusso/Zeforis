@@ -2,9 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const Mongoose = require('mongoose');
 const path = require('path');
-
-const app = express();
-const port = process.env.PORT || 8080;
+const fileUpload = require('express-fileupload');
 
 const addUser = require('./routes/addUser');
 const login = require('./routes/login');
@@ -17,6 +15,9 @@ const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
 
 const checkPermissionsMiddleware = require('./middlewares/checkPermissions');
+
+const app = express();
+const port = process.env.PORT || 8080;
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname + '/../', 'build')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(fileUpload({}));
 
 const boot = async () => {
   const dbUsername = process.env.DB_USERNAME;
@@ -55,6 +57,6 @@ const boot = async () => {
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));
-}
+};
 
 boot();

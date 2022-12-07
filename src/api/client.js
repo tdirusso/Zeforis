@@ -32,7 +32,7 @@ const setActiveClient = (clientObject) => {
 
 const getActiveClient = () => {
   return JSON.parse(localStorage.getItem('client') || null);
-}
+};
 
 export {
   addClient,
