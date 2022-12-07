@@ -45,6 +45,7 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
         fd.append('name', nameVal);
         fd.append('brandColor', brandColor);
         fd.append('isLogoChanged', isLogoChanged);
+        fd.append('clientId', clientToUpdate._id);
 
         const { client, message } = await updateClient(fd);
 
@@ -140,7 +141,7 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
             </Button>
             <Button
               sx={{
-                display: logoSrc ? 'block' : 'none',
+                display: logoSrc && !isLogoLoading ? 'block' : 'none',
                 mr: 2
               }}
               disabled={isLoading}
@@ -155,7 +156,7 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
               sx={{ display: isLogoLoading ? 'block' : 'none' }}>
             </Skeleton>
             <img
-              src={logoSrc}
+              //src={logoSrc}
               alt=""
               width={125}
               onLoad={() => setLogoLoading(false)}

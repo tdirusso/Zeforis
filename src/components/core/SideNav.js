@@ -12,7 +12,7 @@ export default function SideNav({ client }) {
       <div className="flex-centered container">
         <img 
         //src={client.logoUrl} 
-        alt="[[pic here]]" width={45} 
+        alt="" width={45} 
         />
         <Typography variant="body1" mt={1}>{client.name}</Typography>
         <Typography variant="body1" mt={2} color="primary">
