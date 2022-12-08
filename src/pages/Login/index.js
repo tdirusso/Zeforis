@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { login } from "../api/auth";
+import { useRef, useState } from "react";
+import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -7,31 +7,36 @@ import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import { Link } from "react-router-dom";
-import Snackbar from "../components/core/Snackbar";
-import useSnackbar from "../hooks/useSnackbar";
+import Snackbar from "../../components/core/Snackbar";
+import useSnackbar from "../../hooks/useSnackbar";
 import './Login.css';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const email = useRef();
+  const password = useRef();
   const [isLoading, setLoading] = useState(false);
+
   const {
     isOpen,
     openSnackBar,
     type,
     message
   } = useSnackbar();
+
   const navigate = useNavigate();
 
   const handleLogin = e => {
     e.preventDefault();
 
-    if (!email) {
+    const emailVal = email.current.value;
+    const passwordVal = password.current.value;
+
+    if (!emailVal) {
       openSnackBar('Please enter a valid email address', 'error');
       return;
     }
 
-    if (!password) {
+    if (!passwordVal) {
       openSnackBar('Please enter your password', 'error');
       return;
     }
@@ -39,7 +44,10 @@ export default function LoginPage() {
     setLoading(true);
 
     setTimeout(async () => {
-      const { success, message, navTo } = await login({ email, password });
+      const { success, message, navTo } = await login({
+        email: emailVal,
+        password: passwordVal
+      });
 
       if (success) {
         navigate(navTo);
@@ -57,19 +65,21 @@ export default function LoginPage() {
         <form onSubmit={handleLogin}>
           <TextField
             label="Email"
-            onChange={e => setEmail(e.target.value)}
             variant="outlined"
             sx={{ mb: 4 }}
             type="email"
             required
+            inputRef={email}
+            disabled={isLoading}
           />
           <TextField
             label="Password"
-            onChange={e => setPassword(e.target.value)}
             variant="outlined"
             type="password"
             sx={{ mb: 0.5 }}
             required
+            inputRef={password}
+            disabled={isLoading}
           />
           <Box component="span" sx={{ textAlign: 'right', mb: 3.5 }}>
             <Typography
@@ -96,5 +106,5 @@ export default function LoginPage() {
         message={message}
       />
     </div>
-  )
+  );
 };

@@ -7,12 +7,19 @@ module.exports = async (req, res) => {
     firstName,
     lastName,
     password,
-    role
+    role,
+    accountId
   } = req.body;
+
+  if (!accountId) {
+    return res.json({
+      message: 'Missing accountId.'
+    });
+  }
 
   if (!email || !password) {
     return res.json({
-      error: 'Missing email and/or password.'
+      message: 'Missing email and/or password.'
     });
   }
 
@@ -23,7 +30,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const userExists = await User.exists({ email });
+    const userExists = await User.exists({ email, accountId });
 
     if (userExists) {
       return res.json({

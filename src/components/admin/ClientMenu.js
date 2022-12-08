@@ -8,7 +8,7 @@ import Select from '@mui/material/Select';
 export default function ClientMenu({ client, parentHandler }) {
   const [isLoading, setLoading] = useState(true);
   const [clients, setClients] = useState(null);
-  const [error, setError] = useState('');
+  const [, setError] = useState('');
   const [clientId, setClientId] = useState(client?._id || '');
 
   const label = clientId ? 'Current Client' : 'Client';

@@ -150,8 +150,8 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
             </Button>
             <Skeleton
               variant='circular'
-              width={125}
-              height={125}
+              width={70}
+              height={70}
               animation='wave'
               sx={{ display: isLogoLoading ? 'block' : 'none' }}>
             </Skeleton>

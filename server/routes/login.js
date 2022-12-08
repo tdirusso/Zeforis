@@ -26,7 +26,8 @@ module.exports = async (req, res) => {
           role,
           firstName,
           lastName,
-          email
+          email,
+          accountId
         } = user;
 
         const token = jwt.sign(
@@ -36,7 +37,8 @@ module.exports = async (req, res) => {
               role,
               firstName,
               lastName,
-              email
+              email,
+              accountId
             }
           },
           process.env.SECRET_KEY,

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, Routes, Route, Outlet } from "react-router-dom";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { getClientTree } from "../../api/client";
 import AddFolder from "../../components/admin/AddFolder";
 import FolderSection from "../../components/core/FolderSection";
@@ -8,7 +8,7 @@ import FolderSection from "../../components/core/FolderSection";
 export default function ClientView() {
   const [isLoading, setLoading] = useState(true);
   const [clientTree, setClientTree] = useState(null);
-  const [error, setError] = useState('');
+  const [, setError] = useState('');
 
   const locationData = useLocation();
   const { clientId, clientName } = locationData.state;
@@ -42,11 +42,11 @@ export default function ClientView() {
 
   const renderTree = (node) => {
 
-    const linkElements = node.links.map(link => {
-      return (
-        <a key={link._id} href={link.url}>{link.name}</a>
-      )
-    });
+    // const linkElements = node.links.map(link => {
+    //   return (
+    //     <a key={link._id} href={link.url}>{link.name}</a>
+    //   )
+    // });
 
     const folderSections = node.folders.map(folder => {
       return (

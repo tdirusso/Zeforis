@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Client = new Schema(
+const Account = new Schema(
   {
     name: {
-      type: String,
-      required: true
-    },
-    accountId: {
       type: String,
       required: true
     },
@@ -22,4 +18,4 @@ const Client = new Schema(
   }
 );
 
-module.exports = mongoose.model('clients', Client);
+module.exports = mongoose.model('accounts', Account);

@@ -5,6 +5,19 @@ const User = new Schema(
   {
     firstName: String,
     lastName: String,
+    ownerOfAccountId: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      ref: 'accounts'
+    },
+    adminOfClientIds: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: 'clients'
+    },
+    userOfClientIds: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: 'clients'
+    },
     email: {
       type: String,
       lowercase: true,
@@ -20,6 +33,12 @@ const User = new Schema(
       required: true,
       enum: ['Client', 'Administrator'],
       default: 'Client'
+    },
+    invitationCode: String,
+    verificationCode: String,
+    isVerified: {
+      type: Boolean,
+      default: false
     },
     jwtToken: String
   },
