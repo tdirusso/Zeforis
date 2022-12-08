@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from "react";
 import { login } from "../../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const email = useRef();
   const password = useRef();
   const [isLoading, setLoading] = useState(false);
+  const { search } = useLocation();
 
   const {
     isOpen,
@@ -24,6 +26,12 @@ export default function LoginPage() {
   } = useSnackbar();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (new URLSearchParams(search).get('postVerify')) {
+      openSnackBar('Email successfuly verified.', 'success');
+    }
+  }, []);
 
   const handleLogin = e => {
     e.preventDefault();
@@ -100,6 +108,13 @@ export default function LoginPage() {
           </LoadingButton>
         </form>
       </Paper>
+      <Typography
+        variant="p"
+        component={Link}
+        to="/register"
+        sx={{ mt: 3 }}>
+        No account?  Register here.
+      </Typography>
       <Snackbar
         isOpen={isOpen}
         type={type}

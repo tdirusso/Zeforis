@@ -72,29 +72,29 @@ export default function RegisterPage() {
               label="First name"
               variant="outlined"
               sx={{ mr: 1 }}
-              type="email"
               required
               inputRef={firstName}
               disabled={isLoading}
+              autoComplete="off"
             />
             <TextField
               label="Last name"
               variant="outlined"
               sx={{ ml: 1 }}
-              type="email"
               required
               inputRef={lastName}
               disabled={isLoading}
+              autoComplete="off"
             />
           </Box>
           <TextField
             label="Org / Company name"
             variant="outlined"
             sx={{ mb: 4 }}
-            type="email"
             required
             inputRef={orgName}
             disabled={isLoading}
+            autoComplete="off"
           />
           <TextField
             label="Email"
@@ -128,7 +128,7 @@ export default function RegisterPage() {
           <Typography
             variant="p"
             component={Link}
-            to="">
+            to="/login">
             Have an account?  Sign in here.
           </Typography>
         </Box>

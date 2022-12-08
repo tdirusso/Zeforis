@@ -13,6 +13,8 @@ const getAllClients = require('./routes/getAllClients');
 const getClientTree = require('./routes/getClientTree');
 const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
+const register = require('./routes/register');
+const verify = require('./routes/verify');
 
 const checkPermissionsMiddleware = require('./middlewares/checkPermissions');
 
@@ -52,7 +54,9 @@ const boot = async () => {
   app.post('/api/addClient', checkPermissionsMiddleware, addClient);
   app.get('/api/getAllClients', checkPermissionsMiddleware, getAllClients);
   app.get('/api/getClientTree', checkPermissionsMiddleware, getClientTree);
+  app.get('/api/verify', verify);
   app.post('/api/addFolder', checkPermissionsMiddleware, addFolder);
+  app.post('/api/register', register);
   app.patch('/api/updateClient', checkPermissionsMiddleware, updateClient);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));

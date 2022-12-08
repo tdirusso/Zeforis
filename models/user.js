@@ -12,10 +12,12 @@ const User = new Schema(
     },
     adminOfClientIds: {
       type: [mongoose.SchemaTypes.ObjectId],
+      default: [],
       ref: 'clients'
     },
     userOfClientIds: {
       type: [mongoose.SchemaTypes.ObjectId],
+      default: [],
       ref: 'clients'
     },
     email: {
@@ -40,6 +42,7 @@ const User = new Schema(
       type: Boolean,
       default: false
     },
+    orgName: String,
     jwtToken: String
   },
   {

@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
 
   if (!firstName || !lastName) {
     return res.json({
-      error: 'Missing first or last name.'
+      message: 'Missing first or last name.'
     });
   }
 
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
 
     if (userExists) {
       return res.json({
-        error: `"${email}" is already in use.  Please login instead.`
+        message: `"${email}" is already in use.  Please login instead.`
       });
     }
 

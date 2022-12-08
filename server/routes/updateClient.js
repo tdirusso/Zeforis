@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
 
   if (!name || !brandColor) {
     return res.json({
-      error: 'Missing client name.'
+      message: 'Missing client name.'
     });
   }
 
