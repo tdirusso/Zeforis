@@ -31,18 +31,16 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="register-success" element={<RegisterSuccessPage />} />
+
           <Route path="admin/*" element={<AdminPage setTheme={setTheme} />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="settings" element={<AdminSettings />} />
-
             <Route exact path="client/:clientName/" element={<ClientView />}>
               <Route path='folders/*' element={<FolderView />} />
             </Route>
-
           </Route>
 
           <Route path='home/*' element={<HomePage />}>
-
           </Route>
 
           <Route path="*" element={<Navigate to="login" />} />

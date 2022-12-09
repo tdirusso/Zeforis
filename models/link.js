@@ -5,7 +5,8 @@ const Link = new Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
     url: {
       type: String,

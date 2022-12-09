@@ -1,24 +1,30 @@
 const jwt = require('jsonwebtoken');
+const User = require('../../models/user');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
 module.exports = async (req, res) => {
-  const { token } = req.body;
+  const token = req.headers['x-access-token'];
 
   if (!token) {
     return res.json({
-      message: 'No token provided.'
+      message: 'Unauthorized.'
     });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-    return res.json({
-      user: decoded.user
-    });
+    const userId = decoded.user.id;
+
+    const user = await User.findById(userId).select('-password -jwtToken')
+      .populate('adminOfClientIds')
+      .populate('userOfClientIds')
+      .lean();
+
+    return res.json({ user });
   } catch (error) {
     console.log(error);
 

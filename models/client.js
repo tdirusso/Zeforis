@@ -5,11 +5,13 @@ const Client = new Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
     accountId: {
-      type: String,
-      required: true
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      ref: 'accounts'
     },
     brandColor: String,
     logoUrl: {

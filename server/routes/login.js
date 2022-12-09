@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../../models/user');
+const Client = require('../../models/client');
 const jwt = require('jsonwebtoken');
 
 if (process.env.NODE_ENV === 'development') {
@@ -7,7 +8,10 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 module.exports = async (req, res) => {
-  const { email, password } = req.body;
+  const {
+    email,
+    password
+  } = req.body;
 
   if (!email || !password) {
     return res.json({
@@ -22,23 +26,10 @@ module.exports = async (req, res) => {
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
-        const {
-          role,
-          firstName,
-          lastName,
-          email,
-          accountId
-        } = user;
-
         const token = jwt.sign(
           {
             user: {
-              id: user._id,
-              role,
-              firstName,
-              lastName,
-              email,
-              accountId
+              id: user._id
             }
           },
           process.env.SECRET_KEY,
@@ -48,10 +39,13 @@ module.exports = async (req, res) => {
         user.jwtToken = token;
         await user.save();
 
-        return res.json({
-          token,
-          role
-        });
+        let redirectUrl = '/home/dashboard';
+
+        if (user.adminOfClientIds.length > 0 || user.ownerOfAccountId) {
+          redirectUrl = '/admin/dashboard';
+        }
+
+        return res.json({ token, redirectUrl });
       }
 
       return res.json({

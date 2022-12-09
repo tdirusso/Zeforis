@@ -5,16 +5,17 @@ if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
-
 module.exports = async (req, res, next) => {
-  let { token } = req.body;
-
+  const token = req.headers['x-access-token'];
+  
   if (!token) {
-    token = req.headers['x-access-token'];
+    return res.json({ message: 'Unauthorized.' });
+  }
 
-    if (!token) {
-      return res.json({ message: 'Unauthorized.' });
-    }
+  const { clientId, accountId } = req.body;
+
+  if (!clientId && !accountId) {
+    return res.json({ message: 'Unauthorized.' });
   }
 
   try {
@@ -23,12 +24,22 @@ module.exports = async (req, res, next) => {
     const userId = decoded.user.id;
     const user = await User.findById(userId);
 
-    if (user.role === 'Administrator') {
-      req.userId = userId;
-      return next();
+    if (user) {
+      if (user.ownerOfAccountId?.toString() === accountId) {
+        return next();
+      } else {
+        const isAdminOfClient = user.adminOfClientIds.some(objectId => objectId.toString() === clientId);
+
+        if (isAdminOfClient) {
+          return next();
+        } else {
+          return res.json({ message: 'Unauthorized.' });
+        }
+      }
     }
 
-    return res.json({ message: 'Invalid permissions.' });
+    return res.json({ message: 'Invalid user.' });
+
   } catch (error) {
     console.log(error);
     return res.json({ message: error.message });

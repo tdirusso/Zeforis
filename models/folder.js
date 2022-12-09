@@ -5,7 +5,8 @@ const Folder = new Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
     clientId: {
       type: String,

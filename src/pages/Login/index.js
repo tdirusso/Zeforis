@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
+import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const email = useRef();
   const password = useRef();
   const [isLoading, setLoading] = useState(false);
+  const [loginType, setLoginType] = useState('');
   const { search } = useLocation();
 
   const {
@@ -52,19 +54,23 @@ export default function LoginPage() {
     setLoading(true);
 
     setTimeout(async () => {
-      const { success, message, navTo } = await login({
+      const result = await login({
         email: emailVal,
         password: passwordVal
       });
 
-      if (success) {
-        navigate(navTo);
+      if (result.token) {
+        navigate(result.redirectUrl);
       } else {
         setLoading(false);
-        openSnackBar(message, 'error');
+        openSnackBar(result.message, 'error');
       }
     }, 1000);
   };
+
+  if (!loginType) {
+    return <ChooseLoginType setLoginType={setLoginType} />;
+  }
 
   return (
     <div className="Login flex-centered">
@@ -123,3 +129,22 @@ export default function LoginPage() {
     </div>
   );
 };
+
+function ChooseLoginType({ setLoginType }) {
+  return (
+    <div className="Login flex-centered">
+       <Paper sx={{ p: 8, pt: 5 }} className="container">
+        <Typography variant="body1">Please choose the appropriate environment.</Typography>
+        <Box sx={{mt: 3}}>
+          <Button variant="outlined" sx={{mb:2}} size="large">
+            Administrator Portal
+          </Button>
+          <br></br>
+          <Button variant="outlined" size="large">
+            Client Portal
+          </Button>
+        </Box>
+       </Paper>
+    </div>
+  );
+}

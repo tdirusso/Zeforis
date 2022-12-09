@@ -17,9 +17,10 @@ export default function useAuth() {
     }
 
     async function authenticate() {
-      const { user } = await authenticateUser(token);
+      const { user } = await authenticateUser();
 
       if (user) {
+        console.log(user);
         setUser(user);
       } else {
         navigate('/login');

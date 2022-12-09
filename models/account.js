@@ -5,12 +5,18 @@ const Account = new Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
     brandColor: String,
     logoUrl: {
       type: String,
       default: ''
+    },
+    clients: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: 'clients',
+      default: []
     }
   },
   {

@@ -16,7 +16,7 @@ const updateClient = require('./routes/updateClient');
 const register = require('./routes/register');
 const verify = require('./routes/verify');
 
-const checkPermissionsMiddleware = require('./middlewares/checkPermissions');
+const checkPermissionsMW = require('./middlewares/checkPermissions');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -47,17 +47,17 @@ const boot = async () => {
 
   await Mongoose.connect(dbUri);
 
-  app.post('/api/addUser', checkPermissionsMiddleware, addUser);
+  app.post('/api/addUser', checkPermissionsMW, addUser);
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
-  app.post('/api/addLink', checkPermissionsMiddleware, addLink);
-  app.post('/api/addClient', checkPermissionsMiddleware, addClient);
-  app.get('/api/getAllClients', checkPermissionsMiddleware, getAllClients);
-  app.get('/api/getClientTree', checkPermissionsMiddleware, getClientTree);
+  app.post('/api/addLink', checkPermissionsMW, addLink);
+  app.post('/api/addClient', checkPermissionsMW, addClient);
+  app.get('/api/getAllClients', checkPermissionsMW, getAllClients);
+  app.get('/api/getClientTree', checkPermissionsMW, getClientTree);
   app.get('/api/verify', verify);
-  app.post('/api/addFolder', checkPermissionsMiddleware, addFolder);
+  app.post('/api/addFolder', checkPermissionsMW, addFolder);
   app.post('/api/register', register);
-  app.patch('/api/updateClient', checkPermissionsMiddleware, updateClient);
+  app.patch('/api/updateClient', checkPermissionsMW, updateClient);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

@@ -3,11 +3,16 @@ const Schema = mongoose.Schema;
 
 const User = new Schema(
   {
-    firstName: String,
-    lastName: String,
+    firstName: {
+      type: String,
+      trim: true
+    },
+    lastName: {
+      type: String,
+      trim: true
+    },
     ownerOfAccountId: {
       type: mongoose.SchemaTypes.ObjectId,
-      required: true,
       ref: 'accounts'
     },
     adminOfClientIds: {
@@ -15,34 +20,32 @@ const User = new Schema(
       default: [],
       ref: 'clients'
     },
-    userOfClientIds: {
+    memberOfClientIds: {
       type: [mongoose.SchemaTypes.ObjectId],
       default: [],
       ref: 'clients'
+    },
+    memberOfAccountIds: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      default: [],
+      ref: 'accounts',
     },
     email: {
       type: String,
       lowercase: true,
       uninque: true,
-      required: true
+      required: true,
+      trim: true
     },
     password: {
       type: String,
       required: true
     },
-    role: {
-      type: String,
-      required: true,
-      enum: ['Client', 'Administrator'],
-      default: 'Client'
-    },
-    invitationCode: String,
     verificationCode: String,
     isVerified: {
       type: Boolean,
       default: false
     },
-    orgName: String,
     jwtToken: String
   },
   {

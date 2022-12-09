@@ -7,15 +7,7 @@ const login = async (payload) => {
     localStorage.setItem('token', data.token);
   }
 
-  const success = data.token ? true : false;
-  const navTo = data.role === 'Administrator' ? '/admin/dashboard' : '/home/dashboard';
-  const message = data.message;
-
-  return {
-    success,
-    navTo,
-    message
-  };
+  return data;
 };
 
 const logout = () => {
@@ -23,29 +15,19 @@ const logout = () => {
   window.location.href = '/login';
 };
 
-const authenticateUser = async (token) => {
-  const { data } = await request.post(`authenticate`, { token });
+const authenticateUser = async () => {
+  const { data } = await request.post(`authenticate`);
 
-  if (data.user) {
-    if (data.user.role !== 'Administrator' && window.location.pathname.includes('admin')) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-
-    return {
-      user: data.user
-    };
+  if (!data.user) {
+    localStorage.removeItem('token');
   }
 
-  localStorage.removeItem('token');
-  return {
-    message: data.message
-  }
+  return data;
 };
 
 const getToken = () => {
   return localStorage.getItem('token');
-}
+};
 
 export {
   login,
