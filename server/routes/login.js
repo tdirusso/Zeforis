@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const User = require('../../models/user');
-const Client = require('../../models/client');
 const jwt = require('jsonwebtoken');
 
 if (process.env.NODE_ENV === 'development') {
@@ -10,7 +9,8 @@ if (process.env.NODE_ENV === 'development') {
 module.exports = async (req, res) => {
   const {
     email,
-    password
+    password,
+    loginType
   } = req.body;
 
   if (!email || !password) {
@@ -39,13 +39,17 @@ module.exports = async (req, res) => {
         user.jwtToken = token;
         await user.save();
 
-        let redirectUrl = '/home/dashboard';
-
-        if (user.adminOfClientIds.length > 0 || user.ownerOfAccountId) {
-          redirectUrl = '/admin/dashboard';
+        if (loginType === 'admin') {
+          if (user.adminOfClients.length === 0 && !user.ownerOfAccount) {
+            return res.json({
+              message: 'Your are not the owner or administrator for any accounts.  Please '
+            });
+          } else {
+            return res.json({ token, redirectUrl: '/admin/dashboard' });
+          }
         }
 
-        return res.json({ token, redirectUrl });
+        return res.json({ token, redirectUrl: '/home/dashboard' });
       }
 
       return res.json({

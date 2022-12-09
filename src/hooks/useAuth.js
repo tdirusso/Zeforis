@@ -7,6 +7,8 @@ export default function useAuth() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const portalType = window.location.pathname.includes('admin') ? 'admin' : 'client';
+
   useEffect(() => {
     const token = getToken();
 
@@ -21,7 +23,19 @@ export default function useAuth() {
 
       if (user) {
         console.log(user);
-        setUser(user);
+
+        if (portalType === 'admin') {
+          const { adminOfClients, ownerOfAccount } = user;
+
+          if (adminOfClients.length === 0 && !ownerOfAccount) {
+            navigate('/login');
+            //TODO allow user to create account for admin
+          } else {
+            setUser(user);
+          }
+        } else {
+          setUser(user);
+        }
       } else {
         navigate('/login');
       }

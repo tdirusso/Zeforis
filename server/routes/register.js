@@ -43,7 +43,8 @@ module.exports = async (req, res) => {
       lastName,
       email,
       password: await bcrypt.hash(password, 10),
-      ownerOfAccountId: account._id,
+      ownerOfAccount: account._id,
+      memberOfAccounts: [account._id],
       verificationCode
     });
 

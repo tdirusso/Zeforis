@@ -11,21 +11,21 @@ const User = new Schema(
       type: String,
       trim: true
     },
-    ownerOfAccountId: {
+    ownerOfAccount: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'accounts'
     },
-    adminOfClientIds: {
+    adminOfClients: {
       type: [mongoose.SchemaTypes.ObjectId],
       default: [],
       ref: 'clients'
     },
-    memberOfClientIds: {
+    memberOfClients: {
       type: [mongoose.SchemaTypes.ObjectId],
       default: [],
       ref: 'clients'
     },
-    memberOfAccountIds: {
+    memberOfAccounts: {
       type: [mongoose.SchemaTypes.ObjectId],
       default: [],
       ref: 'accounts',
@@ -46,7 +46,11 @@ const User = new Schema(
       type: Boolean,
       default: false
     },
-    jwtToken: String
+    jwtToken: String,
+    createdAt: {
+      type: Number,
+      default: () => Date.now()
+    }
   },
   {
     versionKey: false

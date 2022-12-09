@@ -6,8 +6,16 @@ const register = async (payload) => {
   return data;
 };
 
+const getActiveAccount = () => {
+  return JSON.parse(localStorage.getItem('account') || null);
+};
 
+const setActiveAccount = (accountObject) => {
+  localStorage.setItem('account', JSON.stringify(accountObject));
+};
 
 export {
-  register
+  register,
+  getActiveAccount,
+  setActiveAccount
 };
