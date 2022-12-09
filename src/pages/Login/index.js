@@ -7,20 +7,16 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import BuildIcon from '@mui/icons-material/Build';
-import CloudIcon from '@mui/icons-material/Cloud';
 import './Login.css';
 
 export default function LoginPage() {
   const email = useRef();
   const password = useRef();
   const [isLoading, setLoading] = useState(false);
-  const [showedVerified, setShowedVerified] = useState(false);
-  const [loginType, setLoginType] = useState('');
+  const { search } = useLocation();
 
   const {
     isOpen,
@@ -30,6 +26,13 @@ export default function LoginPage() {
   } = useSnackbar();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (new URLSearchParams(search).get('postVerify')) {
+      openSnackBar('Email successfuly verified.', 'success');
+    }
+  }, []);
+
 
   const handleLogin = e => {
     e.preventDefault();
@@ -52,12 +55,11 @@ export default function LoginPage() {
     setTimeout(async () => {
       const result = await login({
         email: emailVal,
-        password: passwordVal,
-        loginType
+        password: passwordVal
       });
 
       if (result.token) {
-        navigate(result.redirectUrl);
+        navigate('/home/dashboard');
       } else {
         setLoading(false);
         openSnackBar(result.message, 'error');
@@ -65,32 +67,10 @@ export default function LoginPage() {
     }, 1000);
   };
 
-  if (!loginType) {
-    return <ChooseLoginType
-      setLoginType={setLoginType}
-      showedVerified={showedVerified}
-      setShowedVerified={setShowedVerified}
-    />;
-  }
-
   return (
     <div className="Login flex-centered">
       <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 1 }}>Sign in</Typography>
-        <Typography variant="body1" sx={{ mb: 2 }} color="primary" className="flex-centered">
-          {loginType === 'admin' ?
-            <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> :
-            <CloudIcon fontSize="small" sx={{ mr: 0.5 }} />}
-          {loginType === 'admin' ?
-            'Administrator Portal' :
-            'Client Portal'}
-        </Typography>
-        <Button
-          sx={{ mb: 5 }}
-          variant="outlined"
-          onClick={() => setLoginType('')}>
-          Change Environment
-        </Button >
+        <Typography variant="h5" sx={{ mb: 5 }}>Sign in</Typography>
         <form onSubmit={handleLogin}>
           <TextField
             label="Email"
@@ -145,62 +125,3 @@ export default function LoginPage() {
     </div>
   );
 };
-
-function ChooseLoginType({ setLoginType, showedVerified, setShowedVerified }) {
-  const { search } = useLocation();
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
-
-  useEffect(() => {
-    if (!showedVerified) {
-      if (new URLSearchParams(search).get('postVerify')) {
-        openSnackBar('Email successfuly verified.', 'success');
-        setShowedVerified(true);
-      }
-    }
-  }, []);
-
-  return (
-    <div className="Login flex-centered">
-      <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="body1">Please choose the appropriate environment.</Typography>
-        <Box sx={{ mt: 6 }}>
-          <Button
-            variant="outlined"
-            sx={{ mb: 2 }}
-            size="large"
-            onClick={() => setLoginType('admin')}
-            startIcon={<BuildIcon fontSize="large" />}>
-            Administrator Portal
-          </Button>
-          <br></br>
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{ mb: 6 }}
-            onClick={() => setLoginType('client')}
-            startIcon={<CloudIcon fontSize="large" />}>
-            Client Portal
-          </Button>
-          <br></br>
-          <Typography
-            variant="p"
-            component={Link}
-            to="/register">
-            No account?  Register here.
-          </Typography>
-        </Box>
-      </Paper>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
-    </div>
-  );
-}

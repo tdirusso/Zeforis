@@ -8,7 +8,7 @@ const Client = new Schema(
       required: true,
       trim: true
     },
-    accountId: {
+    account: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
       ref: 'accounts'

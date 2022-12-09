@@ -7,15 +7,14 @@ import {
   Navigate
 } from 'react-router-dom';
 import './index.css';
-import AdminPage from './pages/Admin';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
-import AdminDashboard from './pages/Admin/Dashboard';
-import ClientView from './pages/Admin/ClientView';
+import Dashboard from './pages/Home/Dashboard';
+import ClientView from './pages/Home/ClientView';
 import FolderView from './components/core/FolderView';
-import AdminSettings from './pages/Admin/Settings';
+import Settings from './pages/Home/Settings';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 
@@ -32,17 +31,14 @@ function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="register-success" element={<RegisterSuccessPage />} />
 
-          <Route path="admin/*" element={<AdminPage setTheme={setTheme} />}>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="settings" element={<AdminSettings />} />
+          <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="settings" element={<Settings />} />
             <Route exact path="client/:clientName/" element={<ClientView />}>
               <Route path='folders/*' element={<FolderView />} />
             </Route>
           </Route>
-
-          <Route path='home/*' element={<HomePage />}>
-          </Route>
-
+          
           <Route path="*" element={<Navigate to="login" />} />
         </Routes>
       </Router>

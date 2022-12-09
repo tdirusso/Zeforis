@@ -9,9 +9,8 @@ if (process.env.NODE_ENV === 'development') {
 module.exports = async (req, res) => {
   const {
     email,
-    password,
-    loginType
-  } = req.body;
+    password
+    } = req.body;
 
   if (!email || !password) {
     return res.json({
@@ -39,17 +38,7 @@ module.exports = async (req, res) => {
         user.jwtToken = token;
         await user.save();
 
-        if (loginType === 'admin') {
-          if (user.adminOfClients.length === 0 && !user.ownerOfAccount) {
-            return res.json({
-              message: 'Your are not the owner or administrator for any accounts.  Please '
-            });
-          } else {
-            return res.json({ token, redirectUrl: '/admin/dashboard' });
-          }
-        }
-
-        return res.json({ token, redirectUrl: '/home/dashboard' });
+        return res.json({ token });
       }
 
       return res.json({

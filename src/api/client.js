@@ -34,11 +34,31 @@ const getActiveClient = () => {
   return JSON.parse(localStorage.getItem('client') || null);
 };
 
+const getUserClientListForAccount = (user, activeAccountId) => {
+  const result = [];
+
+
+  user.adminOfClients.forEach(client => {
+    if (client.account === activeAccountId) {
+      result.push({ ...client, access: 'admin' });
+    }
+  });
+
+  user.memberOfClients.forEach(client => {
+    if (client.account === activeAccountId) {
+      result.push({ ...client, access: 'member' });
+    }
+  });
+
+  return result;
+};
+
 export {
   addClient,
   getAllClients,
   getClientTree,
   updateClient,
   setActiveClient,
-  getActiveClient
+  getActiveClient,
+  getUserClientListForAccount
 };

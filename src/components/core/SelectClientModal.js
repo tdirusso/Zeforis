@@ -2,9 +2,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import ClientMenu from './ClientMenu';
+import ClientMenu from '../admin/ClientMenu';
 import useSnackbar from "../../hooks/useSnackbar";
-import Snackbar from "../../components/core/Snackbar";
+import Snackbar from "./Snackbar";
 import { setActiveClient } from '../../api/client';
 
 export default function SelectClientModal() {

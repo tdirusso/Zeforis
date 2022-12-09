@@ -14,7 +14,7 @@ import Snackbar from "../../components/core/Snackbar";
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const { client } = useOutletContext();
+  const { client, clients } = useOutletContext();
 
   const {
     isOpen,
@@ -25,7 +25,7 @@ export default function Settings() {
 
   const changeClient = (clientObject) => {
     setActiveClient(clientObject)
-    openSnackBar('Loading client...', 'info');
+    openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -37,7 +37,11 @@ export default function Settings() {
       <Divider sx={{ mb: 3 }} />
       <Typography variant="h6" gutterBottom>Clients</Typography>
       <Box sx={{ width: '225px', mt: 3 }}>
-        <ClientMenu client={client} parentHandler={changeClient} />
+        <ClientMenu
+         client={client}
+          clients={clients}
+           parentHandler={changeClient}
+           />
         <Button
           variant="outlined"
           sx={{ mt: 2, mr: 2 }}

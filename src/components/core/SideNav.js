@@ -29,16 +29,16 @@ export default function SideNav({ client }) {
         />
         <div className="menu">
           <ul>
-            <NavLink to="/admin/dashboard">
+            <NavLink to="/home/dashboard">
               <li> <GridViewIcon />Dashboard</li>
             </NavLink>
-            <NavLink to="/admin/tasks">
+            <NavLink to="/home/tasks">
               <li><TaskAltIcon />Tasks</li>
             </NavLink>
-            <NavLink to="/admin/folders">
+            <NavLink to="/home/folders">
               <li><FolderIcon />Folders</li>
             </NavLink>
-            <NavLink to="/admin/settings">
+            <NavLink to="/home/settings">
               <li><SettingsIcon /> Settings</li>
             </NavLink>
 

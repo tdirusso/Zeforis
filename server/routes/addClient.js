@@ -1,5 +1,6 @@
 const Client = require('../../models/client');
 const Folder = require('../../models/folder');
+const User = require('../../models/user');
 const s3 = require('../../aws/s3');
 const sharp = require('sharp');
 
@@ -8,8 +9,11 @@ const acceptMimes = ['image/png', 'image/jpeg'];
 module.exports = async (req, res) => {
   const {
     name,
-    brandColor
+    brandColor,
+    accountId
   } = req.body;
+
+  const { userId } = req;
 
   const logoFile = req.files?.logoFile;
 
@@ -22,14 +26,17 @@ module.exports = async (req, res) => {
   try {
     const client = await Client.create({
       name,
-      brandColor
+      brandColor,
+      account: accountId
     });
 
     await Folder.create({
       name: 'root',
-      clientId: client._id.toString(),
+      client: client._id,
       parentFolderId: ''
     });
+
+    await User.updateOne({ _id: userId }, { $push: { adminOfClients: client._id } });
 
     if (logoFile) {
       if (acceptMimes.includes(logoFile.mimetype)) {

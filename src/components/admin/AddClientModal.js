@@ -12,7 +12,7 @@ import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { addClient, setActiveClient } from '../../api/client';
 
-export default function AddClientModal({ open, setOpen, hideCancel }) {
+export default function AddClientModal({ open, setOpen, hideCancel, accountId }) {
 
   const name = useRef();
   const [brandColor, setBrandColor] = useState('#267ffd');
@@ -43,6 +43,7 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
         fd.append('logoFile', logoFile);
         fd.append('name', nameVal);
         fd.append('brandColor', brandColor);
+        fd.append('accountId', accountId);
 
         const { client, message } = await addClient(fd);
 
@@ -122,11 +123,11 @@ export default function AddClientModal({ open, setOpen, hideCancel }) {
             </Box>
           </Box>
           <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
-            <Button 
-            variant='outlined' 
-            component='label'
-             sx={{ mr: 1 }}
-             disabled={isLoading}>
+            <Button
+              variant='outlined'
+              component='label'
+              sx={{ mr: 1 }}
+              disabled={isLoading}>
               Upload Logo
               <input
                 hidden
