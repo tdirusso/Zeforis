@@ -32,21 +32,23 @@ module.exports = async (req, res) => {
       });
     }
 
-    const account = await Account.create({
-      name: orgName
-    });
-
     const verificationCode = Math.floor(1000 + Math.random() * 9000);
 
-    await User.create({
+    const newUser = await User.create({
       firstName,
       lastName,
       email,
       password: await bcrypt.hash(password, 10),
-      ownerOfAccount: account._id,
-      memberOfAccounts: [account._id],
       verificationCode
     });
+
+    const account = await Account.create({
+      name: orgName,
+      createdBy: newUser._id
+    });
+
+    newUser.memberOfAccounts = [account._id];
+    await newUser.save();
 
     await sendVerifyEmail(email, verificationCode);
 

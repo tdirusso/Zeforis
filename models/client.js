@@ -17,6 +17,16 @@ const Client = new Schema(
     logoUrl: {
       type: String,
       default: ''
+    },
+    members: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      default: [],
+      ref: 'users'
+    },
+    admins: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      default: [],
+      ref: 'users'
     }
   },
   {

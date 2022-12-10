@@ -14,7 +14,7 @@ import Snackbar from "../../components/core/Snackbar";
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const { client, clients } = useOutletContext();
+  const { client, clients, account } = useOutletContext();
 
   const {
     isOpen,
@@ -24,7 +24,7 @@ export default function Settings() {
   } = useSnackbar();
 
   const changeClient = (clientObject) => {
-    setActiveClient(clientObject)
+    setActiveClient(clientObject);
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
@@ -38,10 +38,10 @@ export default function Settings() {
       <Typography variant="h6" gutterBottom>Clients</Typography>
       <Box sx={{ width: '225px', mt: 3 }}>
         <ClientMenu
-         client={client}
+          client={client}
           clients={clients}
-           parentHandler={changeClient}
-           />
+          parentHandler={changeClient}
+        />
         <Button
           variant="outlined"
           sx={{ mt: 2, mr: 2 }}
@@ -66,14 +66,15 @@ export default function Settings() {
         </Button>
       </Box>
       <Divider sx={{ mt: 4, mb: 4 }} />
-      <Typography variant="h6" gutterBottom>Users</Typography>
+      <Typography variant="h6" gutterBottom>{account.name} Users</Typography>
       <Divider sx={{ mt: 4, mb: 4 }} />
       <Typography variant="h6" gutterBottom>Account</Typography>
 
       <AddClientModal
         open={createClientModalOpen}
-        setOpen={setCreateClientModalOpen} 
-        />
+        setOpen={setCreateClientModalOpen}
+        accountId={account._id}
+      />
 
       <EditClientModal
         open={editClientModalOpen}
@@ -87,5 +88,5 @@ export default function Settings() {
         message={message}
       />
     </div>
-  )
+  );
 };

@@ -102,7 +102,7 @@ export default function Admin({ theme, setTheme }) {
       <main>
         <Header />
         <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
-          <Outlet context={{ client, clients }} />
+          <Outlet context={{ client, clients, account }} />
         </Paper>
       </main>
 

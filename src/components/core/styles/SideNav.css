@@ -64,6 +64,6 @@
   margin-bottom: 25px;
 }
 
-.Sidenav a:visited {
+.Sidenav a:visited, .Sidenav a {
   color: inherit;
 }

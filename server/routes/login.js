@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
   const {
     email,
     password
-    } = req.body;
+  } = req.body;
 
   if (!email || !password) {
     return res.json({
@@ -25,10 +25,28 @@ module.exports = async (req, res) => {
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
+        var populateQuery = [
+          {path:'adminOfClients'}, 
+          {path:'memberOfClients'}
+        ];
+
+        // await user.populate('adminOfClients')
+        //   .populate('memberOfClients')
+        //   .populate('memberOfAccounts')
+        //   .populate('ownerOfAccount')
+        //   .lean();
+        await User.populate(user, populateQuery);
+
+        console.log(user);
+
         const token = jwt.sign(
           {
             user: {
-              id: user._id
+              id: user._id,
+              adminOfClients: user.adminOfClients,
+              memberOfClients: user.memberOfClients,
+              memberOfAccounts: user.memberOfAccounts,
+              ownerOfAccount: user.ownerOfAccount
             }
           },
           process.env.SECRET_KEY,

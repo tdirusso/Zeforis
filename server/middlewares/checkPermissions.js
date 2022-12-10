@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/user');
+const Account = require('../../models/account');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -27,6 +28,23 @@ module.exports = async (req, res, next) => {
     req.userId = user._id;
 
     if (user) {
+      if (clientId) {
+        
+
+      } else {
+        const account = await Account.findById(accountId);
+
+        if (!account) {
+          return res.json({ message: 'Unknown account.' });
+        } else if (user._id === account.createdBy.toString()) {
+          return next();
+        } else {
+          return res.json({message: 'You are not the account owner.'})
+        }
+      }
+     
+     
+     
       if (user.ownerOfAccount?.toString() === accountId) {
         return next();
       } else {

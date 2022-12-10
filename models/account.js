@@ -13,10 +13,10 @@ const Account = new Schema(
       type: String,
       default: ''
     },
-    clients: {
-      type: [mongoose.SchemaTypes.ObjectId],
-      ref: 'clients',
-      default: []
+    createdBy: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'users',
+      required: true
     }
   },
   {

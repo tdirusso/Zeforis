@@ -20,7 +20,6 @@ module.exports = async (req, res) => {
     const userId = decoded.user.id;
 
     const user = await User.findById(userId).select('-password -jwtToken')
-      .populate('adminOfClients')
       .populate('memberOfAccounts')
       .lean();
 
