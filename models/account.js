@@ -17,6 +17,11 @@ const Account = new Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'users',
       required: true
+    },
+    members: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: 'users',
+      default: []
     }
   },
   {

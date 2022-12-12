@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
 
   if (!name) {
     return res.json({
-      MediaKeyMessageEvent: 'Missing client name.'
+      message: 'Missing client name.'
     });
   }
 

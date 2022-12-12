@@ -1,3 +1,8 @@
 .main-content {
   padding: 75px;
 }
+
+main {
+  margin-left: 275px;
+  padding: 40px 20px 40px 20px;
+}

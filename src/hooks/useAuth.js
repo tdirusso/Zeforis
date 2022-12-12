@@ -5,6 +5,8 @@ import { authenticateUser, getToken } from "../api/auth";
 
 export default function useAuth() {
   const [user, setUser] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
 
@@ -18,26 +20,22 @@ export default function useAuth() {
     }
 
     async function authenticate() {
-      const { user } = await authenticateUser();
+      const { user, message } = await authenticateUser();
 
       if (user) {
         console.log(user);
-
-        const { adminOfClients, ownerOfAccount } = user;
-
-        if (adminOfClients.length === 0 && !ownerOfAccount) {
-          navigate('/login');
-          //TODO allow user to create account for admin
-        } else {
-          setUser(user);
-        }
+        setUser(user);
+        setLoading(false);
       } else {
+        setError(message);
         navigate('/login');
       }
     }
   }, []);
 
   return {
-    user
+    user,
+    isUserLoading: isLoading,
+    authError: error
   };
 }

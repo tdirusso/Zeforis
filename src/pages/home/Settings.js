@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import ClientMenu from "../../components/admin/ClientMenu";
 import EditIcon from '@mui/icons-material/Edit';
 import './styles/settings.css';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddClientModal from "../../components/admin/AddClientModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditClientModal from "../../components/admin/EditClientModal";
@@ -14,7 +14,19 @@ import Snackbar from "../../components/core/Snackbar";
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const { client, clients, account } = useOutletContext();
+  const { client, clients, account, settingsData } = useOutletContext();
+  const [isLoading, setLoading] = useState(false);
+  
+
+  useEffect(() => {
+    async function getSettingsData() {
+
+    }
+
+    if (!settingsData) {
+      getSettingsData();
+    }
+  }, []);
 
   const {
     isOpen,

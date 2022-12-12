@@ -4,9 +4,9 @@ import ClientList from "../../components/admin/ClientMenu";
 export default function Dashboard() {
   return (
     <div>
-      <ClientList />
+      {/* <ClientList />
       <br></br>
-      <Link to="addClient" ><button>Add Client</button></Link>
+      <Link to="addClient" ><button>Add Client</button></Link> */}
     </div>
   )
 };

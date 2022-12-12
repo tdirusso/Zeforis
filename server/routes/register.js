@@ -44,7 +44,8 @@ module.exports = async (req, res) => {
 
     const account = await Account.create({
       name: orgName,
-      createdBy: newUser._id
+      createdBy: newUser._id,
+      members: [newUser._id]
     });
 
     newUser.memberOfAccounts = [account._id];

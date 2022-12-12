@@ -46,7 +46,10 @@ const User = new Schema(
       type: Boolean,
       default: false
     },
-    jwtToken: String,
+    needsUpdatedJWT: {
+      type: Boolean,
+      default: false
+    },
     createdAt: {
       type: Number,
       default: () => Date.now()

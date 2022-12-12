@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/user');
-const Account = require('../../models/account');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -25,40 +24,57 @@ module.exports = async (req, res, next) => {
     const userId = decoded.user.id;
     const user = await User.findById(userId).lean();
 
-    req.userId = user._id;
-
     if (user) {
-      if (clientId) {
-        
+      req.user = user;
 
-      } else {
-        const account = await Account.findById(accountId);
+      if (user.needsUpdatedJWT) {
+        await User.populate(user, [
+          { path: 'adminOfClients', select: '_id name account' },
+          { path: 'memberOfClients', select: '_id name account' },
+          { path: 'memberOfAccounts', select: '_id name' },
+          { path: 'ownerOfAccount', select: '_id name' }
+        ]);
 
-        if (!account) {
-          return res.json({ message: 'Unknown account.' });
-        } else if (user._id === account.createdBy.toString()) {
-          return next();
-        } else {
-          return res.json({message: 'You are not the account owner.'})
-        }
+        const userTokenData = {
+          user: {
+            id: user._id,
+            adminOfClients: user.adminOfClients,
+            memberOfClients: user.memberOfClients,
+            memberOfAccounts: user.memberOfAccounts,
+            ownerOfAccount: user.ownerOfAccount
+          }
+        };
+
+        const token = jwt.sign(userTokenData,
+          process.env.SECRET_KEY,
+          { expiresIn: 86400 }
+        );
+
+        user.needsUpdatedJWT = false;
+        await user.save();
+
+        return res.json({ updatedToken: token });
       }
-     
-     
-     
-      if (user.ownerOfAccount?.toString() === accountId) {
-        return next();
-      } else {
-        const isAdminOfClient = user.adminOfClients.some(objectId => objectId.toString() === clientId);
 
+      if (clientId) {
+        const isAdminOfClient = user.adminOfClients.some(objectId => objectId.toString() === clientId);
         if (isAdminOfClient) {
           return next();
         } else {
           return res.json({ message: 'Unauthorized.' });
         }
+      } else {
+        const isOwnerOfAccount = user.ownerOfAccount._id === accountId;
+
+        if (isOwnerOfAccount) {
+          return next();
+        } else {
+          return res.json({ message: 'Unauthorized' });
+        }
       }
     }
 
-    return res.json({ message: 'Invalid user.' });
+    return res.json({ message: 'Unknown user.' });
 
   } catch (error) {
     console.log(error);

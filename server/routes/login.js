@@ -25,36 +25,15 @@ module.exports = async (req, res) => {
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
-        var populateQuery = [
-          {path:'adminOfClients'}, 
-          {path:'memberOfClients'}
-        ];
-
-        // await user.populate('adminOfClients')
-        //   .populate('memberOfClients')
-        //   .populate('memberOfAccounts')
-        //   .populate('ownerOfAccount')
-        //   .lean();
-        await User.populate(user, populateQuery);
-
-        console.log(user);
-
         const token = jwt.sign(
           {
             user: {
-              id: user._id,
-              adminOfClients: user.adminOfClients,
-              memberOfClients: user.memberOfClients,
-              memberOfAccounts: user.memberOfAccounts,
-              ownerOfAccount: user.ownerOfAccount
+              id: user._id
             }
           },
           process.env.SECRET_KEY,
           { expiresIn: 86400 }
         );
-
-        user.jwtToken = token;
-        await user.save();
 
         return res.json({ token });
       }

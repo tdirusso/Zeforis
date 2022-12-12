@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
-import './admin.css';
 import Header from "../../components/core/Header";
 import { Box, CircularProgress, createTheme, Paper } from "@mui/material";
 import './styles/index.css';
@@ -15,12 +14,15 @@ import { getActiveClient, getUserClientListForAccount } from "../../api/client";
 import AddClientModal from "../../components/admin/AddClientModal";
 import { getActiveAccount, setActiveAccount } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
+import { getInitialBatch } from "../../api/user";
 
-export default function Admin({ theme, setTheme }) {
-  const { user } = useAuth();
+export default function Home({ theme, setTheme }) {
+  const { user, authError } = useAuth();
   const [client] = useState(getActiveClient());
   const [account] = useState(getActiveAccount());
   const [isLoading, setLoading] = useState(true);
+
+  const [userData, setUserData] = useState(null);
 
   const {
     isOpen,
@@ -30,10 +32,23 @@ export default function Admin({ theme, setTheme }) {
   } = useSnackbar();
 
   useEffect(() => {
-    if (user) {
-      setLoading(false);
+    async function fetchInitialBatch() {
+      const { batchData, message } = await getInitialBatch();
+      if (batchData) {
+        setUserData(batchData.userData);
+        setLoading(false);
+      } else {
+        openSnackBar(message, 'error');
+      }
     }
-  }, [user]);
+
+
+    if (user) {
+      fetchInitialBatch();
+    } else if (authError) {
+      openSnackBar(authError, 'error');
+    }
+  }, [user, authError]);
 
   useEffect(() => {
     if (client && client.brandColor) {
@@ -52,7 +67,7 @@ export default function Admin({ theme, setTheme }) {
   }
 
   if (!account) {
-    if (user.memberOfAccounts.length === 1) {
+    if (userData.memberOfAccounts.length === 1) {
       setActiveAccount(user.memberOfAccounts[0]);
     } else {
       return (
@@ -102,7 +117,13 @@ export default function Admin({ theme, setTheme }) {
       <main>
         <Header />
         <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
-          <Outlet context={{ client, clients, account }} />
+          <Outlet
+            context={{
+              client,
+              clients,
+              account,
+            }}
+          />
         </Paper>
       </main>
 
