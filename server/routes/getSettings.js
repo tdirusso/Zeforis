@@ -20,7 +20,10 @@ module.exports = async (req, res) => {
       { path: 'admins' }
     ]).lean();
 
-    const account = await Account.findById(accountId).populate('members').lean();
+    const account = await Account.findById(accountId).populate([
+      { path: 'members' },
+      { path: 'admins' }
+    ]).lean();
 
     return res.json({ settings: { client, account } });
 

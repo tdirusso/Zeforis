@@ -22,6 +22,11 @@ const Account = new Schema(
       type: [mongoose.SchemaTypes.ObjectId],
       ref: 'users',
       default: []
+    },
+    admins: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: 'users',
+      default: []
     }
   },
   {

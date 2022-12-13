@@ -4,7 +4,6 @@ const Mongoose = require('mongoose');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 
-const addUser = require('./routes/addUser');
 const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
 const addLink = require('./routes/addLink');
@@ -48,7 +47,6 @@ const boot = async () => {
 
   await Mongoose.connect(dbUri);
 
-  app.post('/api/addUser', checkPermissionsMW, addUser);
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
   app.post('/api/addLink', checkPermissionsMW, addLink);

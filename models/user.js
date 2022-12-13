@@ -38,8 +38,7 @@ const User = new Schema(
       trim: true
     },
     password: {
-      type: String,
-      required: true
+      type: String
     },
     verificationCode: String,
     isVerified: {

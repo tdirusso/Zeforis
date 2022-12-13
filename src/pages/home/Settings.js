@@ -17,7 +17,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
-import ConstructionIcon from '@mui/icons-material/Construction';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import InviteClientMemberModal from "../../components/admin/InviteClientMemberModal";
 
@@ -44,7 +43,6 @@ export default function Settings() {
     async function fetchSettingsData() {
       const { settings, message } = await getSettingsData(account._id, client._id);
 
-      console.log(settings);
       if (settings) {
         setClientMembers(settings.client.members);
         setClientAdmins(settings.client.admins);
@@ -188,7 +186,7 @@ export default function Settings() {
                 <ListItem
                   secondaryAction={
                     <IconButton edge="end" aria-label="delete">
-                      <ClearIcon />
+                      <EditIcon fontSize="small"/>
                     </IconButton>
                   }>
                   <ListItemText

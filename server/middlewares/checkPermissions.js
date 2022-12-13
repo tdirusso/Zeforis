@@ -31,8 +31,8 @@ module.exports = async (req, res, next) => {
       req.userId = user._id;
 
       if (clientId) {
-        const isAdminOfClient = user.adminOfClients.some(objectId => objectId.toString() === clientId);
-
+        const isAdminOfClient = user.adminOfClients.some(({_id}) => _id.toString() === clientId);
+        
         if (isAdminOfClient) {
           return next();
         } else {

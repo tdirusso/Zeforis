@@ -12,7 +12,6 @@ import useSnackbar from '../../hooks/useSnackbar';
 import { setActiveClientId, updateClient } from '../../api/client';
 
 export default function EditClientModal({ open, setOpen, clientToUpdate }) {
-
   const name = useRef(clientToUpdate.name);
   const [brandColor, setBrandColor] = useState(clientToUpdate.brandColor);
   const [logoSrc, setLogoSrc] = useState(clientToUpdate.logoUrl);
