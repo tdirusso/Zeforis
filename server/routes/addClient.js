@@ -27,7 +27,8 @@ module.exports = async (req, res) => {
     const client = await Client.create({
       name,
       brandColor,
-      account: accountId
+      account: accountId,
+      admins: [userId]
     });
 
     await Folder.create({

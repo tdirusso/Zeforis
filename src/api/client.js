@@ -58,6 +58,12 @@ const removeActiveClientId = () => {
   localStorage.removeItem('activeClientId');
 };
 
+const inviteClientMember = async (payload) => {
+  const { data } = await request.post(`inviteClientMember`, payload);
+
+  return data;
+};
+
 export {
   addClient,
   getAllClients,
@@ -67,5 +73,6 @@ export {
   getActiveClientId,
   getUserClientListForAccount,
   getSettingsData,
-  removeActiveClientId
+  removeActiveClientId,
+  inviteClientMember
 };

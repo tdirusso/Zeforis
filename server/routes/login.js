@@ -22,6 +22,10 @@ module.exports = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user) {
+      if (!user.isVerified) {
+        return res.json({ message: 'Please verify your email address.' });
+      }
+      
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
