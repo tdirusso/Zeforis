@@ -4,7 +4,7 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import Header from "../../components/core/Header";
-import { Box, CircularProgress, createTheme, Paper } from "@mui/material";
+import { Box, createTheme, Paper } from "@mui/material";
 import './styles/index.css';
 import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
@@ -14,6 +14,7 @@ import { getActiveClientId, getUserClientListForAccount } from "../../api/client
 import AddClientModal from "../../components/admin/AddClientModal";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
+import Loader from "../../components/core/Loader";
 
 export default function Home({ theme, setTheme }) {
   let activeAccountId = getActiveAccountId();
@@ -39,7 +40,6 @@ export default function Home({ theme, setTheme }) {
         });
 
         if (activeAccount) {
-          console.log(activeAccount);
           setAccount(activeAccount);
         }
       }
@@ -50,6 +50,12 @@ export default function Home({ theme, setTheme }) {
         });
 
         if (activeClient) {
+          if (activeClient.brandColor) {
+            document.documentElement.style.setProperty('--colors-primary', activeClient.brandColor);
+            themeConfig.palette.primary.main = activeClient.brandColor;
+            setTheme(createTheme(themeConfig));
+          }
+
           setClient(activeClient);
         }
       }
@@ -60,20 +66,8 @@ export default function Home({ theme, setTheme }) {
     }
   }, [user, authError]);
 
-  useEffect(() => {
-    if (client && client.brandColor) {
-      themeConfig.palette.primary.main = client.brandColor;
-      setTheme(createTheme(themeConfig));
-      document.documentElement.style.setProperty('--colors-primary', client.brandColor);
-    }
-  }, []);
-
   if (isLoading) {
-    return (
-      <Box className="flex-centered" sx={{ height: '100%' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Loader />;
   }
 
   if (!activeAccountId) {

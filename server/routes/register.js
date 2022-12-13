@@ -49,6 +49,7 @@ module.exports = async (req, res) => {
     });
 
     newUser.memberOfAccounts = [account._id];
+    newUser.ownerOfAccount = account._id;
     await newUser.save();
 
     await sendVerifyEmail(email, verificationCode);

@@ -22,49 +22,24 @@ module.exports = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
     const userId = decoded.user.id;
-    const user = await User.findById(userId).lean();
+    const user = await User.findById(userId)
+      .populate('ownerOfAccount')
+      .populate('adminOfClients')
+      .lean();
 
     if (user) {
-      req.user = user;
-
-      if (user.needsUpdatedJWT) {
-        await User.populate(user, [
-          { path: 'adminOfClients', select: '_id name account' },
-          { path: 'memberOfClients', select: '_id name account' },
-          { path: 'memberOfAccounts', select: '_id name' },
-          { path: 'ownerOfAccount', select: '_id name' }
-        ]);
-
-        const userTokenData = {
-          user: {
-            id: user._id,
-            adminOfClients: user.adminOfClients,
-            memberOfClients: user.memberOfClients,
-            memberOfAccounts: user.memberOfAccounts,
-            ownerOfAccount: user.ownerOfAccount
-          }
-        };
-
-        const token = jwt.sign(userTokenData,
-          process.env.SECRET_KEY,
-          { expiresIn: 86400 }
-        );
-
-        user.needsUpdatedJWT = false;
-        await user.save();
-
-        return res.json({ updatedToken: token });
-      }
+      req.userId = user._id;
 
       if (clientId) {
         const isAdminOfClient = user.adminOfClients.some(objectId => objectId.toString() === clientId);
+
         if (isAdminOfClient) {
           return next();
         } else {
           return res.json({ message: 'Unauthorized.' });
         }
       } else {
-        const isOwnerOfAccount = user.ownerOfAccount._id === accountId;
+        const isOwnerOfAccount = user.ownerOfAccount._id.toString() === accountId;
 
         if (isOwnerOfAccount) {
           return next();

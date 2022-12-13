@@ -48,6 +48,12 @@ const getUserClientListForAccount = (user, activeAccountId) => {
   return result;
 };
 
+const getSettingsData = async (accountId, clientId) => {
+  const { data } = await request.get(`getSettings?accountId=${accountId}&clientId=${clientId}`);
+
+  return data;
+};
+
 export {
   addClient,
   getAllClients,
@@ -55,5 +61,6 @@ export {
   updateClient,
   setActiveClientId,
   getActiveClientId,
-  getUserClientListForAccount
+  getUserClientListForAccount,
+  getSettingsData
 };

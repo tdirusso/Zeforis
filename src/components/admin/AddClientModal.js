@@ -13,7 +13,6 @@ import useSnackbar from '../../hooks/useSnackbar';
 import { addClient, setActiveClientId } from '../../api/client';
 
 export default function AddClientModal({ open, setOpen, hideCancel, accountId }) {
-
   const name = useRef();
   const [brandColor, setBrandColor] = useState('#267ffd');
   const [logoSrc, setLogoSrc] = useState('');

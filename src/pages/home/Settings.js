@@ -7,15 +7,17 @@ import { useEffect, useState } from "react";
 import AddClientModal from "../../components/admin/AddClientModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditClientModal from "../../components/admin/EditClientModal";
-import { setActiveClientId } from "../../api/client";
+import { getSettingsData, setActiveClientId } from "../../api/client";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
+import Loader from "../../components/core/Loader";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const { client, clients, account } = useOutletContext();
-  const [isLoading, setLoading] = useState(false);
+  const [settingsData, setSettingsData] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   const {
     isOpen,
@@ -24,6 +26,22 @@ export default function Settings() {
     message
   } = useSnackbar();
 
+  useEffect(() => {
+    async function fetchSettingsData() {
+      const { settings, message } = await getSettingsData(account._id, client._id);
+
+      console.log(settings)
+      if (settings) {
+        setSettingsData(settings);
+        setLoading(false);
+      } else {
+        openSnackBar(message, 'error');
+      }
+    }
+
+    fetchSettingsData();
+  }, []);
+
   const changeClient = (clientObject) => {
     setActiveClientId(clientObject._id);
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
@@ -31,6 +49,10 @@ export default function Settings() {
       window.location.reload();
     }, 1000);
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className="Settings">

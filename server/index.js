@@ -11,6 +11,7 @@ const addLink = require('./routes/addLink');
 const addClient = require('./routes/addClient');
 const getAllClients = require('./routes/getAllClients');
 const getClientTree = require('./routes/getClientTree');
+const getSettings = require('./routes/getSettings');
 const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
 const register = require('./routes/register');
@@ -55,6 +56,7 @@ const boot = async () => {
   app.get('/api/getAllClients', checkPermissionsMW, getAllClients);
   app.get('/api/getClientTree', checkPermissionsMW, getClientTree);
   app.get('/api/verify', verify);
+  app.get('/api/getSettings', getSettings);
   app.post('/api/addFolder', checkPermissionsMW, addFolder);
   app.post('/api/register', register);
   app.patch('/api/updateClient', checkPermissionsMW, updateClient);
