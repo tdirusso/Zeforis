@@ -7,26 +7,15 @@ import { useEffect, useState } from "react";
 import AddClientModal from "../../components/admin/AddClientModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditClientModal from "../../components/admin/EditClientModal";
-import { setActiveClient } from "../../api/client";
+import { setActiveClientId } from "../../api/client";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const { client, clients, account, settingsData } = useOutletContext();
+  const { client, clients, account } = useOutletContext();
   const [isLoading, setLoading] = useState(false);
-  
-
-  useEffect(() => {
-    async function getSettingsData() {
-
-    }
-
-    if (!settingsData) {
-      getSettingsData();
-    }
-  }, []);
 
   const {
     isOpen,
@@ -36,7 +25,7 @@ export default function Settings() {
   } = useSnackbar();
 
   const changeClient = (clientObject) => {
-    setActiveClient(clientObject);
+    setActiveClientId(clientObject._id);
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
@@ -48,7 +37,7 @@ export default function Settings() {
       <Typography variant="h5" gutterBottom>Settings</Typography>
       <Divider sx={{ mb: 3 }} />
       <Typography variant="h6" gutterBottom>Clients</Typography>
-      <Box sx={{ width: '225px', mt: 3 }}>
+      <Box sx={{ width: '300px', mt: 3 }}>
         <ClientMenu
           client={client}
           clients={clients}

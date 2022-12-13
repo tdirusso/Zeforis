@@ -4,7 +4,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
-import { setActiveAccount } from '../../api/account';
+import { setActiveAccountId } from '../../api/account';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -25,9 +25,9 @@ export default function SelectAccountModal({ accounts }) {
   const handleSelection = (e) => {
     setAccountId(e.target.value);
 
-    const selectedClientObject = accounts.find(account => account._id === e.target.value);
-    setActiveAccount(selectedClientObject);
-    openSnackBar(`Loading ${selectedClientObject.name}...`, 'info');
+    const selectedAccountObject = accounts.find(account => account._id === e.target.value);
+    setActiveAccountId(selectedAccountObject._id);
+    openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
     }, 1000);

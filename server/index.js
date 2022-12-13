@@ -15,10 +15,8 @@ const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
 const register = require('./routes/register');
 const verify = require('./routes/verify');
-const initialBatch = require('./routes/initialBatch');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
-const authMW = require('./middlewares/authenticate');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -57,7 +55,6 @@ const boot = async () => {
   app.get('/api/getAllClients', checkPermissionsMW, getAllClients);
   app.get('/api/getClientTree', checkPermissionsMW, getClientTree);
   app.get('/api/verify', verify);
-  app.get('/api/initialBatch', authMW, initialBatch);
   app.post('/api/addFolder', checkPermissionsMW, addFolder);
   app.post('/api/register', register);
   app.patch('/api/updateClient', checkPermissionsMW, updateClient);

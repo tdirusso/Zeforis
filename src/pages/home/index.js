@@ -10,19 +10,19 @@ import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import themeConfig from "../../theme";
-import { getActiveClient, getUserClientListForAccount } from "../../api/client";
+import { getActiveClientId, getUserClientListForAccount } from "../../api/client";
 import AddClientModal from "../../components/admin/AddClientModal";
-import { getActiveAccount, setActiveAccount } from "../../api/account";
+import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
-import { getInitialBatch } from "../../api/user";
 
 export default function Home({ theme, setTheme }) {
-  const { user, authError } = useAuth();
-  const [client] = useState(getActiveClient());
-  const [account] = useState(getActiveAccount());
-  const [isLoading, setLoading] = useState(true);
+  let activeAccountId = getActiveAccountId();
+  let activeClientId = getActiveClientId();
 
-  const [userData, setUserData] = useState(null);
+  const { user, authError } = useAuth();
+  const [isLoading, setLoading] = useState(true);
+  const [client, setClient] = useState(null);
+  const [account, setAccount] = useState(null);
 
   const {
     isOpen,
@@ -32,19 +32,29 @@ export default function Home({ theme, setTheme }) {
   } = useSnackbar();
 
   useEffect(() => {
-    async function fetchInitialBatch() {
-      const { batchData, message } = await getInitialBatch();
-      if (batchData) {
-        setUserData(batchData.userData);
-        setLoading(false);
-      } else {
-        openSnackBar(message, 'error');
-      }
-    }
-
-
     if (user) {
-      fetchInitialBatch();
+      if (activeAccountId) {
+        const activeAccount = user.memberOfAccounts.find(account => {
+          return account._id === activeAccountId;
+        });
+
+        if (activeAccount) {
+          console.log(activeAccount);
+          setAccount(activeAccount);
+        }
+      }
+
+      if (activeClientId) {
+        const activeClient = user.adminOfClients.concat(user.memberOfClients).find(client => {
+          return client._id === activeClientId;
+        });
+
+        if (activeClient) {
+          setClient(activeClient);
+        }
+      }
+
+      setLoading(false);
     } else if (authError) {
       openSnackBar(authError, 'error');
     }
@@ -66,9 +76,10 @@ export default function Home({ theme, setTheme }) {
     );
   }
 
-  if (!account) {
-    if (userData.memberOfAccounts.length === 1) {
-      setActiveAccount(user.memberOfAccounts[0]);
+  if (!activeAccountId) {
+    if (user.memberOfAccounts.length === 1) {
+      setActiveAccountId(user.memberOfAccounts[0]._id);
+      activeAccountId = user.memberOfAccounts[0]._id;
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
@@ -83,7 +94,7 @@ export default function Home({ theme, setTheme }) {
     }
   }
 
-  const clients = getUserClientListForAccount(user, account._id);
+  const clients = getUserClientListForAccount(user, activeAccountId);
 
   if (clients.length === 0) {
     return (
@@ -92,21 +103,16 @@ export default function Home({ theme, setTheme }) {
           open={true}
           setOpen={() => { }}
           hideCancel={true}
-          accountId={account._id}
+          accountId={activeAccountId}
         />
       </Box>
     );
   }
 
-  let clientExists = false;
-  if (client) {
-    clientExists = clients.some(({ _id }) => client._id === _id);
-  }
-
-  if (!clientExists) {
+  if (!client) {
     return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
-        <SelectClientModal />
+        <SelectClientModal client={client} clients={clients} />
       </Box>
     );
   }
@@ -121,7 +127,7 @@ export default function Home({ theme, setTheme }) {
             context={{
               client,
               clients,
-              account,
+              account
             }}
           />
         </Paper>

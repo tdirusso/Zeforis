@@ -5,9 +5,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ClientMenu from '../admin/ClientMenu';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
-import { setActiveClient } from '../../api/client';
+import { setActiveClientId } from '../../api/client';
 
-export default function SelectClientModal() {
+export default function SelectClientModal({ clients, client }) {
   const {
     isOpen,
     openSnackBar,
@@ -16,8 +16,8 @@ export default function SelectClientModal() {
   } = useSnackbar();
 
   const handleSelection = (clientObject) => {
-    setActiveClient(clientObject);
-    openSnackBar('Loading client...', 'info');
+    setActiveClientId(clientObject._id);
+    openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -32,7 +32,11 @@ export default function SelectClientModal() {
             Please select the client you want to work on from the drop-down list below.
           </DialogContentText>
           <br></br>
-          <ClientMenu parentHandler={handleSelection} />
+          <ClientMenu
+            parentHandler={handleSelection}
+            clients={clients}
+            client={client}
+          />
         </DialogContent>
       </Dialog>
 

@@ -39,7 +39,6 @@ export default function ClientMenu({ client, clients, parentHandler }) {
               <MenuItem sx={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
               }}
                 key={client._id}
                 value={client._id}>

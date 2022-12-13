@@ -9,7 +9,6 @@ export default function useAuth() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const token = getToken();
 
@@ -23,7 +22,6 @@ export default function useAuth() {
       const { user, message } = await authenticateUser();
 
       if (user) {
-        console.log(user);
         setUser(user);
         setLoading(false);
       } else {

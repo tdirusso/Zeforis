@@ -5,12 +5,7 @@ const addUser = async (payload) => {
   return data;
 };
 
-const getInitialBatch = async () => {
-  const { data } = await request.get(`initialBatch`);
-  return data;
-};
 
 export {
-  addUser,
-  getInitialBatch
+  addUser
 };

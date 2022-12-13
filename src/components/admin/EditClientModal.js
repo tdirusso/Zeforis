@@ -9,7 +9,7 @@ import { TwitterPicker } from 'react-color';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { setActiveClient, updateClient } from '../../api/client';
+import { setActiveClientId, updateClient } from '../../api/client';
 
 export default function EditClientModal({ open, setOpen, clientToUpdate }) {
 
@@ -50,7 +50,7 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
         const { client, message } = await updateClient(fd);
 
         if (client) {
-          setActiveClient(client);
+          setActiveClientId(client._id);
           openSnackBar('Client updated.', 'success');
           setTimeout(() => {
             window.location.reload();

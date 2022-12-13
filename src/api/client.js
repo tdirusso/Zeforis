@@ -22,17 +22,16 @@ const updateClient = async (payload) => {
   return data;
 };
 
-const setActiveClient = (clientObject) => {
-  localStorage.setItem('client', JSON.stringify(clientObject));
+const setActiveClientId = (clientId) => {
+  localStorage.setItem('activeClientId', clientId);
 };
 
-const getActiveClient = () => {
-  return JSON.parse(localStorage.getItem('client') || null);
+const getActiveClientId = () => {
+  return localStorage.getItem('activeClientId') || null;
 };
 
 const getUserClientListForAccount = (user, activeAccountId) => {
   const result = [];
-
 
   user.adminOfClients.forEach(client => {
     if (client.account === activeAccountId) {
@@ -54,7 +53,7 @@ export {
   getAllClients,
   getClientTree,
   updateClient,
-  setActiveClient,
-  getActiveClient,
+  setActiveClientId,
+  getActiveClientId,
   getUserClientListForAccount
 };

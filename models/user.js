@@ -46,10 +46,6 @@ const User = new Schema(
       type: Boolean,
       default: false
     },
-    needsUpdatedJWT: {
-      type: Boolean,
-      default: false
-    },
     createdAt: {
       type: Number,
       default: () => Date.now()
