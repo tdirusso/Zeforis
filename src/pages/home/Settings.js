@@ -11,6 +11,7 @@ import { getSettingsData, setActiveClientId } from "../../api/client";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import Loader from "../../components/core/Loader";
+import { logout } from "../../api/auth";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
@@ -30,7 +31,7 @@ export default function Settings() {
     async function fetchSettingsData() {
       const { settings, message } = await getSettingsData(account._id, client._id);
 
-      console.log(settings)
+      //console.log(settings);
       if (settings) {
         setSettingsData(settings);
         setLoading(false);
@@ -92,6 +93,11 @@ export default function Settings() {
       <Typography variant="h6" gutterBottom>{account.name} Users</Typography>
       <Divider sx={{ mt: 4, mb: 4 }} />
       <Typography variant="h6" gutterBottom>Account</Typography>
+      <Button
+        variant="contained"
+        onClick={logout}>
+        Sign Out
+      </Button>
 
       <AddClientModal
         open={createClientModalOpen}

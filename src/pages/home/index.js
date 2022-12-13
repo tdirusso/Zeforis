@@ -10,7 +10,7 @@ import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import themeConfig from "../../theme";
-import { getActiveClientId, getUserClientListForAccount } from "../../api/client";
+import { getActiveClientId, getUserClientListForAccount, setActiveClientId } from "../../api/client";
 import AddClientModal from "../../components/admin/AddClientModal";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
@@ -70,10 +70,10 @@ export default function Home({ theme, setTheme }) {
     return <Loader />;
   }
 
-  if (!activeAccountId) {
+  if (!account) {
     if (user.memberOfAccounts.length === 1) {
       setActiveAccountId(user.memberOfAccounts[0]._id);
-      activeAccountId = user.memberOfAccounts[0]._id;
+      setAccount(user.memberOfAccounts[0]);
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
@@ -104,11 +104,16 @@ export default function Home({ theme, setTheme }) {
   }
 
   if (!client) {
-    return (
-      <Box className="flex-centered" sx={{ height: '100%' }}>
-        <SelectClientModal client={client} clients={clients} />
-      </Box>
-    );
+    if (clients.length === 1) {
+      setActiveClientId(clients[0]._id);
+      setClient(clients[0]);
+    } else {
+      return (
+        <Box className="flex-centered" sx={{ height: '100%' }}>
+          <SelectClientModal client={client} clients={clients} />
+        </Box>
+      );
+    }
   }
 
   return (

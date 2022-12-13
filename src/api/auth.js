@@ -1,4 +1,6 @@
 import request from '../lib/request';
+import { removeActiveAccountId } from './account';
+import { removeActiveClientId } from './client';
 
 const login = async (payload) => {
   const { data } = await request.post(`login`, payload);
@@ -12,6 +14,8 @@ const login = async (payload) => {
 
 const logout = () => {
   removeToken();
+  removeActiveAccountId();
+  removeActiveClientId();
   window.location.href = '/login';
 };
 
@@ -35,7 +39,7 @@ const setToken = (token) => {
 
 const removeToken = () => {
   localStorage.removeItem('token');
-}
+};
 
 export {
   login,

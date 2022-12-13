@@ -14,8 +14,13 @@ const setActiveAccountId = (accountId) => {
   localStorage.setItem('activeAccountId', accountId);
 };
 
+const removeActiveAccountId = () => {
+  localStorage.removeItem('activeAccountId');
+};
+
 export {
   register,
   getActiveAccountId,
-  setActiveAccountId
+  setActiveAccountId,
+  removeActiveAccountId
 };

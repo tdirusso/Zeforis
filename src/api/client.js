@@ -54,6 +54,10 @@ const getSettingsData = async (accountId, clientId) => {
   return data;
 };
 
+const removeActiveClientId = () => {
+  localStorage.removeItem('activeClientId');
+};
+
 export {
   addClient,
   getAllClients,
@@ -62,5 +66,6 @@ export {
   setActiveClientId,
   getActiveClientId,
   getUserClientListForAccount,
-  getSettingsData
+  getSettingsData,
+  removeActiveClientId
 };
