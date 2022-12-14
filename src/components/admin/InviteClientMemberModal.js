@@ -11,7 +11,7 @@ import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { inviteClientMember } from '../../api/client';
 
-export default function InviteClientMemberModal({ open, setOpen, clientId, clientName }) {
+export default function InviteClientMemberModal({ open, setOpen, clientId, clientName, accountId }) {
   const email = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -36,13 +36,17 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
       try {
         const { success, message } = await inviteClientMember({
           email: emailVal,
-          clientId
+          clientId,
+          accountId
         });
 
         console.log(success, message);
 
         if (success) {
-
+          openSnackBar('Invitation successfully sent.', 'success');
+          setLoading(false);
+          setOpen(false);
+          email.current.value = '';
         } else {
           openSnackBar(message, 'error');
           setLoading(false);
@@ -69,7 +73,7 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
             Please enter the email address of the user you would like to invite.
             They will have <strong>view only</strong> access.
           </DialogContentText>
-          <Box sx={{mt: 3, mb: 3}}>
+          <Box sx={{ mt: 3, mb: 3 }}>
             <TextField
               label="Email"
               fullWidth

@@ -128,8 +128,8 @@ export default function Settings() {
                       </IconButton>
                     }>
                     <ListItemText
-                      primary="Single-line item"
-                      secondary={'Secondary text'}
+                      primary={`${member.firstName} ${member.lastName}`}
+                      secondary={member.email}
                     />
                   </ListItem>
                   {index !== clientMembers.length - 1 ? <Divider /> : null}
@@ -186,7 +186,7 @@ export default function Settings() {
                 <ListItem
                   secondaryAction={
                     <IconButton edge="end" aria-label="delete">
-                      <EditIcon fontSize="small"/>
+                      <EditIcon fontSize="small" />
                     </IconButton>
                   }>
                   <ListItemText
@@ -226,6 +226,7 @@ export default function Settings() {
         setOpen={setInviteClientModalOpen}
         clientId={client._id}
         clientName={client.name}
+        accountId={account._id}
       />
 
       <Snackbar

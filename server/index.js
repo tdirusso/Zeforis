@@ -15,6 +15,7 @@ const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
 const register = require('./routes/register');
 const verify = require('./routes/verify');
+const inviteClientMember = require('./routes/inviteClientMember');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 
@@ -57,6 +58,7 @@ const boot = async () => {
   app.get('/api/getSettings', getSettings);
   app.post('/api/addFolder', checkPermissionsMW, addFolder);
   app.post('/api/register', register);
+  app.post('/api/inviteClientMember', checkPermissionsMW, inviteClientMember);
   app.patch('/api/updateClient', checkPermissionsMW, updateClient);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));

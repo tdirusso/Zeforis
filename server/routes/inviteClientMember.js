@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.find({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: email.toLowerCase() });
     const client = await Client.findById(clientId);
     const account = await Account.findById(accountId);
 
@@ -31,8 +31,9 @@ module.exports = async (req, res) => {
     }
 
     if (user) {
-      const isUserAlreadyMemberOfClient = user.memberOfClients.some(clientId => clientId.toString() === clientId);
-      const isUserAlreadyAdminOfClient = user.adminOfClients.some(clientId => clientId.toString() === clientId);
+      const isUserAlreadyMemberOfClient = user.memberOfClients.some(id => id.toString() === clientId);
+      const isUserAlreadyAdminOfClient = user.adminOfClients.some(id => id.toString() === clientId);
+      const isUserPartOfAccount = user.memberOfAccounts.some(id => id.toString() === accountId);
 
       if (isUserAlreadyMemberOfClient) {
         return res.json({ message: `${email} is already a member of ${client.name}` });
@@ -41,29 +42,59 @@ module.exports = async (req, res) => {
       }
 
       user.memberOfClients.push(clientId);
-      user.memberOfAccounts.push(accountId);
 
       client.members.push(user._id);
 
-      account.members.push(user._id);
+      if (!isUserPartOfAccount) {
+        account.members.push(user._id);
+        user.memberOfAccounts.push(accountId);
+
+        await account.save();
+      }
 
       await user.save();
       await client.save();
-      await account.save();
 
       //TODO enable account org branding in email
-      await sendInvitationEmail(
-        email.toLowerCase(),
+      await sendInvitationEmail({
+        email: email.toLowerCase(),
         clientId,
-        account.name,
-        '../../email/templates/inviteNewUser.ejs'
-      );
+        accountName: account.name,
+        clientName: client.name,
+        templateFile: '../../email/templates/inviteExistingUser.ejs'
+      });
 
       return res.json({ success: true });
     } else {
 
-    }
+      const verificationCode = Math.floor(1000 + Math.random() * 9000);
 
+      const newUser = await User.create({
+        email,
+        verificationCode
+      });
+
+      newUser.memberOfAccounts = [accountId];
+      account.members.push(newUser._id);
+      client.members.push(newUser._id);
+
+      await newUser.save();
+      await account.save();
+      await client.save();
+
+      await sendInvitationEmail(
+        {
+          email: email.toLowerCase(),
+          clientId,
+          accountName: account.name,
+          verificationCode,
+          clientName: client.name,
+          templateFile: '../../email/templates/inviteNewUser.ejs'
+        }
+      );
+
+      return res.json({ success: true });
+    }
   } catch (error) {
     console.log(error);
     return res.json({
@@ -72,8 +103,12 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail(email, clientId, accountName, templateFile) {
-  const qs = `email=${email}&clientId=${clientId}`;
+async function sendInvitationEmail({ email, clientId, accountName, templateFile, clientName, verificationCode }) {
+  let qs = `email=${email}&clientId=${clientId}`;
+
+  if (verificationCode) {
+    qs += `&verificationCode=${verificationCode}`;
+  }
 
   const verificationUrl = isDev ?
     `http://localhost:8080/api/acceptInvitation?${qs}` :
@@ -81,7 +116,8 @@ async function sendInvitationEmail(email, clientId, accountName, templateFile) {
 
   const ejsData = {
     verificationUrl,
-    accountName
+    accountName,
+    clientName
   };
 
   const templatePath = path.resolve(__dirname, templateFile);
@@ -90,7 +126,7 @@ async function sendInvitationEmail(email, clientId, accountName, templateFile) {
   await emailService.sendMail({
     from: 'Client Portal',
     to: email,
-    subject: `Client Portal - Verify your Email`,
+    subject: `Client Portal - ${accountName} has invited you to collaborate`,
     text: template,
     html: template
   });
