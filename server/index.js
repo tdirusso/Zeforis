@@ -17,6 +17,7 @@ const register = require('./routes/register');
 const verify = require('./routes/verify');
 const inviteClientMember = require('./routes/inviteClientMember');
 const completeRegistration = require('./routes/completeRegistration');
+const removeClientMember = require('./routes/removeClientMember');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 
@@ -62,6 +63,7 @@ const boot = async () => {
   app.post('/api/inviteClientMember', checkPermissionsMW, inviteClientMember);
   app.patch('/api/updateClient', checkPermissionsMW, updateClient);
   app.post('/api/completeRegistration', completeRegistration);
+  app.delete('/api/removeClientMember', checkPermissionsMW, removeClientMember);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

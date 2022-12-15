@@ -64,6 +64,12 @@ const inviteClientMember = async (payload) => {
   return data;
 };
 
+const removeClientMember = async (payload) => {
+  const { data } = await request.delete(`removeClientMember`, { data: payload });
+
+  return data;
+};
+
 export {
   addClient,
   getAllClients,
@@ -74,5 +80,6 @@ export {
   getUserClientListForAccount,
   getSettingsData,
   removeActiveClientId,
-  inviteClientMember
+  inviteClientMember,
+  removeClientMember
 };

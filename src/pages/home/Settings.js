@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Button, Divider, Typography } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import ClientMenu from "../../components/admin/ClientMenu";
@@ -19,11 +20,15 @@ import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import InviteClientMemberModal from "../../components/admin/InviteClientMemberModal";
+import RemoveClientMemberModal from "../../components/admin/RemoveClientMemberModal";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const [inviteClientMemberModalOpen, setInviteClientModalOpen] = useState(false);
+  const [removeClientMemberModalOpen, setRemoveClientModalOpen] = useState(false);
+
+  const [userToModify, setUserToModify] = useState(null);
 
   const { client, clients, account } = useOutletContext();
   const [clientMembers, setClientMembers] = useState([]);
@@ -56,12 +61,17 @@ export default function Settings() {
     fetchSettingsData();
   }, []);
 
-  const changeClient = (clientObject) => {
+  const handleChangeClient = (clientObject) => {
     setActiveClientId(clientObject._id);
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
+  };
+
+  const handleRemoveClientMember = (userObject) => {
+    setUserToModify(userObject);
+    setRemoveClientModalOpen(true);
   };
 
   if (isLoading) {
@@ -77,7 +87,7 @@ export default function Settings() {
         <ClientMenu
           client={client}
           clients={clients}
-          parentHandler={changeClient}
+          parentHandler={handleChangeClient}
         />
         <Button
           variant="outlined"
@@ -123,7 +133,10 @@ export default function Settings() {
                 <React.Fragment key={member._id}>
                   <ListItem
                     secondaryAction={
-                      <IconButton edge="end" aria-label="delete">
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveClientMember(member)}>
                         <ClearIcon />
                       </IconButton>
                     }>
@@ -227,6 +240,15 @@ export default function Settings() {
         clientId={client._id}
         clientName={client.name}
         accountId={account._id}
+      />
+
+      <RemoveClientMemberModal
+        open={removeClientMemberModalOpen}
+        setOpen={setRemoveClientModalOpen}
+        clientId={client._id}
+        clientName={client.name}
+        accountId={account._id}
+        user={userToModify}
       />
 
       <Snackbar
