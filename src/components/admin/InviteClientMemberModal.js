@@ -13,6 +13,8 @@ import { inviteClientMember } from '../../api/client';
 
 export default function InviteClientMemberModal({ open, setOpen, clientId, clientName, accountId }) {
   const email = useRef();
+  const firstName = useRef();
+  const lastName = useRef();
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -22,11 +24,20 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
     message
   } = useSnackbar();
 
-  const handleInviteClientMember = () => {
+  const handleInviteClientMember = e => {
+    e.preventDefault();
+
     const emailVal = email.current.value;
+    const firstNameVal = firstName.current.value;
+    const lastNameVal = lastName.current.value;
 
     if (!emailVal) {
-      openSnackBar('Please enter an email addres for the new member.', 'error');
+      openSnackBar('Please enter an email addres of the new member.', 'error');
+      return;
+    }
+
+    if (!firstName || !lastName) {
+      openSnackBar('Please enter the full name of the new member.', 'error');
       return;
     }
 
@@ -37,16 +48,14 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
         const { success, message } = await inviteClientMember({
           email: emailVal,
           clientId,
-          accountId
+          accountId,
+          firstName: firstNameVal,
+          lastName: lastNameVal
         });
-
-        console.log(success, message);
 
         if (success) {
           openSnackBar('Invitation successfully sent.', 'success');
-          setLoading(false);
-          setOpen(false);
-          email.current.value = '';
+          handleClose();
         } else {
           openSnackBar(message, 'error');
           setLoading(false);
@@ -62,6 +71,8 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
     setOpen(false);
     setLoading(false);
     email.current.value = '';
+    firstName.current.value = '';
+    lastName.current.value = '';
   };
 
   return (
@@ -70,31 +81,55 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
         <DialogTitle>Invite someone from {clientName}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the email address of the user you would like to invite.
+            Please enter the name and email address of the user you would like to invite.
             They will have <strong>view only</strong> access.
           </DialogContentText>
-          <Box sx={{ mt: 3, mb: 3 }}>
-            <TextField
-              label="Email"
-              fullWidth
-              autoFocus
-              disabled={isLoading}
-              inputRef={email}
-            >
-            </TextField>
-          </Box>
-          <DialogActions>
-            <Button
-              onClick={handleClose}>
-              Cancel
-            </Button>
-            <LoadingButton
-              variant='contained'
-              onClick={handleInviteClientMember}
-              loading={isLoading}>
-              Send Invite
-            </LoadingButton>
-          </DialogActions>
+          <form onSubmit={handleInviteClientMember}>
+            <Box sx={{ mt: 3, display: 'flex' }}>
+              <TextField
+                label="First name"
+                sx={{ flexGrow: 1, mr: 2 }}
+                autoFocus
+                disabled={isLoading}
+                inputRef={firstName}
+                required
+              >
+              </TextField>
+              <TextField
+                label="Last name"
+                sx={{ flexGrow: 1, ml: 2 }}
+                disabled={isLoading}
+                inputRef={lastName}
+                required
+              >
+              </TextField>
+            </Box>
+            <Box sx={{ mt: 3, mb: 3 }}>
+              <TextField
+                label="Email"
+                fullWidth
+                disabled={isLoading}
+                inputRef={email}
+                type="email"
+                required
+              >
+              </TextField>
+            </Box>
+            <DialogActions>
+              <Button
+                onClick={handleClose}>
+                Cancel
+              </Button>
+              <LoadingButton
+                variant='contained'
+                type='submit'
+                onClick={handleInviteClientMember}
+                required
+                loading={isLoading}>
+                Send Invite
+              </LoadingButton>
+            </DialogActions>
+          </form>
         </DialogContent>
       </Dialog>
       <Snackbar
@@ -102,6 +137,6 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
         type={type}
         message={message}
       />
-    </div >
+    </div>
   );
 };

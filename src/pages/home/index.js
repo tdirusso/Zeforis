@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import Header from "../../components/core/Header";
 import { Box, createTheme, Paper } from "@mui/material";
@@ -17,6 +17,17 @@ import SelectAccountModal from "../../components/core/SelectAccountModal";
 import Loader from "../../components/core/Loader";
 
 export default function Home({ theme, setTheme }) {
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+
+  const accountIdPassed = queryParams.get('accountId');
+  const clientIdPassed = queryParams.get('clientId');
+  if (accountIdPassed && clientIdPassed) {
+    setActiveAccountId(accountIdPassed);
+    setActiveClientId(clientIdPassed);
+    window.location = window.location.href.split('?')[0];
+  }
+
   let activeAccountId = getActiveAccountId();
   let activeClientId = getActiveClientId();
 

@@ -5,20 +5,33 @@ const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 const emailService = require('../../email');
+const validator = require("email-validator");
 
 const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = async (req, res) => {
   const {
     email,
+    firstName,
+    lastName,
     clientId,
     accountId
   } = req.body;
 
-  if (!clientId || !email) {
+  if (!clientId || !accountId) {
     return res.json({
-      message: 'Missing clientId or email.'
+      message: 'Missing clientId or accountId.'
     });
+  }
+
+  if (!firstName || !lastName || !email) {
+    return res.json({
+      message: 'Missing name or email.'
+    });
+  }
+
+  if (!validator.validate(email)) {
+    return res.json({ message: 'Email address is not valid.' });
   }
 
   try {
@@ -41,6 +54,16 @@ module.exports = async (req, res) => {
         return res.json({ message: `${email} is already an administrator of ${client.name}` });
       }
 
+      //TODO enable account org branding in email
+      await sendInvitationEmail({
+        email: email.toLowerCase(),
+        clientId,
+        accountId,
+        accountName: account.name,
+        clientName: client.name,
+        templateFile: '../../email/templates/inviteExistingUser.ejs'
+      });
+
       user.memberOfClients.push(clientId);
 
       client.members.push(user._id);
@@ -55,43 +78,34 @@ module.exports = async (req, res) => {
       await user.save();
       await client.save();
 
-      //TODO enable account org branding in email
-      await sendInvitationEmail({
-        email: email.toLowerCase(),
-        clientId,
-        accountName: account.name,
-        clientName: client.name,
-        templateFile: '../../email/templates/inviteExistingUser.ejs'
-      });
-
       return res.json({ success: true });
     } else {
-
-      const verificationCode = Math.floor(1000 + Math.random() * 9000);
+      await sendInvitationEmail(
+        {
+          email: email.toLowerCase(),
+          clientId,
+          accountId,
+          accountName: account.name,
+          clientName: client.name,
+          templateFile: '../../email/templates/inviteNewUser.ejs',
+          isNewUser: true
+        }
+      );
 
       const newUser = await User.create({
         email,
-        verificationCode
+        firstName,
+        lastName
       });
 
       newUser.memberOfAccounts = [accountId];
+      newUser.memberOfClients = [clientId];
       account.members.push(newUser._id);
       client.members.push(newUser._id);
 
       await newUser.save();
       await account.save();
       await client.save();
-
-      await sendInvitationEmail(
-        {
-          email: email.toLowerCase(),
-          clientId,
-          accountName: account.name,
-          verificationCode,
-          clientName: client.name,
-          templateFile: '../../email/templates/inviteNewUser.ejs'
-        }
-      );
 
       return res.json({ success: true });
     }
@@ -103,16 +117,16 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail({ email, clientId, accountName, templateFile, clientName, verificationCode }) {
-  let qs = `email=${email}&clientId=${clientId}`;
+async function sendInvitationEmail({ email, clientId, accountName, templateFile, clientName, accountId, isNewUser }) {
+  let qs = `email=${email}&clientId=${clientId}&accountId=${accountId}`;
 
-  if (verificationCode) {
-    qs += `&verificationCode=${verificationCode}`;
+  let verificationUrl = isDev ? `http://localhost:3000` : 'google.com';
+
+  if (isNewUser) {
+    verificationUrl += `/complete-registration?${qs}`;
+  } else {
+    verificationUrl += `/home/dashboard?${qs}`;
   }
-
-  const verificationUrl = isDev ?
-    `http://localhost:8080/api/acceptInvitation?${qs}` :
-    `google.com`;
 
   const ejsData = {
     verificationUrl,

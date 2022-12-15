@@ -5,6 +5,7 @@ const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 const emailService = require('../../email');
+const validator = require("email-validator");
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -23,8 +24,12 @@ module.exports = async (req, res) => {
     });
   }
 
+  if (!validator.validate(email)) {
+    return res.json({ message: 'Email address is not valid.' });
+  }
+
   try {
-    const userExists = await User.exists({ email });
+    const userExists = await User.exists({ email: email.toLowerCase() });
 
     if (userExists) {
       return res.json({

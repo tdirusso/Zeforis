@@ -16,7 +16,7 @@ const logout = () => {
   removeToken();
   removeActiveAccountId();
   removeActiveClientId();
-  window.location.href = '/login';
+  window.location = '/login';
 };
 
 const authenticateUser = async () => {

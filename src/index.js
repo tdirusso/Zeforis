@@ -11,6 +11,7 @@ import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
+import CompleteRegistrationPage from './pages/CompleteRegistration';
 import Dashboard from './pages/Home/Dashboard';
 import ClientView from './pages/Home/ClientView';
 import FolderView from './components/core/FolderView';
@@ -30,6 +31,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="register-success" element={<RegisterSuccessPage />} />
+          <Route path="complete-registration" element={<CompleteRegistrationPage />} />
 
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
             <Route path="dashboard" element={<Dashboard />} />
@@ -38,7 +40,7 @@ function App() {
               <Route path='folders/*' element={<FolderView />} />
             </Route>
           </Route>
-          
+
           <Route path="*" element={<Navigate to="login" />} />
         </Routes>
       </Router>
