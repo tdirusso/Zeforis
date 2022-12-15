@@ -17,7 +17,9 @@ export default function RemoveClientMemberModal(props) {
     clientId,
     clientName,
     accountId,
-    user
+    user,
+    setClientMembers,
+    setAccountMembers
   } = props;
 
   const userId = user?._id;
@@ -37,17 +39,29 @@ export default function RemoveClientMemberModal(props) {
 
     setTimeout(async () => {
       try {
-        const { success, message } = await removeClientMember({
+        const result = await removeClientMember({
           clientId,
           accountId,
           userId
         });
 
-        if (success) {
-          openSnackBar('Successully removed.', 'success');
+        const updatedUser = result.user;
+        const resultMessage = result.message;
+        const removedFromAccount = result.removedFromAccount;
+
+        if (updatedUser) {
+          setTimeout(() => {
+            openSnackBar('Successully removed.', 'success');
+          }, 250);
+
+          if (removedFromAccount) {
+            setAccountMembers(members => members.filter(member => member._id !== user._id));
+          }
+
+          setClientMembers(members => members.filter(member => member._id !== user._id));
           handleClose();
         } else {
-          openSnackBar(message, 'error');
+          openSnackBar(resultMessage, 'error');
           setLoading(false);
         }
       } catch (error) {
@@ -67,7 +81,7 @@ export default function RemoveClientMemberModal(props) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirm Member Removal</DialogTitle>
         <DialogContent >
-          <DialogContentText sx={{mb: 5}}>
+          <DialogContentText sx={{ mb: 5 }}>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{clientName}?</strong>
           </DialogContentText>
           <DialogActions>

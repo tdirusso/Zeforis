@@ -11,7 +11,17 @@ import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { inviteClientMember } from '../../api/client';
 
-export default function InviteClientMemberModal({ open, setOpen, clientId, clientName, accountId }) {
+export default function InviteClientMemberModal(props) {
+  const {
+    open,
+    setOpen,
+    clientId,
+    clientName,
+    accountId,
+    setClientMembers,
+    setAccountMembers
+  } = props;
+
   const email = useRef();
   const firstName = useRef();
   const lastName = useRef();
@@ -45,7 +55,7 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
 
     setTimeout(async () => {
       try {
-        const { success, message } = await inviteClientMember({
+        const { user, message, addedToAccount } = await inviteClientMember({
           email: emailVal,
           clientId,
           accountId,
@@ -53,8 +63,16 @@ export default function InviteClientMemberModal({ open, setOpen, clientId, clien
           lastName: lastNameVal
         });
 
-        if (success) {
-          openSnackBar('Invitation successfully sent.', 'success');
+        if (user) {
+          setTimeout(() => {
+            openSnackBar('Invitation successfully sent.', 'success');
+          }, 250);
+
+          if (addedToAccount) {
+            setAccountMembers(members => [...members, user]);
+          }
+
+          setClientMembers(members => [...members, user]);
           handleClose();
         } else {
           openSnackBar(message, 'error');

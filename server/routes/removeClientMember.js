@@ -25,13 +25,16 @@ module.exports = async (req, res) => {
     const user = await User.findOneAndUpdate({ _id: userId }, { $pull: { memberOfClients: clientId } }, { new: true });
     await Client.updateOne({ _id: clientId }, { $pull: { members: userId } });
 
+    let removedFromAccount = false;
+
     if (user.memberOfClients.length === 0 && user.adminOfClients.length === 0) {
       user.memberOfAccounts = [];
       await user.save();
       await Account.updateOne({ _id: accountId }, { $pull: { members: userId } });
+      removedFromAccount = true;
     }
 
-    return res.json({ success: true });
+    return res.json({ user: user.toObject(), removedFromAccount });
 
   } catch (error) {
     console.log(error);

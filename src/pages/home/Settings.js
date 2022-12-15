@@ -240,6 +240,8 @@ export default function Settings() {
         clientId={client._id}
         clientName={client.name}
         accountId={account._id}
+        setClientMembers={setClientMembers}
+        setAccountMembers={setAccountMembers}
       />
 
       <RemoveClientMemberModal
@@ -249,6 +251,8 @@ export default function Settings() {
         clientName={client.name}
         accountId={account._id}
         user={userToModify}
+        setClientMembers={setClientMembers}
+        setAccountMembers={setAccountMembers}
       />
 
       <Snackbar

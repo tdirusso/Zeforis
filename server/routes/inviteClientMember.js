@@ -78,7 +78,7 @@ module.exports = async (req, res) => {
       await user.save();
       await client.save();
 
-      return res.json({ success: true });
+      return res.json({ user: user.toObject(), addedToAccount: !isUserPartOfAccount });
     } else {
       await sendInvitationEmail(
         {
@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
       await account.save();
       await client.save();
 
-      return res.json({ success: true });
+      return res.json({ user: newUser.toObject(), addedToAccount: true });
     }
   } catch (error) {
     console.log(error);
