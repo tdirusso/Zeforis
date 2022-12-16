@@ -1,30 +1,18 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useRef, useState } from 'react';
+import { useState, useRef } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Box, TextField } from '@mui/material';
+import { Box, DialogContentText, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { inviteClientMember } from '../../api/client';
+import { updateProfile } from '../../api/user';
 
-export default function InviteClientMemberModal(props) {
-  const {
-    open,
-    setOpen,
-    clientId,
-    clientName,
-    accountId,
-    setClientMembers,
-    setAccountMembers
-  } = props;
-
-  const email = useRef();
-  const firstName = useRef();
-  const lastName = useRef();
+export default function EditProfileModal({ open, setOpen, user, setFirstName, setLastName }) {
+  const firstName = useRef(user.firstName);
+  const lastName = useRef(user.lastName);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -34,20 +22,14 @@ export default function InviteClientMemberModal(props) {
     message
   } = useSnackbar();
 
-  const handleInviteClientMember = e => {
+  const handleUpdateProfile = e => {
     e.preventDefault();
 
-    const emailVal = email.current.value;
     const firstNameVal = firstName.current.value;
     const lastNameVal = lastName.current.value;
 
-    if (!emailVal) {
-      openSnackBar('Please enter an email addres of the new member.', 'error');
-      return;
-    }
-
-    if (!firstName || !lastName) {
-      openSnackBar('Please enter the full name of the new member.', 'error');
+    if (!firstNameVal || !lastNameVal) {
+      openSnackBar('Please enter a first and last name.', 'error');
       return;
     }
 
@@ -55,25 +37,19 @@ export default function InviteClientMemberModal(props) {
 
     setTimeout(async () => {
       try {
-        const { user, message, addedToAccount } = await inviteClientMember({
-          email: emailVal,
-          clientId,
-          accountId,
+
+        const { success, message } = await updateProfile({
           firstName: firstNameVal,
           lastName: lastNameVal
         });
 
-        if (user) {
+        if (success) {
           setTimeout(() => {
-            openSnackBar('Invitation successfully sent.', 'success');
-          }, 250);
-
-          if (addedToAccount) {
-            setAccountMembers(members => [...members, user]);
-          }
-
-          setClientMembers(members => [...members, user]);
-          handleClose();
+            openSnackBar('Profile updated.', 'success');
+          }, 300);
+          setFirstName(firstNameVal);
+          setLastName(lastNameVal);
+          setOpen(false);
         } else {
           openSnackBar(message, 'error');
           setLoading(false);
@@ -87,45 +63,35 @@ export default function InviteClientMemberModal(props) {
 
   const handleClose = () => {
     setOpen(false);
-    setLoading(false);
   };
 
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Invite someone from {clientName}</DialogTitle>
+        <DialogTitle>Edit Profile</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the name and email address of the user you would like to invite.
-            They will have <strong>view only</strong> access.
+            You can edit your first and last name below.
           </DialogContentText>
-          <form onSubmit={handleInviteClientMember}>
-            <Box sx={{ mt: 3, display: 'flex' }}>
+          <form onSubmit={handleUpdateProfile}>
+            <Box sx={{ mt: 4, mb: 3, display: 'flex' }}>
               <TextField
                 label="First name"
-                sx={{ flexGrow: 1, mr: 2 }}
+                fullWidth
                 autoFocus
                 disabled={isLoading}
                 inputRef={firstName}
+                defaultValue={user.firstName}
                 required
+                sx={{ mr: 3 }}
               >
               </TextField>
               <TextField
                 label="Last name"
-                sx={{ flexGrow: 1, ml: 2 }}
-                disabled={isLoading}
-                inputRef={lastName}
-                required
-              >
-              </TextField>
-            </Box>
-            <Box sx={{ mt: 3, mb: 3 }}>
-              <TextField
-                label="Email"
                 fullWidth
                 disabled={isLoading}
-                inputRef={email}
-                type="email"
+                inputRef={lastName}
+                defaultValue={user.lastName}
                 required
               >
               </TextField>
@@ -138,10 +104,9 @@ export default function InviteClientMemberModal(props) {
               <LoadingButton
                 variant='contained'
                 type='submit'
-                onClick={handleInviteClientMember}
-                required
+                onClick={handleUpdateProfile}
                 loading={isLoading}>
-                Send Invite
+                Update
               </LoadingButton>
             </DialogActions>
           </form>

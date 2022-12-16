@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
 
     if (!user) {
       return res.json({
-        message: 'Unknown user.'
+        message: 'User does not exist.'
       });
     }
 

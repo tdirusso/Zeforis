@@ -4,7 +4,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useState, useRef } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Box, Skeleton, TextField } from '@mui/material';
+import { Box, DialogContentText, Skeleton, TextField } from '@mui/material';
 import { TwitterPicker } from 'react-color';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
@@ -98,6 +98,9 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Edit {clientToUpdate.name}</DialogTitle>
         <DialogContent>
+          <DialogContentText>
+            You can modify the client name, branding and logo below.
+          </DialogContentText>
           <Box sx={{ mt: 3, mb: 3 }}>
             <TextField
               label="Client Name"

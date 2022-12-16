@@ -49,7 +49,7 @@ module.exports = async (req, res, next) => {
       }
     }
 
-    return res.json({ message: 'Unknown user.' });
+    return res.json({ message: 'User does not exist.' });
 
   } catch (error) {
     console.log(error);

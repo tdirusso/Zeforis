@@ -18,8 +18,10 @@ const verify = require('./routes/verify');
 const inviteClientMember = require('./routes/inviteClientMember');
 const completeRegistration = require('./routes/completeRegistration');
 const removeClientMember = require('./routes/removeClientMember');
+const updateProfile = require('./routes/updateProfile');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
+const checkAuth = require('./middlewares/checkAuth');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -64,6 +66,7 @@ const boot = async () => {
   app.patch('/api/updateClient', checkPermissionsMW, updateClient);
   app.post('/api/completeRegistration', completeRegistration);
   app.delete('/api/removeClientMember', checkPermissionsMW, removeClientMember);
+  app.patch('/api/updateProfile', checkAuth, updateProfile);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

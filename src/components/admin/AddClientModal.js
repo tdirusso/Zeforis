@@ -69,7 +69,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, accountId })
     setBrandColor('#267ffd');
     setLogoSrc('');
     setLogoFile(null);
-    name.current.value = '';
   };
 
   const handleLogoChange = e => {

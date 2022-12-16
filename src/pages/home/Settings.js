@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import ClientMenu from "../../components/admin/ClientMenu";
 import EditIcon from '@mui/icons-material/Edit';
@@ -21,21 +21,34 @@ import ClearIcon from '@mui/icons-material/Clear';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import InviteClientMemberModal from "../../components/admin/InviteClientMemberModal";
 import RemoveClientMemberModal from "../../components/admin/RemoveClientMemberModal";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import AccountMenu from "../../components/core/AccountMenu";
+import { setActiveAccountId } from "../../api/account";
+import EditProfileModal from "../../components/core/EditProfileModal";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const [inviteClientMemberModalOpen, setInviteClientModalOpen] = useState(false);
   const [removeClientMemberModalOpen, setRemoveClientModalOpen] = useState(false);
+  const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
 
   const [userToModify, setUserToModify] = useState(null);
 
-  const { client, clients, account } = useOutletContext();
+  const { client, clients, account, user } = useOutletContext();
+
   const [clientMembers, setClientMembers] = useState([]);
   const [clientAdmins, setClientAdmins] = useState([]);
   const [accountMembers, setAccountMembers] = useState([]);
+  const [accountAdmins, setAccountAdmins] = useState([]);
+
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
 
   const [isLoading, setLoading] = useState(true);
+
+  const [accountTabVal, setAccountTabVal] = useState(0);
 
   const {
     isOpen,
@@ -43,6 +56,8 @@ export default function Settings() {
     type,
     message
   } = useSnackbar();
+
+  const accountUsersLength = accountMembers.length + accountAdmins.length;
 
   useEffect(() => {
     async function fetchSettingsData() {
@@ -52,6 +67,7 @@ export default function Settings() {
         setClientMembers(settings.client.members);
         setClientAdmins(settings.client.admins);
         setAccountMembers(settings.account.members);
+        setAccountAdmins(settings.account.admins);
         setLoading(false);
       } else {
         openSnackBar(message, 'error');
@@ -76,13 +92,41 @@ export default function Settings() {
 
   if (isLoading) {
     return <Loader />;
+  };
+
+  const handleAccountSelection = accountId => {
+    const selectedAccountObject = user.memberOfAccounts.find(account => account._id === accountId);
+    setActiveAccountId(selectedAccountObject._id);
+    openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
+
+  function TabPanel(props) {
+    const { children, value, index } = props;
+
+    return (
+      <div
+        hidden={value !== index}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            {children}
+          </Box>
+        )}
+      </div>
+    );
   }
 
   return (
-    <div className="Settings">
+    <Paper sx={{ p: 5 }}>
       <Typography variant="h5" gutterBottom>Settings</Typography>
-      <Divider sx={{ mb: 3 }} />
-      <Typography variant="h6" gutterBottom>Clients</Typography>
+
+      <Divider textAlign="left" sx={{ mb: 5, mt: 6 }}>
+        <Chip label="Clients" />
+      </Divider>
       <Box sx={{ width: '300px', mt: 3 }}>
         <ClientMenu
           client={client}
@@ -116,7 +160,7 @@ export default function Settings() {
 
       <Box sx={{ mt: 4.5, maxWidth: 500 }}>
         <Typography variant="body1" gutterBottom>
-          <strong>Members</strong>
+          <strong>Members of {client.name}</strong>
           <Button
             variant="outlined"
             size="small"
@@ -156,7 +200,7 @@ export default function Settings() {
       <Box sx={{ mt: 4.5, maxWidth: 500 }}>
         <Typography variant="body1" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
           <strong>
-            Administrators
+            Administrators of {client.name}
           </strong>
           <Button
             variant="outlined"
@@ -169,16 +213,29 @@ export default function Settings() {
         <List dense>
           {
             clientAdmins.map((member, index) => {
+              const isYou = member._id === user._id;
+
+              let primaryText = <span>{member.firstName} {member.lastName}</span>;
+
+              if (isYou) {
+                primaryText = <span>
+                  {member.firstName} {member.lastName}
+                  <span style={{ color: '#bababa' }}>{` (you)`}</span>
+                </span>;
+              }
+
               return (
                 <React.Fragment key={member._id}>
                   <ListItem
                     secondaryAction={
                       <IconButton edge="end" aria-label="delete">
-                        <ClearIcon />
+                        {
+                          !isYou ? <ClearIcon /> : null
+                        }
                       </IconButton>
                     }>
                     <ListItemText
-                      primary={`${member.firstName} ${member.lastName}`}
+                      primary={primaryText}
                       secondary={member.email}
                     />
                   </ListItem>
@@ -189,34 +246,116 @@ export default function Settings() {
           }
         </List>
       </Box>
-      <Divider sx={{ mt: 4, mb: 4 }} />
-      <Typography variant="h6" gutterBottom>{account.name} Users</Typography>
-      <List dense sx={{ maxWidth: 500 }}>
-        {
-          accountMembers.map((member, index) => {
-            return (
-              <React.Fragment key={member._id}>
-                <ListItem
-                  secondaryAction={
-                    <IconButton edge="end" aria-label="delete">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  }>
-                  <ListItemText
-                    primary={`${member.firstName} ${member.lastName}`}
-                    secondary={member.email}
-                  />
-                </ListItem>
-                {index !== accountMembers.length - 1 ? <Divider /> : null}
-              </React.Fragment>
-            );
-          })
-        }
-      </List>
 
-      <Divider sx={{ mt: 4, mb: 4 }} />
-      <Typography variant="h6" gutterBottom>Account</Typography>
+      <Divider textAlign="left" sx={{ mt: 6, mb: 3 }} >
+        <Chip label={`${account.name} Users (${accountUsersLength})`} />
+      </Divider>
+      <Tabs value={accountTabVal} onChange={(_, val) => setAccountTabVal(val)}>
+        <Tab label={`Administrators (${accountAdmins.length})`} />
+        <Tab label={`Members (${accountMembers.length})`} />
+      </Tabs>
+
+      <TabPanel value={accountTabVal} index={0}>
+        <List dense sx={{ maxWidth: 500 }}>
+          {
+            accountAdmins.map((member, index) => {
+              const isYou = member._id === user._id;
+
+              let primaryText = <span>{member.firstName} {member.lastName}</span>;
+
+              if (isYou) {
+                primaryText = <span>
+                  {member.firstName} {member.lastName}
+                  <span style={{ color: '#bababa' }}>{` (you)`}</span>
+                </span>;
+              }
+
+              return (
+                <React.Fragment key={member._id}>
+                  <ListItem
+                    secondaryAction={
+                      <IconButton edge="end" aria-label="delete">
+                        {
+                          !isYou ? <EditIcon fontSize="small" /> : null
+                        }
+                      </IconButton>
+                    }>
+                    <ListItemText
+                      primary={primaryText}
+                      secondary={member.email}
+                    />
+                  </ListItem>
+                  {index !== accountMembers.length - 1 ? <Divider /> : null}
+                </React.Fragment>
+              );
+            })
+          }
+        </List>
+      </TabPanel>
+
+      <TabPanel value={accountTabVal} index={1}>
+        <List dense sx={{ maxWidth: 500 }}>
+          {
+            accountMembers.map((member, index) => {
+              return (
+                <React.Fragment key={member._id}>
+                  <ListItem
+                    secondaryAction={
+                      <IconButton edge="end" aria-label="delete">
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    }>
+                    <ListItemText
+                      primary={`${member.firstName} ${member.lastName}`}
+                      secondary={member.email}
+                    />
+                  </ListItem>
+                  {index !== accountMembers.length - 1 ? <Divider /> : null}
+                </React.Fragment>
+              );
+            })
+          }
+        </List>
+      </TabPanel>
+
+      <Divider textAlign="left" sx={{ mb: 3 }}>
+        <Chip label="Account" />
+      </Divider>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Typography variant="body1" sx={{ mr: 2 }}>
+          <strong>Name:</strong>
+        </Typography>
+        <Typography variant="body1">{firstName} {lastName}</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Typography variant="body1" sx={{ mr: 2 }}>
+          <strong>Email:</strong>
+        </Typography>
+        <Typography variant="body1">{user.email}</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Typography variant="body1" sx={{ mr: 2 }}>
+          <strong>Created:</strong>
+        </Typography>
+        <Typography variant="body1">{new Date(user.createdAt).toLocaleString()}</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Button
+          variant="outlined"
+          sx={{ mt: 2 }}
+          startIcon={<EditIcon />}
+          onClick={() => setEditProfileModalOpen(true)}>Edit
+        </Button>
+      </Box>
+      <Box sx={{ mt: 4, maxWidth: 300 }}>
+        <AccountMenu
+          accounts={user.memberOfAccounts}
+          accountId={account._id}
+          parentHandler={handleAccountSelection}
+        />
+      </Box>
       <Button
+        sx={{ mt: 6 }}
         variant="contained"
         onClick={logout}>
         Sign Out
@@ -255,11 +394,21 @@ export default function Settings() {
         setAccountMembers={setAccountMembers}
       />
 
+      <EditProfileModal
+        setFirstName={setFirstName}
+        setLastName={setLastName}
+        user={user}
+        open={editProfileModalOpen}
+        setOpen={setEditProfileModalOpen}
+      />
+
       <Snackbar
         isOpen={isOpen}
         type={type}
         message={message}
       />
-    </div>
+
+
+    </Paper>
   );
 };

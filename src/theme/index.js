@@ -60,6 +60,13 @@ const theme = {
           fontWeight: 300
         }
       }
+    },
+    MuiTab: {
+      defaultProps: {
+        sx: {
+          textTransform: 'none'
+        }
+      }
     }
   }
 };

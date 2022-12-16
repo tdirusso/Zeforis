@@ -4,7 +4,7 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import Header from "../../components/core/Header";
-import { Box, createTheme, Paper } from "@mui/material";
+import { Box, createTheme } from "@mui/material";
 import './styles/index.css';
 import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
@@ -132,15 +132,16 @@ export default function Home({ theme, setTheme }) {
       <SideNav theme={theme} client={client} />
       <main>
         <Header />
-        <Paper sx={{ width: '100%' }} elevation={1} className="main-content">
+        {/* <Paper sx={{ width: '100%' }} elevation={1} className="main-content"> */}
           <Outlet
             context={{
               client,
               clients,
-              account
+              account,
+              user
             }}
           />
-        </Paper>
+        {/* </Paper> */}
       </main>
 
       <Snackbar
