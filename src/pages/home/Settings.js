@@ -337,7 +337,7 @@ export default function Settings() {
         <Typography variant="body1" sx={{ mr: 2 }}>
           <strong>Created:</strong>
         </Typography>
-        <Typography variant="body1">{new Date(user.createdAt).toLocaleString()}</Typography>
+        <Typography variant="body1">{new Date(user.dateCreated).toLocaleString()}</Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Button

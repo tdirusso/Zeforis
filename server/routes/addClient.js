@@ -1,5 +1,4 @@
 const Client = require('../../models/client');
-const Folder = require('../../models/folder');
 const User = require('../../models/user');
 const s3 = require('../../aws/s3');
 const sharp = require('sharp');
@@ -29,12 +28,6 @@ module.exports = async (req, res) => {
       brandColor,
       account: accountId,
       admins: [userId]
-    });
-
-    await Folder.create({
-      name: 'root',
-      client: client._id,
-      parentFolderId: ''
     });
 
     await User.updateOne({ _id: userId }, { $push: { adminOfClients: client._id } });

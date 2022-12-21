@@ -27,6 +27,10 @@ const Account = new Schema(
       type: [mongoose.SchemaTypes.ObjectId],
       ref: 'users',
       default: []
+    },
+    dateCreated: {
+      type: Number,
+      default: () => Date.now()
     }
   },
   {

@@ -3,22 +3,21 @@ const Folder = require('../../models/folder');
 module.exports = async (req, res) => {
   const {
     name,
-    parentFolderId,
+    description,
     clientId
   } = req.body;
 
   if (!name || !clientId) {
     return res.json({
-      message: 'Missing folder name or client ID.'
+      message: 'Missing folder name or clientId.'
     });
   }
 
   try {
-
     const folder = await Folder.create({
       name,
-      parentFolderId,
-      clientId
+      description,
+      client: clientId
     });
 
     return res.json({

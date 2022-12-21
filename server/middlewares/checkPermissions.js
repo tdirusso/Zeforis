@@ -12,10 +12,14 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Unauthorized.' });
   }
 
-  const { clientId, accountId } = req.body;
+  let { clientId, accountId } = req.body;
 
   if (!clientId && !accountId) {
-    return res.json({ message: 'Unauthorized.' });
+    ({ clientId, accountId } = req.query);
+
+    if (!clientId && !accountId) {
+      return res.json({ message: 'Unauthorized.' });
+    }
   }
 
   try {
@@ -31,8 +35,8 @@ module.exports = async (req, res, next) => {
       req.userId = user._id;
 
       if (clientId) {
-        const isAdminOfClient = user.adminOfClients.some(({_id}) => _id.toString() === clientId);
-        
+        const isAdminOfClient = user.adminOfClients.some(({ _id }) => _id.toString() === clientId);
+
         if (isAdminOfClient) {
           return next();
         } else {

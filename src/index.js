@@ -13,8 +13,6 @@ import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
 import CompleteRegistrationPage from './pages/CompleteRegistration';
 import Dashboard from './pages/Home/Dashboard';
-import ClientView from './pages/Home/ClientView';
-import FolderView from './components/core/FolderView';
 import Settings from './pages/Home/Settings';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
@@ -36,9 +34,6 @@ function App() {
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="settings" element={<Settings />} />
-            <Route exact path="client/:clientName/" element={<ClientView />}>
-              <Route path='folders/*' element={<FolderView />} />
-            </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="login" />} />

@@ -10,7 +10,7 @@ import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import themeConfig from "../../theme";
-import { getActiveClientId, getUserClientListForAccount, setActiveClientId } from "../../api/client";
+import { getActiveClientId, getTasks, getUserClientListForAccount, setActiveClientId } from "../../api/client";
 import AddClientModal from "../../components/admin/AddClientModal";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
@@ -35,6 +35,7 @@ export default function Home({ theme, setTheme }) {
   const [isLoading, setLoading] = useState(true);
   const [client, setClient] = useState(null);
   const [account, setAccount] = useState(null);
+  const [tasks, setTasks] = useState(null);
 
   const {
     isOpen,
@@ -76,6 +77,24 @@ export default function Home({ theme, setTheme }) {
       openSnackBar(authError, 'error');
     }
   }, [user, authError]);
+
+  useEffect(() => {
+
+    if (client && !tasks) {
+      fetchTasks();
+    }
+
+    async function fetchTasks() {
+      console.log(client._id)
+      const result = await getTasks(client._id);
+      console.log(result);
+      // if (tasks) {
+      //   setTasks([]);
+      // } else {
+      //   openSnackBar(message, 'error');
+      // }
+    }
+  }, [client]);
 
   if (isLoading) {
     return <Loader />;
@@ -133,14 +152,14 @@ export default function Home({ theme, setTheme }) {
       <main>
         <Header />
         {/* <Paper sx={{ width: '100%' }} elevation={1} className="main-content"> */}
-          <Outlet
-            context={{
-              client,
-              clients,
-              account,
-              user
-            }}
-          />
+        <Outlet
+          context={{
+            client,
+            clients,
+            account,
+            user
+          }}
+        />
         {/* </Paper> */}
       </main>
 

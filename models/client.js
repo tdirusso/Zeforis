@@ -27,6 +27,10 @@ const Client = new Schema(
       type: [mongoose.SchemaTypes.ObjectId],
       default: [],
       ref: 'users'
+    },
+    dateCreated: {
+      type: Number,
+      default: () => Date.now()
     }
   },
   {

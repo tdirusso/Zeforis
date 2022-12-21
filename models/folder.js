@@ -8,13 +8,18 @@ const Folder = new Schema(
       required: true,
       trim: true
     },
+    description: {
+      type: String,
+      trim: true
+    },
     client: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
       ref: 'clients'
     },
-    parentFolderId: {
-      type: String,
+    dateCreated: {
+      type: Number,
+      default: () => Date.now()
     }
   },
   {
