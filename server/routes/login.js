@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
+const pool = require('../../database');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -19,20 +19,26 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email });
+
+    const [userResult] = await pool.query(
+      'SELECT id, is_verified, password FROM users WHERE email = ?',
+      [email.toLowerCase()]
+    );
+
+    const user = userResult[0];
 
     if (user) {
-      if (!user.isVerified) {
+      if (!user.is_verified) {
         return res.json({ message: 'Please verify your email address.' });
       }
-      
+
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
         const token = jwt.sign(
           {
             user: {
-              id: user._id
+              id: user.id
             }
           },
           process.env.SECRET_KEY,

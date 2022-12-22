@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
-const User = require('../../models/user');
-const Account = require('../../models/account');
 const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 const emailService = require('../../email');
 const validator = require("email-validator");
+
+const pool = require('../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -29,9 +29,10 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const userExists = await User.exists({ email: email.toLowerCase() });
 
-    if (userExists) {
+    const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [email.toLowerCase()]);
+
+    if (existsResult.length) {
       return res.json({
         message: `"${email}" is already in use.  Please sign in instead.`
       });
@@ -39,23 +40,19 @@ module.exports = async (req, res) => {
 
     const verificationCode = Math.floor(1000 + Math.random() * 9000);
 
-    const newUser = await User.create({
-      firstName,
-      lastName,
-      email,
-      password: await bcrypt.hash(password, 10),
-      verificationCode
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const account = await Account.create({
-      name: orgName,
-      createdBy: newUser._id,
-      admins: [newUser._id]
-    });
+    const createUserResult = await pool.query(
+      'INSERT INTO users (first_name, last_name, email, password, verification_code) VALUES (?,?,?,?,?)',
+      [firstName, lastName, email.toLowerCase(), hashedPassword, verificationCode]);
 
-    newUser.memberOfAccounts = [account._id];
-    newUser.ownerOfAccount = account._id;
-    await newUser.save();
+
+    const userId = createUserResult[0].insertId;
+
+    await pool.query(
+      'INSERT INTO accounts (name, owner_id) VALUES (?,?)',
+      [orgName, userId]
+    );
 
     await sendVerifyEmail(email, verificationCode);
 

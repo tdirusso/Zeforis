@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const Mongoose = require('mongoose');
 const path = require('path');
 const fileUpload = require('express-fileupload');
+const pool = require('../database');
 
 const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
@@ -42,6 +43,9 @@ app.use(cookieParser());
 app.use(fileUpload({}));
 
 const boot = async () => {
+
+ // await (await pool.getConnection()).ping();
+
   const dbUsername = process.env.DB_USERNAME;
   const dbPassword = process.env.DB_PASSWORD;
   const dbCluster = process.env.DB_CLUSTER;

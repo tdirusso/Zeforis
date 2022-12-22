@@ -1,4 +1,4 @@
-const User = require('../../models/user');
+const pool = require('../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -15,27 +15,18 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email });
 
-    if (user) {
-      const storedCode = user.verificationCode;
+    const [result] = await pool.query(
+      'UPDATE users SET verification_code = NULL, is_verified = 1 WHERE email = ? AND verification_code = ?',
+      [email.toLowerCase(), verificationCode]
+    );
 
-      if (storedCode === verificationCode) {
-        user.isVerified = true;
-        user.verificationCode = undefined;
-
-        await user.save();
-
-        return res.redirect(
-          isDev ?
-            'http://localhost:3000/login?postVerify=true' :
-            'google.com'
-        );
-      } else {
-        return res.json({
-          message: 'Invalid verification code, please try again.'
-        });
-      }
+    if (result.affectedRows) {
+      return res.redirect(
+        isDev ?
+          'http://localhost:3000/login?postVerify=true' :
+          'google.com'
+      );
     }
 
     return res.json({
