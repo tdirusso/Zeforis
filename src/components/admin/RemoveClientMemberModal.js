@@ -22,7 +22,7 @@ export default function RemoveClientMemberModal(props) {
     setAccountMembers
   } = props;
 
-  const userId = user?._id;
+  const userId = user?.id;
   const name = user?.firstName + ' ' + user?.lastName;
 
   const [isLoading, setLoading] = useState(false);
@@ -55,10 +55,10 @@ export default function RemoveClientMemberModal(props) {
           }, 250);
 
           if (removedFromAccount) {
-            setAccountMembers(members => members.filter(member => member._id !== user._id));
+            setAccountMembers(members => members.filter(member => member.id !== user.id));
           }
 
-          setClientMembers(members => members.filter(member => member._id !== user._id));
+          setClientMembers(members => members.filter(member => member.id !== user.id));
           handleClose();
         } else {
           openSnackBar(resultMessage, 'error');

@@ -61,7 +61,7 @@ export default function Settings() {
 
   useEffect(() => {
     async function fetchSettingsData() {
-      const { settings, message } = await getSettingsData(account._id, client._id);
+      const { settings, message } = await getSettingsData(account.id, client.id);
 
       if (settings) {
         setClientMembers(settings.client.members);
@@ -78,7 +78,7 @@ export default function Settings() {
   }, []);
 
   const handleChangeClient = (clientObject) => {
-    setActiveClientId(clientObject._id);
+    setActiveClientId(clientObject.id);
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
@@ -95,8 +95,8 @@ export default function Settings() {
   };
 
   const handleAccountSelection = accountId => {
-    const selectedAccountObject = user.memberOfAccounts.find(account => account._id === accountId);
-    setActiveAccountId(selectedAccountObject._id);
+    const selectedAccountObject = user.memberOfAccounts.find(account => account.id === accountId);
+    setActiveAccountId(selectedAccountObject.id);
     openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
@@ -174,7 +174,7 @@ export default function Settings() {
           {
             clientMembers.map((member, index) => {
               return (
-                <React.Fragment key={member._id}>
+                <React.Fragment key={member.id}>
                   <ListItem
                     secondaryAction={
                       <IconButton
@@ -213,7 +213,7 @@ export default function Settings() {
         <List dense>
           {
             clientAdmins.map((member, index) => {
-              const isYou = member._id === user._id;
+              const isYou = member.id === user.id;
 
               let primaryText = <span>{member.firstName} {member.lastName}</span>;
 
@@ -225,7 +225,7 @@ export default function Settings() {
               }
 
               return (
-                <React.Fragment key={member._id}>
+                <React.Fragment key={member.id}>
                   <ListItem
                     secondaryAction={
                       <IconButton edge="end" aria-label="delete">
@@ -259,7 +259,7 @@ export default function Settings() {
         <List dense sx={{ maxWidth: 500 }}>
           {
             accountAdmins.map((member, index) => {
-              const isYou = member._id === user._id;
+              const isYou = member.id === user.id;
 
               let primaryText = <span>{member.firstName} {member.lastName}</span>;
 
@@ -271,7 +271,7 @@ export default function Settings() {
               }
 
               return (
-                <React.Fragment key={member._id}>
+                <React.Fragment key={member.id}>
                   <ListItem
                     secondaryAction={
                       <IconButton edge="end" aria-label="delete">
@@ -298,7 +298,7 @@ export default function Settings() {
           {
             accountMembers.map((member, index) => {
               return (
-                <React.Fragment key={member._id}>
+                <React.Fragment key={member.id}>
                   <ListItem
                     secondaryAction={
                       <IconButton edge="end" aria-label="delete">
@@ -350,7 +350,7 @@ export default function Settings() {
       <Box sx={{ mt: 4, maxWidth: 300 }}>
         <AccountMenu
           accounts={user.memberOfAccounts}
-          accountId={account._id}
+          accountId={account.id}
           parentHandler={handleAccountSelection}
         />
       </Box>
@@ -364,7 +364,7 @@ export default function Settings() {
       <AddClientModal
         open={createClientModalOpen}
         setOpen={setCreateClientModalOpen}
-        accountId={account._id}
+        accountId={account.id}
       />
 
       <EditClientModal
@@ -376,9 +376,9 @@ export default function Settings() {
       <InviteClientMemberModal
         open={inviteClientMemberModalOpen}
         setOpen={setInviteClientModalOpen}
-        clientId={client._id}
+        clientId={client.id}
         clientName={client.name}
-        accountId={account._id}
+        accountId={account.id}
         setClientMembers={setClientMembers}
         setAccountMembers={setAccountMembers}
       />
@@ -386,9 +386,9 @@ export default function Settings() {
       <RemoveClientMemberModal
         open={removeClientMemberModalOpen}
         setOpen={setRemoveClientModalOpen}
-        clientId={client._id}
+        clientId={client.id}
         clientName={client.name}
-        accountId={account._id}
+        accountId={account.id}
         user={userToModify}
         setClientMembers={setClientMembers}
         setAccountMembers={setAccountMembers}

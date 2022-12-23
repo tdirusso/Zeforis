@@ -44,12 +44,12 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
         fd.append('name', nameVal);
         fd.append('brandColor', brandColor);
         fd.append('isLogoChanged', isLogoChanged);
-        fd.append('clientId', clientToUpdate._id);
+        fd.append('clientId', clientToUpdate.id);
 
         const { client, message } = await updateClient(fd);
 
         if (client) {
-          setActiveClientId(client._id);
+          setActiveClientId(client.id);
           openSnackBar('Client updated.', 'success');
           setTimeout(() => {
             window.location.reload();

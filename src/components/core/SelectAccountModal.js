@@ -16,8 +16,8 @@ export default function SelectAccountModal({ accounts }) {
   } = useSnackbar();
 
   const handleSelection = accountId => {
-    const selectedAccountObject = accounts.find(account => account._id === accountId);
-    setActiveAccountId(selectedAccountObject._id);
+    const selectedAccountObject = accounts.find(account => account.id === accountId);
+    setActiveAccountId(selectedAccountObject.id);
     openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();

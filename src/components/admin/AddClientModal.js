@@ -47,7 +47,7 @@ export default function AddClientModal({ open, setOpen, hideCancel, accountId })
         const { client, message } = await addClient(fd);
 
         if (client) {
-          setActiveClientId(client._id);
+          setActiveClientId(client.id);
           openSnackBar('Client created.', 'success');
           setTimeout(() => {
             window.location.reload();

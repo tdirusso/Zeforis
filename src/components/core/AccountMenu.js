@@ -26,8 +26,8 @@ export default function AccountMenu({ accounts, accountId, parentHandler }) {
           accounts.map(account => {
             return (
               <MenuItem
-                key={account._id}
-                value={account._id}>
+                key={account.id}
+                value={account.id}>
                 {account.name}
               </MenuItem>
             );

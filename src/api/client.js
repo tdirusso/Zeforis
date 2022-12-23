@@ -27,23 +27,25 @@ const setActiveClientId = (clientId) => {
 };
 
 const getActiveClientId = () => {
-  return localStorage.getItem('activeClientId') || null;
+  return Number(localStorage.getItem('activeClientId'));
 };
 
 const getUserClientListForAccount = (user, activeAccountId) => {
   const result = [];
 
   user.adminOfClients.forEach(client => {
-    if (client.account === activeAccountId) {
+    if (client.accountId === activeAccountId) {
       result.push({ ...client, access: 'admin' });
     }
   });
 
   user.memberOfClients.forEach(client => {
-    if (client.account === activeAccountId) {
+    if (client.accountId === activeAccountId) {
       result.push({ ...client, access: 'member' });
     }
   });
+
+  console.log(result);
 
   return result;
 };

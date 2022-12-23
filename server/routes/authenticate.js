@@ -90,7 +90,8 @@ module.exports = async (req, res) => {
           id: client_id,
           name: client_name,
           brand: client_brand,
-          logo: client_logo
+          logo: client_logo,
+          accountId: account_id
         };
 
         if (permission_type === 'admin') {

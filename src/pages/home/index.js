@@ -46,9 +46,10 @@ export default function Home({ theme, setTheme }) {
 
   useEffect(() => {
     if (user) {
+      console.log(user)
       if (activeAccountId) {
         const activeAccount = user.memberOfAccounts.find(account => {
-          return account._id === activeAccountId;
+          return account.id === activeAccountId;
         });
 
         if (activeAccount) {
@@ -58,7 +59,7 @@ export default function Home({ theme, setTheme }) {
 
       if (activeClientId) {
         const activeClient = user.adminOfClients.concat(user.memberOfClients).find(client => {
-          return client._id === activeClientId;
+          return client.id === activeClientId;
         });
 
         if (activeClient) {
@@ -85,8 +86,8 @@ export default function Home({ theme, setTheme }) {
     }
 
     async function fetchTasks() {
-      console.log(client._id)
-      const result = await getTasks(client._id);
+      console.log(client.id)
+      const result = await getTasks(client.id);
       console.log(result);
       // if (tasks) {
       //   setTasks([]);
@@ -102,7 +103,7 @@ export default function Home({ theme, setTheme }) {
 
   if (!account) {
     if (user.memberOfAccounts.length === 1) {
-      setActiveAccountId(user.memberOfAccounts[0]._id);
+      setActiveAccountId(user.memberOfAccounts[0].id);
       setAccount(user.memberOfAccounts[0]);
     } else {
       return (
@@ -135,7 +136,7 @@ export default function Home({ theme, setTheme }) {
 
   if (!client) {
     if (clients.length === 1) {
-      setActiveClientId(clients[0]._id);
+      setActiveClientId(clients[0].id);
       setClient(clients[0]);
     } else {
       return (

@@ -7,7 +7,7 @@ const register = async (payload) => {
 };
 
 const getActiveAccountId = () => {
-  return localStorage.getItem('activeAccountId');
+  return Number(localStorage.getItem('activeAccountId'));
 };
 
 const setActiveAccountId = (accountId) => {

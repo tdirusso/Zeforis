@@ -28,7 +28,7 @@ export default function Dashboard() {
       <AddFolderModal
         open={addFolderModalOpen}
         setOpen={setAddFolderModalOpen}
-        clientId={client._id}
+        clientId={client.id}
       />
 
     </Paper>

@@ -6,7 +6,7 @@ import Select from '@mui/material/Select';
 import { Typography } from "@mui/material";
 
 export default function ClientMenu({ client, clients, parentHandler }) {
-  const [clientId, setClientId] = useState(client?._id || '');
+  const [clientId, setClientId] = useState(client?.id || '');
 
   const label = clientId ? 'Current Client' : 'Client';
 
@@ -14,7 +14,7 @@ export default function ClientMenu({ client, clients, parentHandler }) {
     setClientId(e.target.value);
 
     if (parentHandler) {
-      const selectedClientObject = clients.find(client => client._id === e.target.value);
+      const selectedClientObject = clients.find(client => client.id === e.target.value);
       parentHandler(selectedClientObject);
     }
   };
@@ -40,8 +40,8 @@ export default function ClientMenu({ client, clients, parentHandler }) {
                 display: 'flex',
                 alignItems: 'center',
               }}
-                key={client._id}
-                value={client._id}>
+                key={client.id}
+                value={client.id}>
                 {client.name}
                 <Typography variant="body2" color="#b9b9b9" sx={{ ml: 1.5 }}>
                   {

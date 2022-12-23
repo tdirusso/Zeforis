@@ -16,7 +16,7 @@ export default function SelectClientModal({ clients, client }) {
   } = useSnackbar();
 
   const handleSelection = (clientObject) => {
-    setActiveClientId(clientObject._id);
+    setActiveClientId(clientObject.id);
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
