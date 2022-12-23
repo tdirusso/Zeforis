@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../../models/user');
+const pool = require('../../database');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -16,10 +16,10 @@ module.exports = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
     const userId = decoded.user.id;
-    const user = await User.exists({ _id: userId });
+    const [existsResult] = await pool.query('SELECT 1 FROM users WHERE id = ?', [userId]);
 
-    if (user) {
-      req.userId = user._id;
+    if (existsResult.length) {
+      req.userId = userId;
       return next();
     }
 
