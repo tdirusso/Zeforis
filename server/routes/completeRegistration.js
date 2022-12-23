@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const User = require('../../models/user');
 const validator = require("email-validator");
+const pool = require('../../database');
 
 module.exports = async (req, res) => {
   const {
@@ -24,7 +24,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const [userResult] = await pool.query('SELECT id, password FROM users WHERE email = ?', [email.toLowerCase()]);
+
+    const user = userResult[0];
 
     if (!user) {
       return res.json({
@@ -36,13 +38,24 @@ module.exports = async (req, res) => {
       return res.json({ message: 'Account already fully registered - please sign in instead.' });
     }
 
-    const isUserAdminOfClient = user.memberOfAccounts.some(({ _id }) => _id.toString() === clientId);
-    const isUserMemberOfClient = user.memberOfClients.some(({ _id }) => _id.toString() === clientId);
+    const [isAdminOrMemberResult] = await pool.query(
+      `
+        SELECT EXISTS (
+          SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?
+          UNION
+          SELECT 1 FROM client_members WHERE user_id = ? AND client_id = ?
+        ) 
+      `,
+      [user.id, clientId, user.id, clientId]
+    );
 
-    if (isUserAdminOfClient || isUserMemberOfClient) {
-      user.password = await bcrypt.hash(password, 10);
-      user.isVerified = true;
-      await user.save();
+    if (Object.keys(isAdminOrMemberResult[0][0])) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await pool.query(
+        'UPDATE users SET is_verified = 1, password = ? WHERE id = ?',
+        [hashedPassword, user.id]
+      );
 
       return res.json({ success: true });
     } else {

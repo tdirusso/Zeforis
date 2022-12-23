@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../../models/user');
+const pool = require('../../database');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -26,35 +26,32 @@ module.exports = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
     const userId = decoded.user.id;
-    const user = await User.findById(userId)
-      .populate('ownerOfAccount')
-      .populate('adminOfClients')
-      .lean();
 
-    if (user) {
-      req.userId = user._id;
+    if (clientId) {
+      const [doesClientAdminExistResult] = await pool.query(
+        'SELECT EXISTS(SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?)',
+        [userId, clientId]
+      );
 
-      if (clientId) {
-        const isAdminOfClient = user.adminOfClients.some(({ _id }) => _id.toString() === clientId);
-
-        if (isAdminOfClient) {
-          return next();
-        } else {
-          return res.json({ message: 'Unauthorized.' });
-        }
+      if (Object.values(doesClientAdminExistResult[0])[0]) {
+        req.userId = userId;
+        return next();
       } else {
-        const isOwnerOfAccount = user.ownerOfAccount._id.toString() === accountId;
+        return res.json({ message: 'Unauthorized.' });
+      }
+    } else {
+      const [isOwnerOfAccountResult] = await pool.query(
+        'SELECT EXISTS(SELECT 1 FROM accounts WHERE id = ? AND owner_id = ?)',
+        [accountId, userId]
+      );
 
-        if (isOwnerOfAccount) {
-          return next();
-        } else {
-          return res.json({ message: 'Unauthorized' });
-        }
+      if (Object.values(isOwnerOfAccountResult[0])[0]) {
+        req.userId = userId;
+        return next();
+      } else {
+        return res.json({ message: 'Unauthorized' });
       }
     }
-
-    return res.json({ message: 'User does not exist.' });
-
   } catch (error) {
     console.log(error);
     return res.json({ message: error.message });

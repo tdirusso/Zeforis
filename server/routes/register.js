@@ -29,10 +29,9 @@ module.exports = async (req, res) => {
   }
 
   try {
+    const [existsResult] = await pool.query('SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)', [email.toLowerCase()]);
 
-    const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [email.toLowerCase()]);
-
-    if (existsResult.length) {
+    if (Object.values(existsResult[0])[0]) {
       return res.json({
         message: `"${email}" is already in use.  Please sign in instead.`
       });
@@ -45,7 +44,6 @@ module.exports = async (req, res) => {
     const createUserResult = await pool.query(
       'INSERT INTO users (first_name, last_name, email, password, verification_code) VALUES (?,?,?,?,?)',
       [firstName, lastName, email.toLowerCase(), hashedPassword, verificationCode]);
-
 
     const userId = createUserResult[0].insertId;
 

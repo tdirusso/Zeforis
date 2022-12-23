@@ -16,9 +16,9 @@ module.exports = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
     const userId = decoded.user.id;
-    const [existsResult] = await pool.query('SELECT 1 FROM users WHERE id = ?', [userId]);
+    const [existsResult] = await pool.query('SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)', [userId]);
 
-    if (existsResult.length) {
+    if (Object.values(existsResult[0])[0]) {
       req.userId = userId;
       return next();
     }

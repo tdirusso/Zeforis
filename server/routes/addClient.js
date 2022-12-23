@@ -1,7 +1,6 @@
-const Client = require('../../models/client');
-const User = require('../../models/user');
 const s3 = require('../../aws/s3');
 const sharp = require('sharp');
+const pool = require('../../database');
 
 const acceptMimes = ['image/png', 'image/jpeg'];
 
@@ -23,14 +22,19 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const client = await Client.create({
-      name,
-      brandColor,
-      account: accountId,
-      admins: [userId]
-    });
+    const newClient = await pool.query(
+      'INSERT INTO clients (name, account_id, brand_color) VALUES (?,?,?)',
+      [name, accountId, brandColor]
+    );
 
-    await User.updateOne({ _id: userId }, { $push: { adminOfClients: client._id } });
+    const newClientId = newClient[0].insertId;
+
+    await pool.query(
+      'INSERT INTO client_admins (client_id, user_id) VALUES (?,?)',
+      [newClientId, userId]
+    );
+
+    let logoUrl = '';
 
     if (logoFile) {
       if (acceptMimes.includes(logoFile.mimetype)) {
@@ -42,7 +46,7 @@ module.exports = async (req, res) => {
         const resizedLogoSize = Buffer.byteLength(resizedLogoBuffer);
         if (resizedLogoSize <= 250000) { //250,000 bytes -> 250 kb -> 0.25 mb
           const now = Date.now();
-          const uploadFileName = `client-logos/${client._id}-${now}.png`;
+          const uploadFileName = `client-logos/${newClientId}-${now}.png`;
 
           const s3ObjectParams = {
             Key: uploadFileName,
@@ -52,15 +56,25 @@ module.exports = async (req, res) => {
 
           const s3Result = await s3.upload(s3ObjectParams).promise();
 
-          client.logoUrl = s3Result.Location;
-          await client.save();
+          logoUrl = s3Result.Location;
+
+          await pool.query(
+            'UPDATE clients SET logo_url = ? WHERE client_id = ?',
+            [logoUrl, newClientId]
+          );
         }
       }
     }
 
-    return res.json({
-      client: client.toObject()
-    });
+    const clientObject = {
+      id: newClientId,
+      name,
+      brandColor,
+      accountId,
+      logoUrl
+    };
+
+    return res.json({ client: clientObject });
   } catch (error) {
     console.log(error);
 

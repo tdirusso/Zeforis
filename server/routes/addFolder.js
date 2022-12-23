@@ -1,4 +1,4 @@
-const Folder = require('../../models/folder');
+const pool = require('../../database');
 
 module.exports = async (req, res) => {
   const {
@@ -14,15 +14,19 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const folder = await Folder.create({
+    const newFolder = await pool.query(
+      'INSERT INTO folders (name, description, client_id) VALUES (?,?,?)',
+      [name, description, clientId]
+    );
+
+    const folderObject = {
+      id: newFolder[0].insertId,
       name,
       description,
-      client: clientId
-    });
+      clientId
+    };
 
-    return res.json({
-      folder: folder.toObject()
-    });
+    return res.json({ folder: folderObject });
   } catch (error) {
     console.log(error);
 
