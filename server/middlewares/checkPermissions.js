@@ -29,11 +29,11 @@ module.exports = async (req, res, next) => {
 
     if (clientId) {
       const [doesClientAdminExistResult] = await pool.query(
-        'SELECT EXISTS(SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?)',
+        'SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?',
         [userId, clientId]
       );
 
-      if (Object.values(doesClientAdminExistResult[0])[0]) {
+      if (doesClientAdminExistResult.length) {
         req.userId = userId;
         return next();
       } else {
@@ -41,11 +41,11 @@ module.exports = async (req, res, next) => {
       }
     } else {
       const [isOwnerOfAccountResult] = await pool.query(
-        'SELECT EXISTS(SELECT 1 FROM accounts WHERE id = ? AND owner_id = ?)',
+        'SELECT 1 FROM accounts WHERE id = ? AND owner_id = ?',
         [accountId, userId]
       );
 
-      if (Object.values(isOwnerOfAccountResult[0])[0]) {
+      if (isOwnerOfAccountResult.length) {
         req.userId = userId;
         return next();
       } else {

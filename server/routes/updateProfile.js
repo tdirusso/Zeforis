@@ -1,4 +1,4 @@
-const User = require('../../models/user');
+const pool = require('../../database');
 
 module.exports = async (req, res) => {
   const {
@@ -19,13 +19,16 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.findByIdAndUpdate(updaterUserId, { firstName, lastName });
+    const [updateResult] = await pool.query(
+      'UPDATE users SET first_name = ?, last_name = ? WHERE id = ?',
+      [firstName, lastName, updaterUserId]
+    );
 
-    if (!user) {
-      return res.json({ message: 'User does not exist.' });
+    if (updateResult.affectedRows) {
+      return res.json({ success: true });
     }
 
-    return res.json({ success: true });
+    return res.json({ message: 'Invalid user.' });
   } catch (error) {
     console.log(error);
 

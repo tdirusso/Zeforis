@@ -3,12 +3,10 @@ const cookieParser = require('cookie-parser');
 const Mongoose = require('mongoose');
 const path = require('path');
 const fileUpload = require('express-fileupload');
-const pool = require('../database');
 
 const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
 const addClient = require('./routes/addClient');
-const getAllClients = require('./routes/getAllClients');
 const getTasks = require('./routes/getTasks');
 const getSettings = require('./routes/getSettings');
 const addFolder = require('./routes/addFolder');
@@ -44,8 +42,6 @@ app.use(fileUpload({}));
 
 const boot = async () => {
 
- // await (await pool.getConnection()).ping();
-
   const dbUsername = process.env.DB_USERNAME;
   const dbPassword = process.env.DB_PASSWORD;
   const dbCluster = process.env.DB_CLUSTER;
@@ -58,7 +54,6 @@ const boot = async () => {
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
   app.post('/api/addClient', checkPermissionsMW, addClient);
-  app.get('/api/getAllClients', checkPermissionsMW, getAllClients);
   app.get('/api/getTasks', checkPermissionsMW, getTasks);
   app.get('/api/verify', verify);
   app.get('/api/getSettings', getSettings);

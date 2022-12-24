@@ -40,16 +40,14 @@ module.exports = async (req, res) => {
 
     const [isAdminOrMemberResult] = await pool.query(
       `
-        SELECT EXISTS (
           SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?
           UNION
           SELECT 1 FROM client_members WHERE user_id = ? AND client_id = ?
-        ) 
       `,
       [user.id, clientId, user.id, clientId]
     );
 
-    if (Object.keys(isAdminOrMemberResult[0][0])) {
+    if (isAdminOrMemberResult.length) {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       await pool.query(

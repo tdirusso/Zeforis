@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-
     const [result] = await pool.query(
       'UPDATE users SET verification_code = NULL, is_verified = 1 WHERE email = ? AND verification_code = ?',
       [email.toLowerCase(), verificationCode]

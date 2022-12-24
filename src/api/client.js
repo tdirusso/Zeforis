@@ -6,11 +6,6 @@ const addClient = async (payload) => {
   return data;
 };
 
-const getAllClients = async () => {
-  const { data } = await request.get(`getAllClients`);
-  return data;
-};
-
 const getClientTree = async (clientId) => {
   const { data } = await request.get(`getClientTree?clientId=${clientId}`);
   return data;
@@ -45,8 +40,6 @@ const getUserClientListForAccount = (user, activeAccountId) => {
     }
   });
 
-  console.log(result);
-
   return result;
 };
 
@@ -80,7 +73,6 @@ const getTasks = async (clientId) => {
 
 export {
   addClient,
-  getAllClients,
   getClientTree,
   updateClient,
   setActiveClientId,

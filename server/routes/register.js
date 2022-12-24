@@ -29,9 +29,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const [existsResult] = await pool.query('SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)', [email.toLowerCase()]);
+    const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [email.toLowerCase()]);
 
-    if (Object.values(existsResult[0])[0]) {
+    if (existsResult.length) {
       return res.json({
         message: `"${email}" is already in use.  Please sign in instead.`
       });
