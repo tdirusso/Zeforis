@@ -29,7 +29,7 @@ module.exports = async (req, res, next) => {
 
     if (clientId) {
       const [doesClientAdminExistResult] = await pool.query(
-        'SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?',
+        'SELECT 1 FROM client_users WHERE user_id = ? AND client_id = ? AND role = "admin"',
         [userId, clientId]
       );
 

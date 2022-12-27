@@ -45,11 +45,11 @@ export default function RemoveClientMemberModal(props) {
           userId
         });
 
-        const updatedUser = result.user;
+        const success = result.success;
         const resultMessage = result.message;
         const removedFromAccount = result.removedFromAccount;
 
-        if (updatedUser) {
+        if (success) {
           setTimeout(() => {
             openSnackBar('Successully removed.', 'success');
           }, 250);

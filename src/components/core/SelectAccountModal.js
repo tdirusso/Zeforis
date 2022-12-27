@@ -30,7 +30,7 @@ export default function SelectAccountModal({ accounts }) {
         <DialogTitle>Select an Organization</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please select an organization you would like to view the drop-down list below.
+            Please select an organization from the drop-down list below.
           </DialogContentText>
           <br></br>
           <AccountMenu

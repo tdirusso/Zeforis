@@ -39,12 +39,8 @@ module.exports = async (req, res) => {
     }
 
     const [isAdminOrMemberResult] = await pool.query(
-      `
-          SELECT 1 FROM client_admins WHERE user_id = ? AND client_id = ?
-          UNION
-          SELECT 1 FROM client_members WHERE user_id = ? AND client_id = ?
-      `,
-      [user.id, clientId, user.id, clientId]
+      `SELECT 1 FROM client_users WHERE user_id = ? AND client_id = ? LIMIT 1`,
+      [user.id, clientId]
     );
 
     if (isAdminOrMemberResult.length) {

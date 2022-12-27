@@ -27,46 +27,46 @@ module.exports = async (req, res) => {
     const user = userResult[0];
 
     if (user) {
-      const [userData] = await pool.query(
+      const [clientMemberData] = await pool.query(
         `
           SELECT 
-            client_admins.client_id, 
-            client_admins.user_id,
+            client_users.client_id, 
+            client_users.user_id,
+            client_users.role,
             accounts.name AS account_name,
             accounts.brand_color AS account_brand,
             accounts.logo_url AS account_logo,
             accounts.id AS account_id,
             clients.name AS client_name, 
             clients.brand_color AS client_brand, 
-            clients.logo_url AS client_logo, 
-            'admin' AS permission_type FROM client_admins 
-          LEFT JOIN clients ON clients.id = client_admins.client_id
-          LEFT JOIN accounts ON accounts.id = clients.account_id
-          WHERE user_id = ?
-          UNION ALL
-          SELECT 
-            client_members.client_id, 
-            client_members.user_id,
-            accounts.name AS account_name,
-            accounts.brand_color AS account_brand,
-            accounts.logo_url AS account_logo,
-            accounts.id AS account_id,
-            clients.name AS client_name, 
-            clients.brand_color AS client_brand, 
-            clients.logo_url AS client_logo,
-            'member' AS permission_type FROM client_members
-          LEFT JOIN clients ON clients.id = client_members.client_id
+            clients.logo_url AS client_logo
+          FROM client_users
+          LEFT JOIN clients ON clients.id = client_users.client_id
           LEFT JOIN accounts ON accounts.id = clients.account_id
           WHERE user_id = ?
         `,
-        [userId, userId]
+        [userId]
+      );
+
+      const [ownedAccountsData] = await pool.query(
+        'SELECT id, name, brand_color, logo_url FROM accounts WHERE owner_id = ?',
+        [userId]
       );
 
       const memberOfAccounts = {};
       const memberOfClients = [];
       const adminOfClients = [];
 
-      userData.forEach(row => {
+      ownedAccountsData.forEach(row => {
+        memberOfAccounts[row.id] = {
+          id: row.id,
+          name: row.name,
+          brandColor: row.brand_color,
+          logo: row.logo_url
+        };
+      });
+
+      clientMemberData.forEach(row => {
         const {
           account_id,
           account_name,
@@ -76,25 +76,25 @@ module.exports = async (req, res) => {
           client_name,
           client_brand,
           client_logo,
-          permission_type
+          role
         } = row;
 
         memberOfAccounts[account_id] = {
           id: account_id,
           name: account_name,
-          brand: account_brand,
+          brandColor: account_brand,
           logo: account_logo
         };
 
         const clientObject = {
           id: client_id,
           name: client_name,
-          brand: client_brand,
+          brandColor: client_brand,
           logo: client_logo,
           accountId: account_id
         };
 
-        if (permission_type === 'admin') {
+        if (role === 'admin') {
           adminOfClients.push(clientObject);
         } else {
           memberOfClients.push(clientObject);

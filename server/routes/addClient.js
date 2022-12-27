@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
     const newClientId = newClient[0].insertId;
 
     await pool.query(
-      'INSERT INTO client_admins (client_id, user_id) VALUES (?,?)',
+      'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "admin")',
       [newClientId, userId]
     );
 

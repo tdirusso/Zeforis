@@ -86,9 +86,8 @@ export default function Home({ theme, setTheme }) {
     }
 
     async function fetchTasks() {
-      console.log(client.id)
-      const result = await getTasks(client.id);
-      console.log(result);
+     // const result = await getTasks(client.id);
+     // console.log(result);
       // if (tasks) {
       //   setTasks([]);
       // } else {

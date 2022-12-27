@@ -1,6 +1,4 @@
-const User = require('../../models/user');
-const Account = require('../../models/account');
-const Client = require('../../models/client');
+const pool = require('../../database');
 
 module.exports = async (req, res) => {
   const {
@@ -22,20 +20,40 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.findOneAndUpdate({ _id: userId }, { $pull: { memberOfClients: clientId } }, { new: true });
-    await Client.updateOne({ _id: clientId }, { $pull: { members: userId } });
+    const [removeResult] = await pool.query(
+      'DELETE FROM client_users WHERE client_id = ? AND user_id = ? AND role = "member"',
+      [clientId, userId]
+    );
 
-    let removedFromAccount = false;
+    if (removeResult.affectedRows) {
+      let removedFromAccount = false;
 
-    if (user.memberOfClients.length === 0 && user.adminOfClients.length === 0) {
-      user.memberOfAccounts = [];
-      await user.save();
-      await Account.updateOne({ _id: accountId }, { $pull: { members: userId } });
-      removedFromAccount = true;
+      const [countResult] = await pool.query(
+        `
+        SELECT COUNT(*) FROM 
+          (
+            SELECT 1 FROM client_users
+            LEFT JOIN clients ON clients.id = client_users.client_id
+            LEFT JOIN accounts ON accounts.id = clients.account_id 
+            WHERE accounts.id = ? AND user_id = ?
+          ) 
+        AS count`,
+        [accountId, userId]
+      );
+
+      const clientCount = Object.values(countResult[0])[0];
+
+      if (clientCount === 0) {
+        removedFromAccount = true;
+      }
+
+      return res.json({
+        success: true,
+        removedFromAccount
+      });
     }
 
-    return res.json({ user: user.toObject(), removedFromAccount });
-
+    return res.json({ message: 'User is not a member of this client' });
   } catch (error) {
     console.log(error);
 
