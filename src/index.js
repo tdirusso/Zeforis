@@ -14,6 +14,8 @@ import RegisterSuccessPage from './pages/Register/RegisterSuccess';
 import CompleteRegistrationPage from './pages/CompleteRegistration';
 import Dashboard from './pages/Home/Dashboard';
 import Settings from './pages/Home/Settings';
+import FoldersPage from './pages/Home/Folders';
+import TasksPage from './pages/Home/Tasks';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 
@@ -33,6 +35,8 @@ function App() {
 
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="folders" element={<FoldersPage />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

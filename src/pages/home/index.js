@@ -10,7 +10,7 @@ import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import themeConfig from "../../theme";
-import { getActiveClientId, getTasks, getUserClientListForAccount, setActiveClientId } from "../../api/client";
+import { getActiveClientId, getClientData, getUserClientListForAccount, setActiveClientId } from "../../api/client";
 import AddClientModal from "../../components/admin/AddClientModal";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
@@ -36,6 +36,8 @@ export default function Home({ theme, setTheme }) {
   const [client, setClient] = useState(null);
   const [account, setAccount] = useState(null);
   const [tasks, setTasks] = useState(null);
+  const [folders, setFolders] = useState(null);
+  const [clientUsers, setClientUsers] = useState(null);
 
   const {
     isOpen,
@@ -46,7 +48,7 @@ export default function Home({ theme, setTheme }) {
 
   useEffect(() => {
     if (user) {
-      console.log(user)
+      console.log(user);
       if (activeAccountId) {
         const activeAccount = user.memberOfAccounts.find(account => {
           return account.id === activeAccountId;
@@ -72,27 +74,27 @@ export default function Home({ theme, setTheme }) {
           setClient(activeClient);
         }
       }
-
-      setLoading(false);
     } else if (authError) {
       openSnackBar(authError, 'error');
     }
   }, [user, authError]);
 
   useEffect(() => {
-
     if (client && !tasks) {
-      fetchTasks();
+      fetchClientData();
     }
 
-    async function fetchTasks() {
-     // const result = await getTasks(client.id);
-     // console.log(result);
-      // if (tasks) {
-      //   setTasks([]);
-      // } else {
-      //   openSnackBar(message, 'error');
-      // }
+    async function fetchClientData() {
+      const result = await getClientData(client.id);
+
+      if (!tasks) {
+        setTasks([]);
+        setFolders(result.folders);
+        setClientUsers(result.clientUsers);
+        setLoading(false);
+      } else {
+        openSnackBar(message, 'error');
+      }
     }
   }, [client]);
 
@@ -157,7 +159,9 @@ export default function Home({ theme, setTheme }) {
             client,
             clients,
             account,
-            user
+            user,
+            folders,
+            clientUsers
           }}
         />
         {/* </Paper> */}

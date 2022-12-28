@@ -13,23 +13,8 @@ export default function Dashboard() {
 
   return (
     <Paper className="Dashboard" sx={{ p: 5 }}>
-      <Box>
-        <Fab
-          variant="extended"
-          sx={{ textTransform: 'none', boxShadow: 'none' }}
-          color="primary"
-          onClick={() => setAddFolderModalOpen(true)}>
-          <FolderIcon sx={{ mr: 1 }} />
-          New Folder
-        </Fab>
-      </Box>
-
-
-      <AddFolderModal
-        open={addFolderModalOpen}
-        setOpen={setAddFolderModalOpen}
-        clientId={client.id}
-      />
+     
+        
 
     </Paper>
   );

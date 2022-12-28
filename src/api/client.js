@@ -65,8 +65,8 @@ const removeClientMember = async (payload) => {
   return data;
 };
 
-const getTasks = async (clientId) => {
-  const { data } = await request.get(`getTasks?clientId=${clientId}`);
+const getClientData = async (clientId) => {
+  const { data } = await request.get(`getClientData?clientId=${clientId}`);
 
   return data;
 };
@@ -82,5 +82,5 @@ export {
   removeActiveClientId,
   inviteClientMember,
   removeClientMember,
-  getTasks
+  getClientData
 };

@@ -73,39 +73,40 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
           <DialogContentText>
             Please enter the folder name and optional description below.
           </DialogContentText>
-          <form onSubmit={handleCreateFolder}></form>
-          <Box sx={{ mt: 3, mb: 3 }}>
-            <TextField
-              label="Name"
-              fullWidth
-              autoFocus
-              disabled={isLoading}
-              inputRef={name}
-              required
-            >
-            </TextField>
-            <TextField
-              label="Desciption (optional)"
-              fullWidth
-              disabled={isLoading}
-              inputRef={description}
-              sx={{ mt: 4 }}
-            >
-            </TextField>
-          </Box>
-          <DialogActions>
-            <Button
-              onClick={handleClose}>
-              Cancel
-            </Button>
-            <LoadingButton
-              variant='contained'
-              onClick={handleCreateFolder}
-              type='submit'
-              loading={isLoading}>
-              Create Folder
-            </LoadingButton>
-          </DialogActions>
+          <form onSubmit={handleCreateFolder}>
+            <Box sx={{ mt: 3, mb: 3 }}>
+              <TextField
+                label="Name"
+                fullWidth
+                autoFocus
+                disabled={isLoading}
+                inputRef={name}
+                required
+              >
+              </TextField>
+              <TextField
+                label="Desciption (optional)"
+                fullWidth
+                disabled={isLoading}
+                inputRef={description}
+                sx={{ mt: 4 }}
+              >
+              </TextField>
+            </Box>
+            <DialogActions>
+              <Button
+                onClick={handleClose}>
+                Cancel
+              </Button>
+              <LoadingButton
+                variant='contained'
+                onClick={handleCreateFolder}
+                type='submit'
+                loading={isLoading}>
+                Create Folder
+              </LoadingButton>
+            </DialogActions>
+          </form>
         </DialogContent>
       </Dialog>
       <Snackbar
@@ -113,6 +114,6 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
         type={type}
         message={message}
       />
-    </div >
+    </div>
   );
 };

@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const [clientMemberData] = await pool.query(
+    const [accountMemberData] = await pool.query(
       `
         SELECT 
           users.id as user_id,
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
 
     const users = {};
 
-    clientMemberData.forEach(row => {
+    accountMemberData.forEach(row => {
       const {
         client_id,
         client_name,

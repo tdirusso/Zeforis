@@ -6,7 +6,7 @@ const fileUpload = require('express-fileupload');
 const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
 const addClient = require('./routes/addClient');
-const getTasks = require('./routes/getTasks');
+const getClientData = require('./routes/getClientData');
 const getSettings = require('./routes/getSettings');
 const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
@@ -43,7 +43,7 @@ const boot = async () => {
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
   app.post('/api/addClient', checkPermissionsMW, addClient);
-  app.get('/api/getTasks', checkPermissionsMW, getTasks);
+  app.get('/api/getClientData', checkPermissionsMW, getClientData);
   app.get('/api/verify', verify);
   app.get('/api/getSettings', getSettings);
   app.post('/api/addFolder', checkPermissionsMW, addFolder);
