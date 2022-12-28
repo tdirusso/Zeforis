@@ -1,6 +1,5 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const Mongoose = require('mongoose');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 
@@ -41,16 +40,6 @@ app.use(cookieParser());
 app.use(fileUpload({}));
 
 const boot = async () => {
-
-  const dbUsername = process.env.DB_USERNAME;
-  const dbPassword = process.env.DB_PASSWORD;
-  const dbCluster = process.env.DB_CLUSTER;
-  const dbName = process.env.DB_NAME;
-
-  const dbUri = `mongodb+srv://${dbUsername}:${dbPassword}@${dbCluster}/${dbName}`;
-
-  await Mongoose.connect(dbUri);
-
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
   app.post('/api/addClient', checkPermissionsMW, addClient);

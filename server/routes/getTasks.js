@@ -1,5 +1,3 @@
-const Folder = require('../../models/folder');
-const Task = require('../../models/task');
 
 module.exports = async (req, res) => {
 
@@ -11,30 +9,30 @@ module.exports = async (req, res) => {
 
   try {
 
-    const folders = await Folder.find({ client: clientId }).lean();
-    const folderIds = folders.map(folder => folder._id.toString());
+    //const folders = await Folder.find({ client: clientId }).lean();
+   // const folderIds = folders.map(folder => folder._id.toString());
 
-    let tasks = await Task.find({ folder: { $in: folderIds } }).lean();
+    // let tasks = await Task.find({ folder: { $in: folderIds } }).lean();
 
-    const foldersMap = new Map(folders.map(folder => [folder._id.toString(), folder]));
+    // const foldersMap = new Map(folders.map(folder => [folder._id.toString(), folder]));
 
-    tasks = [{ folder: '63a36cf749bb76fc0bdd963e', name: 'task 1' }];
+    // tasks = [{ folder: '63a36cf749bb76fc0bdd963e', name: 'task 1' }];
 
-    tasks.forEach(task => {
-      const folderId = task.folder.toString();
+    // tasks.forEach(task => {
+    //   const folderId = task.folder.toString();
 
-      const folder = foldersMap.get(folderId);
+    //   const folder = foldersMap.get(folderId);
 
-      if (folder.tasks) {
-        folder.tasks.push(task);
-      } else {
-        folder.tasks = [task];
-      }
-    });
+    //   if (folder.tasks) {
+    //     folder.tasks.push(task);
+    //   } else {
+    //     folder.tasks = [task];
+    //   }
+    // });
 
 
 
-    return res.json({ folders: Array.from(foldersMap, ([name, value]) => value) });
+    // return res.json({ folders: Array.from(foldersMap, ([name, value]) => value) });
 
   } catch (error) {
     console.log(error);

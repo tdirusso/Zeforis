@@ -19,7 +19,7 @@ export default function RemoveClientMemberModal(props) {
     accountId,
     user,
     setClientMembers,
-    setAccountMembers
+    setAccountUsers
   } = props;
 
   const userId = user?.id;
@@ -34,6 +34,10 @@ export default function RemoveClientMemberModal(props) {
     message
   } = useSnackbar();
 
+  const willBeRemovedFromAccount = user?.memberOfClients.map(client => client.id).length === 1;
+
+  console.log(willBeRemovedFromAccount)
+
   const handleRemoveClientMember = () => {
     setLoading(true);
 
@@ -47,15 +51,14 @@ export default function RemoveClientMemberModal(props) {
 
         const success = result.success;
         const resultMessage = result.message;
-        const removedFromAccount = result.removedFromAccount;
 
         if (success) {
           setTimeout(() => {
             openSnackBar('Successully removed.', 'success');
           }, 250);
 
-          if (removedFromAccount) {
-            setAccountMembers(members => members.filter(member => member.id !== user.id));
+          if (willBeRemovedFromAccount) {
+            setAccountUsers(members => members.filter(member => member.id !== user.id));
           }
 
           setClientMembers(members => members.filter(member => member.id !== user.id));

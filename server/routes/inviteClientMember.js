@@ -1,11 +1,9 @@
-const User = require('../../models/user');
-const Client = require('../../models/client');
-const Account = require('../../models/account');
 const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 const emailService = require('../../email');
 const validator = require("email-validator");
+const pool = require('../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -15,7 +13,9 @@ module.exports = async (req, res) => {
     firstName,
     lastName,
     clientId,
-    accountId
+    clientName,
+    accountId,
+    accountName
   } = req.body;
 
   if (!clientId || !accountId) {
@@ -35,79 +35,53 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email: email.toLowerCase() });
-    const client = await Client.findById(clientId);
-    const account = await Account.findById(accountId);
+    const [userResult] = await pool.query(
+      'SELECT id, first_name, last_name, email FROM users WHERE email = ?',
+      [email.toLowerCase()]);
 
-    if (!client || !account) {
-      return res.json({ message: 'Account or client does not exist.' });
-    }
+    const user = userResult[0];
 
     if (user) {
-      const isUserAlreadyMemberOfClient = user.memberOfClients.some(id => id.toString() === clientId);
-      const isUserAlreadyAdminOfClient = user.adminOfClients.some(id => id.toString() === clientId);
-      const isUserPartOfAccount = user.memberOfAccounts.some(id => id.toString() === accountId);
-
-      if (isUserAlreadyMemberOfClient) {
-        return res.json({ message: `${email} is already a member of ${client.name}` });
-      } else if (isUserAlreadyAdminOfClient) {
-        return res.json({ message: `${email} is already an administrator of ${client.name}` });
-      }
+      await pool.query(
+        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "member")',
+        [clientId, user.id]
+      );
 
       //TODO enable account org branding in email
       await sendInvitationEmail({
         email: email.toLowerCase(),
         clientId,
         accountId,
-        accountName: account.name,
-        clientName: client.name,
+        accountName,
+        clientName,
         templateFile: '../../email/templates/inviteExistingUser.ejs'
       });
 
-      user.memberOfClients.push(clientId);
-
-      client.members.push(user._id);
-
-      if (!isUserPartOfAccount) {
-        account.members.push(user._id);
-        user.memberOfAccounts.push(accountId);
-
-        await account.save();
-      }
-
-      await user.save();
-      await client.save();
-
-      return res.json({ user: user.toObject(), addedToAccount: !isUserPartOfAccount });
+      return res.json({ success: true, userId: user.id });
     } else {
-      await sendInvitationEmail(
-        {
-          email: email.toLowerCase(),
-          clientId,
-          accountId,
-          accountName: account.name,
-          clientName: client.name,
-          templateFile: '../../email/templates/inviteNewUser.ejs',
-          isNewUser: true
-        }
-      );
-
-      const newUser = await User.create({
-        email,
-        firstName,
-        lastName
+      await sendInvitationEmail({
+        email: email.toLowerCase(),
+        clientId,
+        accountId,
+        accountName,
+        clientName,
+        templateFile: '../../email/templates/inviteNewUser.ejs',
+        isNewUser: true
       });
 
-      newUser.memberOfAccounts = [accountId];
-      newUser.memberOfClients = [clientId];
-      account.members.push(newUser._id);
-      client.members.push(newUser._id);
+      const newUserResult = await pool.query(
+        'INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)',
+        [firstName, lastName, email.toLowerCase()]
+      );
 
-      await newUser.save();
-      await account.save();
-      await client.save();
+      const newUserId = newUserResult[0].insertId;
 
-      return res.json({ user: newUser.toObject(), addedToAccount: true });
+      await pool.query(
+        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "member")',
+        [clientId, newUserId]
+      );
+
+      return res.json({ success: true, userId: newUserId });
     }
   } catch (error) {
     console.log(error);

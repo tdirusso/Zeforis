@@ -18,14 +18,18 @@ export default function InviteClientMemberModal(props) {
     clientId,
     clientName,
     accountId,
+    accountName,
     setClientMembers,
-    setAccountMembers
+    setAccountUsers,
+    accountUsers
   } = props;
-
+  
   const email = useRef();
   const firstName = useRef();
   const lastName = useRef();
   const [isLoading, setLoading] = useState(false);
+
+  const accountUsersIds = accountUsers.map(user => user.id);
 
   const {
     isOpen,
@@ -55,24 +59,41 @@ export default function InviteClientMemberModal(props) {
 
     setTimeout(async () => {
       try {
-        const { user, message, addedToAccount } = await inviteClientMember({
+        const { success, message, userId } = await inviteClientMember({
           email: emailVal,
           clientId,
           accountId,
+          clientName,
+          accountName,
           firstName: firstNameVal,
           lastName: lastNameVal
         });
 
-        if (user) {
+        if (success) {
           setTimeout(() => {
             openSnackBar('Invitation successfully sent.', 'success');
           }, 250);
 
-          if (addedToAccount) {
-            setAccountMembers(members => [...members, user]);
+          const addedUser = {
+            id: userId,
+            firstName: firstNameVal,
+            lastName: lastNameVal,
+            email: emailVal
+          };
+
+          if (!accountUsersIds.includes(userId)) { // User is new to the account
+            addedUser.memberOfClients = [{ id: clientId, name: clientName }];
+            addedUser.adminOfClients = [];
+            setAccountUsers(members => [...members, addedUser]);
+            setClientMembers(members => [...members, addedUser]);
+          } else { // User already exists in the account
+            const accountUsersClone = [...accountUsers];
+            const theExistingUser = accountUsersClone.find(user => user.id === userId);
+            theExistingUser.memberOfClients.push({ id: clientId, name: clientName });
+            setAccountUsers(accountUsersClone);
+            setClientMembers(members => [...members, theExistingUser]);
           }
 
-          setClientMembers(members => [...members, user]);
           handleClose();
         } else {
           openSnackBar(message, 'error');

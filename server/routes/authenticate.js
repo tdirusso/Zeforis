@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
           firstName: user.first_name,
           lastName: user.last_name,
           email: user.email,
-          dateCreated: user.dateCreated,
+          dateCreated: user.date_created,
           memberOfAccounts: Object.values(memberOfAccounts),
           adminOfClients,
           memberOfClients

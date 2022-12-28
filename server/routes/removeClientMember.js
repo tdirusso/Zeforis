@@ -26,31 +26,7 @@ module.exports = async (req, res) => {
     );
 
     if (removeResult.affectedRows) {
-      let removedFromAccount = false;
-
-      const [countResult] = await pool.query(
-        `
-        SELECT COUNT(*) FROM 
-          (
-            SELECT 1 FROM client_users
-            LEFT JOIN clients ON clients.id = client_users.client_id
-            LEFT JOIN accounts ON accounts.id = clients.account_id 
-            WHERE accounts.id = ? AND user_id = ?
-          ) 
-        AS count`,
-        [accountId, userId]
-      );
-
-      const clientCount = Object.values(countResult[0])[0];
-
-      if (clientCount === 0) {
-        removedFromAccount = true;
-      }
-
-      return res.json({
-        success: true,
-        removedFromAccount
-      });
+      return res.json({ success: true });
     }
 
     return res.json({ message: 'User is not a member of this client' });

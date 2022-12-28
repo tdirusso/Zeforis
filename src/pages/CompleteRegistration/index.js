@@ -49,7 +49,7 @@ export default function CompleteRegistrationPage() {
       });
 
       if (success) {
-        openSnackBar('Account successfully updated...', 'success');
+        openSnackBar('Registration completed successfully.', 'success');
         setTimeout(() => {
           navigate('/login');
         }, 2000);

@@ -21,8 +21,6 @@ import ClearIcon from '@mui/icons-material/Clear';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import InviteClientMemberModal from "../../components/admin/InviteClientMemberModal";
 import RemoveClientMemberModal from "../../components/admin/RemoveClientMemberModal";
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import AccountMenu from "../../components/core/AccountMenu";
 import { setActiveAccountId } from "../../api/account";
 import EditProfileModal from "../../components/core/EditProfileModal";
@@ -40,15 +38,12 @@ export default function Settings() {
 
   const [clientMembers, setClientMembers] = useState([]);
   const [clientAdmins, setClientAdmins] = useState([]);
-  const [accountMembers, setAccountMembers] = useState([]);
-  const [accountAdmins, setAccountAdmins] = useState([]);
+  const [accountUsers, setAccountUsers] = useState([]);
 
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
 
   const [isLoading, setLoading] = useState(true);
-
-  const [accountTabVal, setAccountTabVal] = useState(0);
 
   const {
     isOpen,
@@ -57,17 +52,22 @@ export default function Settings() {
     message
   } = useSnackbar();
 
-  const accountUsersLength = accountMembers.length + accountAdmins.length;
+  const accountUsersLength = accountUsers.length;
 
   useEffect(() => {
     async function fetchSettingsData() {
       const { settings, message } = await getSettingsData(account.id, client.id);
 
       if (settings) {
-        setClientMembers(settings.client.members);
-        setClientAdmins(settings.client.admins);
-        setAccountMembers(settings.account.members);
-        setAccountAdmins(settings.account.admins);
+        setClientAdmins(settings.accountUsers.filter(
+          user => user.adminOfClients.map(a => a.id).includes(client.id))
+        );
+
+        setClientMembers(settings.accountUsers.filter(
+          user => user.memberOfClients.map(a => a.id).includes(client.id))
+        );
+
+        setAccountUsers(settings.accountUsers);
         setLoading(false);
       } else {
         openSnackBar(message, 'error');
@@ -102,23 +102,6 @@ export default function Settings() {
       window.location.reload();
     }, 1000);
   };
-
-
-  function TabPanel(props) {
-    const { children, value, index } = props;
-
-    return (
-      <div
-        hidden={value !== index}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            {children}
-          </Box>
-        )}
-      </div>
-    );
-  }
 
   return (
     <Paper sx={{ p: 5 }}>
@@ -250,73 +233,42 @@ export default function Settings() {
       <Divider textAlign="left" sx={{ mt: 6, mb: 3 }} >
         <Chip label={`${account.name} Users (${accountUsersLength})`} />
       </Divider>
-      <Tabs value={accountTabVal} onChange={(_, val) => setAccountTabVal(val)}>
-        <Tab label={`Administrators (${accountAdmins.length})`} />
-        <Tab label={`Members (${accountMembers.length})`} />
-      </Tabs>
 
-      <TabPanel value={accountTabVal} index={0}>
-        <List dense sx={{ maxWidth: 500 }}>
-          {
-            accountAdmins.map((member, index) => {
-              const isYou = member.id === user.id;
+      <List dense sx={{ maxWidth: 500 }}>
+        {
+          accountUsers.map((accountUser, index) => {
+            const isYou = accountUser.id === user.id;
 
-              let primaryText = <span>{member.firstName} {member.lastName}</span>;
+            let primaryText = <span>{accountUser.firstName} {accountUser.lastName}</span>;
 
-              if (isYou) {
-                primaryText = <span>
-                  {member.firstName} {member.lastName}
-                  <span style={{ color: '#bababa' }}>{` (you)`}</span>
-                </span>;
-              }
+            if (isYou) {
+              primaryText = <span>
+                {accountUser.firstName} {accountUser.lastName}
+                <span style={{ color: '#bababa' }}>{` (you)`}</span>
+              </span>;
+            }
 
-              return (
-                <React.Fragment key={member.id}>
-                  <ListItem
-                    secondaryAction={
-                      <IconButton edge="end" aria-label="delete">
-                        {
-                          !isYou ? <EditIcon fontSize="small" /> : null
-                        }
-                      </IconButton>
-                    }>
-                    <ListItemText
-                      primary={primaryText}
-                      secondary={member.email}
-                    />
-                  </ListItem>
-                  {index !== accountMembers.length - 1 ? <Divider /> : null}
-                </React.Fragment>
-              );
-            })
-          }
-        </List>
-      </TabPanel>
-
-      <TabPanel value={accountTabVal} index={1}>
-        <List dense sx={{ maxWidth: 500 }}>
-          {
-            accountMembers.map((member, index) => {
-              return (
-                <React.Fragment key={member.id}>
-                  <ListItem
-                    secondaryAction={
-                      <IconButton edge="end" aria-label="delete">
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    }>
-                    <ListItemText
-                      primary={`${member.firstName} ${member.lastName}`}
-                      secondary={member.email}
-                    />
-                  </ListItem>
-                  {index !== accountMembers.length - 1 ? <Divider /> : null}
-                </React.Fragment>
-              );
-            })
-          }
-        </List>
-      </TabPanel>
+            return (
+              <React.Fragment key={accountUser.id}>
+                <ListItem
+                  secondaryAction={
+                    <IconButton edge="end" aria-label="delete">
+                      {
+                        !isYou ? <EditIcon fontSize="small" /> : null
+                      }
+                    </IconButton>
+                  }>
+                  <ListItemText
+                    primary={primaryText}
+                    secondary={accountUser.email}
+                  />
+                </ListItem>
+                {index !== accountUsers.length - 1 ? <Divider /> : null}
+              </React.Fragment>
+            );
+          })
+        }
+      </List>
 
       <Divider textAlign="left" sx={{ mb: 3 }}>
         <Chip label="Account" />
@@ -379,8 +331,11 @@ export default function Settings() {
         clientId={client.id}
         clientName={client.name}
         accountId={account.id}
+        accountName={account.name}
         setClientMembers={setClientMembers}
-        setAccountMembers={setAccountMembers}
+        setAccountUsers={setAccountUsers}
+        accountUsers={accountUsers}
+        clientMembers={clientMembers}
       />
 
       <RemoveClientMemberModal
@@ -391,7 +346,7 @@ export default function Settings() {
         accountId={account.id}
         user={userToModify}
         setClientMembers={setClientMembers}
-        setAccountMembers={setAccountMembers}
+        setAccountUsers={setAccountUsers}
       />
 
       <EditProfileModal
@@ -407,8 +362,6 @@ export default function Settings() {
         type={type}
         message={message}
       />
-
-
     </Paper>
   );
 };
