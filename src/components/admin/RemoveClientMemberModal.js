@@ -36,8 +36,6 @@ export default function RemoveClientMemberModal(props) {
 
   const willBeRemovedFromAccount = user?.memberOfClients.map(client => client.id).length === 1;
 
-  console.log(willBeRemovedFromAccount)
-
   const handleRemoveClientMember = () => {
     setLoading(true);
 

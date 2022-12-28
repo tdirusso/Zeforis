@@ -27,55 +27,37 @@ module.exports = async (req, res) => {
     );
 
     const foldersIds = folders.map(folder => folder.id);
-    // const [tasksResult] = await pool.query(
-    //   `
-    //     SELECT
-    //       tasks.id as task_id,
-    //       tasks.name as task_name,
-    //       tasks.description as task_description,
-    //       status,
-    //       folder_id,
-    //       link_url,
-    //       assigned_to_id,
-    //       progress,
-    //       date_completed,
-    //       tasks.date_created,
-    //       GROUP_CONCAT(tags.id, ':', tags.name) as tags,
-    //       users.first_name,
-    //       users.last_name
-    //       FROM tasks
-    //       LEFT JOIN task_tags ON task_tags.task_id = tasks.id
-    //       LEFT JOIN tags ON tags.id = task_tags.tag_id
-    //       LEFT JOIN users ON tasks.assigned_to_id = users.id
-    //       WHERE tasks.folder_id IN ?
-    //   `,
-    //   [foldersIds]
-    // );
+    const [tasks] = await pool.query(
+      `
+        SELECT
+          tasks.id as task_id,
+          tasks.name as task_name,
+          tasks.description as task_description,
+          tasks.date_created,
+          tasks.created_by_id,
+          tasks.status,
+          tasks.folder_id,
+          tasks.link_url,
+          tasks.assigned_to_id,
+          tasks.progress,
+          tasks.date_completed,
+          group_CONCAT(tags.id, ':', tags.name) as tags,
+          assigned_user.first_name as assigned_first,
+          assigned_user.last_name as assigned_last,
+          created_user.first_name as created_first,
+          created_user.last_name as created_last
+        FROM tasks
+        LEFT JOIN task_tags ON task_tags.task_id = tasks.id
+        LEFT JOIN tags ON tags.id = task_tags.tag_id
+        LEFT JOIN users as assigned_user ON tasks.assigned_to_id = assigned_user.id
+        LEFT JOIN users as created_user ON tasks.created_by_id = created_user.id
+        WHERE tasks.folder_id IN (?)
+        GROUP BY tasks.id
+      `,
+      [foldersIds]
+    );
 
-    //const folders = await Folder.find({ client: clientId }).lean();
-    // const folderIds = folders.map(folder => folder._id.toString());
-
-    // let tasks = await Task.find({ folder: { $in: folderIds } }).lean();
-
-    // const foldersMap = new Map(folders.map(folder => [folder._id.toString(), folder]));
-
-    // tasks = [{ folder: '63a36cf749bb76fc0bdd963e', name: 'task 1' }];
-
-    // tasks.forEach(task => {
-    //   const folderId = task.folder.toString();
-
-    //   const folder = foldersMap.get(folderId);
-
-    //   if (folder.tasks) {
-    //     folder.tasks.push(task);
-    //   } else {
-    //     folder.tasks = [task];
-    //   }
-    // });
-
-    return res.json({ folders, clientUsers });
-
-    // return res.json({ folders: Array.from(foldersMap, ([name, value]) => value) });
+    return res.json({ folders, clientUsers, tasks });
 
   } catch (error) {
     console.log(error);

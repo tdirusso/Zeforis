@@ -48,7 +48,6 @@ export default function Home({ theme, setTheme }) {
 
   useEffect(() => {
     if (user) {
-      console.log(user);
       if (activeAccountId) {
         const activeAccount = user.memberOfAccounts.find(account => {
           return account.id === activeAccountId;
@@ -88,7 +87,7 @@ export default function Home({ theme, setTheme }) {
       const result = await getClientData(client.id);
 
       if (!tasks) {
-        setTasks([]);
+        setTasks(result.tasks);
         setFolders(result.folders);
         setClientUsers(result.clientUsers);
         setLoading(false);
@@ -161,6 +160,7 @@ export default function Home({ theme, setTheme }) {
             account,
             user,
             folders,
+            tasks,
             clientUsers
           }}
         />

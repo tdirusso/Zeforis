@@ -16,6 +16,7 @@ const inviteClientMember = require('./routes/inviteClientMember');
 const completeRegistration = require('./routes/completeRegistration');
 const removeClientMember = require('./routes/removeClientMember');
 const updateProfile = require('./routes/updateProfile');
+const addTask = require('./routes/addTask');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -51,6 +52,7 @@ const boot = async () => {
   app.post('/api/inviteClientMember', checkPermissionsMW, inviteClientMember);
   app.patch('/api/updateClient', checkPermissionsMW, updateClient);
   app.post('/api/completeRegistration', completeRegistration);
+  app.post('/api/addTask', checkPermissionsMW, addTask);
   app.delete('/api/removeClientMember', checkPermissionsMW, removeClientMember);
   app.patch('/api/updateProfile', checkAuth, updateProfile);
 

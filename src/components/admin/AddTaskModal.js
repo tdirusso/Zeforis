@@ -9,17 +9,18 @@ import { Box, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addFolder } from '../../api/folder';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import { FormControl } from "@mui/material";
+import { addTask } from '../../api/task';
 
-export default function AddTaskModal({ open, setOpen, clientId, folders, clientUsers }) {
+export default function AddTaskModal({ open, setOpen, folders, clientUsers, clientId }) {
   const name = useRef();
   const description = useRef();
   const linkUrl = useRef();
+
   const [isLoading, setLoading] = useState(false);
   const [status, setStatus] = useState('New');
   const [folderId, setFolderId] = useState('');
@@ -53,15 +54,21 @@ export default function AddTaskModal({ open, setOpen, clientId, folders, clientU
 
     setTimeout(async () => {
       try {
-        const { folder, message } = await addFolder({
+        const { success, id, message } = await addTask({
           name: nameVal,
           description: descriptionVal,
+          linkUrl: linkUrl.current.value,
+          status,
+          assignedToId,
+          progress,
+          folderId,
           clientId
         });
 
-        if (folder) {
+        if (success) {
+          console.log(id);
           setTimeout(() => {
-            openSnackBar('Folder created.', 'success');
+            openSnackBar('Task created.', 'success');
           }, 300);
           handleClose();
         } else {
@@ -81,6 +88,7 @@ export default function AddTaskModal({ open, setOpen, clientId, folders, clientU
       setStatus('New');
       setFolderId('');
       setProgress(0);
+      setAssignedToId('');
       setLoading(false);
     }, 500);
   };
@@ -128,6 +136,7 @@ export default function AddTaskModal({ open, setOpen, clientId, folders, clientU
                   labelId="status-label"
                   value={status}
                   label="Status"
+                  disabled={isLoading}
                   onChange={e => setStatus(e.target.value)}>
                   <MenuItem value="New">New</MenuItem>
                   <MenuItem value="Not Started">Not Started</MenuItem>
@@ -146,6 +155,7 @@ export default function AddTaskModal({ open, setOpen, clientId, folders, clientU
                 <Select
                   labelId="folder-label"
                   value={folderId}
+                  disabled={isLoading}
                   label="Folder"
                   onChange={e => setFolderId(e.target.value)}>
                   {
@@ -161,6 +171,7 @@ export default function AddTaskModal({ open, setOpen, clientId, folders, clientU
                 <Select
                   labelId="assigned-label"
                   value={assignedToId}
+                  disabled={isLoading}
                   label="Assigned To"
                   onChange={e => setAssignedToId(e.target.value)}>
                   {
@@ -179,6 +190,7 @@ export default function AddTaskModal({ open, setOpen, clientId, folders, clientU
                 marks={[{ value: 10, label: 'Task Progress' }]}
                 min={0}
                 max={100}
+                disabled={isLoading}
                 value={progress}
                 onChange={e => setProgress(e.target.value)}
                 valueLabelFormat={val => `${val}%`}
