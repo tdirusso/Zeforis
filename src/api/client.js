@@ -71,6 +71,12 @@ const getClientData = async (clientId) => {
   return data;
 };
 
+const addTags = async (payload) => {
+  const { data } = await request.post(`addTags`, payload);
+
+  return data;
+};
+
 export {
   addClient,
   getClientTree,
@@ -82,5 +88,6 @@ export {
   removeActiveClientId,
   inviteClientMember,
   removeClientMember,
-  getClientData
+  getClientData,
+  addTags
 };

@@ -15,6 +15,11 @@ module.exports = async (req, res) => {
       [clientId]
     );
 
+    const [tags] = await pool.query(
+      'SELECT * FROM tags WHERE client_id = ?',
+      [clientId]
+    );
+
     const [clientUsers] = await pool.query(
       `
         SELECT 
@@ -41,6 +46,7 @@ module.exports = async (req, res) => {
           tasks.assigned_to_id,
           tasks.progress,
           tasks.date_completed,
+          tasks.is_key_task,
           group_CONCAT(tags.id, ':', tags.name) as tags,
           assigned_user.first_name as assigned_first,
           assigned_user.last_name as assigned_last,
@@ -57,7 +63,7 @@ module.exports = async (req, res) => {
       [foldersIds]
     );
 
-    return res.json({ folders, clientUsers, tasks });
+    return res.json({ folders, clientUsers, tasks, tags });
 
   } catch (error) {
     console.log(error);

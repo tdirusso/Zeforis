@@ -14,7 +14,7 @@ import AddTaskModal from "../../../components/admin/AddTaskModal";
 export default function TasksPage() {
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
 
-  const { client, folders, clientUsers } = useOutletContext();
+  const { client, folders, clientUsers, tags, setTags } = useOutletContext();
 
   return (
     <Paper className="Folders" sx={{ p: 5 }}>
@@ -35,6 +35,8 @@ export default function TasksPage() {
         clientId={client.id}
         folders={folders}
         clientUsers={clientUsers}
+        tags={tags}
+        setTags={setTags}
       />
 
     </Paper>

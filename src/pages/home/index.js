@@ -37,6 +37,7 @@ export default function Home({ theme, setTheme }) {
   const [account, setAccount] = useState(null);
   const [tasks, setTasks] = useState(null);
   const [folders, setFolders] = useState(null);
+  const [tags, setTags] = useState(null);
   const [clientUsers, setClientUsers] = useState(null);
 
   const {
@@ -89,6 +90,7 @@ export default function Home({ theme, setTheme }) {
       if (!tasks) {
         setTasks(result.tasks);
         setFolders(result.folders);
+        setTags(result.tags);
         setClientUsers(result.clientUsers);
         setLoading(false);
       } else {
@@ -161,6 +163,8 @@ export default function Home({ theme, setTheme }) {
             user,
             folders,
             tasks,
+            tags,
+            setTags,
             clientUsers
           }}
         />
