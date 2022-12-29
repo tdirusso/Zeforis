@@ -4,14 +4,13 @@ import { useOutletContext } from "react-router-dom";
 import ClientMenu from "../../components/admin/ClientMenu";
 import EditIcon from '@mui/icons-material/Edit';
 import './styles/settings.css';
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AddClientModal from "../../components/admin/AddClientModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditClientModal from "../../components/admin/EditClientModal";
-import { getSettingsData, setActiveClientId } from "../../api/client";
+import { setActiveClientId } from "../../api/client";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import Loader from "../../components/core/Loader";
 import { logout } from "../../api/auth";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -34,16 +33,19 @@ export default function Settings() {
 
   const [userToModify, setUserToModify] = useState(null);
 
-  const { client, clients, account, user } = useOutletContext();
-
-  const [clientMembers, setClientMembers] = useState([]);
-  const [clientAdmins, setClientAdmins] = useState([]);
-  const [accountUsers, setAccountUsers] = useState([]);
+  const {
+    client,
+    clients,
+    account,
+    user,
+    clientMembers,
+    clientAdmins,
+    accountUsers,
+    setAccountUsers
+  } = useOutletContext();
 
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
-
-  const [isLoading, setLoading] = useState(true);
 
   const {
     isOpen,
@@ -53,29 +55,6 @@ export default function Settings() {
   } = useSnackbar();
 
   const accountUsersLength = accountUsers.length;
-
-  useEffect(() => {
-    async function fetchSettingsData() {
-      const { settings, message } = await getSettingsData(account.id, client.id);
-
-      if (settings) {
-        setClientAdmins(settings.accountUsers.filter(
-          user => user.adminOfClients.map(a => a.id).includes(client.id))
-        );
-
-        setClientMembers(settings.accountUsers.filter(
-          user => user.memberOfClients.map(a => a.id).includes(client.id))
-        );
-
-        setAccountUsers(settings.accountUsers);
-        setLoading(false);
-      } else {
-        openSnackBar(message, 'error');
-      }
-    }
-
-    fetchSettingsData();
-  }, []);
 
   const handleChangeClient = (clientObject) => {
     setActiveClientId(clientObject.id);
@@ -88,10 +67,6 @@ export default function Settings() {
   const handleRemoveClientMember = (userObject) => {
     setUserToModify(userObject);
     setRemoveClientModalOpen(true);
-  };
-
-  if (isLoading) {
-    return <Loader />;
   };
 
   const handleAccountSelection = accountId => {
@@ -188,8 +163,7 @@ export default function Settings() {
           <Button
             variant="outlined"
             size="small"
-            sx={{ ml: 1.5 }}
-          >
+            sx={{ ml: 1.5 }}>
             Manage Access
           </Button>
         </Typography>
@@ -273,6 +247,7 @@ export default function Settings() {
       <Divider textAlign="left" sx={{ mb: 3 }}>
         <Chip label="Account" />
       </Divider>
+
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography variant="body1" sx={{ mr: 2 }}>
           <strong>Name:</strong>
@@ -332,7 +307,6 @@ export default function Settings() {
         clientName={client.name}
         accountId={account.id}
         accountName={account.name}
-        setClientMembers={setClientMembers}
         setAccountUsers={setAccountUsers}
         accountUsers={accountUsers}
         clientMembers={clientMembers}
@@ -345,7 +319,7 @@ export default function Settings() {
         clientName={client.name}
         accountId={account.id}
         user={userToModify}
-        setClientMembers={setClientMembers}
+        accountUsers={accountUsers}
         setAccountUsers={setAccountUsers}
       />
 

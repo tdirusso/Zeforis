@@ -43,12 +43,6 @@ const getUserClientListForAccount = (user, activeAccountId) => {
   return result;
 };
 
-const getSettingsData = async (accountId, clientId) => {
-  const { data } = await request.get(`getSettings?accountId=${accountId}&clientId=${clientId}`);
-
-  return data;
-};
-
 const removeActiveClientId = () => {
   localStorage.removeItem('activeClientId');
 };
@@ -65,8 +59,8 @@ const removeClientMember = async (payload) => {
   return data;
 };
 
-const getClientData = async (clientId) => {
-  const { data } = await request.get(`getClientData?clientId=${clientId}`);
+const getClientData = async (clientId, accountId) => {
+  const { data } = await request.get(`getClientData?clientId=${clientId}&accountId=${accountId}`);
 
   return data;
 };
@@ -84,7 +78,6 @@ export {
   setActiveClientId,
   getActiveClientId,
   getUserClientListForAccount,
-  getSettingsData,
   removeActiveClientId,
   inviteClientMember,
   removeClientMember,

@@ -7,7 +7,6 @@ const login = require('./routes/login');
 const authenticate = require('./routes/authenticate');
 const addClient = require('./routes/addClient');
 const getClientData = require('./routes/getClientData');
-const getSettings = require('./routes/getSettings');
 const addFolder = require('./routes/addFolder');
 const updateClient = require('./routes/updateClient');
 const register = require('./routes/register');
@@ -47,7 +46,6 @@ const boot = async () => {
   app.post('/api/addClient', checkPermissionsMW, addClient);
   app.get('/api/getClientData', checkPermissionsMW, getClientData);
   app.get('/api/verify', verify);
-  app.get('/api/getSettings', getSettings);
   app.post('/api/addFolder', checkPermissionsMW, addFolder);
   app.post('/api/register', register);
   app.post('/api/inviteClientMember', checkPermissionsMW, inviteClientMember);

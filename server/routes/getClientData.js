@@ -2,7 +2,7 @@ const pool = require('../../database');
 
 module.exports = async (req, res) => {
 
-  const { clientId } = req.query;
+  const { clientId, accountId } = req.query;
 
   if (!clientId) {
     return res.json({ message: 'No clientId provided.' });
@@ -20,16 +20,61 @@ module.exports = async (req, res) => {
       [clientId]
     );
 
-    const [clientUsers] = await pool.query(
+    const [accountUsers] = await pool.query(
       `
         SELECT 
-        users.first_name, users.last_name, users.id, client_users.role
-        FROM client_users 
+          users.id as user_id,
+          users.first_name, 
+          users.last_name,
+          users.email,
+          clients.id as client_id,
+          clients.name as client_name,
+          client_users.role
+        FROM client_users
+        LEFT JOIN clients ON client_users.client_id = clients.id
         LEFT JOIN users ON client_users.user_id = users.id
-        WHERE client_users.client_id = ?
+        LEFT JOIN accounts ON accounts.id = clients.account_id
+        WHERE clients.account_id = ?
       `,
-      [clientId]
+      [accountId]
     );
+
+    const accountUsersMap = {};
+
+    accountUsers.forEach(row => {
+      const {
+        client_id,
+        client_name,
+        user_id,
+        first_name,
+        last_name,
+        role,
+        email
+      } = row;
+
+      if (!accountUsersMap[user_id]) {
+        accountUsersMap[user_id] = {
+          firstName: first_name,
+          lastName: last_name,
+          email,
+          id: user_id,
+          memberOfClients: [],
+          adminOfClients: []
+        };
+      }
+
+      if (role === 'admin') {
+        accountUsersMap[user_id].adminOfClients.push({
+          id: client_id,
+          name: client_name
+        });
+      } else {
+        accountUsersMap[user_id].memberOfClients.push({
+          id: client_id,
+          name: client_name
+        });
+      }
+    });
 
     const foldersIds = folders.map(folder => folder.id);
     const [tasks] = await pool.query(
@@ -63,7 +108,12 @@ module.exports = async (req, res) => {
       [foldersIds]
     );
 
-    return res.json({ folders, clientUsers, tasks, tags });
+    return res.json({
+      folders,
+      tasks,
+      tags,
+      accountUsers: Object.values(accountUsersMap)
+    });
 
   } catch (error) {
     console.log(error);

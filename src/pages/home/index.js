@@ -38,7 +38,21 @@ export default function Home({ theme, setTheme }) {
   const [tasks, setTasks] = useState(null);
   const [folders, setFolders] = useState(null);
   const [tags, setTags] = useState(null);
-  const [clientUsers, setClientUsers] = useState(null);
+  const [accountUsers, setAccountUsers] = useState([]);
+
+
+  const clientMembers = [];
+  const clientAdmins = [];
+
+  accountUsers.forEach(accountUser => {
+    if (accountUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
+      clientAdmins.push(accountUser);
+    }
+
+    if (accountUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
+      clientMembers.push(accountUser);
+    }
+  });
 
   const {
     isOpen,
@@ -85,13 +99,13 @@ export default function Home({ theme, setTheme }) {
     }
 
     async function fetchClientData() {
-      const result = await getClientData(client.id);
+      const result = await getClientData(client.id, account.id);
 
       if (!tasks) {
         setTasks(result.tasks);
         setFolders(result.folders);
         setTags(result.tags);
-        setClientUsers(result.clientUsers);
+        setAccountUsers(result.accountUsers);
         setLoading(false);
       } else {
         openSnackBar(message, 'error');
@@ -165,7 +179,10 @@ export default function Home({ theme, setTheme }) {
             tasks,
             tags,
             setTags,
-            clientUsers
+            accountUsers,
+            setAccountUsers,
+            clientMembers,
+            clientAdmins
           }}
         />
         {/* </Paper> */}

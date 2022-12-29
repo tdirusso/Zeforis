@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -15,12 +15,22 @@ import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import { FormControl } from "@mui/material";
 import { addTask } from '../../api/task';
-import Chip from '@mui/material/Chip';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
 import { addTags } from '../../api/client';
 
-export default function AddTaskModal({ open, setOpen, folders, clientUsers, clientId, tags, setTags }) {
+export default function AddTaskModal(props) {
+
+  const {
+    open,
+    setOpen,
+    folders,
+    clientUsers,
+    clientId,
+    tags,
+    setTags
+  } = props;
+
   const name = useRef();
   const description = useRef();
   const linkUrl = useRef();
@@ -31,7 +41,7 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
   const [folderId, setFolderId] = useState('');
   const [assignedToId, setAssignedToId] = useState('');
   const [progress, setProgress] = useState(0);
-  const [tagIds, setTagIds] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [isAddingTags, setIsAddingTags] = useState(false);
 
   const tagIdNameMap = {};
@@ -73,7 +83,8 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
           assignedToId,
           progress,
           folderId,
-          clientId
+          clientId,
+          tags: selectedTags
         });
 
         if (success) {
@@ -110,10 +121,8 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
 
         if (result.success) {
           const insertedTags = result.tags;
-          const addedIds = insertedTags.map(tag => tag.id);
-
           setTags(tags => [...tags, ...insertedTags]);
-          setTagIds(tagIds => [...tagIds, ...addedIds]);
+          setSelectedTags(tags => [...tags, ...insertedTags]);
           setIsAddingTags(false);
           newTags.current.value = '';
         } else {
@@ -131,6 +140,7 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
       setFolderId('');
       setProgress(0);
       setAssignedToId('');
+      setSelectedTags([]);
       setLoading(false);
     }, 500);
   };
@@ -150,16 +160,14 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
               autoFocus
               disabled={isLoading}
               inputRef={name}
-              required
-            >
+              required>
             </TextField>
             <TextField
               label="Desciption (optional)"
               fullWidth
               disabled={isLoading}
               inputRef={description}
-              sx={{ mt: 4 }}
-            >
+              sx={{ mt: 4 }}>
             </TextField>
 
             <TextField
@@ -167,8 +175,7 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
               fullWidth
               disabled={isLoading}
               inputRef={linkUrl}
-              sx={{ mt: 4 }}
-            >
+              sx={{ mt: 4 }}>
             </TextField>
 
             <FormControl fullWidth sx={{ mt: 2 }}>
@@ -224,33 +231,23 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
             </FormControl>
 
             <FormControl fullWidth sx={{ mt: 3 }}>
-              <InputLabel id="tags-label">Tags</InputLabel>
-              <Select
-                labelId="tags-label"
-                value={tagIds}
-                disabled={isLoading}
-                label="Tags"
+              <Autocomplete
                 multiple
-                onChange={e => setTagIds(e.target.value)}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value) => {
-                      return (
-                        <Chip
-                          key={value}
-                          label={tagIdNameMap[value]}
-                          onMouseDown={e => e.stopPropagation()}
-                          onDelete={() => console.log('test')} />
-                      );
-                    })}
-                  </Box>
-                )}>
-                {
-                  tags.map(tag => {
-                    return <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>;
-                  })
-                }
-              </Select>
+                options={tags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                disableCloseOnSelect
+                disabled={isLoading}
+                onChange={(_, newVal) => setSelectedTags(newVal)}
+                value={selectedTags}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Tags"
+                    placeholder=""
+                  />
+                )}
+              />
             </FormControl>
             <Box sx={{ mt: 1 }}>
               <Input
@@ -265,6 +262,7 @@ export default function AddTaskModal({ open, setOpen, folders, clientUsers, clie
                     <LoadingButton
                       onClick={handleAddTags}
                       loading={isAddingTags}
+                      disabled={isLoading}
                       size='small'>
                       Add Tags
                     </LoadingButton>

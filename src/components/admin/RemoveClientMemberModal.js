@@ -18,12 +18,15 @@ export default function RemoveClientMemberModal(props) {
     clientName,
     accountId,
     user,
-    setClientMembers,
+    accountUsers,
     setAccountUsers
   } = props;
 
   const userId = user?.id;
   const name = user?.firstName + ' ' + user?.lastName;
+
+  const accountUsersMap = {};
+  accountUsers.forEach(user => accountUsersMap[user.id] = user);
 
   const [isLoading, setLoading] = useState(false);
 
@@ -56,10 +59,14 @@ export default function RemoveClientMemberModal(props) {
           }, 250);
 
           if (willBeRemovedFromAccount) {
-            setAccountUsers(members => members.filter(member => member.id !== user.id));
+            setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
+          } else {
+            const accountUsersClone = [...accountUsers];
+            const theExistingUser = accountUsersMap[userId];
+            theExistingUser.memberOfClients = theExistingUser.memberOfClients.filter(client => client.id !== clientId);
+            setAccountUsers(accountUsersClone);
           }
 
-          setClientMembers(members => members.filter(member => member.id !== user.id));
           handleClose();
         } else {
           openSnackBar(resultMessage, 'error');

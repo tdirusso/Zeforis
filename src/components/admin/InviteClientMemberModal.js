@@ -19,17 +19,18 @@ export default function InviteClientMemberModal(props) {
     clientName,
     accountId,
     accountName,
-    setClientMembers,
     setAccountUsers,
     accountUsers
   } = props;
-  
+
   const email = useRef();
   const firstName = useRef();
   const lastName = useRef();
   const [isLoading, setLoading] = useState(false);
 
-  const accountUsersIds = accountUsers.map(user => user.id);
+  const accountUsersMap = {};
+
+  accountUsers.forEach(user => accountUsersMap[user.id] = user);
 
   const {
     isOpen,
@@ -81,17 +82,15 @@ export default function InviteClientMemberModal(props) {
             email: emailVal
           };
 
-          if (!accountUsersIds.includes(userId)) { // User is new to the account
+          if (!Object.keys(accountUsersMap).includes(userId)) { // User is new to the account
             addedUser.memberOfClients = [{ id: clientId, name: clientName }];
             addedUser.adminOfClients = [];
             setAccountUsers(members => [...members, addedUser]);
-            setClientMembers(members => [...members, addedUser]);
           } else { // User already exists in the account
             const accountUsersClone = [...accountUsers];
-            const theExistingUser = accountUsersClone.find(user => user.id === userId);
+            const theExistingUser = accountUsersMap[userId];
             theExistingUser.memberOfClients.push({ id: clientId, name: clientName });
             setAccountUsers(accountUsersClone);
-            setClientMembers(members => [...members, theExistingUser]);
           }
 
           handleClose();
