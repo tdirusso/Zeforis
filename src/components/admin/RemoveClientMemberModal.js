@@ -94,6 +94,7 @@ export default function RemoveClientMemberModal(props) {
           </DialogContentText>
           <DialogActions>
             <Button
+              disabled={isLoading}
               onClick={handleClose}>
               Cancel
             </Button>

@@ -1,11 +1,6 @@
 import { Paper } from "@mui/material";
-import { useOutletContext, useParams } from "react-router-dom";
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useRef, useState } from 'react';
-import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Autocomplete, Box, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -16,17 +11,23 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import { FormControl } from "@mui/material";
-// import { addTask } from '../../api/task';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
 import { addTags } from '../../../api/client';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import RemoveTaskModal from "../../../components/admin/RemoveTaskModal";
 
 export default function TaskPage() {
 
   const { taskId } = useParams();
+  const navigate = useNavigate();
+
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+
+  const exitPath = queryParams.get('exitPath');
 
   const {
     tasks,
@@ -35,7 +36,8 @@ export default function TaskPage() {
     clientAdmins,
     clientMembers,
     client,
-    setTags
+    setTags,
+    setTasks
   } = useOutletContext();
 
   const {
@@ -61,6 +63,7 @@ export default function TaskPage() {
   const [isKeyTask, setIsKeyTask] = useState(task.is_key_task);
   const [dueDate, setDueDate] = useState(task.date_due);
   const [isLoading, setLoading] = useState(false);
+  const [removeTaskModalOpen, setRemoveTaskModalOpen] = useState(false);
 
   if (!task) {
     return <div>No task found.</div>;
@@ -74,7 +77,12 @@ export default function TaskPage() {
   tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
 
   const curTagsIds = task.tags?.split(',').filter(Boolean) || [];
-  console.log(curTagsIds)
+
+  const defaultTags = curTagsIds.map(tagId => ({
+    id: Number(tagId),
+    name: tagIdNameMap[tagId],
+    client_id: clientId
+  }));
 
   const handleAddTags = () => {
     const newTagsVal = newTags.current.value;
@@ -212,9 +220,9 @@ export default function TaskPage() {
             filterSelectedOptions
             disableCloseOnSelect
             disabled={isLoading}
-            
+            defaultValue={defaultTags}
             onChange={(_, newVal) => setSelectedTags(newVal)}
-            value={selectedTags}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -262,11 +270,46 @@ export default function TaskPage() {
           valueLabelFormat={val => `${val}%`}
         />
       </Box>
+      <Box>
+        Last Updated By:  {task.updated_by_first} {task.updated_by_last}
+        <br></br>
+        Last Updated Time: {new Date(new Date(task.date_last_updated).toLocaleString() + ' UTC').toLocaleString()}
+      </Box>
+      <Box mt={5}>
+        <Button
+          disabled={isLoading}
+          onClick={() => navigate(exitPath)}>
+          Cancel
+        </Button>
+
+        <LoadingButton
+          variant="contained"
+          color="error"
+          loading={isLoading}
+          onClick={() => setRemoveTaskModalOpen(true)}>
+          Delete Task
+        </LoadingButton>
+
+        <LoadingButton
+          loading={isLoading}
+          variant="contained">
+          Update Task
+        </LoadingButton>
+      </Box>
 
       <Snackbar
         isOpen={isOpen}
         type={type}
         message={message}
+      />
+
+      <RemoveTaskModal
+        open={removeTaskModalOpen}
+        setOpen={setRemoveTaskModalOpen}
+        task={task}
+        setTasks={setTasks}
+        clientId={client.id}
+        exitPath={exitPath}
       />
     </Paper>
   );

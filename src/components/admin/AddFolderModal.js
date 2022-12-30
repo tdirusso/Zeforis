@@ -101,6 +101,7 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
             </Box>
             <DialogActions>
               <Button
+                disabled={isLoading}
                 onClick={handleClose}>
                 Cancel
               </Button>

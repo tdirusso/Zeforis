@@ -6,6 +6,13 @@ const addTask = async (payload) => {
   return data;
 };
 
+const removeTask = async (payload) => {
+  const { data } = await request.delete(`removeTask`, { data: payload });
+
+  return data;
+};
+
 export {
-  addTask
+  addTask,
+  removeTask
 };

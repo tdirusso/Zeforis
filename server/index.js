@@ -18,6 +18,7 @@ const updateProfile = require('./routes/updateProfile');
 const addTask = require('./routes/addTask');
 const addTags = require('./routes/addTags');
 const removeTag = require('./routes/removeTag');
+const removeTask = require('./routes/removeTask');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -56,6 +57,7 @@ const boot = async () => {
   app.post('/api/addTags', checkPermissionsMW, addTags);
   app.delete('/api/removeClientMember', checkPermissionsMW, removeClientMember);
   app.delete('/api/removeTag', checkPermissionsMW, removeTag);
+  app.delete('/api/removeTask', checkPermissionsMW, removeTask);
   app.patch('/api/updateProfile', checkAuth, updateProfile);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));

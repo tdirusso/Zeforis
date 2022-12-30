@@ -152,6 +152,7 @@ export default function InviteClientMemberModal(props) {
             </Box>
             <DialogActions>
               <Button
+                disabled={isLoading}
                 onClick={handleClose}>
                 Cancel
               </Button>

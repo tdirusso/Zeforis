@@ -167,6 +167,7 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
           </Box>
           <DialogActions>
             <Button
+              disabled={isLoading}
               onClick={handleClose}>
               Cancel
             </Button>

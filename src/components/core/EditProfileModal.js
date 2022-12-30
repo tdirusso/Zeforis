@@ -98,6 +98,7 @@ export default function EditProfileModal({ open, setOpen, user, setFirstName, se
             </Box>
             <DialogActions>
               <Button
+                disabled={isLoading}
                 onClick={handleClose}>
                 Cancel
               </Button>

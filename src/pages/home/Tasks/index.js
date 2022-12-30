@@ -20,7 +20,8 @@ export default function TasksPage() {
     clientAdmins,
     clientMembers,
     tags,
-    setTags
+    setTags,
+    setTasks
   } = useOutletContext();
 
   const clientUsers = [...clientMembers, ...clientAdmins];
@@ -46,6 +47,7 @@ export default function TasksPage() {
         clientUsers={clientUsers}
         tags={tags}
         setTags={setTags}
+        setTasks={setTasks}
       />
 
     </Paper>

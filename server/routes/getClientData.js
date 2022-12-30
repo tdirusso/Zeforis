@@ -92,16 +92,21 @@ module.exports = async (req, res) => {
           tasks.progress,
           tasks.date_completed,
           tasks.is_key_task,
+          tasks.date_due,
+          tasks.date_last_updated,
           group_CONCAT(tags.id) as tags,
           assigned_user.first_name as assigned_first,
           assigned_user.last_name as assigned_last,
           created_user.first_name as created_first,
-          created_user.last_name as created_last
+          created_user.last_name as created_last,
+          updated_by_user.first_name as updated_by_first,
+          updated_by_user.last_name as updated_by_last
         FROM tasks
         LEFT JOIN task_tags ON task_tags.task_id = tasks.id
         LEFT JOIN tags ON tags.id = task_tags.tag_id
         LEFT JOIN users as assigned_user ON tasks.assigned_to_id = assigned_user.id
         LEFT JOIN users as created_user ON tasks.created_by_id = created_user.id
+        LEFT JOIN users as updated_by_user ON tasks.last_updated_by_id = updated_by_user.id
         WHERE tasks.folder_id IN (?)
         GROUP BY tasks.id
       `,

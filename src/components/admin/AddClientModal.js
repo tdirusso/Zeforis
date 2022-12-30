@@ -152,7 +152,8 @@ export default function AddClientModal({ open, setOpen, hideCancel, accountId })
           <DialogActions>
             {
               hideCancel ? '' : <Button
-                onClick={handleClose}>
+                onClick={handleClose}
+                disabled={isLoading}>
                 Cancel
               </Button>
             }

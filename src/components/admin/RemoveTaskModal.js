@@ -8,18 +8,21 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { removeTag } from '../../api/client';
+import { removeTask } from '../../api/task';
+import { useNavigate } from 'react-router-dom';
 
-export default function RemoveTagModal(props) {
+export default function RemoveTaskModal(props) {
+
   const {
     open,
     setOpen,
-    tag,
-    setTags,
-    tasks,
+    task,
     setTasks,
-    clientId
+    clientId,
+    exitPath
   } = props;
+
+  const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
 
@@ -30,34 +33,35 @@ export default function RemoveTagModal(props) {
     message
   } = useSnackbar();
 
-  const handleRemoveTag = () => {
+  const handleRemoveTask = () => {
     setLoading(true);
 
     setTimeout(async () => {
       try {
-        const result = await removeTag({
+        const result = await removeTask({
           clientId,
-          tagId: tag.id
+          taskId: task.task_id
         });
 
         const success = result.success;
         const resultMessage = result.message;
 
         if (success) {
-          const tasksClone = [...tasks];
-          tasksClone.forEach(task => {
-            if (task.tags) {
-              task.tags.replace(tag.id, '');
-            }
-          });
-
-          setTimeout(() => {
+          if (exitPath) {
             openSnackBar('Successully removed.', 'success');
-          }, 250);
 
-          setTags(curTags => curTags.filter(t => t.id !== tag.id));
-          setTasks(tasksClone);
-          handleClose();
+            setTimeout(() => {
+              navigate(exitPath);
+              setTasks(tasks => tasks.filter(t => t.task_id !== task.task_id));
+            }, 1000);
+          } else {
+            setTimeout(() => {
+              openSnackBar('Successully removed.', 'success');
+            }, 250);
+
+            setTasks(tasks => tasks.filter(t => t.task_id !== task.task_id));
+            handleClose();
+          }
         } else {
           openSnackBar(resultMessage, 'error');
           setLoading(false);
@@ -79,13 +83,10 @@ export default function RemoveTagModal(props) {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Confirm Tag Removal</DialogTitle>
+        <DialogTitle>Confirm Task Removal</DialogTitle>
         <DialogContent >
           <DialogContentText sx={{ mb: 5 }}>
-            Are you sure you want to remove the <strong>"{tag?.name}"</strong> tag?
-            <br></br>
-            <br></br>
-            If you proceed, the tag will be removed from all tasks in which is it currently placed.
+            Are you sure you want to delete the task <strong>"{task?.task_name}"</strong>?
           </DialogContentText>
           <DialogActions>
             <Button
@@ -95,11 +96,11 @@ export default function RemoveTagModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveTag}
+              onClick={handleRemoveTask}
               required
               loading={isLoading}
               color="error">
-              Yes, remove "{tag?.name}"
+              Yes, Delete Task
             </LoadingButton>
           </DialogActions>
         </DialogContent>

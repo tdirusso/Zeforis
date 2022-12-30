@@ -30,7 +30,8 @@ export default function AddTaskModal(props) {
     clientUsers,
     clientId,
     tags,
-    setTags
+    setTags,
+    setTasks
   } = props;
 
   const name = useRef();
@@ -64,6 +65,7 @@ export default function AddTaskModal(props) {
 
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
+    const linkVal = linkUrl.current.value;
 
     if (!nameVal) {
       openSnackBar('Please enter a name for the new task.', 'error');
@@ -79,10 +81,10 @@ export default function AddTaskModal(props) {
 
     setTimeout(async () => {
       try {
-        const { success, id, message } = await addTask({
+        const { success, message, task } = await addTask({
           name: nameVal,
           description: descriptionVal,
-          linkUrl: linkUrl.current.value,
+          linkUrl: linkVal,
           status,
           assignedToId,
           progress,
@@ -94,10 +96,10 @@ export default function AddTaskModal(props) {
         });
 
         if (success) {
-          console.log(id);
           setTimeout(() => {
             openSnackBar('Task created.', 'success');
           }, 300);
+          setTasks(tasks => [...tasks, task]);
           handleClose();
         } else {
           openSnackBar(message, 'error');
@@ -313,6 +315,7 @@ export default function AddTaskModal(props) {
           </Box>
           <DialogActions>
             <Button
+              disabled={isLoading}
               onClick={handleClose}>
               Cancel
             </Button>

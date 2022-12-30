@@ -1,8 +1,9 @@
-import { Box, LinearProgress, Paper, Typography, Button, Link } from "@mui/material";
+import { Box, LinearProgress, Paper, Typography, Button } from "@mui/material";
 import './styles/dashboard.css';
 
 import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
 
@@ -49,7 +50,9 @@ export default function Dashboard() {
                   mb={2}
                   key={task.task_id}
                   justifyContent="center">
-                  <Typography>{task.task_name}</Typography>
+                  <Typography component={Link} to={`/home/task/${task.task_id}?exitPath=/home/dashboard`}>
+                    {task.task_name}
+                  </Typography>
                   <Box flex={1}>
                     <Box display="flex" alignItems="center">
                       <LinearProgress
@@ -66,7 +69,7 @@ export default function Dashboard() {
                   </Box>
                   <Button
                     variant="outlined"
-                    component={Link}
+                    component="a"
                     href={task.link_url}
                     target="_blank"
                     disabled={task.link_url === '' || task.link_url === null}
@@ -101,7 +104,7 @@ export default function Dashboard() {
                         {taskName}
                         <Button
                           variant="outlined"
-                          component={Link}
+                          component="a"
                           href={task.link_url}
                           target="_blank"
                           disabled={task.link_url === '' || task.link_url === null}
