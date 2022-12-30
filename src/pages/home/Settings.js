@@ -23,6 +23,7 @@ import RemoveClientMemberModal from "../../components/admin/RemoveClientMemberMo
 import AccountMenu from "../../components/core/AccountMenu";
 import { setActiveAccountId } from "../../api/account";
 import EditProfileModal from "../../components/core/EditProfileModal";
+import RemoveTagModal from "../../components/admin/RemoveTagModal";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
@@ -30,8 +31,10 @@ export default function Settings() {
   const [inviteClientMemberModalOpen, setInviteClientModalOpen] = useState(false);
   const [removeClientMemberModalOpen, setRemoveClientModalOpen] = useState(false);
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
+  const [removeTagModalOpen, setRemoveTagModalOpen] = useState(false);
 
   const [userToModify, setUserToModify] = useState(null);
+  const [tagToDelete, setTagToDelete] = useState(null);
 
   const {
     client,
@@ -41,7 +44,11 @@ export default function Settings() {
     clientMembers,
     clientAdmins,
     accountUsers,
-    setAccountUsers
+    setAccountUsers,
+    tags,
+    setTags,
+    tasks,
+    setTasks
   } = useOutletContext();
 
   const [firstName, setFirstName] = useState(user.firstName);
@@ -76,6 +83,11 @@ export default function Settings() {
     setTimeout(() => {
       window.location.reload();
     }, 1000);
+  };
+
+  const handleRemoveTag = (tag) => {
+    setTagToDelete(tag);
+    setRemoveTagModalOpen(true);
   };
 
   return (
@@ -202,6 +214,23 @@ export default function Settings() {
             })
           }
         </List>
+
+        <Box>
+          <Typography>Tags</Typography>
+          <Typography variant="caption">New tags can be added when creating a new task.</Typography>
+          <br></br>
+          <br></br>
+          {
+            tags.map(tag =>
+              <Chip
+                label={tag.name}
+                key={tag.id}
+                sx={{ mr: 1, mb: 1 }}
+                onDelete={() => handleRemoveTag(tag)}>
+              </Chip>
+            )
+          }
+        </Box>
       </Box>
 
       <Divider textAlign="left" sx={{ mt: 6, mb: 3 }} >
@@ -329,6 +358,16 @@ export default function Settings() {
         user={user}
         open={editProfileModalOpen}
         setOpen={setEditProfileModalOpen}
+      />
+
+      <RemoveTagModal
+        open={removeTagModalOpen}
+        setOpen={setRemoveTagModalOpen}
+        tag={tagToDelete}
+        setTags={setTags}
+        clientId={client.id}
+        tasks={tasks}
+        setTasks={setTasks}
       />
 
       <Snackbar

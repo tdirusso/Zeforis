@@ -71,6 +71,12 @@ const addTags = async (payload) => {
   return data;
 };
 
+const removeTag = async (payload) => {
+  const { data } = await request.delete(`removeTag`, { data: payload });
+
+  return data;
+};
+
 export {
   addClient,
   getClientTree,
@@ -82,5 +88,6 @@ export {
   inviteClientMember,
   removeClientMember,
   getClientData,
-  addTags
+  addTags,
+  removeTag
 };

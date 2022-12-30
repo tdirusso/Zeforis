@@ -179,6 +179,7 @@ export default function Home({ theme, setTheme }) {
             tasks,
             tags,
             setTags,
+            setTasks,
             accountUsers,
             setAccountUsers,
             clientMembers,
