@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Box, TextField } from '@mui/material';
+import { Box, TextField, Checkbox, FormControlLabel, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -15,6 +15,7 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
   const name = useRef();
   const description = useRef();
   const [isLoading, setLoading] = useState(false);
+  const [isKeyFolder, setIsKeyFolder] = useState(false);
 
   const {
     isOpen,
@@ -41,7 +42,8 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
         const { folder, message } = await addFolder({
           name: nameVal,
           description: descriptionVal,
-          clientId
+          clientId,
+          isKeyFolder
         });
 
         if (folder) {
@@ -92,6 +94,10 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
                 sx={{ mt: 4 }}
               >
               </TextField>
+              <FormControlLabel
+                control={<Checkbox onChange={(_, val) => setIsKeyFolder(val)} />}
+                label="Key Folder"
+              />
             </Box>
             <DialogActions>
               <Button

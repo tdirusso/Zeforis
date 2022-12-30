@@ -9,7 +9,8 @@ module.exports = async (req, res) => {
     linkUrl = null,
     assignedToId = null,
     progress = 0,
-    tags = []
+    tags = [],
+    isKeyTask = false
   } = req.body;
 
   const creatorUserId = req.userId;
@@ -23,10 +24,10 @@ module.exports = async (req, res) => {
   try {
     const newTask = await pool.query(
       `INSERT INTO tasks 
-        (name, description, status, folder_id, link_url, assigned_to_id, progress, created_by_id) 
-        VALUES 
-        (?,?,?,?,?,?,?,?)`,
-      [name, description, status, folderId, linkUrl, assignedToId, progress, creatorUserId]
+        (name, description, status, folder_id, link_url, assigned_to_id, progress, created_by_id, is_key_task) 
+        VALUES
+        (?,?,?,?,?,?,?,?,?)`,
+      [name, description, status, folderId, linkUrl, assignedToId, progress, creatorUserId, isKeyTask]
     );
 
     const newTaskId = newTask[0].insertId;

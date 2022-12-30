@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -43,6 +43,7 @@ export default function AddTaskModal(props) {
   const [progress, setProgress] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
   const [isAddingTags, setIsAddingTags] = useState(false);
+  const [isKeyTask, setIsKeyTask] = useState(false);
 
   const tagIdNameMap = {};
 
@@ -84,7 +85,8 @@ export default function AddTaskModal(props) {
           progress,
           folderId,
           clientId,
-          tags: selectedTags
+          tags: selectedTags,
+          isKeyTask
         });
 
         if (success) {
@@ -178,6 +180,11 @@ export default function AddTaskModal(props) {
               sx={{ mt: 4 }}>
             </TextField>
 
+            <FormControlLabel
+              control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} />}
+              label="Key Task"
+            />
+
             <FormControl fullWidth sx={{ mt: 2 }}>
               <InputLabel id="status-label">Status</InputLabel>
               <Select
@@ -224,7 +231,7 @@ export default function AddTaskModal(props) {
                 onChange={e => setAssignedToId(e.target.value)}>
                 {
                   clientUsers.map(user => {
-                    return <MenuItem key={user.id} value={user.id}>{user.first_name} {user.last_name}</MenuItem>;
+                    return <MenuItem key={user.id} value={user.id}>{user.firstName} {user.lastName}</MenuItem>;
                   })
                 }
               </Select>
@@ -270,7 +277,7 @@ export default function AddTaskModal(props) {
                 }
               ></Input>
               <Typography variant='caption'>
-                If you need to add new tags, type them into the text field above, comma separated, and click "Add Tags".
+                To add new tags, type them into the text field above, comma separated, and click "Add Tags".
               </Typography>
             </Box>
           </Box>
