@@ -3,14 +3,15 @@ const pool = require('../../database');
 module.exports = async (req, res) => {
   const {
     name,
-    description = null,
+    description,
     status = 'New',
     folderId,
-    linkUrl = null,
-    assignedToId = null,
+    linkUrl,
+    assignedToId,
     progress = 0,
     tags = [],
-    isKeyTask = false
+    isKeyTask = false,
+    dueDate
   } = req.body;
 
   const creatorUserId = req.userId;
@@ -24,10 +25,10 @@ module.exports = async (req, res) => {
   try {
     const newTask = await pool.query(
       `INSERT INTO tasks 
-        (name, description, status, folder_id, link_url, assigned_to_id, progress, created_by_id, is_key_task) 
+        (name, description, status, folder_id, link_url, assigned_to_id, progress, created_by_id, is_key_task, date_due) 
         VALUES
-        (?,?,?,?,?,?,?,?,?)`,
-      [name, description, status, folderId, linkUrl, assignedToId, progress, creatorUserId, isKeyTask]
+        (?,?,?,?,?,?,?,?,?,?)`,
+      [name, description, status, folderId, linkUrl, assignedToId, progress, creatorUserId, isKeyTask, dueDate]
     );
 
     const newTaskId = newTask[0].insertId;

@@ -18,6 +18,9 @@ import { addTask } from '../../api/task';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
 import { addTags } from '../../api/client';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 export default function AddTaskModal(props) {
 
@@ -44,6 +47,7 @@ export default function AddTaskModal(props) {
   const [selectedTags, setSelectedTags] = useState([]);
   const [isAddingTags, setIsAddingTags] = useState(false);
   const [isKeyTask, setIsKeyTask] = useState(false);
+  const [dueDate, setDueDate] = useState(null);
 
   const tagIdNameMap = {};
 
@@ -86,7 +90,8 @@ export default function AddTaskModal(props) {
           folderId,
           clientId,
           tags: selectedTags,
-          isKeyTask
+          isKeyTask,
+          dueDate
         });
 
         if (success) {
@@ -143,6 +148,7 @@ export default function AddTaskModal(props) {
       setProgress(0);
       setAssignedToId('');
       setSelectedTags([]);
+      setDueDate(null);
       setLoading(false);
     }, 500);
   };
@@ -184,6 +190,18 @@ export default function AddTaskModal(props) {
               control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} />}
               label="Key Task"
             />
+
+            <Box>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DesktopDatePicker
+                  label="Due Date"
+                  inputFormat="MM/DD/YYYY"
+                  value={dueDate}
+                  onChange={value => setDueDate(value)}
+                  renderInput={(params) => <TextField {...params} />}
+                ></DesktopDatePicker>
+              </LocalizationProvider>
+            </Box>
 
             <FormControl fullWidth sx={{ mt: 2 }}>
               <InputLabel id="status-label">Status</InputLabel>
