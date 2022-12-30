@@ -87,7 +87,7 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
               >
               </TextField>
               <TextField
-                label="Desciption (optional)"
+                label="Description"
                 fullWidth
                 disabled={isLoading}
                 inputRef={description}

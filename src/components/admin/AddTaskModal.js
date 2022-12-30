@@ -23,7 +23,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 export default function AddTaskModal(props) {
-
   const {
     open,
     setOpen,
@@ -171,7 +170,7 @@ export default function AddTaskModal(props) {
               required>
             </TextField>
             <TextField
-              label="Desciption (optional)"
+              label="Description"
               fullWidth
               disabled={isLoading}
               inputRef={description}
@@ -269,7 +268,6 @@ export default function AddTaskModal(props) {
                   <TextField
                     {...params}
                     label="Tags"
-                    placeholder=""
                   />
                 )}
               />

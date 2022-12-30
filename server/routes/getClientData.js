@@ -92,7 +92,7 @@ module.exports = async (req, res) => {
           tasks.progress,
           tasks.date_completed,
           tasks.is_key_task,
-          group_CONCAT(tags.id, ':', tags.name) as tags,
+          group_CONCAT(tags.id) as tags,
           assigned_user.first_name as assigned_first,
           assigned_user.last_name as assigned_last,
           created_user.first_name as created_first,

@@ -47,7 +47,7 @@ export default function RemoveTagModal(props) {
           const tasksClone = [...tasks];
           tasksClone.forEach(task => {
             if (task.tags) {
-              task.tags.replace(`${tag.id}:${tag.name}`);
+              task.tags.replace(tag.id, '');
             }
           });
 
