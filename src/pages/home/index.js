@@ -180,6 +180,7 @@ export default function Home({ theme, setTheme }) {
             tags,
             setTags,
             setTasks,
+            setFolders,
             accountUsers,
             setAccountUsers,
             clientMembers,

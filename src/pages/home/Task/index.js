@@ -18,6 +18,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import RemoveTaskModal from "../../../components/admin/RemoveTaskModal";
+import { updateTask } from "../../../api/task";
 
 export default function TaskPage() {
 
@@ -54,11 +55,25 @@ export default function TaskPage() {
   const linkUrl = useRef();
   const newTags = useRef();
 
+  const clientUsers = [...clientAdmins, ...clientMembers];
+  const clientId = client.id;
+
+  const tagIdNameMap = {};
+  tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
+
+  const curTagsIds = task.tags?.split(',').filter(Boolean) || [];
+
+  const currentTags = curTagsIds.map(tagId => ({
+    id: Number(tagId),
+    name: tagIdNameMap[tagId],
+    client_id: clientId
+  }));
+
   const [status, setStatus] = useState(task.status);
   const [folderId, setFolderId] = useState(task.folder_id);
   const [assignedToId, setAssignedToId] = useState(task.assigned_to_id);
   const [progress, setProgress] = useState(task.progress);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState(currentTags);
   const [isAddingTags, setIsAddingTags] = useState(false);
   const [isKeyTask, setIsKeyTask] = useState(task.is_key_task);
   const [dueDate, setDueDate] = useState(task.date_due);
@@ -69,20 +84,63 @@ export default function TaskPage() {
     return <div>No task found.</div>;
   }
 
-  const clientUsers = [...clientAdmins, ...clientMembers];
-  const clientId = client.id;
+  const tasksIdMap = {};
 
+  tasks.forEach(t => tasksIdMap[t.task_id] = t);
 
-  const tagIdNameMap = {};
-  tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
+  const handleUpdateTask = () => {
+    const nameVal = name.current.value;
+    const descriptionVal = description.current.value;
+    const linkVal = linkUrl.current.value;
 
-  const curTagsIds = task.tags?.split(',').filter(Boolean) || [];
+    if (!nameVal) {
+      openSnackBar('Please enter a name for the task.', 'error');
+      return;
+    }
 
-  const defaultTags = curTagsIds.map(tagId => ({
-    id: Number(tagId),
-    name: tagIdNameMap[tagId],
-    client_id: clientId
-  }));
+    if (!folderId) {
+      openSnackBar('Please select a folder the task should reside in.', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    setTimeout(async () => {
+      try {
+        const result = await updateTask({
+          name: nameVal,
+          description: descriptionVal,
+          linkUrl: linkVal,
+          status,
+          assignedToId,
+          progress,
+          folderId,
+          clientId,
+          tags: selectedTags,
+          isKeyTask,
+          dueDate,
+          taskId,
+          currentTags
+        });
+
+        if (result.task) {
+          let tasksClone = [...tasks];
+          let theTaskIndex = tasksClone.findIndex(t => t.task_id === Number(taskId));
+          tasksClone[theTaskIndex] = result.task;
+
+          setTasks(tasksClone);
+          openSnackBar('Task updated.', 'success');
+          setLoading(false);
+        } else {
+          openSnackBar(result.message, 'error');
+          setLoading(false);
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
+    }, 1000);
+  };
 
   const handleAddTags = () => {
     const newTagsVal = newTags.current.value;
@@ -144,6 +202,7 @@ export default function TaskPage() {
         </TextField>
 
         <FormControlLabel
+          disabled={isLoading}
           control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} defaultChecked={task.is_key_task === 1} />}
           label="Key Task"
         />
@@ -152,6 +211,7 @@ export default function TaskPage() {
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <DesktopDatePicker
               label="Due Date"
+              disabled={isLoading}
               inputFormat="MM/DD/YYYY"
               value={dueDate}
               onChange={value => setDueDate(value)}
@@ -220,7 +280,7 @@ export default function TaskPage() {
             filterSelectedOptions
             disableCloseOnSelect
             disabled={isLoading}
-            defaultValue={defaultTags}
+            value={selectedTags}
             onChange={(_, newVal) => setSelectedTags(newVal)}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             renderInput={(params) => (
@@ -285,14 +345,15 @@ export default function TaskPage() {
         <LoadingButton
           variant="contained"
           color="error"
-          loading={isLoading}
+          disabled={isLoading}
           onClick={() => setRemoveTaskModalOpen(true)}>
           Delete Task
         </LoadingButton>
 
         <LoadingButton
           loading={isLoading}
-          variant="contained">
+          variant="contained"
+          onClick={handleUpdateTask}>
           Update Task
         </LoadingButton>
       </Box>

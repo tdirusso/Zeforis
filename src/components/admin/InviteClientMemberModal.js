@@ -82,14 +82,14 @@ export default function InviteClientMemberModal(props) {
             email: emailVal
           };
 
-          if (!Object.keys(accountUsersMap).includes(userId)) { // User is new to the account
+          if (!accountUsersMap[userId]) { // User is new to the account
             addedUser.memberOfClients = [{ id: clientId, name: clientName }];
             addedUser.adminOfClients = [];
             setAccountUsers(members => [...members, addedUser]);
           } else { // User already exists in the account
             const accountUsersClone = [...accountUsers];
-            const theExistingUser = accountUsersMap[userId];
-            theExistingUser.memberOfClients.push({ id: clientId, name: clientName });
+            const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
+            accountUsersClone[theExistingUserIndex].memberOfClients.push({ id: clientId, name: clientName });
             setAccountUsers(accountUsersClone);
           }
 

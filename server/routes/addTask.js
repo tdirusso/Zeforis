@@ -89,10 +89,7 @@ module.exports = async (req, res) => {
       [newTaskId]
     );
 
-    return res.json({
-      success: true,
-      task: insertedTask[0]
-    });
+    return res.json({ task: insertedTask[0] });
   } catch (error) {
     console.log(error);
 

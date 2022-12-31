@@ -62,8 +62,8 @@ export default function RemoveClientMemberModal(props) {
             setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
           } else {
             const accountUsersClone = [...accountUsers];
-            const theExistingUser = accountUsersMap[userId];
-            theExistingUser.memberOfClients = theExistingUser.memberOfClients.filter(client => client.id !== clientId);
+            const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
+            accountUsersClone[theExistingUserIndex].memberOfClients = accountUsersClone[theExistingUserIndex].memberOfClients.filter(client => client.id !== clientId);
             setAccountUsers(accountUsersClone);
           }
 

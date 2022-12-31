@@ -11,7 +11,7 @@ import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { addFolder } from '../../api/folder';
 
-export default function AddFolderModal({ open, setOpen, clientId }) {
+export default function AddFolderModal({ open, setOpen, clientId, setFolders }) {
   const name = useRef();
   const description = useRef();
   const [isLoading, setLoading] = useState(false);
@@ -50,6 +50,8 @@ export default function AddFolderModal({ open, setOpen, clientId }) {
           setTimeout(() => {
             openSnackBar('Folder created.', 'success');
           }, 300);
+          
+          setFolders(folders => [...folders, folder]);
           handleClose();
         } else {
           openSnackBar(message, 'error');

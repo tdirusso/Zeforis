@@ -12,7 +12,13 @@ const removeTask = async (payload) => {
   return data;
 };
 
+const updateTask = async (payload) => {
+  const { data } = await request.patch(`updateTask`, payload);
+  return data;
+};
+
 export {
   addTask,
-  removeTask
+  removeTask,
+  updateTask
 };

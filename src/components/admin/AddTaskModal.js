@@ -81,7 +81,7 @@ export default function AddTaskModal(props) {
 
     setTimeout(async () => {
       try {
-        const { success, message, task } = await addTask({
+        const { message, task } = await addTask({
           name: nameVal,
           description: descriptionVal,
           linkUrl: linkVal,
@@ -95,7 +95,7 @@ export default function AddTaskModal(props) {
           dueDate
         });
 
-        if (success) {
+        if (task) {
           setTimeout(() => {
             openSnackBar('Task created.', 'success');
           }, 300);

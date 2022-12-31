@@ -15,7 +15,11 @@ import React from 'react';
 export default function FoldersPage() {
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
 
-  const { client, folders } = useOutletContext();
+  const {
+    client,
+    folders,
+    setFolders
+  } = useOutletContext();
 
   return (
     <Paper className="Folders" sx={{ p: 5 }}>
@@ -58,6 +62,7 @@ export default function FoldersPage() {
         open={addFolderModalOpen}
         setOpen={setAddFolderModalOpen}
         clientId={client.id}
+        setFolders={setFolders}
       />
 
     </Paper>

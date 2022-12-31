@@ -24,8 +24,8 @@ module.exports = async (req, res) => {
       id: newFolder[0].insertId,
       name,
       description,
-      clientId,
-      isKeyFolder
+      client_id: clientId,
+      is_key_folder: isKeyFolder
     };
 
     return res.json({ folder: folderObject });
