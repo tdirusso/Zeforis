@@ -17,6 +17,7 @@ import Settings from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders';
 import TasksPage from './pages/Home/Tasks';
 import TaskPage from './pages/Home/Task';
+import FolderPage from './pages/Home/Folder';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 
@@ -39,6 +40,7 @@ function App() {
             <Route path="tasks" element={<TasksPage />} />
             <Route path="task/:taskId" element={<TaskPage />} />
             <Route path="folders" element={<FoldersPage />} />
+            <Route path="folder/:folderId" element={<FolderPage />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

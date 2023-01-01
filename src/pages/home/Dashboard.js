@@ -1,31 +1,15 @@
 import { Box, LinearProgress, Paper, Typography, Button } from "@mui/material";
 import './styles/dashboard.css';
-
 import { useOutletContext } from "react-router-dom";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
 
   const {
     client,
-    folders,
-    tasks
+    keyTasks,
+    keyFolders
   } = useOutletContext();
-
-  const foldersMap = {};
-
-  const keyTasks = [];
-
-  folders.forEach(folder => {
-    foldersMap[folder.id] = { ...folder, tasks: [] };
-  });
-
-  tasks.forEach(task => {
-    foldersMap[task.folder_id].tasks.push(task);
-
-    if (task.is_key_task) keyTasks.push(task);
-  });
 
   return (
     <Paper className="Dashboard" sx={{ p: 5 }}>
@@ -85,7 +69,7 @@ export default function Dashboard() {
 
       <Box sx={{ display: 'flex' }}>
         {
-          folders.map(folder => {
+          keyFolders.map(folder => {
             return (
               <Paper key={folder.id} sx={{ p: 3, m: 3 }}>
                 <h4>{folder.name}</h4>
@@ -94,7 +78,7 @@ export default function Dashboard() {
                   <h5>Links</h5>
                 </Box>
                 {
-                  foldersMap[folder.id].tasks?.slice(0, 3).map(task => {
+                  folder.tasks?.slice(0, 3).map(task => {
                     let taskName = task.task_name;
                     if (task.task_name.length > 15) {
                       taskName = taskName.substring(0, 15) + ' ...';

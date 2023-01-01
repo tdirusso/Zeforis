@@ -14,7 +14,7 @@ import { addClient, setActiveClientId } from '../../api/client';
 
 export default function AddClientModal({ open, setOpen, hideCancel, accountId }) {
   const name = useRef();
-  const [brandColor, setBrandColor] = useState('#267ffd');
+  const [brandColor, setBrandColor] = useState('#2399ef');
   const [logoSrc, setLogoSrc] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [isLoading, setLoading] = useState(false);

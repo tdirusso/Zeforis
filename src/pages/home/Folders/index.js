@@ -1,9 +1,9 @@
-import { Box, Paper } from "@mui/material";
+import { Box, ListItemButton, Paper } from "@mui/material";
 import './styles.css';
 import Fab from '@mui/material/Fab';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddFolderModal from "../../../components/admin/AddFolderModal";
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -41,13 +41,15 @@ export default function FoldersPage() {
             folders.map((folder, index) => {
               return (
                 <React.Fragment key={folder.id}>
-                  <ListItem>
-                    <ListItemIcon>
-                      <FolderIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`${folder.name}`}
-                    />
+                  <ListItem component={Link} to={`/home/folder/${folder.id}?exitPath=/home/folders`}>
+                    <ListItemButton>
+                      <ListItemIcon>
+                        <FolderIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`${folder.name}`}
+                      />
+                    </ListItemButton>
                   </ListItem>
                   {index !== folders.length - 1 ? <Divider /> : null}
                 </React.Fragment>
@@ -56,7 +58,6 @@ export default function FoldersPage() {
           }
         </List>
       </Box>
-
 
       <AddFolderModal
         open={addFolderModalOpen}

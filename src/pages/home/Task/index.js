@@ -172,7 +172,7 @@ export default function TaskPage() {
 
   return (
     <Paper className="Folders" sx={{ p: 5 }}>
-
+      <Button onClick={() => navigate(exitPath)}>Back</Button>
       <Box sx={{ mt: 3, mb: 3 }}>
         <TextField
           label="Name"
@@ -203,7 +203,7 @@ export default function TaskPage() {
 
         <FormControlLabel
           disabled={isLoading}
-          control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} defaultChecked={task.is_key_task === 1} />}
+          control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} value={isKeyTask} />}
           label="Key Task"
         />
 

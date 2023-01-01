@@ -1,14 +1,22 @@
 const theme = {
   palette: {
     primary: {
-      main: '#267ffd',
+      main: '#2399ef',
       contrastText: '#ffffff'
     }
   },
   typography: {
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: 'Montserrat'
   },
   components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'rgb(95 116 141 / 3%) 0px 2px 1px -1px, rgb(95 116 141 / 4%) 0px 1px 1px 0px, rgb(95 116 141 / 8%) 0px 1px 3px 0px'
+        }
+      }
+    },
     MuiButton: {
       defaultProps: {
         disableRipple: true

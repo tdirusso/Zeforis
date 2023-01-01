@@ -80,9 +80,9 @@ export default function Home({ theme, setTheme }) {
 
         if (activeClient) {
           if (activeClient.brandColor) {
-            document.documentElement.style.setProperty('--colors-primary', activeClient.brandColor);
-            themeConfig.palette.primary.main = activeClient.brandColor;
-            setTheme(createTheme(themeConfig));
+           // document.documentElement.style.setProperty('--colors-primary', activeClient.brandColor);
+            //themeConfig.palette.primary.main = activeClient.brandColor;
+            //setTheme(createTheme(themeConfig));
           }
 
           setClient(activeClient);
@@ -163,6 +163,20 @@ export default function Home({ theme, setTheme }) {
     }
   }
 
+  const foldersMap = {};
+  const keyTasks = [];
+
+  folders.forEach(folder => {
+    foldersMap[folder.id] = { ...folder, tasks: [] };
+  });
+
+  tasks.forEach(task => {
+    foldersMap[task.folder_id].tasks.push(task);
+    if (task.is_key_task) keyTasks.push(task);
+  });
+
+  const keyFolders = Object.values(foldersMap).filter(folder => Boolean(folder.is_key_folder));
+
   return (
     <div>
       <SideNav theme={theme} client={client} />
@@ -178,6 +192,9 @@ export default function Home({ theme, setTheme }) {
             folders,
             tasks,
             tags,
+            foldersMap,
+            keyTasks,
+            keyFolders,
             setTags,
             setTasks,
             setFolders,

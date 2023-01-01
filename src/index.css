@@ -1,6 +1,6 @@
 :root {
-  --colors-primary: #267ffd;
-  --colors-primary-rgb: 38, 127, 252;
+  --colors-primary: #2399ef;
+  --colors-primary-rgb: 35, 153, 239;
 }
 
 html, body, #root {
@@ -10,9 +10,9 @@ html, body, #root {
 
 body {
   margin: 0;
-  font-family: 'Roboto', sans-serif;
-  background-color: #eceef1;
-  color: #7a7a7a;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f3f4f9;
+  color: #121f43;
   overflow-x: hidden;
 }
 
@@ -36,4 +36,24 @@ a {
 
 a, a:visited {
   color: var(--colors-primary);
+}
+
+a.MuiListItem-root {
+  color: initial;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: white;
+}
+::-webkit-scrollbar-thumb {
+  background: #8da2b799;
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8da2b799;
 }

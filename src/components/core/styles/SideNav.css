@@ -33,30 +33,30 @@
 }
 
 .Sidenav .menu li {
-  display: flex;
-  align-items: center;
   margin: 15px 0;
   padding: 10px 0;
   padding-left: 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: white;
   cursor: pointer;
+  transition: all 200ms;
 }
 
 .Sidenav .menu svg {
   color: #cbced4;
   margin-right: 15px;
+  transition: all 200ms;
 }
 
 .Sidenav .menu li:hover,
 .Sidenav .menu .active li {
-  background-color: var(--colors-primary);
-  color: white;
+  background-color: rgba(var(--colors-primary-rgb), 0.1);
+  color: var(--colors-primary);
 }
 
 .Sidenav .menu li:hover svg,
 .Sidenav .menu .active svg {
-  color: white;
+  color: var(--colors-primary);
 }
 
 .Sidenav .buttons {
