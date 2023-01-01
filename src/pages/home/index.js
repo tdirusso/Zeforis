@@ -4,8 +4,8 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import Header from "../../components/core/Header";
-import { Box, createTheme } from "@mui/material";
-import './styles/index.css';
+import { Box, createTheme, Grid } from "@mui/material";
+import './styles.css';
 import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
@@ -80,7 +80,7 @@ export default function Home({ theme, setTheme }) {
 
         if (activeClient) {
           if (activeClient.brandColor) {
-           // document.documentElement.style.setProperty('--colors-primary', activeClient.brandColor);
+            // document.documentElement.style.setProperty('--colors-primary', activeClient.brandColor);
             //themeConfig.palette.primary.main = activeClient.brandColor;
             //setTheme(createTheme(themeConfig));
           }
@@ -178,40 +178,43 @@ export default function Home({ theme, setTheme }) {
   const keyFolders = Object.values(foldersMap).filter(folder => Boolean(folder.is_key_folder));
 
   return (
-    <div>
+    <Box>
       <SideNav theme={theme} client={client} />
-      <main>
-        <Header />
-        {/* <Paper sx={{ width: '100%' }} elevation={1} className="main-content"> */}
-        <Outlet
-          context={{
-            client,
-            clients,
-            account,
-            user,
-            folders,
-            tasks,
-            tags,
-            foldersMap,
-            keyTasks,
-            keyFolders,
-            setTags,
-            setTasks,
-            setFolders,
-            accountUsers,
-            setAccountUsers,
-            clientMembers,
-            clientAdmins
-          }}
-        />
-        {/* </Paper> */}
-      </main>
 
+      <Box component="main">
+
+        <Box className="main-content">
+          <Grid container spacing={3}>
+            <Header />
+            <Outlet
+              context={{
+                client,
+                clients,
+                account,
+                user,
+                folders,
+                tasks,
+                tags,
+                foldersMap,
+                keyTasks,
+                keyFolders,
+                setTags,
+                setTasks,
+                setFolders,
+                accountUsers,
+                setAccountUsers,
+                clientMembers,
+                clientAdmins
+              }}
+            />
+          </Grid>
+        </Box>
+      </Box>
       <Snackbar
         isOpen={isOpen}
         type={type}
         message={message}
       />
-    </div>
+    </Box>
   );
 };

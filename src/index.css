@@ -18,6 +18,7 @@ body {
 
 body * {
   box-sizing: border-box;
+  margin: 0;
 }
 
 .flex {
@@ -40,6 +41,10 @@ a, a:visited {
 
 a.MuiListItem-root {
   color: initial;
+}
+
+h5 {
+  font-size: 0.9rem;
 }
 
 ::-webkit-scrollbar {

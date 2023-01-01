@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, ButtonBase, Divider, Typography } from "@mui/material";
 import './styles/SideNav.css';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -8,6 +8,16 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import SpeedIcon from '@mui/icons-material/Speed';
 
 export default function SideNav({ client }) {
+
+  const buttonBaseStyles = {
+    width: '100%',
+    height: '100%',
+    px: 2,
+    py: 1.5,
+    borderRadius: '8px',
+    justifyContent: 'flex-start'
+  };
+
   return (
     <Box className="Sidenav">
       <Box className="flex-centered container">
@@ -15,7 +25,11 @@ export default function SideNav({ client }) {
           //src={client.logoUrl} 
           alt=""
           width={45} />
-        <Typography variant="body1" mt={1}>{client.name}</Typography>
+        <Typography
+          variant="body1"
+          mt={1}>
+          {client.name}
+        </Typography>
         <Divider
           sx={{
             borderWidth: '1px',
@@ -29,64 +43,84 @@ export default function SideNav({ client }) {
           <ul>
             <NavLink to="/home/dashboard">
               <li>
-                <Typography
-                  variant="body2"
-                  display="flex"
-                  alignItems="center">
-                  <SpeedIcon />
-                  Dashboard
-                </Typography>
+                <ButtonBase sx={buttonBaseStyles}>
+                  <Typography
+                    variant="body2"
+                    display="flex"
+                    alignItems="center">
+                    <SpeedIcon />
+                    Dashboard
+                  </Typography>
+                </ButtonBase>
               </li>
+
             </NavLink>
             <NavLink to="/home/tasks">
               <li>
-                <Typography
-                  variant="body2"
-                  display="flex"
-                  alignItems="center">
-                  <TaskAltIcon />Tasks
-                </Typography>
+                <ButtonBase sx={buttonBaseStyles}>
+                  <Typography
+                    variant="body2"
+                    display="flex"
+                    alignItems="center">
+                    <TaskAltIcon />Tasks
+                  </Typography>
+                </ButtonBase>
               </li>
             </NavLink>
             <NavLink to="/home/folders">
               <li>
-                <Typography
-                  variant="body2"
-                  display="flex"
-                  alignItems="center">
-                  <FolderIcon />
-                  Folders
-                </Typography>
+                <ButtonBase sx={buttonBaseStyles}>
+                  <Typography
+                    variant="body2"
+                    display="flex"
+                    alignItems="center">
+                    <FolderIcon />
+                    Folders
+                  </Typography>
+                </ButtonBase>
               </li>
             </NavLink>
             <NavLink to="/home/analytics">
               <li>
-                <Typography
-                  variant="body2"
-                  display="flex"
-                  alignItems="center">
-                  <InsightsIcon />
-                  Analytics
-                </Typography>
+                <ButtonBase sx={buttonBaseStyles}>
+                  <Typography
+                    variant="body2"
+                    display="flex"
+                    alignItems="center">
+                    <InsightsIcon />
+                    Analytics
+                  </Typography>
+                </ButtonBase>
               </li>
             </NavLink>
             <NavLink to="/home/settings">
               <li>
-                <Typography
-                  variant="body2"
-                  display="flex"
-                  alignItems="center">
-                  <SettingsIcon />
-                  Settings
-                </Typography>
+                <ButtonBase sx={buttonBaseStyles}>
+                  <Typography
+                    variant="body2"
+                    display="flex"
+                    alignItems="center">
+                    <SettingsIcon />
+                    Settings
+                  </Typography>
+                </ButtonBase>
               </li>
             </NavLink>
           </ul>
         </Box>
       </Box>
       <Box className="buttons">
-        <Button variant="contained" fullWidth sx={{ mb: 2 }}>Upgrade Plan</Button>
-        <Button variant="outlined" fullWidth>Contact Support</Button>
+        <Button
+          variant="contained"
+          fullWidth
+          sx={{ mb: 2 }}>
+          Upgrade Plan
+        </Button>
+        <Button
+          variant="outlined"
+          fullWidth>
+          Contact Support
+        </Button>
       </Box>
     </Box>
   );

@@ -1,29 +1,29 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
-import ClientMenu from "../../components/admin/ClientMenu";
+import ClientMenu from "../../../components/admin/ClientMenu";
 import EditIcon from '@mui/icons-material/Edit';
-import './styles/settings.css';
+import './styles.css';
 import React, { useState } from "react";
-import AddClientModal from "../../components/admin/AddClientModal";
+import AddClientModal from "../../../components/admin/AddClientModal";
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditClientModal from "../../components/admin/EditClientModal";
-import { setActiveClientId } from "../../api/client";
-import useSnackbar from "../../hooks/useSnackbar";
-import Snackbar from "../../components/core/Snackbar";
-import { logout } from "../../api/auth";
+import EditClientModal from "../../../components/admin/EditClientModal";
+import { setActiveClientId } from "../../../api/client";
+import useSnackbar from "../../../hooks/useSnackbar";
+import Snackbar from "../../../components/core/Snackbar";
+import { logout } from "../../../api/auth";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import InviteClientMemberModal from "../../components/admin/InviteClientMemberModal";
-import RemoveClientMemberModal from "../../components/admin/RemoveClientMemberModal";
-import AccountMenu from "../../components/core/AccountMenu";
-import { setActiveAccountId } from "../../api/account";
-import EditProfileModal from "../../components/core/EditProfileModal";
-import RemoveTagModal from "../../components/admin/RemoveTagModal";
+import InviteClientMemberModal from "../../../components/admin/InviteClientMemberModal";
+import RemoveClientMemberModal from "../../../components/admin/RemoveClientMemberModal";
+import AccountMenu from "../../../components/core/AccountMenu";
+import { setActiveAccountId } from "../../../api/account";
+import EditProfileModal from "../../../components/core/EditProfileModal";
+import RemoveTagModal from "../../../components/admin/RemoveTagModal";
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
