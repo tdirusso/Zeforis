@@ -32,6 +32,7 @@ const theme = {
       styleOverrides: {
         root: {
           textTransform: 'none',
+          whiteSpace: 'nowrap',
           boxShadow: 'none',
           fontWeight: 400,
           borderRadius: '6px',

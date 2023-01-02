@@ -66,7 +66,7 @@ function UpcomingTaskRow({ task }) {
       display="flex"
       alignItems="center"
       gap={1.5}
-      mb={1}
+      mb={0.25}
       px={1}
       py={1}
       borderRadius='8px'
@@ -84,7 +84,10 @@ function UpcomingTaskRow({ task }) {
         </Typography>
       </Box>
       <Box flex={1} textAlign="center">
-        <Chip label={task.status} className={task.status} />
+        <Chip
+          label={task.status}
+          sx={{ cursor: 'pointer' }}
+          className={task.status} />
       </Box>
       <Button
         variant="outlined"

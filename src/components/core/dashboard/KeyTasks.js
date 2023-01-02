@@ -65,7 +65,7 @@ function KeyTaskRow({ task }) {
       display="flex"
       alignItems="center"
       gap={1.5}
-      mb={1}
+      mb={0.25}
       px={1}
       py={1}
       borderRadius='8px'

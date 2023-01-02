@@ -9,38 +9,49 @@ export default function Dashboard() {
 
   const {
     tasks,
-    keyTasks,
-    keyFolders
+    folders
   } = useOutletContext();
 
   const tasksSortedByDate = tasks.sort((a, b) => {
     return new Date(a.date_due) - new Date(b.date_due);
   }).filter(t => t.date_due);
 
-
   const now = new Date();
   let numTasksInProgress = 0;
   let numTasksCompleted = 0;
   let numTasksPastDue = 0;
 
+  const keyTasks = [];
+  const keyFolders = folders.filter(folder => Boolean(folder.is_key_folder));
+
   tasks.forEach(task => {
     const dateDue = task.date_due ? new Date(task.date_due) : null;
 
-    if (task.status === 'In Progress') numTasksInProgress++;
-    else if (task.status === 'Complete') numTasksCompleted++;
-    if (dateDue && dateDue < now) numTasksPastDue++;
+    if (task.status === 'In Progress') {
+      numTasksInProgress++;
+    } else if (task.status === 'Complete') {
+      numTasksCompleted++;
+    }
+
+    if (dateDue && dateDue < now) {
+      numTasksPastDue++;
+    }
+
+    if (task.is_key_task) {
+      keyTasks.push(task);
+    }
   });
 
   return (
     <>
       <KeyTasks tasks={keyTasks.slice(0, 5)} />
-      <KeyFolders keyFolders={keyFolders} />
       <UpcomingTasks tasks={tasksSortedByDate.slice(0, 5)} />
       <TaskStats
         numComplete={numTasksCompleted}
         numPastDue={numTasksPastDue}
         numInProgress={numTasksInProgress}
       />
+      <KeyFolders folders={keyFolders} />
     </>
   );
 };

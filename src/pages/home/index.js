@@ -164,7 +164,6 @@ export default function Home({ theme, setTheme }) {
   }
 
   const foldersMap = {};
-  const keyTasks = [];
 
   folders.forEach(folder => {
     foldersMap[folder.id] = { ...folder, tasks: [] };
@@ -172,17 +171,12 @@ export default function Home({ theme, setTheme }) {
 
   tasks.forEach(task => {
     foldersMap[task.folder_id].tasks.push(task);
-    if (task.is_key_task) keyTasks.push(task);
   });
-
-  const keyFolders = Object.values(foldersMap).filter(folder => Boolean(folder.is_key_folder));
 
   return (
     <Box>
       <SideNav theme={theme} client={client} />
-
       <Box component="main">
-
         <Box className="main-content">
           <Grid container spacing={3}>
             <Header />
@@ -192,12 +186,9 @@ export default function Home({ theme, setTheme }) {
                 clients,
                 account,
                 user,
-                folders,
+                folders: Object.values(foldersMap),
                 tasks,
                 tags,
-                foldersMap,
-                keyTasks,
-                keyFolders,
                 setTags,
                 setTasks,
                 setFolders,

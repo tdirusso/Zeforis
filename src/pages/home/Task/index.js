@@ -206,7 +206,7 @@ export default function TaskPage() {
           control={<Checkbox
             onChange={(_, val) => setIsKeyTask(val)}
             value={isKeyTask}
-            defaultChecked={Boolean(task.is_key_task)}
+            checked={isKeyTask}
           />}
           label="Key Task"
         />
