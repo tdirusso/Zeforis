@@ -43,6 +43,10 @@ a.MuiListItem-root {
   color: initial;
 }
 
+h2, h4 {
+  font-weight: 600;
+}
+
 h5 {
   font-size: 0.9rem;
 }
@@ -54,6 +58,7 @@ h5 {
 ::-webkit-scrollbar-track {
   background: white;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #8da2b799;
   border-radius: 50px;
@@ -61,4 +66,44 @@ h5 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #8da2b799;
+}
+
+.MuiChip-root.Complete {
+  background-color: #27ce881a;
+  color: #27ce88;
+}
+
+.MuiChip-root.New {
+  background-color: #0040ff17;
+  color: #273bce;
+}
+
+.MuiChip-root.Next.Up {
+  background-color: #8527ce1a;
+  color: #8527ce;
+}
+
+.MuiChip-root.In.Progress {
+  background-color: #ffa5001c;
+  color: orange;
+}
+
+.MuiChip-root.Currently.Writing {
+  background-color: #ffc0cb2b;
+  color: pink;
+}
+
+.MuiChip-root.Pending.Approval {
+  background-color: #ff00000f;
+  color: red;
+}
+
+.MuiChip-root.Approved {
+  background-color: #00d0d01c;
+  color: #00d0d0;
+}
+
+.MuiChip-root.Ready.to.Implement {
+  background-color: #a52a2a12;
+  color: brown;
 }

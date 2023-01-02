@@ -1,8 +1,0 @@
-.key-task-row {
-  transition: all 250ms;
-  cursor: pointer;
-}
-
-.key-task-row:hover {
-  background: #f3f4f9;
-}

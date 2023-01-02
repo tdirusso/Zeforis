@@ -1,0 +1,32 @@
+.task-row {
+  transition: all 250ms;
+  cursor: pointer;
+}
+
+.task-row:hover {
+  background: #f3f4f9;
+}
+
+.in-progress-icon {
+  background-color: #ffa5001c;
+  color: orange;
+  display: inline-flex;
+  border-radius: 50%;
+  padding: 15px;
+}
+
+.completed-icon {
+  background-color: #27ce881a;
+  color: #27ce88;
+  display: inline-flex;
+  border-radius: 50%;
+  padding: 15px;
+}
+
+.past-due-icon {
+  background-color: #ff00000f;
+  color: red;
+  display: inline-flex;
+  border-radius: 50%;
+  padding: 15px;
+}

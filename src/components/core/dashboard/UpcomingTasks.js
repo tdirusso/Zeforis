@@ -1,62 +1,103 @@
-import { Box, LinearProgress, Paper, Typography, Button, Grid } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Paper, Typography, Button, Grid, Chip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
+const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function UpcomingTasks({ tasks }) {
-
-  const upcomingTasks = tasks;
+  const tasksLength = tasks.length;
 
   return (
-    <Grid item xs={12} md={6}>
-      <Paper sx={{height: '100%'}}>
+    <Grid item xs={12} md={5}>
+      <Paper sx={{ height: '100%' }}>
         <Box
-          component="h5"
-          sx={{ mb: 3 }}>Upcoming Tasks</Box>
+          display="flex"
+          alignItems="center"
+          mb={1}
+          justifyContent="space-between">
+          <Box
+            component="h5"
+            display="flex"
+            alignItems="center">
+            Upcoming Tasks
+          </Box>
+          <Button
+            sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
+            View All
+          </Button>
+        </Box>
         {
-          upcomingTasks.map(task => {
-            return (
-              <Box
-                display="flex"
-                alignItems="center"
-                gap={3}
-                mb={2}
-                key={task.task_id}
-                justifyContent="center">
-                <Typography
-                  flexBasis='25%'
-                  component={Link}
-                  variant="body2"
-                  to={`/home/task/${task.task_id}?exitPath=/home/dashboard`}>
-                  {task.task_name}
-                </Typography>
-                <Box flex={1}>
-                  <Box display="flex" alignItems="center">
-                    <LinearProgress
-                      variant="determinate"
-                      value={task.progress}
-                      sx={{
-                        height: 10,
-                        width: '100%',
-                        mr: 1.5,
-                        borderRadius: 25
-                      }}
-                    />
-                    <span>{task.progress}%</span>
-                  </Box>
-                </Box>
-                <Button
-                  variant="outlined"
-                  component="a"
-                  href={task.link_url}
-                  target="_blank"
-                  disabled={task.link_url === '' || task.link_url === null}
-                  size="small">
-                  Open Link
-                </Button>
-              </Box>
-            );
-          })
+          tasksLength > 0 ?
+            <UpcomingTasksList tasks={tasks} /> :
+            <NoUpcomingTasksMessage />
         }
       </Paper>
     </Grid>
   );
 };
+
+function NoUpcomingTasksMessage() {
+  return (
+    <Box mt={2}>
+      <Typography variant="body2">
+        There are currently no upcoming tasks.
+      </Typography>
+    </Box>
+  );
+}
+
+const UpcomingTasksList = ({ tasks }) => tasks.map(task => <UpcomingTaskRow task={task} key={task.task_id} />);
+
+function UpcomingTaskRow({ task }) {
+  const navigate = useNavigate();
+
+  let taskName = task.task_name;
+
+  if (taskName.length > 40) {
+    taskName = taskName.substring(0, 40) + '...';
+  }
+
+  const dateDue = new Date(task.date_due);
+  const dateDueDay = days[dateDue.getDay()];
+  const dateDueMonth = months[dateDue.getMonth()];
+
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      gap={1.5}
+      mb={1}
+      px={1}
+      py={1}
+      borderRadius='8px'
+      key={task.task_id}
+      className="task-row"
+      onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
+      justifyContent="center">
+      <Box flexBasis='45%' minWidth={75}>
+        <Typography
+          variant="body2">
+          {taskName}
+        </Typography>
+        <Typography variant="caption" color="#adadad">
+          Due: &nbsp;{`${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}`}
+        </Typography>
+      </Box>
+      <Box flex={1} textAlign="center">
+        <Chip label={task.status} className={task.status} />
+      </Box>
+      <Button
+        variant="outlined"
+        component="a"
+        href={task.link_url}
+        target="_blank"
+        disabled={task.link_url === '' || task.link_url === null}
+        onClick={e => e.stopPropagation()}
+        size="small">
+        {
+          task.link_url ? 'Open Link' : 'No Link'
+        }
+      </Button>
+    </Box>
+  );
+}

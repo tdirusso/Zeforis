@@ -1,14 +1,12 @@
 import { Box, LinearProgress, Paper, Typography, Button, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
-import './styles.css';
-import { useState } from "react";
 
-export default function KeyTasks({ keyTasks }) {
-  const keyTasksLength = keyTasks.length;
+export default function KeyTasks({ tasks }) {
+  const tasksLength = tasks.length;
 
   return (
-    <Grid item xs={12} md={6}>
+    <Grid item xs={12} md={7}>
       <Paper sx={{ height: '100%' }}>
         <Box
           display="flex"
@@ -27,13 +25,13 @@ export default function KeyTasks({ keyTasks }) {
             Key Tasks
           </Box>
           <Button
-            sx={{ display: keyTasksLength > 0 ? 'block' : 'none' }}>
+            sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View All
           </Button>
         </Box>
         {
-          keyTasksLength > 0 ?
-            <KeyTasksList keyTasks={keyTasks} /> :
+          tasksLength > 0 ?
+            <KeyTasksList tasks={tasks} /> :
             <NoKeyTasksMessage />
         }
       </Paper>
@@ -51,15 +49,10 @@ function NoKeyTasksMessage() {
   );
 }
 
-const KeyTasksList = ({ keyTasks }) => keyTasks.slice(0, 5).map(task => <KeyTaskRow task={task} key={task.task_id} />);
+const KeyTasksList = ({ tasks }) => tasks.map(task => <KeyTaskRow task={task} key={task.task_id} />);
 
 function KeyTaskRow({ task }) {
   const navigate = useNavigate();
-  const [progress, setProgress] = useState(0);
-
-  setTimeout(() => {
-    setProgress(task.progress);
-  }, 0);
 
   let taskName = task.task_name;
 
@@ -73,11 +66,11 @@ function KeyTaskRow({ task }) {
       alignItems="center"
       gap={1.5}
       mb={1}
-      px={3}
+      px={1}
       py={1}
       borderRadius='8px'
       key={task.task_id}
-      className="key-task-row"
+      className="task-row"
       onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
       justifyContent="center">
       <Typography
@@ -89,7 +82,7 @@ function KeyTaskRow({ task }) {
         <Box display="flex" alignItems="center">
           <LinearProgress
             variant="determinate"
-            value={progress}
+            value={task.progress}
             sx={{
               height: 10,
               width: '100%',

@@ -75,7 +75,7 @@ export default function TaskPage() {
   const [progress, setProgress] = useState(task.progress);
   const [selectedTags, setSelectedTags] = useState(currentTags);
   const [isAddingTags, setIsAddingTags] = useState(false);
-  const [isKeyTask, setIsKeyTask] = useState(task.is_key_task);
+  const [isKeyTask, setIsKeyTask] = useState(Boolean(task.is_key_task));
   const [dueDate, setDueDate] = useState(task.date_due);
   const [isLoading, setLoading] = useState(false);
   const [removeTaskModalOpen, setRemoveTaskModalOpen] = useState(false);
@@ -171,7 +171,7 @@ export default function TaskPage() {
   };
 
   return (
-    <Paper className="Folders" sx={{ p: 5 }}>
+    <Paper sx={{ p: 5 }}>
       <Button onClick={() => navigate(exitPath)}>Back</Button>
       <Box sx={{ mt: 3, mb: 3 }}>
         <TextField
@@ -203,7 +203,11 @@ export default function TaskPage() {
 
         <FormControlLabel
           disabled={isLoading}
-          control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} value={isKeyTask} />}
+          control={<Checkbox
+            onChange={(_, val) => setIsKeyTask(val)}
+            value={isKeyTask}
+            defaultChecked={Boolean(task.is_key_task)}
+          />}
           label="Key Task"
         />
 
