@@ -7,9 +7,17 @@ const theme = {
   },
   typography: {
     fontSize: 14,
-    fontFamily: 'Montserrat'
+    fontFamily: 'Montserrat',
+    //fontWeight: 500
   },
   components: {
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          //fontWeight: 500
+        }
+      }
+    },
     MuiPaper: {
       styleOverrides: {
         root: {

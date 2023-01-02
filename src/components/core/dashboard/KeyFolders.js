@@ -1,21 +1,14 @@
-import { Box, LinearProgress, Paper, Typography, Button, Grid } from "@mui/material";
-import { useOutletContext } from "react-router-dom";
+import { Box, Paper, Typography, Button, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 
-export default function KeyFolders() {
-
-  const {
-    keyFolders,
-    folders
-  } = useOutletContext();
-
+export default function KeyFolders({ keyFolders }) {
   return (
     <>
       {
-        folders.map(folder => {
+        keyFolders.map(folder => {
           return (
             <Grid item xs={12} md={6} key={folder.id}>
-              <Paper>
+              <Paper sx={{ height: '100%' }}>
                 <Box
                   component="h5"
                   sx={{ mb: 3 }}>Key Tasks</Box>
@@ -47,7 +40,7 @@ export default function KeyFolders() {
                   })
                 }
                 <br></br>
-                <Button>View More</Button>
+                <Button component={Link}>View More</Button>
               </Paper>
             </Grid>
           );
