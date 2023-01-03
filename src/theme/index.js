@@ -8,16 +8,8 @@ const theme = {
   typography: {
     fontSize: 14,
     fontFamily: 'Montserrat',
-    //fontWeight: 500
   },
   components: {
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          //fontWeight: 500
-        }
-      }
-    },
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -66,10 +58,17 @@ const theme = {
         },
         inputProps: {
           sx: {
-            fontWeight: 300
+            fontWeight: 400
+          }
+        },
+      },
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderRadius: '8px',
           }
         }
-      },
+      }
     },
     MuiAlertTitle: {
       defaultProps: {

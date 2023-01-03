@@ -4,9 +4,14 @@ import KeyTasks from "../../../components/core/dashboard/KeyTasks";
 import TaskStats from "../../../components/core/dashboard/TaskStats";
 import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
 import './styles.css';
+import { Box, Paper, Typography, Button, Grid } from "@mui/material";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import { useState } from "react";
+import AddFolderModal from "../../../components/admin/AddFolderModal";
 
 export default function Dashboard() {
-
+  const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
+  
   const {
     tasks,
     folders
@@ -51,7 +56,36 @@ export default function Dashboard() {
         numPastDue={numTasksPastDue}
         numInProgress={numTasksInProgress}
       />
-      <KeyFolders folders={keyFolders} />
+      {
+        keyFolders.length > 0 ?
+          <KeyFolders folders={keyFolders} /> :
+          <NoFoldersMessage setAddFolderModalOpen={setAddFolderModalOpen} />
+      }
+
+      <AddFolderModal
+        open={addFolderModalOpen}
+        setOpen={setAddFolderModalOpen}
+        willBeKey={true}
+      />
     </>
   );
 };
+
+function NoFoldersMessage({ setAddFolderModalOpen }) {
+  return (
+    <Grid item xs={12} md={4}>
+      <Paper sx={{ height: '100%' }}>
+        <Typography variant="body2">
+          There are currently no key folders.
+        </Typography>
+        <Button
+          sx={{ mt: 1.5 }}
+          variant="outlined"
+          onClick={() => setAddFolderModalOpen(true)}
+          startIcon={<CreateNewFolderIcon />}>
+          Create Key Folder
+        </Button>
+      </Paper>
+    </Grid>
+  );
+}

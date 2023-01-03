@@ -17,14 +17,10 @@ export default function TasksPage() {
   const {
     client,
     folders,
-    clientAdmins,
-    clientMembers,
     tags,
     setTags,
     setTasks
   } = useOutletContext();
-
-  const clientUsers = [...clientMembers, ...clientAdmins];
 
   return (
     <Paper className="Folders" sx={{ p: 5 }}>
@@ -44,7 +40,6 @@ export default function TasksPage() {
         setOpen={setAddFolderModalOpen}
         clientId={client.id}
         folders={folders}
-        clientUsers={clientUsers}
         tags={tags}
         setTags={setTags}
         setTasks={setTasks}

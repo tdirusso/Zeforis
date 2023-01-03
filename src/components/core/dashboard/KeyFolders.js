@@ -1,8 +1,18 @@
 import { Box, Paper, Typography, Button, Grid } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
 import { useNavigate } from "react-router-dom";
+import AddTaskIcon from '@mui/icons-material/AddTask';
+import { useState } from "react";
+import AddTaskModal from "../../admin/AddTaskModal";
 
 export default function KeyFolders({ folders }) {
+  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
+  const [folderIdToMod, setFolderIdToMod] = useState(null);
+
+  const handleOpenAddTaskModal = (folderId) => {
+    setFolderIdToMod(folderId);
+    setAddTaskModalOpen(true);
+  };
 
   return (
     <>
@@ -35,23 +45,36 @@ export default function KeyFolders({ folders }) {
                 {
                   taskLength > 0 ?
                     <TaskList tasks={folder.tasks.slice(0, 5)} /> :
-                    <NoTasksMessage />
+                    <NoTasksMessage handleOpenAddTaskModal={() => handleOpenAddTaskModal(folder.id)} />
                 }
               </Paper>
             </Grid>
           );
         })
       }
+
+      <AddTaskModal
+        open={addTaskModalOpen}
+        setOpen={setAddTaskModalOpen}
+        folderId={folderIdToMod}
+      />
     </>
   );
 };
 
-function NoTasksMessage() {
+function NoTasksMessage({ handleOpenAddTaskModal }) {
   return (
     <Box mt={2}>
       <Typography variant="body2">
-        There no tasks in this folder.
+        There are no tasks in this folder.
       </Typography>
+      <Button
+        sx={{ mt: 1.5 }}
+        variant="outlined"
+        onClick={handleOpenAddTaskModal}
+        startIcon={<AddTaskIcon />}>
+        Add Task
+      </Button>
     </Box>
   );
 }

@@ -10,12 +10,25 @@ import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { addFolder } from '../../api/folder';
+import { useOutletContext } from 'react-router-dom';
 
-export default function AddFolderModal({ open, setOpen, clientId, setFolders }) {
+export default function AddFolderModal(props) {
+  const {
+    open,
+    setOpen,
+    willBeKey
+  } = props;
+
   const name = useRef();
   const description = useRef();
   const [isLoading, setLoading] = useState(false);
-  const [isKeyFolder, setIsKeyFolder] = useState(false);
+  const [isKeyFolder, setIsKeyFolder] = useState(Boolean(willBeKey));
+
+  const {
+    client, setFolders
+  } = useOutletContext();
+
+  const clientId = client.id;
 
   const {
     isOpen,
@@ -50,7 +63,7 @@ export default function AddFolderModal({ open, setOpen, clientId, setFolders }) 
           setTimeout(() => {
             openSnackBar('Folder created.', 'success');
           }, 300);
-          
+
           setFolders(folders => [...folders, folder]);
           handleClose();
         } else {
@@ -72,33 +85,40 @@ export default function AddFolderModal({ open, setOpen, clientId, setFolders }) 
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create New Folder</DialogTitle>
+        <DialogTitle>
+          Create New Folder
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the folder name and optional description below.
+            Please enter the new folder's name and description (optional) below.
           </DialogContentText>
           <form onSubmit={handleCreateFolder}>
-            <Box sx={{ mt: 3, mb: 3 }}>
+            <Box sx={{ mt: 2, mb: 1 }}>
               <TextField
-                label="Name"
                 fullWidth
                 autoFocus
                 disabled={isLoading}
                 inputRef={name}
                 required
+                label='Name'
               >
               </TextField>
               <TextField
-                label="Description"
                 fullWidth
                 disabled={isLoading}
                 inputRef={description}
-                sx={{ mt: 4 }}
+                label="Description"
+                sx={{ mt: 2 }}
               >
               </TextField>
               <FormControlLabel
-                control={<Checkbox onChange={(_, val) => setIsKeyFolder(val)} />}
-                label="Key Folder"
+                componentsProps={{ typography: { fontWeight: '300' } }}
+                sx={{ mt: 2, fontSize: '12px' }}
+                control={<Checkbox
+                  onChange={(_, val) => setIsKeyFolder(val)}
+                  defaultChecked={willBeKey}
+                />}
+                label="Is this a Key Folder?"
               />
             </Box>
             <DialogActions>
