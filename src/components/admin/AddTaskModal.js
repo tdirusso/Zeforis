@@ -50,7 +50,7 @@ export default function AddTaskModal(props) {
   const [isLoading, setLoading] = useState(false);
   const [status, setStatus] = useState('New');
   const [folderId, setFolderId] = useState(folderIdToSet || '');
-  const [assignedToId, setAssignedToId] = useState('');
+  const [assignedToId, setAssignedToId] = useState(null);
   const [progress, setProgress] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
   const [isAddingTags, setIsAddingTags] = useState(false);
@@ -121,7 +121,6 @@ export default function AddTaskModal(props) {
     }, 1000);
   };
 
-
   const handleAddTags = () => {
     const newTagsVal = newTags.current.value;
 
@@ -154,9 +153,9 @@ export default function AddTaskModal(props) {
     setOpen(false);
     setTimeout(() => {
       setStatus('New');
-      setFolderId('');
+      setFolderId(null);
       setProgress(0);
-      setAssignedToId('');
+      setAssignedToId(null);
       setSelectedTags([]);
       setDueDate(null);
       setLoading(false);
@@ -201,68 +200,36 @@ export default function AddTaskModal(props) {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="folder-label">Folder</InputLabel>
-                  <Select
-                    labelId="folder-label"
-                    value={folderIdToSet || folderId}
-                    disabled={Boolean(folderIdToSet) || isLoading}
-                    label="Folder"
-                    onChange={e => setFolderId(e.target.value)}>
-                    {
-                      folders.map(folder =>
-                        <MenuItem
-                          key={folder.id}
-                          value={folder.id}>
-                          {folder.name}
-                        </MenuItem>
-                      )
-                    }
-                  </Select>
+                  <Autocomplete
+                    options={folders}
+                    getOptionLabel={(option) => option.name || ''}
+                    disabled={isLoading}
+                    onChange={(_, newVal) => setFolderId(newVal?.id || null)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Folder"
+                      />
+                    )}
+                  />
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="assigned-label">
-                    Assigned To
-                  </InputLabel>
-                  <Select
-                    labelId="assigned-label"
-                    value={assignedToId}
+                  <Autocomplete
+                    options={[...clientAdmins, ...clientMembers]}
+                    getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
                     disabled={isLoading}
-                    label="Assigned To"
-                    onChange={e => setAssignedToId(e.target.value)}>
-                    <MenuItem disabled>
-                      <Divider sx={{ width: '100%', fontSize: '0.9rem' }}>
-                        Administrators
-                      </Divider>
-                    </MenuItem>
-                    {
-                      clientAdmins.map(user =>
-                        <MenuItem
-                          key={user.id}
-                          value={user.id}>
-                          {user.firstName} {user.lastName}
-                        </MenuItem>
-                      )
-                    }
-                    <MenuItem disabled>
-                      <Divider sx={{
-                        width: '100%',
-                        fontSize: '0.9rem'
-                      }}>
-                        Members
-                      </Divider>
-                    </MenuItem>
-                    {
-                      clientMembers.map(user =>
-                        <MenuItem
-                          key={user.id}
-                          value={user.id}>
-                          {user.firstName} {user.lastName}
-                        </MenuItem>
-                      )
-                    }
-                  </Select>
+                    groupBy={(option) => option.role}
+                    onChange={(_, newVal) => setAssignedToId(newVal?.id || null)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Assigned To"
+                      />
+                    )}
+                  />
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -302,12 +269,13 @@ export default function AddTaskModal(props) {
                   <Autocomplete
                     multiple
                     options={tags}
+                    value={selectedTags}
+                    isOptionEqualToValue={(option, value) => option.name === value.name}
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions
                     disableCloseOnSelect
                     disabled={isLoading}
                     onChange={(_, newVal) => setSelectedTags(newVal)}
-                    value={selectedTags}
                     renderInput={(params) => (
                       <TextField
                         {...params}

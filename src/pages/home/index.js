@@ -46,11 +46,11 @@ export default function Home({ theme, setTheme }) {
 
   accountUsers.forEach(accountUser => {
     if (accountUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientAdmins.push(accountUser);
+      clientAdmins.push({ ...accountUser, role: 'Administrator' });
     }
 
     if (accountUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientMembers.push(accountUser);
+      clientMembers.push({ ...accountUser, role: 'Member' });
     }
   });
 
@@ -173,34 +173,34 @@ export default function Home({ theme, setTheme }) {
     foldersMap[task.folder_id].tasks.push(task);
   });
 
+  const context = {
+    client,
+    clients,
+    account,
+    user,
+    folders: Object.values(foldersMap),
+    tasks,
+    tags,
+    setTags,
+    setTasks,
+    setFolders,
+    accountUsers,
+    setAccountUsers,
+    clientMembers,
+    clientAdmins
+  };
+
   return (
     <Box>
       <SideNav theme={theme} client={client} />
       <Box component="main">
         <Box className="main-content">
           <Grid container spacing={3}>
-            <Header />
-            <Outlet
-              context={{
-                client,
-                clients,
-                account,
-                user,
-                folders: Object.values(foldersMap),
-                tasks,
-                tags,
-                setTags,
-                setTasks,
-                setFolders,
-                accountUsers,
-                setAccountUsers,
-                clientMembers,
-                clientAdmins
-              }}
-            />
+            <Outlet context={context} />
           </Grid>
         </Box>
       </Box>
+
       <Snackbar
         isOpen={isOpen}
         type={type}

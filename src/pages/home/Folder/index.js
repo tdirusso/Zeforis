@@ -43,7 +43,7 @@ export default function FolderPage() {
   } = useSnackbar();
 
   return (
-    <Paper className="Folder" sx={{ p: 5 }}>
+    <Paper sx={{ p: 5 }}>
       <Button onClick={() => navigate(exitPath)}>Back</Button>
 
       <Box>

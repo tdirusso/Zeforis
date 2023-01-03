@@ -8,6 +8,7 @@ import { Paper, Typography, Button, Grid } from "@mui/material";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import { useState } from "react";
 import AddFolderModal from "../../../components/admin/AddFolderModal";
+import Header from "../../../components/core/Header";
 
 export default function Dashboard() {
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
@@ -49,6 +50,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <Header />
       <KeyTasks tasks={keyTasks.slice(0, 5)} />
       <UpcomingTasks tasks={tasksSortedByDate.slice(0, 5)} />
       <TaskStats
