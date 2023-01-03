@@ -32,6 +32,11 @@ export default function Header() {
     setAddTaskModalOpen(true);
   };
 
+  const openAddFolder = () => {
+    setAnchorEl(null);
+    setAddFolderModalOpen(true);
+  };
+
   return (
     <Grid item xs={12} component="header">
       <Paper
@@ -61,7 +66,7 @@ export default function Header() {
               </ListItemIcon>
               <ListItemText>New Task</ListItemText>
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={openAddFolder}>
               <ListItemIcon>
                 <FolderIcon fontSize="small" />
               </ListItemIcon>

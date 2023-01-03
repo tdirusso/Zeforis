@@ -1,50 +1,31 @@
-import { Box, Paper } from "@mui/material";
 import './styles.css';
-import Fab from '@mui/material/Fab';
 import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import React from 'react';
 import AddTaskModal from "../../../components/admin/AddTaskModal";
+import Header from "../../../components/core/Header";
+import TasksTable from "../../../components/core/tasks/TasksTable";
 
 export default function TasksPage() {
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
 
   const {
-    client,
-    folders,
-    tags,
-    setTags,
-    setTasks
+    tasks
   } = useOutletContext();
 
+
   return (
-    <Paper className="Folders" sx={{ p: 5 }}>
-      <Box>
-        <Fab
-          variant="extended"
-          disableRipple
-          sx={{ textTransform: 'none', boxShadow: 'none' }}
-          color="primary"
-          onClick={() => setAddFolderModalOpen(true)}>
-          New Task
-        </Fab>
-      </Box>
+    <>
+      <Header />
+
+      <TasksTable tasks={tasks} />
 
       <AddTaskModal
         open={addFolderModalOpen}
         setOpen={setAddFolderModalOpen}
-        clientId={client.id}
-        folders={folders}
-        tags={tags}
-        setTags={setTags}
-        setTasks={setTasks}
       />
 
-    </Paper>
+    </>
+
   );
 };

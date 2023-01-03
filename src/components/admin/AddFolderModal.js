@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Box, TextField, Checkbox, FormControlLabel, } from '@mui/material';
+import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -37,9 +37,7 @@ export default function AddFolderModal(props) {
     message
   } = useSnackbar();
 
-  const handleCreateFolder = e => {
-    e.preventDefault();
-
+  const handleCreateFolder = () => {
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
 
@@ -89,11 +87,11 @@ export default function AddFolderModal(props) {
           Create New Folder
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText mb={2}>
             Please enter the new folder's name and description (optional) below.
           </DialogContentText>
-          <form onSubmit={handleCreateFolder}>
-            <Box sx={{ mt: 2, mb: 1 }}>
+          <Grid container rowSpacing={2} columnSpacing={1} >
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 autoFocus
@@ -101,41 +99,45 @@ export default function AddFolderModal(props) {
                 inputRef={name}
                 required
                 label='Name'
-              >
-              </TextField>
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 disabled={isLoading}
                 inputRef={description}
                 label="Description"
-                sx={{ mt: 2 }}
-              >
-              </TextField>
+              />
+            </Grid>
+            <Grid item xs={12} mt="-20px">
               <FormControlLabel
                 componentsProps={{ typography: { fontWeight: '300' } }}
                 sx={{ mt: 2, fontSize: '12px' }}
                 control={<Checkbox
                   onChange={(_, val) => setIsKeyFolder(val)}
                   defaultChecked={willBeKey}
+                  disabled={isLoading}
                 />}
                 label="Is this a Key Folder?"
               />
-            </Box>
-            <DialogActions>
-              <Button
-                disabled={isLoading}
-                onClick={handleClose}>
-                Cancel
-              </Button>
-              <LoadingButton
-                variant='contained'
-                onClick={handleCreateFolder}
-                type='submit'
-                loading={isLoading}>
-                Create Folder
-              </LoadingButton>
-            </DialogActions>
-          </form>
+            </Grid>
+          </Grid>
+          <DialogActions sx={{ p: 0, mt: 2 }}>
+            <Button
+              disabled={isLoading}
+              fullWidth
+              variant='outlined'
+              onClick={handleClose}>
+              Cancel
+            </Button>
+            <LoadingButton
+              variant='contained'
+              onClick={handleCreateFolder}
+              fullWidth
+              loading={isLoading}>
+              Create Folder
+            </LoadingButton>
+          </DialogActions>
         </DialogContent>
       </Dialog>
       <Snackbar

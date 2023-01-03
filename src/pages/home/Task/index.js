@@ -233,7 +233,6 @@ export default function TaskPage() {
             disabled={isLoading}
             onChange={e => setStatus(e.target.value)}>
             <MenuItem value="New">New</MenuItem>
-            <MenuItem value="Not Started">Not Started</MenuItem>
             <MenuItem value="Next Up">Next Up</MenuItem>
             <MenuItem value="In Progress">In Progress</MenuItem>
             <MenuItem value="Currently Writing">Currently Writing</MenuItem>

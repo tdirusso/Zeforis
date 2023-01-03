@@ -164,13 +164,21 @@ export default function Home({ theme, setTheme }) {
   }
 
   const foldersMap = {};
+  const folderIdToName = {};
+  const tagIdToName = {};
+
 
   folders.forEach(folder => {
     foldersMap[folder.id] = { ...folder, tasks: [] };
+    folderIdToName[folder.id] = folder.name;
   });
 
   tasks.forEach(task => {
     foldersMap[task.folder_id].tasks.push(task);
+  });
+
+  tags.forEach(tag => {
+    tagIdToName[tag.id] = tag.name;
   });
 
   const context = {
@@ -187,7 +195,9 @@ export default function Home({ theme, setTheme }) {
     accountUsers,
     setAccountUsers,
     clientMembers,
-    clientAdmins
+    clientAdmins,
+    tagIdToName,
+    folderIdToName
   };
 
   return (

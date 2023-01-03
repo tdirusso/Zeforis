@@ -7,10 +7,10 @@ import AddTaskModal from "../../admin/AddTaskModal";
 
 export default function KeyFolders({ folders }) {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
-  const [folderIdToMod, setFolderIdToMod] = useState(null);
+  const [folderToMod, setFolderToMod] = useState(null);
 
-  const handleOpenAddTaskModal = (folderId) => {
-    setFolderIdToMod(folderId);
+  const handleOpenAddTaskModal = (folder) => {
+    setFolderToMod(folder);
     setAddTaskModalOpen(true);
   };
 
@@ -45,7 +45,7 @@ export default function KeyFolders({ folders }) {
                 {
                   taskLength > 0 ?
                     <TaskList tasks={folder.tasks.slice(0, 5)} /> :
-                    <NoTasksMessage handleOpenAddTaskModal={() => handleOpenAddTaskModal(folder.id)} />
+                    <NoTasksMessage handleOpenAddTaskModal={() => handleOpenAddTaskModal(folder)} />
                 }
               </Paper>
             </Grid>
@@ -56,7 +56,7 @@ export default function KeyFolders({ folders }) {
       <AddTaskModal
         open={addTaskModalOpen}
         setOpen={setAddTaskModalOpen}
-        folderIdToSet={folderIdToMod}
+        folderToSet={folderToMod}
       />
     </>
   );

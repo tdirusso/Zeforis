@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Autocomplete, Box, Checkbox, Divider, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -27,7 +27,7 @@ export default function AddTaskModal(props) {
   const {
     open,
     setOpen,
-    folderIdToSet
+    folderToSet
   } = props;
 
   const {
@@ -49,7 +49,7 @@ export default function AddTaskModal(props) {
 
   const [isLoading, setLoading] = useState(false);
   const [status, setStatus] = useState('New');
-  const [folderId, setFolderId] = useState(folderIdToSet || '');
+  const [folderId, setFolderId] = useState(null);
   const [assignedToId, setAssignedToId] = useState(null);
   const [progress, setProgress] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -74,7 +74,7 @@ export default function AddTaskModal(props) {
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;
-    const folderIdVal = folderId || folderIdToSet;
+    const folderIdVal = folderId || folderToSet?.id;
 
     if (!nameVal) {
       openSnackBar('Please enter a name for the new task.', 'error');
@@ -203,7 +203,9 @@ export default function AddTaskModal(props) {
                   <Autocomplete
                     options={folders}
                     getOptionLabel={(option) => option.name || ''}
-                    disabled={isLoading}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    disabled={Boolean(folderToSet) || isLoading}
+                    defaultValue={folderToSet || null}
                     onChange={(_, newVal) => setFolderId(newVal?.id || null)}
                     renderInput={(params) => (
                       <TextField
@@ -269,7 +271,6 @@ export default function AddTaskModal(props) {
                   <Autocomplete
                     multiple
                     options={tags}
-                    value={selectedTags}
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions
