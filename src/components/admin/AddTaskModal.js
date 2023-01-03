@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Autocomplete, Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Checkbox, Divider, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -26,7 +26,8 @@ import { useOutletContext } from 'react-router-dom';
 export default function AddTaskModal(props) {
   const {
     open,
-    setOpen
+    setOpen,
+    folderIdToSet
   } = props;
 
   const {
@@ -48,7 +49,7 @@ export default function AddTaskModal(props) {
 
   const [isLoading, setLoading] = useState(false);
   const [status, setStatus] = useState('New');
-  const [folderId, setFolderId] = useState('');
+  const [folderId, setFolderId] = useState(folderIdToSet || '');
   const [assignedToId, setAssignedToId] = useState('');
   const [progress, setProgress] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -73,13 +74,14 @@ export default function AddTaskModal(props) {
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;
+    const folderIdVal = folderId || folderIdToSet;
 
     if (!nameVal) {
       openSnackBar('Please enter a name for the new task.', 'error');
       return;
     }
 
-    if (!folderId) {
+    if (!folderIdVal) {
       openSnackBar('Please select which folder the task should reside in.', 'error');
       return;
     }
@@ -95,7 +97,7 @@ export default function AddTaskModal(props) {
           status,
           assignedToId,
           progress,
-          folderId,
+          folderId: folderIdVal,
           clientId,
           tags: selectedTags,
           isKeyTask,
@@ -201,33 +203,64 @@ export default function AddTaskModal(props) {
                 <FormControl fullWidth>
                   <InputLabel id="folder-label">Folder</InputLabel>
                   <Select
-                 // MenuProps={{pap}}
                     labelId="folder-label"
-                    value={folderId}
-                    disabled={isLoading}
+                    value={folderIdToSet || folderId}
+                    disabled={Boolean(folderIdToSet) || isLoading}
                     label="Folder"
                     onChange={e => setFolderId(e.target.value)}>
                     {
-                      folders.map(folder => {
-                        return <MenuItem key={folder.id} value={folder.id}>{folder.name}</MenuItem>;
-                      })
+                      folders.map(folder =>
+                        <MenuItem
+                          key={folder.id}
+                          value={folder.id}>
+                          {folder.name}
+                        </MenuItem>
+                      )
                     }
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="assigned-label">Assigned To</InputLabel>
+                  <InputLabel id="assigned-label">
+                    Assigned To
+                  </InputLabel>
                   <Select
                     labelId="assigned-label"
                     value={assignedToId}
                     disabled={isLoading}
                     label="Assigned To"
                     onChange={e => setAssignedToId(e.target.value)}>
+                    <MenuItem disabled>
+                      <Divider sx={{ width: '100%', fontSize: '0.9rem' }}>
+                        Administrators
+                      </Divider>
+                    </MenuItem>
                     {
-                      [].map(user => {
-                        return <MenuItem key={user.id} value={user.id}>{user.firstName} {user.lastName}</MenuItem>;
-                      })
+                      clientAdmins.map(user =>
+                        <MenuItem
+                          key={user.id}
+                          value={user.id}>
+                          {user.firstName} {user.lastName}
+                        </MenuItem>
+                      )
+                    }
+                    <MenuItem disabled>
+                      <Divider sx={{
+                        width: '100%',
+                        fontSize: '0.9rem'
+                      }}>
+                        Members
+                      </Divider>
+                    </MenuItem>
+                    {
+                      clientMembers.map(user =>
+                        <MenuItem
+                          key={user.id}
+                          value={user.id}>
+                          {user.firstName} {user.lastName}
+                        </MenuItem>
+                      )
                     }
                   </Select>
                 </FormControl>
@@ -243,7 +276,6 @@ export default function AddTaskModal(props) {
                     disabled={isLoading}
                     onChange={e => setStatus(e.target.value)}>
                     <MenuItem value="New">New</MenuItem>
-                    <MenuItem value="Not Started">Not Started</MenuItem>
                     <MenuItem value="Next Up">Next Up</MenuItem>
                     <MenuItem value="In Progress">In Progress</MenuItem>
                     <MenuItem value="Currently Writing">Currently Writing</MenuItem>
@@ -312,7 +344,9 @@ export default function AddTaskModal(props) {
               <Grid item xs={12} sx={{ mt: '-10px' }}>
                 <FormControlLabel
                   componentsProps={{ typography: { fontWeight: '300' } }}
-                  control={<Checkbox onChange={(_, val) => setIsKeyTask(val)} />}
+                  control={<Checkbox
+                    onChange={(_, val) => setIsKeyTask(val)}
+                    disabled={isLoading} />}
                   label="Is this a Key Task?"
                 />
               </Grid>
@@ -337,7 +371,7 @@ export default function AddTaskModal(props) {
               </Grid>
             </Grid>
           </Box>
-          <DialogActions sx={{p: 0}}>
+          <DialogActions sx={{ p: 0 }}>
             <Button
               disabled={isLoading}
               fullWidth

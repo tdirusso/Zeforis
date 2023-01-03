@@ -4,14 +4,14 @@ import KeyTasks from "../../../components/core/dashboard/KeyTasks";
 import TaskStats from "../../../components/core/dashboard/TaskStats";
 import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
 import './styles.css';
-import { Box, Paper, Typography, Button, Grid } from "@mui/material";
+import { Paper, Typography, Button, Grid } from "@mui/material";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import { useState } from "react";
 import AddFolderModal from "../../../components/admin/AddFolderModal";
 
 export default function Dashboard() {
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
-  
+
   const {
     tasks,
     folders

@@ -56,7 +56,7 @@ export default function KeyFolders({ folders }) {
       <AddTaskModal
         open={addTaskModalOpen}
         setOpen={setAddTaskModalOpen}
-        folderId={folderIdToMod}
+        folderIdToSet={folderIdToMod}
       />
     </>
   );
