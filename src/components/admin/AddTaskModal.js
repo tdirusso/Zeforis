@@ -197,11 +197,11 @@ export default function AddTaskModal(props) {
                   inputRef={linkUrl}>
                 </TextField>
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel id="folder-label">Folder</InputLabel>
                   <Select
+                 // MenuProps={{pap}}
                     labelId="folder-label"
                     value={folderId}
                     disabled={isLoading}
@@ -232,7 +232,6 @@ export default function AddTaskModal(props) {
                   </Select>
                 </FormControl>
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel id="status-label">Status</InputLabel>
@@ -255,7 +254,6 @@ export default function AddTaskModal(props) {
                   </Select>
                 </FormControl>
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
@@ -267,7 +265,6 @@ export default function AddTaskModal(props) {
                   ></DesktopDatePicker>
                 </LocalizationProvider>
               </Grid>
-
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <Autocomplete
@@ -312,7 +309,6 @@ export default function AddTaskModal(props) {
                   </Typography>
                 </Box>
               </Grid>
-
               <Grid item xs={12} sx={{ mt: '-10px' }}>
                 <FormControlLabel
                   componentsProps={{ typography: { fontWeight: '300' } }}
@@ -320,9 +316,8 @@ export default function AddTaskModal(props) {
                   label="Is this a Key Task?"
                 />
               </Grid>
-
               <Grid item xs={12} sx={{ mt: '-10px' }}>
-                <Box width={'95%'}>
+                <Box width={'98%'}>
                   <Slider
                     defaultValue={0}
                     valueLabelDisplay="auto"
@@ -341,11 +336,12 @@ export default function AddTaskModal(props) {
                 </Box>
               </Grid>
             </Grid>
-
           </Box>
-          <DialogActions>
+          <DialogActions sx={{p: 0}}>
             <Button
               disabled={isLoading}
+              fullWidth
+              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
@@ -353,6 +349,7 @@ export default function AddTaskModal(props) {
               variant='contained'
               onClick={handleCreateTask}
               type='submit'
+              fullWidth
               loading={isLoading}>
               Create Task
             </LoadingButton>
