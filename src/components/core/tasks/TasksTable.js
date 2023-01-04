@@ -1,4 +1,4 @@
-import { Checkbox, Chip, Grid, Paper, IconButton, TextField, FormControl, Autocomplete } from "@mui/material";
+import { Checkbox, Chip, Grid, Paper, IconButton, TextField, FormControl, Autocomplete, Box, Button } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,11 +13,15 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import './styles.css';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
+import { LoadingButton } from "@mui/lab";
+import EditIcon from '@mui/icons-material/Edit';
+import AddTaskIcon from '@mui/icons-material/AddTask';
+import AddTaskModal from "../../admin/AddTaskModal";
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -35,11 +39,19 @@ const statuses = [
 
 export default function TasksTable({ tasks }) {
 
+  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
+
+  const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
-  const [filterAssignedTo, setFilterAssignedTo] = useState([]);
-  const [filterFolders, setFilterFolders] = useState([]);
-  const [filterStatuses, setFilterStatuses] = useState([]);
-  const [filterSortBy, setFilterSortBy] = useState('none');
+  const [filterAssignedTo, setFilterAssignedTo] = useState(null);
+  const [filterFolder, setFilterFolder] = useState(null);
+  const [filterStatus, setFilterStatus] = useState(null);
+  const [sortBy, setSortBy] = useState('name');
+  const [theTasks, setTheTasks] = useState(tasks);
+
+  useEffect(() => {
+    setTheTasks(tasks);
+  }, [tasks]);
 
   const {
     folderIdToName,
@@ -53,6 +65,66 @@ export default function TasksTable({ tasks }) {
   const handleMenuClick = () => {
 
   };
+
+  let filteredTasks = [...theTasks];
+
+  filteredTasks = filteredTasks.filter(task => {
+    let shouldReturnTask = true;
+    const tagIds = task.tags?.split(',') || [];
+
+    if (filterName) {
+      shouldReturnTask = task.task_name.toLowerCase().includes(filterName.toLowerCase());
+      if (!shouldReturnTask) {
+        return false;
+      }
+    }
+
+    if (filterAssignedTo) {
+      shouldReturnTask = filterAssignedTo.id === task.assigned_to_id;
+      if (!shouldReturnTask) {
+        return false;
+      }
+    }
+
+    if (filterTags.length > 0) {
+      shouldReturnTask = filterTags.every(({ id }) => tagIds.includes(String(id)));
+      if (!shouldReturnTask) {
+        return false;
+      }
+    }
+
+    if (filterFolder) {
+      shouldReturnTask = filterFolder.id === task.folder_id;
+      if (!shouldReturnTask) {
+        return false;
+      }
+    }
+
+    if (filterStatus) {
+      shouldReturnTask = filterStatus === task.status;
+    }
+
+    return shouldReturnTask;;
+  });
+
+  switch (sortBy) {
+    case 'name':
+      filteredTasks.sort((a, b) => a.task_name.localeCompare(b.task_name));
+      break;
+    case 'status':
+      filteredTasks.sort((a, b) => a.status.localeCompare(b.status));
+      break;
+    case 'dateDue':
+      filteredTasks = filteredTasks.filter(t => t.date_due).sort((a, b) => {
+        return new Date(a.date_due) - new Date(b.date_due);
+      });
+      break;
+    case 'folder':
+      filteredTasks.sort((a, b) => folderIdToName[a.folder_id].localeCompare(folderIdToName[b.folder_id]));
+      break;
+    default:
+      break;
+  }
 
   return (
     <>
@@ -87,16 +159,14 @@ export default function TasksTable({ tasks }) {
                     fullWidth
                     size="small"
                     label='Name'
+                    onChange={e => setFilterName(e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <FormControl fullWidth>
                     <Autocomplete
-                      multiple
                       size="small"
                       options={[...clientAdmins, ...clientMembers]}
-                      filterSelectedOptions
-                      disableCloseOnSelect
                       getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                       isOptionEqualToValue={(option, value) => option.id === value.id}
                       groupBy={(option) => option.role}
@@ -133,14 +203,11 @@ export default function TasksTable({ tasks }) {
                 <Grid item xs={12} md={4}>
                   <FormControl fullWidth>
                     <Autocomplete
-                      multiple
-                      filterSelectedOptions
-                      disableCloseOnSelect
                       size="small"
                       options={folders}
                       getOptionLabel={(option) => option.name || ''}
                       isOptionEqualToValue={(option, value) => option.id === value.id}
-                      onChange={(_, newVal) => setFilterFolders(newVal)}
+                      onChange={(_, newVal) => setFilterFolder(newVal)}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -153,12 +220,9 @@ export default function TasksTable({ tasks }) {
                 <Grid item xs={12} md={4}>
                   <FormControl fullWidth>
                     <Autocomplete
-                      multiple
-                      filterSelectedOptions
-                      disableCloseOnSelect
                       size="small"
                       options={statuses}
-                      onChange={(_, newVal) => setFilterStatuses(newVal)}
+                      onChange={(_, newVal) => setFilterStatus(newVal)}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -174,18 +238,13 @@ export default function TasksTable({ tasks }) {
                     <FormLabel>Sort by</FormLabel>
                     <RadioGroup
                       row
-                      value={filterSortBy}
-                      onChange={(_, val) => setFilterSortBy(val)}
+                      value={sortBy}
+                      onChange={(_, val) => setSortBy(val)}
                       name="row-radio-buttons-group">
-                      <FormControlLabel
-                        value="none"
-                        control={<Radio size="small" />}
-                        label="None (default)"
-                      />
                       <FormControlLabel
                         value="name"
                         control={<Radio size="small" />}
-                        label="Task Name"
+                        label="Task Name (default)"
                       />
                       <FormControlLabel
                         value="status"
@@ -212,8 +271,22 @@ export default function TasksTable({ tasks }) {
       </Grid>
 
       <Grid item xs={12}>
+        <Box display="flex" justifyContent="space-between">
+          <LoadingButton
+            variant="contained"
+            startIcon={<EditIcon />}>
+            Edit Selected
+          </LoadingButton>
+          <Button
+            variant="outlined"
+            onClick={() => setAddTaskModalOpen(true)}
+            startIcon={<AddTaskIcon />}>New Task</Button>
+        </Box>
+      </Grid>
+
+      <Grid item xs={12}>
         <Paper sx={{ px: 0, overflowX: 'auto' }}>
-          <Table sx={{ minWidth: 650 }} className="tasks-table">
+          <Table sx={{ minWidth: 650 }} className="tasks-table" size="small">
             <TableHead>
               <TableRow sx={{
                 '& .MuiTableCell-root': { border: 0 }
@@ -230,7 +303,7 @@ export default function TasksTable({ tasks }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {tasks.map((task) => {
+              {filteredTasks.map((task) => {
                 const dateDue = new Date(task.date_due);
                 const dateDueDay = days[dateDue.getDay()];
                 const dateDueMonth = months[dateDue.getMonth()];
@@ -258,7 +331,13 @@ export default function TasksTable({ tasks }) {
                       />
                     </TableCell>
                     <TableCell>{task.progress}</TableCell>
-                    <TableCell>{`${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}`}</TableCell>
+                    <TableCell>
+                      {
+                        task.date_due ?
+                          `${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}` :
+                          'None'
+                      }
+                    </TableCell>
 
                     <TableCell>{
                       tagsArray.map(tagId =>
@@ -284,6 +363,11 @@ export default function TasksTable({ tasks }) {
           </Table>
         </Paper>
       </Grid>
+
+      <AddTaskModal
+        open={addTaskModalOpen}
+        setOpen={setAddTaskModalOpen}
+      />
     </>
   );
 };

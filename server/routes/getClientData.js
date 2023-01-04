@@ -11,12 +11,12 @@ module.exports = async (req, res) => {
   try {
 
     const [folders] = await pool.query(
-      'SELECT * FROM folders WHERE client_id = ?',
+      'SELECT * FROM folders WHERE client_id = ? ORDER BY folders.name',
       [clientId]
     );
 
     const [tags] = await pool.query(
-      'SELECT * FROM tags WHERE client_id = ?',
+      'SELECT * FROM tags WHERE client_id = ? ORDER BY tags.name',
       [clientId]
     );
 
@@ -35,6 +35,7 @@ module.exports = async (req, res) => {
         LEFT JOIN users ON client_users.user_id = users.id
         LEFT JOIN accounts ON accounts.id = clients.account_id
         WHERE clients.account_id = ?
+        ORDER BY users.first_name
       `,
       [accountId]
     );

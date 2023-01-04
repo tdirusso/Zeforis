@@ -167,13 +167,14 @@ export default function Home({ theme, setTheme }) {
   const folderIdToName = {};
   const tagIdToName = {};
 
+  const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
 
   folders.forEach(folder => {
     foldersMap[folder.id] = { ...folder, tasks: [] };
     folderIdToName[folder.id] = folder.name;
   });
 
-  tasks.forEach(task => {
+  sortedTasks.forEach(task => {
     foldersMap[task.folder_id].tasks.push(task);
   });
 
@@ -187,7 +188,7 @@ export default function Home({ theme, setTheme }) {
     account,
     user,
     folders: Object.values(foldersMap),
-    tasks,
+    tasks: sortedTasks,
     tags,
     setTags,
     setTasks,
