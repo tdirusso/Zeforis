@@ -1,4 +1,14 @@
-import { Checkbox, Chip, Grid, Paper, IconButton, TextField, FormControl, Autocomplete, Box, Button } from "@mui/material";
+import {
+  Checkbox,
+  Chip,
+  Grid,
+  Paper,
+  IconButton,
+  Box,
+  Button,
+  TablePagination,
+  Typography
+} from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,40 +16,23 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useOutletContext } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import './styles.css';
 import { useEffect, useState } from "react";
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import { LoadingButton } from "@mui/lab";
 import EditIcon from '@mui/icons-material/Edit';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import AddTaskModal from "../../admin/AddTaskModal";
+import TasksFilter from "./TasksFilter";
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const statuses = [
-  'New',
-  'Next Up',
-  'In Progress',
-  'Currently Writing',
-  'Pending Approval',
-  'Approved',
-  'Ready to Implement',
-  'Complete'
-];
-
 export default function TasksTable({ tasks }) {
 
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
+
+  const [page, setPage] = useState(0);
+  const [selectedTasks, setSelectedTasks] = useState([]);
 
   const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
@@ -56,14 +49,26 @@ export default function TasksTable({ tasks }) {
   const {
     folderIdToName,
     tagIdToName,
-    tags,
-    clientAdmins,
-    clientMembers,
-    folders
   } = useOutletContext();
 
   const handleMenuClick = () => {
 
+  };
+
+  const handleTaskSelection = (taskId) => {
+    if (selectedTasks.includes(taskId)) {
+      setSelectedTasks(selectedTasks.filter(id => id !== taskId));
+    } else {
+      setSelectedTasks(taskIds => [...taskIds, taskId]);
+    }
+  };
+
+  const handleSelectAll = (_, isChecked) => {
+    if (isChecked) {
+      setSelectedTasks(filteredTasks.map(({ task_id }) => task_id));
+    } else {
+      setSelectedTasks([]);
+    }
   };
 
   let filteredTasks = [...theTasks];
@@ -115,7 +120,14 @@ export default function TasksTable({ tasks }) {
       filteredTasks.sort((a, b) => a.status.localeCompare(b.status));
       break;
     case 'dateDue':
-      filteredTasks = filteredTasks.filter(t => t.date_due).sort((a, b) => {
+      filteredTasks.sort((a, b) => {
+        // Sort all tasks without due dates to the bottom
+        if (!a.date_due) return 1;
+        if (!b.date_due) return -1;
+        else return 0;
+      }).sort((a, b) => {
+        // Now sort by the due date
+        if (!a.date_due || !b.date_due) return 1;
         return new Date(a.date_due) - new Date(b.date_due);
       });
       break;
@@ -128,239 +140,142 @@ export default function TasksTable({ tasks }) {
 
   return (
     <>
-      <Grid item xs={12}>
-        <Paper>
-          <Accordion
-            disableGutters
-            defaultExpanded
-            sx={{
-              '&.MuiPaper-root': {
-                p: '0 !important',
-                boxShadow: 0
-              }
-            }}>
-            <AccordionSummary
-              sx={{
-                justifyContent: 'flex-start',
-                '& .MuiAccordionSummary-content': {
-                  flexGrow: 0
-                }
-              }}
-              expandIcon={<ExpandMoreIcon />}>
-              <Typography sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                <FilterAltIcon htmlColor="#cbced4" />
-                Filters
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container rowSpacing={2} columnSpacing={2}>
-                <Grid item xs={12} md={4} >
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label='Name'
-                    onChange={e => setFilterName(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      size="small"
-                      options={[...clientAdmins, ...clientMembers]}
-                      getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      groupBy={(option) => option.role}
-                      onChange={(_, newVal) => setFilterAssignedTo(newVal)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Assigned To"
-                        />
-                      )}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      multiple
-                      options={tags}
-                      isOptionEqualToValue={(option, value) => option.name === value.name}
-                      getOptionLabel={(option) => option.name}
-                      filterSelectedOptions
-                      disableCloseOnSelect
-                      size="small"
-                      onChange={(_, newVal) => setFilterTags(newVal)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Tags"
-                        />
-                      )}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      size="small"
-                      options={folders}
-                      getOptionLabel={(option) => option.name || ''}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      onChange={(_, newVal) => setFilterFolder(newVal)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Folder"
-                        />
-                      )}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      size="small"
-                      options={statuses}
-                      onChange={(_, newVal) => setFilterStatus(newVal)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Status"
-                        />
-                      )}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={4}></Grid>
-                <Grid item xs>
-                  <FormControl className="filter-sort-buttons">
-                    <FormLabel>Sort by</FormLabel>
-                    <RadioGroup
-                      row
-                      value={sortBy}
-                      onChange={(_, val) => setSortBy(val)}
-                      name="row-radio-buttons-group">
-                      <FormControlLabel
-                        value="name"
-                        control={<Radio size="small" />}
-                        label="Task Name (default)"
-                      />
-                      <FormControlLabel
-                        value="status"
-                        control={<Radio size="small" />}
-                        label="Status"
-                      />
-                      <FormControlLabel
-                        value="dateDue"
-                        control={<Radio size="small" />}
-                        label="Date Due"
-                      />
-                      <FormControlLabel
-                        value="folder"
-                        control={<Radio size="small" />}
-                        label="Folder"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-        </Paper>
-      </Grid>
+      <TasksFilter
+        setFilterName={setFilterName}
+        setFilterTags={setFilterTags}
+        setFilterAssignedTo={setFilterAssignedTo}
+        setFilterFolder={setFilterFolder}
+        setFilterStatus={setFilterStatus}
+        setSortBy={setSortBy}
+        sortBy={sortBy}
+      />
 
       <Grid item xs={12}>
         <Box display="flex" justifyContent="space-between">
-          <LoadingButton
-            variant="contained"
-            startIcon={<EditIcon />}>
-            Edit Selected
-          </LoadingButton>
+          <Box display="flex" alignItems="center">
+            <LoadingButton
+              variant="contained"
+              sx={{ mr: 1.5 }}
+              disabled={selectedTasks.length === 0}
+              startIcon={<EditIcon />}>
+              Edit Selected
+            </LoadingButton>
+            {
+              selectedTasks.length > 0 ?
+                <Box component="h6">
+                  {selectedTasks.length} selected
+                </Box> :
+                ''
+            }
+          </Box>
           <Button
             variant="outlined"
             onClick={() => setAddTaskModalOpen(true)}
-            startIcon={<AddTaskIcon />}>New Task</Button>
+            startIcon={<AddTaskIcon />}>
+            New Task
+          </Button>
         </Box>
       </Grid>
 
       <Grid item xs={12}>
         <Paper sx={{ px: 0, overflowX: 'auto' }}>
-          <Table sx={{ minWidth: 650 }} className="tasks-table" size="small">
+          <Table
+            sx={{ minWidth: 650 }}
+            className="tasks-table"
+            size="small">
             <TableHead>
               <TableRow sx={{
                 '& .MuiTableCell-root': { border: 0 }
               }}>
-                <TableCell><Checkbox /></TableCell>
+                <TableCell>
+                  <Checkbox
+                    onChange={handleSelectAll}
+                    checked={selectedTasks.length === filteredTasks.length}
+                  />
+                </TableCell>
                 <TableCell sx={{ width: '175px' }}>Name</TableCell>
                 <TableCell>Assigned To</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Progress</TableCell>
-                <TableCell>Due</TableCell>
+                <TableCell sx={{ width: '160px' }}>Due</TableCell>
                 <TableCell sx={{ width: '175px' }}>Tags</TableCell>
                 <TableCell>Folder</TableCell>
-                <TableCell></TableCell>
+                <TableCell sx={{ width: '30px' }}></TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {filteredTasks.map((task) => {
-                const dateDue = new Date(task.date_due);
-                const dateDueDay = days[dateDue.getDay()];
-                const dateDueMonth = months[dateDue.getMonth()];
+              {
+                filteredTasks.slice(page * 25, (page * 25) + 25).map((task) => {
+                  const dateDue = new Date(task.date_due);
+                  const dateDueDay = days[dateDue.getDay()];
+                  const dateDueMonth = months[dateDue.getMonth()];
 
-                const tagsArray = task.tags?.split(',') || [];
+                  const tagsArray = task.tags?.split(',') || [];
 
-                return (
-                  <TableRow
-                    hover
-                    key={task.task_id}
-                    sx={{
-                      '& .MuiTableCell-root': { border: 0 }
-                    }}
-                  >
-                    <TableCell><Checkbox /></TableCell>
-                    <TableCell scope="row">
-                      {task.task_name}
-                    </TableCell>
-                    <TableCell>{task.assigned_first} {task.assigned_last}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={task.status}
-                        className={task.status}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{task.progress}</TableCell>
-                    <TableCell>
-                      {
-                        task.date_due ?
-                          `${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}` :
-                          'None'
-                      }
-                    </TableCell>
-
-                    <TableCell>{
-                      tagsArray.map(tagId =>
+                  return (
+                    <TableRow
+                      hover
+                      onClick={() => handleTaskSelection(task.task_id)}
+                      key={task.task_id}
+                      sx={{
+                        '& .MuiTableCell-root': { border: 0 }
+                      }}>
+                      <TableCell>
+                        <Checkbox checked={selectedTasks.includes(task.task_id)} />
+                      </TableCell>
+                      <TableCell scope="row">
+                        {task.task_name}
+                      </TableCell>
+                      <TableCell>
+                        {task.assigned_first} {task.assigned_last}
+                      </TableCell>
+                      <TableCell>
                         <Chip
-                          key={tagId}
-                          label={tagIdToName[tagId]}
+                          label={task.status}
+                          className={task.status}
                           size="small"
-                          sx={{ m: 0.5 }}
-                        />)}
-                    </TableCell>
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {
+                          task.date_due ?
+                            `${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}` :
+                            'None'
+                        }
+                      </TableCell>
 
-                    <TableCell>{folderIdToName[task.folder_id]}</TableCell>
-                    <TableCell>
-                      <IconButton onClick={handleMenuClick}>
-                        <MoreVertIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              }
-              )}
+                      <TableCell>{
+                        tagsArray.map(tagId =>
+                          <Chip
+                            key={tagId}
+                            label={tagIdToName[tagId]}
+                            size="small"
+                            sx={{ m: 0.5 }}
+                          />)}
+                      </TableCell>
+
+                      <TableCell>{folderIdToName[task.folder_id]}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={handleMenuClick}>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                }
+                )}
             </TableBody>
           </Table>
+          <Box mt={2} mr={2}>
+            <TablePagination
+              rowsPerPageOptions={[-1]}
+              component="div"
+              count={filteredTasks.length}
+              rowsPerPage={25}
+              page={page}
+              onPageChange={(_, pageNum) => setPage(pageNum)}
+            />
+          </Box>
         </Paper>
       </Grid>
 

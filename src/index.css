@@ -43,11 +43,11 @@ a.MuiListItem-root {
   color: initial;
 }
 
-h2, h4 {
+h2, h4, h6 {
   font-weight: 600;
 }
 
-h5 {
+h5, h6 {
   font-size: 0.9rem;
 }
 
