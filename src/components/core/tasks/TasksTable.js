@@ -23,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import AddTaskModal from "../../admin/AddTaskModal";
 import TasksFilter from "./TasksFilter";
+import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -30,6 +31,7 @@ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function TasksTable({ tasks }) {
 
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
+  const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -38,7 +40,7 @@ export default function TasksTable({ tasks }) {
   const [filterTags, setFilterTags] = useState([]);
   const [filterAssignedTo, setFilterAssignedTo] = useState(null);
   const [filterFolder, setFilterFolder] = useState(null);
-  const [filterStatus, setFilterStatus] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [theTasks, setTheTasks] = useState(tasks);
 
@@ -49,6 +51,7 @@ export default function TasksTable({ tasks }) {
   const {
     folderIdToName,
     tagIdToName,
+    client
   } = useOutletContext();
 
   const handleMenuClick = () => {
@@ -105,7 +108,7 @@ export default function TasksTable({ tasks }) {
       }
     }
 
-    if (filterStatus) {
+    if (filterStatus !== 'all') {
       shouldReturnTask = filterStatus === task.status;
     }
 
@@ -146,6 +149,7 @@ export default function TasksTable({ tasks }) {
         setFilterAssignedTo={setFilterAssignedTo}
         setFilterFolder={setFilterFolder}
         setFilterStatus={setFilterStatus}
+        filterStatus={filterStatus}
         setSortBy={setSortBy}
         sortBy={sortBy}
       />
@@ -156,6 +160,7 @@ export default function TasksTable({ tasks }) {
             <LoadingButton
               variant="contained"
               sx={{ mr: 1.5 }}
+              onClick={() => setEditSelectedTasksModalOpen(true)}
               disabled={selectedTasks.length === 0}
               startIcon={<EditIcon />}>
               Edit Selected
@@ -212,16 +217,20 @@ export default function TasksTable({ tasks }) {
 
                   const tagsArray = task.tags?.split(',') || [];
 
+                  const isSelectedRow = selectedTasks.includes(task.task_id);
+
                   return (
                     <TableRow
                       hover
                       onClick={() => handleTaskSelection(task.task_id)}
                       key={task.task_id}
+                      className={isSelectedRow ? 'selected' : ''}
                       sx={{
+                        position: 'relative',
                         '& .MuiTableCell-root': { border: 0 }
                       }}>
                       <TableCell>
-                        <Checkbox checked={selectedTasks.includes(task.task_id)} />
+                        <Checkbox checked={isSelectedRow} />
                       </TableCell>
                       <TableCell scope="row">
                         {task.task_name}
@@ -282,6 +291,13 @@ export default function TasksTable({ tasks }) {
       <AddTaskModal
         open={addTaskModalOpen}
         setOpen={setAddTaskModalOpen}
+      />
+
+      <EditSelectedTasksModal
+        taskIds={selectedTasks}
+        open={editSelectedTasksModalOpen}
+        setOpen={setEditSelectedTasksModalOpen}
+        clientId={client.id}
       />
     </>
   );

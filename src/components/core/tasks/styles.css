@@ -10,3 +10,17 @@
 .filter-sort-buttons span.MuiTypography-root {
   font-size: 0.92rem;
 }
+
+.tasks-table .selected {
+  background-color: #e5f3fd80 !important;
+}
+
+.tasks-table .selected::after {
+  top: 0px;
+  left: 0px;
+  width: 3px;
+  content: "";
+  height: 100%;
+  position: absolute;
+  background-color: var(--colors-primary);
+}

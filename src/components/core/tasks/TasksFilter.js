@@ -4,6 +4,9 @@ import {
   TextField,
   FormControl,
   Autocomplete,
+  MenuItem,
+  Select,
+  InputLabel
 } from "@mui/material";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -37,6 +40,7 @@ export default function TasksFilter(props) {
     setFilterAssignedTo,
     setFilterFolder,
     setFilterStatus,
+    filterStatus,
     setSortBy,
     sortBy
   } = props;
@@ -140,17 +144,22 @@ export default function TasksFilter(props) {
               </Grid>
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
-                  <Autocomplete
+                <InputLabel size="small">Status</InputLabel>
+                  <Select
+                    value={filterStatus}
+                    label="Status"
                     size="small"
-                    options={statuses}
-                    onChange={(_, newVal) => setFilterStatus(newVal)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Status"
-                      />
-                    )}
-                  />
+                    onChange={e => setFilterStatus(e.target.value)}>
+                    <MenuItem value='all'>All</MenuItem>
+                    {
+                      statuses.map(status =>
+                        <MenuItem
+                          key={status}
+                          value={status}>
+                          {status}
+                        </MenuItem>)
+                    }
+                  </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={4}></Grid>
