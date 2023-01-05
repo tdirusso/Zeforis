@@ -262,7 +262,7 @@ export default function AddTaskModal(props) {
                     inputFormat="MM/DD/YYYY"
                     value={dueDate}
                     onChange={value => setDueDate(value)}
-                    renderInput={(params) => <TextField {...params} />}
+                    renderInput={(params) => <TextField {...params} fullWidth/>}
                   ></DesktopDatePicker>
                 </LocalizationProvider>
               </Grid>
