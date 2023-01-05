@@ -20,6 +20,8 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import { useOutletContext } from "react-router-dom";
+import Switch from '@mui/material/Switch';
+import StarIcon from '@mui/icons-material/Star';
 
 const statuses = [
   'New',
@@ -40,6 +42,8 @@ export default function TasksFilter(props) {
     setFilterAssignedTo,
     setFilterFolder,
     setFilterStatus,
+    setFilterKeyTasks,
+    filterKeyTasks,
     filterStatus,
     setSortBy,
     sortBy
@@ -57,7 +61,6 @@ export default function TasksFilter(props) {
       <Paper>
         <Accordion
           disableGutters
-          defaultExpanded
           sx={{
             '&.MuiPaper-root': {
               p: '0 !important',
@@ -144,7 +147,7 @@ export default function TasksFilter(props) {
               </Grid>
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
-                <InputLabel size="small">Status</InputLabel>
+                  <InputLabel size="small">Status</InputLabel>
                   <Select
                     value={filterStatus}
                     label="Status"
@@ -163,6 +166,20 @@ export default function TasksFilter(props) {
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={4}></Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={<Switch
+                    checked={filterKeyTasks}
+                    onChange={(_, val) => setFilterKeyTasks(val)}
+                  />}
+                  label={
+                    <Typography variant="body2" display="flex" alignItems="center">
+                      <StarIcon fontSize="small" htmlColor="gold" />
+                      Key Tasks Only
+                    </Typography>
+                  }
+                />
+              </Grid>
               <Grid item xs>
                 <FormControl className="filter-sort-buttons">
                   <FormLabel>Sort by</FormLabel>

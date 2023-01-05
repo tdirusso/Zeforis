@@ -7,6 +7,8 @@ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function UpcomingTasks({ tasks }) {
   const tasksLength = tasks.length;
 
+  const navigate = useNavigate();
+
   return (
     <Grid item xs={12} md={5}>
       <Paper sx={{ height: '100%' }}>
@@ -22,6 +24,7 @@ export default function UpcomingTasks({ tasks }) {
             Upcoming Tasks
           </Box>
           <Button
+            onClick={() => navigate('/home/tasks?preSort=dateDue')}
             sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View All
           </Button>

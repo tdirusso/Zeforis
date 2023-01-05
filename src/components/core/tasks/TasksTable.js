@@ -14,7 +14,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import './styles.css';
 import { useEffect, useState } from "react";
@@ -31,6 +31,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import StarIcon from '@mui/icons-material/Star';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -45,15 +46,22 @@ export default function TasksTable({ tasks }) {
   const [taskForMenu, setTaskForMenu] = useState(null);
 
   const [anchorEl, setAnchorEl] = useState(null);
-
   const rowMenuOpen = Boolean(anchorEl);
+
+  const { search } = useLocation();
+
+  const queryParams = new URLSearchParams(search);
+
+  const preFilterKeyTasks = queryParams.get('preFilterKeyTasks');
+  const preSort = queryParams.get('preSort') || 'name';
 
   const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
   const [filterAssignedTo, setFilterAssignedTo] = useState(null);
   const [filterFolder, setFilterFolder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
+  const [filterKeyTasks, setFilterKeyTasks] = useState(Boolean(preFilterKeyTasks));
+  const [sortBy, setSortBy] = useState(preSort);
   const [theTasks, setTheTasks] = useState(tasks);
 
   const navigate = useNavigate();
@@ -79,7 +87,7 @@ export default function TasksTable({ tasks }) {
   };
 
   const handleViewTask = () => {
-    navigate(`/home/task/${taskForMenu.task_id}?exitPath=/home/tasks`);
+    navigate(`/home/task/${taskForMenu.task_id}?exitPath=/home/tasks${search}`);
   };
 
   const handleTaskSelection = (taskId) => {
@@ -134,6 +142,13 @@ export default function TasksTable({ tasks }) {
 
     if (filterStatus !== 'all') {
       shouldReturnTask = filterStatus === task.status;
+      if (!shouldReturnTask) {
+        return false;
+      }
+    }
+
+    if (filterKeyTasks) {
+      shouldReturnTask = Boolean(task.is_key_task);
     }
 
     return shouldReturnTask;;
@@ -173,6 +188,8 @@ export default function TasksTable({ tasks }) {
         setFilterAssignedTo={setFilterAssignedTo}
         setFilterFolder={setFilterFolder}
         setFilterStatus={setFilterStatus}
+        setFilterKeyTasks={setFilterKeyTasks}
+        filterKeyTasks={filterKeyTasks}
         filterStatus={filterStatus}
         setSortBy={setSortBy}
         sortBy={sortBy}
@@ -264,7 +281,19 @@ export default function TasksTable({ tasks }) {
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
                       <TableCell scope="row">
-                        {task.task_name}
+                        <Box display="flex" alignItems="center">
+                          {
+                            task.is_key_task ?
+                              <StarIcon
+                                htmlColor="gold"
+                                sx={{ mr: 0.3 }}
+                                fontSize="small"
+                              /> :
+                              ''
+                          }
+                          {task.task_name}
+                        </Box>
+
                       </TableCell>
                       <TableCell>
                         {task.assigned_first} {task.assigned_last}

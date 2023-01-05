@@ -5,6 +5,8 @@ import StarIcon from '@mui/icons-material/Star';
 export default function KeyTasks({ tasks }) {
   const tasksLength = tasks.length;
 
+  const navigate = useNavigate();
+
   return (
     <Grid item xs={12} md={7}>
       <Paper sx={{ height: '100%' }}>
@@ -25,6 +27,7 @@ export default function KeyTasks({ tasks }) {
             Key Tasks
           </Box>
           <Button
+            onClick={() => navigate('/home/tasks?preFilterKeyTasks=true')}
             sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View All
           </Button>
