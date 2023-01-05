@@ -1,26 +1,31 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { removeTask } from '../../api/task';
-import { useNavigate } from 'react-router-dom';
+import { removeTasks } from '../../api/task';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
-export default function RemoveTaskModal(props) {
+export default function RemoveTasksModal(props) {
 
   const {
     open,
     setOpen,
-    task,
-    setTasks,
-    clientId,
-    exitPath
+    taskIds,
+    exitPath,
+    setSelectedTasks
   } = props;
+
+  const {
+    setTasks,
+    client
+  } = useOutletContext();
+
+  const clientId = client.id;
 
   const navigate = useNavigate();
 
@@ -33,33 +38,38 @@ export default function RemoveTaskModal(props) {
     message
   } = useSnackbar();
 
-  const handleRemoveTask = () => {
+  const handleRemoveTasks = () => {
     setLoading(true);
 
     setTimeout(async () => {
       try {
-        const result = await removeTask({
+        const result = await removeTasks({
           clientId,
-          taskId: task.task_id
+          taskIds
         });
 
         const success = result.success;
         const resultMessage = result.message;
 
         if (success) {
+          const removedLength = taskIds.length;
+
           if (exitPath) {
-            openSnackBar('Successully removed.', 'success');
+            openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
 
             setTimeout(() => {
               navigate(exitPath);
-              setTasks(tasks => tasks.filter(t => t.task_id !== task.task_id));
+              setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
             }, 1000);
           } else {
             setTimeout(() => {
-              openSnackBar('Successully removed.', 'success');
+              openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
             }, 250);
 
-            setTasks(tasks => tasks.filter(t => t.task_id !== task.task_id));
+            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
+            if (setSelectedTasks) {
+              setSelectedTasks([]);
+            }
             handleClose();
           }
         } else {
@@ -83,24 +93,26 @@ export default function RemoveTaskModal(props) {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Confirm Task Removal</DialogTitle>
-        <DialogContent >
-          <DialogContentText sx={{ mb: 5 }}>
-            Are you sure you want to delete the task <strong>"{task?.task_name}"</strong>?
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Are you sure you want to <strong>permanently delete</strong> {taskIds.length} tasks?
           </DialogContentText>
-          <DialogActions>
+          <DialogActions sx={{ p: 0 }}>
             <Button
               disabled={isLoading}
+              fullWidth
+              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveTask}
+              onClick={handleRemoveTasks}
               required
+              fullWidth
               loading={isLoading}
               color="error">
-              Yes, Delete Task
+              Yes, Delete
             </LoadingButton>
           </DialogActions>
         </DialogContent>

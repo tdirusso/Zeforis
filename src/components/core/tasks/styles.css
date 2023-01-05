@@ -24,3 +24,7 @@
   position: absolute;
   background-color: var(--colors-primary);
 }
+
+.tasks-table thead th {
+  padding-bottom: 1.5rem;
+}

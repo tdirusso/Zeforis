@@ -6,8 +6,8 @@ const addTask = async (payload) => {
   return data;
 };
 
-const removeTask = async (payload) => {
-  const { data } = await request.delete(`removeTask`, { data: payload });
+const removeTasks = async (payload) => {
+  const { data } = await request.delete(`removeTasks`, { data: payload });
 
   return data;
 };
@@ -24,7 +24,7 @@ const bulkUpdateTasks = async (payload) => {
 
 export {
   addTask,
-  removeTask,
+  removeTasks,
   updateTask,
   bulkUpdateTasks
 };

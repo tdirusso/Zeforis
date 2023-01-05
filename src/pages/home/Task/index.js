@@ -17,7 +17,7 @@ import { addTags } from '../../../api/client';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import RemoveTaskModal from "../../../components/admin/RemoveTaskModal";
+import RemoveTasksModal from "../../../components/admin/RemoveTasksModal";
 import { updateTask } from "../../../api/task";
 
 export default function TaskPage() {
@@ -78,7 +78,7 @@ export default function TaskPage() {
   const [isKeyTask, setIsKeyTask] = useState(Boolean(task.is_key_task));
   const [dueDate, setDueDate] = useState(task.date_due);
   const [isLoading, setLoading] = useState(false);
-  const [removeTaskModalOpen, setRemoveTaskModalOpen] = useState(false);
+  const [removeTasksModalOpen, setRemoveTasksModalOpen] = useState(false);
 
   if (!task) {
     return <div>No task found.</div>;
@@ -349,7 +349,7 @@ export default function TaskPage() {
           variant="contained"
           color="error"
           disabled={isLoading}
-          onClick={() => setRemoveTaskModalOpen(true)}>
+          onClick={() => setRemoveTasksModalOpen(true)}>
           Delete Task
         </LoadingButton>
 
@@ -367,10 +367,10 @@ export default function TaskPage() {
         message={message}
       />
 
-      <RemoveTaskModal
-        open={removeTaskModalOpen}
-        setOpen={setRemoveTaskModalOpen}
-        task={task}
+      <RemoveTasksModal
+        open={removeTasksModalOpen}
+        setOpen={setRemoveTasksModalOpen}
+        taskIds={[task.task_id]}
         setTasks={setTasks}
         clientId={client.id}
         exitPath={exitPath}

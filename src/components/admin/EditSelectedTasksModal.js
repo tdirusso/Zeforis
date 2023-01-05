@@ -25,7 +25,6 @@ const statuses = [
 export default function EditSelectedTasksModal(props) {
   const {
     taskIds,
-    clientId,
     open,
     setOpen,
     setSelectedTasks
@@ -36,8 +35,11 @@ export default function EditSelectedTasksModal(props) {
     clientMembers,
     folders,
     tasks,
-    setTasks
+    setTasks,
+    client
   } = useOutletContext();
+
+  const clientId = client.id;
 
   const [isLoading, setLoading] = useState(false);
   const [action, setAction] = useState('');
@@ -73,7 +75,7 @@ export default function EditSelectedTasksModal(props) {
           updatedTasks.forEach(updatedTask => idToTaskMap[updatedTask.task_id] = updatedTask);
 
           setTimeout(() => {
-            openSnackBar('Successully .', 'success');
+            openSnackBar(`Successully updated ${updatedTasks.length} tasks.`, 'success');
           }, 250);
 
           setTasks(Object.values(idToTaskMap));

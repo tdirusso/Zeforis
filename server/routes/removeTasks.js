@@ -2,18 +2,18 @@ const pool = require('../../database');
 
 module.exports = async (req, res) => {
   const {
-    taskId
+    taskIds
   } = req.body;
 
-  if (!taskId) {
+  if (!taskIds || taskIds.length === 0) {
     return res.json({
       message: 'Missing taskId.'
     });
   }
 
   try {
-    await pool.query('DELETE FROM task_tags WHERE task_id = ?', [taskId]);
-    await pool.query('DELETE FROM tasks WHERE id = ?', [taskId]);
+    await pool.query('DELETE FROM task_tags WHERE task_id IN (?)', [taskIds]);
+    await pool.query('DELETE FROM tasks WHERE id IN (?)', [taskIds]);
 
     return res.json({ success: true });
   } catch (error) {

@@ -23,6 +23,7 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import AddTaskModal from "../../admin/AddTaskModal";
 import TasksFilter from "./TasksFilter";
 import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
+import RemoveTasksModal from "../../admin/RemoveTasksModal";
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -31,6 +32,7 @@ export default function TasksTable({ tasks }) {
 
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
+  const [removeTasksModalOpen, setRemoveTasksModalOpen] = useState(false);
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -49,8 +51,7 @@ export default function TasksTable({ tasks }) {
 
   const {
     folderIdToName,
-    tagIdToName,
-    client
+    tagIdToName
   } = useOutletContext();
 
   const handleMenuClick = () => {
@@ -171,6 +172,17 @@ export default function TasksTable({ tasks }) {
                 </Box> :
                 ''
             }
+            {
+              selectedTasks.length > 0 ?
+                <Button
+                  variant="outlined"
+                  sx={{ ml: 1.5 }}
+                  onClick={() => setRemoveTasksModalOpen(true)}
+                  color="error">
+                  Delete Selected
+                </Button> :
+                ''
+            }
           </Box>
           <Button
             variant="outlined"
@@ -188,9 +200,7 @@ export default function TasksTable({ tasks }) {
             className="tasks-table"
             size="small">
             <TableHead>
-              <TableRow sx={{
-                '& .MuiTableCell-root': { border: 0 }
-              }}>
+              <TableRow sx={{ pb: 3 }}>
                 <TableCell>
                   <Checkbox
                     onChange={handleSelectAll}
@@ -224,10 +234,7 @@ export default function TasksTable({ tasks }) {
                       onClick={() => handleTaskSelection(task.task_id)}
                       key={task.task_id}
                       className={isSelectedRow ? 'selected' : ''}
-                      sx={{
-                        position: 'relative',
-                        '& .MuiTableCell-root': { border: 0 }
-                      }}>
+                      sx={{ position: 'relative', }}>
                       <TableCell>
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
@@ -297,7 +304,13 @@ export default function TasksTable({ tasks }) {
         open={editSelectedTasksModalOpen}
         setOpen={setEditSelectedTasksModalOpen}
         setSelectedTasks={setSelectedTasks}
-        clientId={client.id}
+      />
+
+      <RemoveTasksModal
+        open={removeTasksModalOpen}
+        setOpen={setRemoveTasksModalOpen}
+        taskIds={selectedTasks}
+        setSelectedTasks={setSelectedTasks}
       />
     </>
   );
