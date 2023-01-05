@@ -9,6 +9,7 @@ import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { removeTasks } from '../../api/task';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function RemoveTasksModal(props) {
 
@@ -111,6 +112,7 @@ export default function RemoveTasksModal(props) {
               required
               fullWidth
               loading={isLoading}
+              startIcon={<DeleteIcon />}
               color="error">
               Yes, Delete
             </LoadingButton>

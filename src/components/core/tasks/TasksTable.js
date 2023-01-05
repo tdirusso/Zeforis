@@ -6,14 +6,15 @@ import {
   IconButton,
   Box,
   Button,
-  TablePagination
+  TablePagination,
+  Typography
 } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import './styles.css';
 import { useEffect, useState } from "react";
@@ -24,18 +25,28 @@ import AddTaskModal from "../../admin/AddTaskModal";
 import TasksFilter from "./TasksFilter";
 import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
 import RemoveTasksModal from "../../admin/RemoveTasksModal";
+import DeleteIcon from '@mui/icons-material/Delete';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function TasksTable({ tasks }) {
-
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
   const [removeTasksModalOpen, setRemoveTasksModalOpen] = useState(false);
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
+  const [taskForMenu, setTaskForMenu] = useState(null);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const rowMenuOpen = Boolean(anchorEl);
 
   const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
@@ -44,6 +55,8 @@ export default function TasksTable({ tasks }) {
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [theTasks, setTheTasks] = useState(tasks);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTheTasks(tasks);
@@ -54,8 +67,19 @@ export default function TasksTable({ tasks }) {
     tagIdToName
   } = useOutletContext();
 
-  const handleMenuClick = () => {
+  const handleMenuClick = (e, task) => {
+    e.stopPropagation();
+    setTaskForMenu(task);
+    setAnchorEl(e.currentTarget);
+  };
 
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setTaskForMenu(null);
+  };
+
+  const handleViewTask = () => {
+    navigate(`/home/task/${taskForMenu.task_id}?exitPath=/home/tasks`);
   };
 
   const handleTaskSelection = (taskId) => {
@@ -167,20 +191,21 @@ export default function TasksTable({ tasks }) {
             </LoadingButton>
             {
               selectedTasks.length > 0 ?
-                <Box component="h6">
-                  {selectedTasks.length} selected
-                </Box> :
+                <Button
+                  variant="outlined"
+                  sx={{ mr: 1.5 }}
+                  onClick={() => setRemoveTasksModalOpen(true)}
+                  startIcon={<DeleteIcon />}
+                  color="error">
+                  Delete Selected
+                </Button> :
                 ''
             }
             {
               selectedTasks.length > 0 ?
-                <Button
-                  variant="outlined"
-                  sx={{ ml: 1.5 }}
-                  onClick={() => setRemoveTasksModalOpen(true)}
-                  color="error">
-                  Delete Selected
-                </Button> :
+                <Box component="h6">
+                  {selectedTasks.length} selected
+                </Box> :
                 ''
             }
           </Box>
@@ -271,7 +296,7 @@ export default function TasksTable({ tasks }) {
 
                       <TableCell>{folderIdToName[task.folder_id]}</TableCell>
                       <TableCell>
-                        <IconButton onClick={handleMenuClick}>
+                        <IconButton onClick={e => handleMenuClick(e, task)}>
                           <MoreVertIcon />
                         </IconButton>
                       </TableCell>
@@ -281,6 +306,37 @@ export default function TasksTable({ tasks }) {
                 )}
             </TableBody>
           </Table>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={rowMenuOpen}
+            onClose={handleMenuClose}
+            PaperProps={{
+              style: {
+                width: '20ch',
+              }
+            }}>
+            <MenuItem onClick={handleViewTask}>
+              <ListItemText>
+                <Typography variant="body2">
+                  View Task
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => window.open(taskForMenu?.link_url, '_blank')}
+              disabled={Boolean(!taskForMenu?.link_url)}>
+              <ListItemText sx={{ flexGrow: 0, mr: 1 }}>
+                <Typography variant="body2">
+                  Open Task Link
+                </Typography>
+              </ListItemText>
+              <ListItemIcon>
+                <OpenInNewIcon fontSize="small" />
+              </ListItemIcon>
+            </MenuItem>
+          </Menu>
+
           <Box mt={2} mr={2}>
             <TablePagination
               rowsPerPageOptions={[-1]}
