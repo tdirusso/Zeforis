@@ -23,7 +23,8 @@ export default function RemoveTasksModal(props) {
 
   const {
     setTasks,
-    client
+    client,
+    tasksMap
   } = useOutletContext();
 
   const clientId = client.id;
@@ -60,6 +61,7 @@ export default function RemoveTasksModal(props) {
 
             setTimeout(() => {
               navigate(exitPath);
+
               setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
             }, 1000);
           } else {
@@ -67,7 +69,9 @@ export default function RemoveTasksModal(props) {
               openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
             }, 250);
 
-            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
+            taskIds.forEach(id => delete tasksMap[id]);
+
+            setTasks(Object.values(tasksMap));
             if (setSelectedTasks) {
               setSelectedTasks([]);
             }

@@ -102,7 +102,7 @@ module.exports = async (req, res) => {
         [taskId]
       );
 
-      return res.json({ task: insertedTask[0] });
+      return res.json({ updatedTask: insertedTask[0] });
     }
 
     return res.json({ message: 'Task not found.' });

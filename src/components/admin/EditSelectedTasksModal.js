@@ -34,9 +34,9 @@ export default function EditSelectedTasksModal(props) {
     clientAdmins,
     clientMembers,
     folders,
-    tasks,
     setTasks,
-    client
+    client,
+    tasksMap
   } = useOutletContext();
 
   const clientId = client.id;
@@ -69,16 +69,13 @@ export default function EditSelectedTasksModal(props) {
         });
 
         if (updatedTasks) {
-          const idToTaskMap = {};
-          tasks.forEach(task => idToTaskMap[task.task_id] = task);
-
-          updatedTasks.forEach(updatedTask => idToTaskMap[updatedTask.task_id] = updatedTask);
+          updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
 
           setTimeout(() => {
             openSnackBar(`Successully updated ${updatedTasks.length} tasks.`, 'success');
           }, 250);
 
-          setTasks(Object.values(idToTaskMap));
+          setTasks(Object.values(tasksMap));
           setSelectedTasks([]);
           handleClose();
         } else {

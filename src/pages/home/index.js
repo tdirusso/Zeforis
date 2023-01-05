@@ -164,22 +164,22 @@ export default function Home({ theme, setTheme }) {
   }
 
   const foldersMap = {};
-  const folderIdToName = {};
-  const tagIdToName = {};
+  const tasksMap = {};
+  const tagsMap = {};
 
   const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
 
   folders.forEach(folder => {
     foldersMap[folder.id] = { ...folder, tasks: [] };
-    folderIdToName[folder.id] = folder.name;
   });
 
   sortedTasks.forEach(task => {
     foldersMap[task.folder_id].tasks.push(task);
+    tasksMap[task.task_id] = task;
   });
 
   tags.forEach(tag => {
-    tagIdToName[tag.id] = tag.name;
+    tagsMap[tag.id] = tag;
   });
 
   const context = {
@@ -190,15 +190,16 @@ export default function Home({ theme, setTheme }) {
     folders: Object.values(foldersMap),
     tasks: sortedTasks,
     tags,
+    clientMembers,
+    clientAdmins,
+    accountUsers,
+    tagsMap,
+    foldersMap,
+    tasksMap,
     setTags,
     setTasks,
     setFolders,
-    accountUsers,
-    setAccountUsers,
-    clientMembers,
-    clientAdmins,
-    tagIdToName,
-    folderIdToName
+    setAccountUsers
   };
 
   return (

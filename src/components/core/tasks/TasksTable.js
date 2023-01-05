@@ -63,8 +63,8 @@ export default function TasksTable({ tasks }) {
   }, [tasks]);
 
   const {
-    folderIdToName,
-    tagIdToName
+    foldersMap,
+    tagsMap
   } = useOutletContext();
 
   const handleMenuClick = (e, task) => {
@@ -159,7 +159,7 @@ export default function TasksTable({ tasks }) {
       });
       break;
     case 'folder':
-      filteredTasks.sort((a, b) => folderIdToName[a.folder_id].localeCompare(folderIdToName[b.folder_id]));
+      filteredTasks.sort((a, b) => foldersMap[a.folder_id].name.localeCompare(foldersMap[b.folder_id].name));
       break;
     default:
       break;
@@ -288,13 +288,13 @@ export default function TasksTable({ tasks }) {
                         tagsArray.map(tagId =>
                           <Chip
                             key={tagId}
-                            label={tagIdToName[tagId]}
+                            label={tagsMap[tagId].name}
                             size="small"
                             sx={{ m: 0.5 }}
                           />)}
                       </TableCell>
 
-                      <TableCell>{folderIdToName[task.folder_id]}</TableCell>
+                      <TableCell>{foldersMap[task.folder_id].name}</TableCell>
                       <TableCell>
                         <IconButton onClick={e => handleMenuClick(e, task)}>
                           <MoreVertIcon />
