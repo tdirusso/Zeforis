@@ -20,6 +20,7 @@ const addTags = require('./routes/addTags');
 const removeTag = require('./routes/removeTag');
 const removeTask = require('./routes/removeTask');
 const updateTask = require('./routes/updateTask');
+const bulkUpdateTasks = require('./routes/bulkUpdateTasks');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -61,6 +62,7 @@ const boot = async () => {
   app.delete('/api/removeTask', checkPermissionsMW, removeTask);
   app.patch('/api/updateProfile', checkAuth, updateProfile);
   app.patch('/api/updateTask', checkPermissionsMW, updateTask);
+  app.patch('/api/bulkUpdateTasks', checkPermissionsMW, bulkUpdateTasks);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

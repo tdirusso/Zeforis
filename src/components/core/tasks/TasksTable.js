@@ -6,8 +6,7 @@ import {
   IconButton,
   Box,
   Button,
-  TablePagination,
-  Typography
+  TablePagination
 } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -297,6 +296,7 @@ export default function TasksTable({ tasks }) {
         taskIds={selectedTasks}
         open={editSelectedTasksModalOpen}
         setOpen={setEditSelectedTasksModalOpen}
+        setSelectedTasks={setSelectedTasks}
         clientId={client.id}
       />
     </>

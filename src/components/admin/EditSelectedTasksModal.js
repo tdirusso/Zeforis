@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { removeTask } from '../../api/task';
+import { bulkUpdateTasks } from '../../api/task';
 import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 
@@ -27,13 +27,16 @@ export default function EditSelectedTasksModal(props) {
     taskIds,
     clientId,
     open,
-    setOpen
+    setOpen,
+    setSelectedTasks
   } = props;
 
   const {
     clientAdmins,
     clientMembers,
-    folders
+    folders,
+    tasks,
+    setTasks
   } = useOutletContext();
 
   const [isLoading, setLoading] = useState(false);
@@ -49,27 +52,35 @@ export default function EditSelectedTasksModal(props) {
     message
   } = useSnackbar();
 
-  const handleRemoveTask = () => {
+  const handleBulkUpdate = () => {
     setLoading(true);
 
     setTimeout(async () => {
       try {
-        const result = await removeTask({
+        const { updatedTasks, message } = await bulkUpdateTasks({
           clientId,
-          //taskId: task.task_id
+          taskIds,
+          action,
+          status,
+          folderId: folder?.id,
+          assigneeId: assignee?.id
         });
 
-        const success = result.success;
-        const resultMessage = result.message;
+        if (updatedTasks) {
+          const idToTaskMap = {};
+          tasks.forEach(task => idToTaskMap[task.task_id] = task);
 
-        if (success) {
+          updatedTasks.forEach(updatedTask => idToTaskMap[updatedTask.task_id] = updatedTask);
+
           setTimeout(() => {
-            openSnackBar('Successully removed.', 'success');
+            openSnackBar('Successully .', 'success');
           }, 250);
-          //setTasks(tasks => tasks.filter(t => t.task_id !== task.task_id));
+
+          setTasks(Object.values(idToTaskMap));
+          setSelectedTasks([]);
           handleClose();
         } else {
-          openSnackBar(resultMessage, 'error');
+          openSnackBar(message, 'error');
           setLoading(false);
         }
       } catch (error) {
@@ -119,6 +130,7 @@ export default function EditSelectedTasksModal(props) {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => option.role}
             onChange={(_, newVal) => setAssignee(newVal)}
+            disabled={isLoading}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -132,6 +144,7 @@ export default function EditSelectedTasksModal(props) {
           <Autocomplete
             value={folder}
             options={folders}
+            disabled={isLoading}
             getOptionLabel={(option) => option.name || ''}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             onChange={(_, newVal) => setFolder(newVal)}
@@ -197,7 +210,7 @@ export default function EditSelectedTasksModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveTask}
+              onClick={handleBulkUpdate}
               required
               fullWidth
               loading={isLoading}>

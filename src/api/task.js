@@ -17,8 +17,14 @@ const updateTask = async (payload) => {
   return data;
 };
 
+const bulkUpdateTasks = async (payload) => {
+  const { data } = await request.patch(`bulkUpdateTasks`, payload);
+  return data;
+};
+
 export {
   addTask,
   removeTask,
-  updateTask
+  updateTask,
+  bulkUpdateTasks
 };
