@@ -170,7 +170,7 @@ export default function Home({ theme, setTheme }) {
   const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
 
   folders.forEach(folder => {
-    foldersMap[folder.id] = { ...folder, tasks: [] };
+    foldersMap[String(folder.id)] = { ...folder, tasks: [] };
   });
 
   sortedTasks.forEach(task => {
@@ -182,12 +182,14 @@ export default function Home({ theme, setTheme }) {
     tagsMap[tag.id] = tag;
   });
 
+  const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
+
   const context = {
     client,
     clients,
     account,
     user,
-    folders: Object.values(foldersMap),
+    folders: sortedFolders,
     tasks: sortedTasks,
     tags,
     clientMembers,

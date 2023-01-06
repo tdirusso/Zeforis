@@ -9,6 +9,8 @@ export default function KeyFolders({ folders }) {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [folderToMod, setFolderToMod] = useState(null);
 
+  const navigate = useNavigate();
+
   const handleOpenAddTaskModal = (folder) => {
     setFolderToMod(folder);
     setAddTaskModalOpen(true);
@@ -38,7 +40,8 @@ export default function KeyFolders({ folders }) {
                     />
                     {folder.name}
                   </Box>
-                  <Button>
+                  <Button
+                    onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}>
                     View Folder
                   </Button>
                 </Box>

@@ -39,11 +39,15 @@ export default function FoldersPage() {
   return (
     <>
       <Header />
-      <Grid item xs={2}>
+      <Grid item>
         <Paper
           className="folder-item"
           onClick={() => setAddFolderModalOpen(true)}
-          sx={{ height: '100%', position: 'relative' }}>
+          sx={{
+            height: '100%',
+            position: 'relative',
+            minWidth: 180
+          }}>
           <Box
             display="flex"
             flexDirection="column"
@@ -110,11 +114,15 @@ function Folder({ folder, handleEditClick }) {
   const navigate = useNavigate();
 
   return (
-    <Grid item xs={2}>
+    <Grid item>
       <Paper
         className="folder-item"
         onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}
-        sx={{ height: '100%', position: 'relative' }}>
+        sx={{
+          height: '100%',
+          position: 'relative',
+          minWidth: 180
+        }}>
         <IconButton
           size="small"
           className="edit-folder-button"
@@ -125,6 +133,7 @@ function Folder({ folder, handleEditClick }) {
           display="flex"
           flexDirection="column"
           alignItems="center"
+          textAlign="center"
           justifyContent="center">
           <FolderIcon
             htmlColor="#8ca3ba"

@@ -162,6 +162,7 @@ export default function TaskPage() {
               <Button
                 variant="outlined"
                 size="large"
+                onClick={() => navigate(`/home/tasks?folderId=${task.folder_id}`)}
                 startIcon={<FolderIcon />}>
                 {foldersMap[task.folder_id].name}
               </Button>

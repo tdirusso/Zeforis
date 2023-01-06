@@ -8,14 +8,14 @@ import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addFolder } from '../../api/folder';
+import { updateFolder } from '../../api/folder';
 import { useOutletContext } from 'react-router-dom';
 
 export default function EditFolderModal(props) {
   const {
     open,
     setOpen,
-    folder
+    folder,
   } = props;
 
   const name = useRef();
@@ -23,7 +23,9 @@ export default function EditFolderModal(props) {
   const [isKeyFolder, setIsKeyFolder] = useState(Boolean(folder?.is_key_folder));
 
   const {
-    client, setFolders
+    client,
+    setFolders,
+    foldersMap
   } = useOutletContext();
 
   useEffect(() => {
@@ -51,19 +53,24 @@ export default function EditFolderModal(props) {
 
     setTimeout(async () => {
       try {
-        const { folder, message } = await addFolder({
+        const { updatedFolder, message } = await updateFolder({
           name: nameVal,
           clientId,
-          isKeyFolder
+          isKeyFolder,
+          folderId: folder.id
         });
 
-        if (folder) {
+        if (updatedFolder) {
           setTimeout(() => {
+            setLoading(false);
             openSnackBar('Folder successfully updated.', 'success');
           }, 300);
 
-          setFolders(folders => [...folders, folder]);
-          //handleClose();
+          const theFolder = foldersMap[folder.id];
+          foldersMap[folder.id] = { ...theFolder, ...updatedFolder };
+
+          setFolders(Object.values(foldersMap));
+          setOpen(false);
         } else {
           openSnackBar(message, 'error');
           setLoading(false);

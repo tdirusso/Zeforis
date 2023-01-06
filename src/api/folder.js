@@ -5,6 +5,13 @@ const addFolder = async (payload) => {
   return data;
 };
 
+const updateFolder = async (payload) => {
+  const { data } = await request.patch(`updateFolder`, payload);
+  return data;
+};
+
+
 export {
-  addFolder
+  addFolder,
+  updateFolder
 };

@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
   try {
 
     const [folders] = await pool.query(
-      'SELECT * FROM folders WHERE client_id = ? ORDER BY folders.name',
+      'SELECT * FROM folders WHERE client_id = ?',
       [clientId]
     );
 
