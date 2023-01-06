@@ -94,8 +94,15 @@ async function updateFolders(taskIds, folderId, updaterUserId) {
 }
 
 async function updateStatuses(taskIds, status, updaterUserId) {
-  await pool.query(
-    'UPDATE tasks SET status = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
-    [status, updaterUserId, taskIds]
-  );
+  if (status === 'Complete') {
+    await pool.query(
+      'UPDATE tasks SET status = ?, last_updated_by_id = ?, progress = 100 WHERE tasks.id IN (?)',
+      [status, updaterUserId, taskIds]
+    );
+  } else {
+    await pool.query(
+      'UPDATE tasks SET status = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
+      [status, updaterUserId, taskIds]
+    );
+  }
 }

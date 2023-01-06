@@ -1,8 +1,7 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
@@ -12,20 +11,24 @@ import useSnackbar from '../../hooks/useSnackbar';
 import { addFolder } from '../../api/folder';
 import { useOutletContext } from 'react-router-dom';
 
-export default function AddFolderModal(props) {
+export default function EditFolderModal(props) {
   const {
     open,
     setOpen,
-    willBeKey
+    folder
   } = props;
 
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
-  const [isKeyFolder, setIsKeyFolder] = useState(Boolean(willBeKey));
+  const [isKeyFolder, setIsKeyFolder] = useState(Boolean(folder?.is_key_folder));
 
   const {
     client, setFolders
   } = useOutletContext();
+
+  useEffect(() => {
+    setIsKeyFolder(Boolean(folder?.is_key_folder));
+  }, [folder]);
 
   const clientId = client.id;
 
@@ -36,11 +39,11 @@ export default function AddFolderModal(props) {
     message
   } = useSnackbar();
 
-  const handleCreateFolder = () => {
+  const handleUpdateFolder = () => {
     const nameVal = name.current.value;
 
     if (!nameVal) {
-      openSnackBar('Please enter a name for the new folder.', 'error');
+      openSnackBar('Please enter a name for the folder.', 'error');
       return;
     }
 
@@ -56,11 +59,11 @@ export default function AddFolderModal(props) {
 
         if (folder) {
           setTimeout(() => {
-            openSnackBar('Folder created.', 'success');
+            openSnackBar('Folder successfully updated.', 'success');
           }, 300);
 
           setFolders(folders => [...folders, folder]);
-          handleClose();
+          //handleClose();
         } else {
           openSnackBar(message, 'error');
           setLoading(false);
@@ -74,18 +77,18 @@ export default function AddFolderModal(props) {
 
   const handleClose = () => {
     setOpen(false);
-    setLoading(false);
+    setTimeout(() => {
+      setIsKeyFolder(Boolean(folder.is_key_folder));
+      setLoading(false);
+    }, 500);
   };
 
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          Create New Folder
-        </DialogTitle>
         <DialogContent>
           <DialogContentText mb={2}>
-            Please enter the new folder's name below.
+            You can edit the folder details below.
           </DialogContentText>
           <Grid container rowSpacing={2} columnSpacing={1} >
             <Grid item xs={12}>
@@ -95,6 +98,7 @@ export default function AddFolderModal(props) {
                 disabled={isLoading}
                 inputRef={name}
                 required
+                defaultValue={folder?.name}
                 label='Name'
               />
             </Grid>
@@ -104,7 +108,8 @@ export default function AddFolderModal(props) {
                 sx={{ mt: 2, fontSize: '12px' }}
                 control={<Checkbox
                   onChange={(_, val) => setIsKeyFolder(val)}
-                  defaultChecked={willBeKey}
+                  value={isKeyFolder}
+                  checked={isKeyFolder}
                   disabled={isLoading}
                 />}
                 label="Is this a Key Folder?"
@@ -121,10 +126,10 @@ export default function AddFolderModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleCreateFolder}
+              onClick={handleUpdateFolder}
               fullWidth
               loading={isLoading}>
-              Create Folder
+              Update Folder
             </LoadingButton>
           </DialogActions>
         </DialogContent>

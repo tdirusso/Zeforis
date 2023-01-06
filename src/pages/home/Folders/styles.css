@@ -1,0 +1,14 @@
+.folder-item {
+  cursor: pointer;
+  transition: all 250ms !important;
+}
+
+.folder-item:hover {
+  transform: translateY(-3px);
+}
+
+.edit-folder-button {
+  position: absolute !important;
+  top: 3px;
+  right: 3px;
+}

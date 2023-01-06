@@ -45,6 +45,7 @@ export default function TasksFilter(props) {
     setFilterKeyTasks,
     filterKeyTasks,
     filterStatus,
+    filterFolder,
     setSortBy,
     sortBy
   } = props;
@@ -133,6 +134,7 @@ export default function TasksFilter(props) {
                   <Autocomplete
                     size="small"
                     options={folders}
+                    value={filterFolder}
                     getOptionLabel={(option) => option.name || ''}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     onChange={(_, newVal) => setFilterFolder(newVal)}

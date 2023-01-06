@@ -37,6 +37,12 @@ const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function TasksTable({ tasks }) {
+
+  const {
+    foldersMap,
+    tagsMap
+  } = useOutletContext();
+
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
   const [removeTasksModalOpen, setRemoveTasksModalOpen] = useState(false);
@@ -54,11 +60,12 @@ export default function TasksTable({ tasks }) {
 
   const preFilterKeyTasks = queryParams.get('preFilterKeyTasks');
   const preSort = queryParams.get('preSort') || 'name';
+  const folderId = queryParams.get('folderId');
 
   const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
   const [filterAssignedTo, setFilterAssignedTo] = useState(null);
-  const [filterFolder, setFilterFolder] = useState(null);
+  const [filterFolder, setFilterFolder] = useState(folderId ? foldersMap[folderId] : null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterKeyTasks, setFilterKeyTasks] = useState(Boolean(preFilterKeyTasks));
   const [sortBy, setSortBy] = useState(preSort);
@@ -69,11 +76,6 @@ export default function TasksTable({ tasks }) {
   useEffect(() => {
     setTheTasks(tasks);
   }, [tasks]);
-
-  const {
-    foldersMap,
-    tagsMap
-  } = useOutletContext();
 
   const handleMenuClick = (e, task) => {
     e.stopPropagation();
@@ -191,6 +193,7 @@ export default function TasksTable({ tasks }) {
         setFilterKeyTasks={setFilterKeyTasks}
         filterKeyTasks={filterKeyTasks}
         filterStatus={filterStatus}
+        filterFolder={filterFolder}
         setSortBy={setSortBy}
         sortBy={sortBy}
       />

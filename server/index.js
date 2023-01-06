@@ -15,6 +15,7 @@ const inviteClientMember = require('./routes/inviteClientMember');
 const completeRegistration = require('./routes/completeRegistration');
 const removeClientMember = require('./routes/removeClientMember');
 const updateProfile = require('./routes/updateProfile');
+const updateFolder = require('./routes/updateFolder');
 const addTask = require('./routes/addTask');
 const addTags = require('./routes/addTags');
 const removeTag = require('./routes/removeTag');
@@ -63,6 +64,7 @@ const boot = async () => {
   app.patch('/api/updateProfile', checkAuth, updateProfile);
   app.patch('/api/updateTask', checkPermissionsMW, updateTask);
   app.patch('/api/bulkUpdateTasks', checkPermissionsMW, bulkUpdateTasks);
+  app.patch('/api/updateFolder', checkPermissionsMW, updateFolder);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

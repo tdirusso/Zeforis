@@ -4,29 +4,30 @@ module.exports = async (req, res) => {
   const {
     name,
     isKeyFolder,
+    folderId,
     clientId
   } = req.body;
 
-  if (!name || !clientId) {
+  if (!name || !folderId) {
     return res.json({
-      message: 'Missing folder name or clientId.'
+      message: 'Missing folder parameters.'
     });
   }
 
   try {
-    const newFolder = await pool.query(
-      'INSERT INTO folders (name, client_id, is_key_folder) VALUES (?,?,?)',
-      [name, clientId, isKeyFolder]
+    await pool.query(
+      'UPDATE folders SET name = ?, is_key_folder = ? WHERE id = ?',
+      [name, isKeyFolder, folderId]
     );
 
     const folderObject = {
-      id: newFolder[0].insertId,
+      id: folderId,
       name,
       client_id: clientId,
       is_key_folder: isKeyFolder
     };
 
-    return res.json({ folder: folderObject });
+    return res.json({ updatedFolder: folderObject });
   } catch (error) {
     console.log(error);
 
