@@ -22,7 +22,8 @@ export default function RemoveFolderModal(props) {
   const {
     client,
     foldersMap,
-    setFolders
+    setFolders,
+    setTasks
   } = useOutletContext();
 
   const clientId = client.id;
@@ -53,7 +54,7 @@ export default function RemoveFolderModal(props) {
 
           delete foldersMap[folder.id];
 
-
+          setTasks(tasks => tasks.filter(t => t.folder_id !== folder.id));
           setFolders(Object.values(foldersMap));
           handleClose();
         } else {

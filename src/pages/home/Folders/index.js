@@ -38,8 +38,7 @@ export default function FoldersPage() {
 
   const {
     client,
-    folders,
-    setFolders
+    folders
   } = useOutletContext();
 
   const keyFolders = [];
@@ -154,7 +153,6 @@ export default function FoldersPage() {
         open={addFolderModalOpen}
         setOpen={setAddFolderModalOpen}
         clientId={client.id}
-        setFolders={setFolders}
       />
 
       <EditFolderModal
