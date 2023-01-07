@@ -10,11 +10,31 @@ import Header from "../../../components/core/Header";
 import StarIcon from '@mui/icons-material/Star';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditFolderModal from "../../../components/admin/EditFolderModal";
+import RemoveFolderModal from "../../../components/admin/RemoveFolderModal";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 export default function FoldersPage() {
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
   const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
+  const [removeFolderModalOpen, setRemoveFolderModalOpen] = useState(false);
   const [folderToEdit, setFolderToEdit] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const open = Boolean(anchorEl);
+
+  const handleMenuClick = (e, folder) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+    setFolderToEdit(folder);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setFolderToEdit(null);
+  };
 
   const {
     client,
@@ -30,10 +50,14 @@ export default function FoldersPage() {
     otherFolders.push(folder)
   );
 
-  const handleEditClick = (e, folder) => {
-    e.stopPropagation();
-    setFolderToEdit(folder);
+  const handleEditClick = () => {
     setEditFolderModalOpen(true);
+    setAnchorEl(null);
+  };
+
+  const handleDeleteClick = () => {
+    setRemoveFolderModalOpen(true);
+    setAnchorEl(null);
   };
 
   return (
@@ -76,7 +100,7 @@ export default function FoldersPage() {
           <Folder
             key={folder.id}
             folder={folder}
-            handleEditClick={handleEditClick}
+            handleMenuClick={handleMenuClick}
           />)
       }
       <Grid item xs={12}>
@@ -89,9 +113,42 @@ export default function FoldersPage() {
           <Folder
             key={folder.id}
             folder={folder}
-            handleEditClick={handleEditClick}
+            handleMenuClick={handleMenuClick}
           />)
       }
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleMenuClose}
+        PaperProps={{
+          style: {
+            width: '20ch',
+          }
+        }}>
+        <MenuItem onClick={handleEditClick}>
+          <ListItemText>
+            <Typography variant="body2">
+              Edit Folder
+            </Typography>
+          </ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDeleteClick}>
+          <ListItemText>
+            <Box display="flex" alignItems="center" ml="-5px">
+              <DeleteOutlineIcon
+                fontSize="small"
+                color="error"
+                sx={{ mr: 0.5 }}
+              />
+              <Typography variant="body2" color="error">
+                Delete Folder
+              </Typography>
+            </Box>
+
+          </ListItemText>
+        </MenuItem>
+      </Menu>
 
       <AddFolderModal
         open={addFolderModalOpen}
@@ -105,12 +162,18 @@ export default function FoldersPage() {
         setOpen={setEditFolderModalOpen}
         folder={folderToEdit}
       />
+
+      <RemoveFolderModal
+        open={removeFolderModalOpen}
+        setOpen={setRemoveFolderModalOpen}
+        folder={folderToEdit}
+      />
     </>
   );
 };
 
 
-function Folder({ folder, handleEditClick }) {
+function Folder({ folder, handleMenuClick }) {
   const navigate = useNavigate();
 
   return (
@@ -126,7 +189,7 @@ function Folder({ folder, handleEditClick }) {
         <IconButton
           size="small"
           className="edit-folder-button"
-          onClick={(e) => handleEditClick(e, folder)}>
+          onClick={(e) => handleMenuClick(e, folder)}>
           <MoreVertIcon fontSize="small" />
         </IconButton>
         <Box

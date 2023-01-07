@@ -20,6 +20,7 @@ const addTask = require('./routes/addTask');
 const addTags = require('./routes/addTags');
 const removeTag = require('./routes/removeTag');
 const removeTasks = require('./routes/removeTasks');
+const removeFolder = require('./routes/removeFolder');
 const updateTask = require('./routes/updateTask');
 const bulkUpdateTasks = require('./routes/bulkUpdateTasks');
 
@@ -61,6 +62,7 @@ const boot = async () => {
   app.delete('/api/removeClientMember', checkPermissionsMW, removeClientMember);
   app.delete('/api/removeTag', checkPermissionsMW, removeTag);
   app.delete('/api/removeTasks', checkPermissionsMW, removeTasks);
+  app.delete('/api/removeFolder', checkPermissionsMW, removeFolder);
   app.patch('/api/updateProfile', checkAuth, updateProfile);
   app.patch('/api/updateTask', checkPermissionsMW, updateTask);
   app.patch('/api/bulkUpdateTasks', checkPermissionsMW, bulkUpdateTasks);

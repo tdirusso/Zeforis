@@ -12,14 +12,14 @@ module.exports = async (req, res) => {
     isKeyTask = false,
     dueDate,
     taskId,
-    currentTags
+    currentTags = []
   } = req.body;
 
   let { progress = 0 } = req.body;
 
   const creatorUserId = req.userId;
 
-  if (!name || !folderId || !creatorUserId) {
+  if (!name || !folderId || !creatorUserId || !assignedToId) {
     return res.json({
       message: 'Missing task parameters.'
     });

@@ -57,7 +57,7 @@ export default function EditTaskModal(props) {
     id: Number(tagId),
     name: tagIdNameMap[tagId],
     client_id: clientId
-  })) : undefined;
+  })) : [];
 
   const defaultFolder = foldersMap[task.folder_id] || null;
 
@@ -91,6 +91,7 @@ export default function EditTaskModal(props) {
     const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;
     const folderIdVal = folder?.id;
+    const assignedToVal = assignedTo?.id;
 
     if (!nameVal) {
       openSnackBar('Please enter a name for the task.', 'error');
@@ -99,6 +100,11 @@ export default function EditTaskModal(props) {
 
     if (!folderIdVal) {
       openSnackBar('Please select which folder the task should reside in.', 'error');
+      return;
+    }
+
+    if (!assignedToVal) {
+      openSnackBar('Please select an assignee for the task.', 'error');
       return;
     }
 
@@ -111,7 +117,7 @@ export default function EditTaskModal(props) {
           description: descriptionVal,
           linkUrl: linkVal,
           status,
-          assignedToId: assignedTo.id,
+          assignedToId: assignedToVal,
           progress,
           folderId: folderIdVal,
           clientId,
