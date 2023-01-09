@@ -2,3 +2,18 @@
   align-items: center;
   margin-top: 30px;
 }
+
+.settings-buttons button.active {
+  background-color: rgba(var(--colors-primary-rgb), 0.1);
+}
+
+.settings-buttons button.active::before {
+  left: 0px;
+  width: 4px;
+  content: "";
+  height: 100%;
+  border-radius: 16px;
+  position: absolute;
+  transition: all 0.3s ease 0s;
+  background-color: rgb(36, 153, 239);
+}

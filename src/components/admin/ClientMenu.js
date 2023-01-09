@@ -4,8 +4,10 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { Typography } from "@mui/material";
+import { useOutletContext } from "react-router-dom";
 
-export default function ClientMenu({ client, clients, parentHandler }) {
+export default function ClientMenu({ changeHandler }) {
+  const { clients, client } = useOutletContext();
   const [clientId, setClientId] = useState(client?.id || '');
 
   const label = clientId ? 'Current Client' : 'Client';
@@ -13,17 +15,16 @@ export default function ClientMenu({ client, clients, parentHandler }) {
   const thisHandleChange = e => {
     setClientId(e.target.value);
 
-    if (parentHandler) {
+    if (changeHandler) {
       const selectedClientObject = clients.find(client => client.id === e.target.value);
-      parentHandler(selectedClientObject);
+      changeHandler(selectedClientObject);
     }
   };
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="client-label">{label}</InputLabel>
+      <InputLabel>{label}</InputLabel>
       <Select
-        labelId="client-label"
         value={clientId}
         label={label}
         inputProps={{

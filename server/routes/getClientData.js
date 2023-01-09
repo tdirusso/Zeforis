@@ -77,7 +77,8 @@ module.exports = async (req, res) => {
       }
     });
 
-    const foldersIds = folders.map(folder => folder.id);
+    const foldersIds = folders.length > 0 ? folders.map(folder => folder.id) : null;
+
     const [tasks] = await pool.query(
       `
         SELECT

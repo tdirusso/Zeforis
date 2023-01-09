@@ -33,6 +33,7 @@ export default function useAuth() {
 
   return {
     user,
+    setUser,
     isUserLoading: isLoading,
     authError: error
   };

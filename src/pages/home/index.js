@@ -31,7 +31,7 @@ export default function Home({ theme, setTheme }) {
   let activeAccountId = getActiveAccountId();
   let activeClientId = getActiveClientId();
 
-  const { user, authError } = useAuth();
+  const { user, authError, setUser } = useAuth();
   const [isLoading, setLoading] = useState(true);
   const [client, setClient] = useState(null);
   const [account, setAccount] = useState(null);
@@ -201,7 +201,8 @@ export default function Home({ theme, setTheme }) {
     setTags,
     setTasks,
     setFolders,
-    setAccountUsers
+    setAccountUsers,
+    setUser
   };
 
   return (

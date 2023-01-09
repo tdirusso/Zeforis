@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, Grid, Paper, Typography } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import ClientMenu from "../../../components/admin/ClientMenu";
 import EditIcon from '@mui/icons-material/Edit';
@@ -25,6 +25,19 @@ import { setActiveAccountId } from "../../../api/account";
 import EditProfileModal from "../../../components/core/EditProfileModal";
 import RemoveTagModal from "../../../components/admin/RemoveTagModal";
 import Header from "../../../components/core/Header";
+import PersonIcon from '@mui/icons-material/Person';
+import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import PaidIcon from '@mui/icons-material/Paid';
+import BasicInformation from "../../../components/core/settings/BasicInformation";
+import Clients from "../../../components/core/settings/Clients";
+
+const settings = [
+  { name: 'Basic Information', icon: <PersonIcon fontSize="small" /> },
+  { name: 'Clients', icon: <SwitchAccountIcon fontSize="small" /> },
+  { name: 'Organizations', icon: <ApartmentIcon fontSize="small" /> },
+  { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
+];
 
 export default function Settings() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
@@ -36,6 +49,8 @@ export default function Settings() {
 
   const [userToModify, setUserToModify] = useState(null);
   const [tagToDelete, setTagToDelete] = useState(null);
+
+  const [showSetting, setShowSetting] = useState('Basic Information');
 
   const {
     client,
@@ -91,9 +106,60 @@ export default function Settings() {
     setRemoveTagModalOpen(true);
   };
 
+  let componentToShow = <></>;
+
+  switch (showSetting) {
+    case 'Basic Information':
+      componentToShow = <BasicInformation />;
+      break;
+    case 'Clients':
+      componentToShow = <Clients />;
+      break;
+    default:
+      break;
+  }
+
   return (
     <>
       <Header />
+
+      <Grid item xs={12} md={3}>
+        <Paper sx={{ px: 0 }}>
+          <Box className="settings-buttons">
+            {
+              settings.map(setting => {
+                return (
+                  <Button
+                    fullWidth
+                    size="small"
+                    className={showSetting === setting.name ? 'active' : ''}
+                    key={setting.name}
+                    onClick={() => setShowSetting(setting.name)}
+                    sx={{
+                      px: 3,
+                      py: 1.5,
+                      borderRadius: 0,
+                      justifyContent: 'flex-start',
+                      whiteSpace: 'break-spaces',
+                      lineHeight: 1.25,
+                      textAlign: 'left'
+                    }}
+                    startIcon={setting.icon}
+                  >
+                    {setting.name}
+                  </Button>
+                );
+              })
+            }
+          </Box>
+        </Paper>
+      </Grid>
+
+      <Grid item xs={12} md={9}>
+        {componentToShow}
+      </Grid>
+
+
       <Paper sx={{ p: 5 }}>
         <Typography variant="h5" gutterBottom>Settings</Typography>
 
@@ -101,11 +167,7 @@ export default function Settings() {
           <Chip label="Clients" />
         </Divider>
         <Box sx={{ width: '300px', mt: 3 }}>
-          <ClientMenu
-            client={client}
-            clients={clients}
-            parentHandler={handleChangeClient}
-          />
+
           <Button
             variant="outlined"
             sx={{ mt: 2, mr: 2 }}
