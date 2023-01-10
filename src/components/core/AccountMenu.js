@@ -1,29 +1,35 @@
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
-export default function AccountMenu({ accounts, accountId, parentHandler }) {
+export default function AccountMenu({ changeHandler }) {
 
+  const {
+    user,
+    account
+  } = useOutletContext();
+
+  const accountId = account.id;
   const [selectedAccountId, setSelectedAccountId] = useState(accountId);
 
   const handleSelection = e => {
     const id = e.target.value;
     setSelectedAccountId(id);
 
-    if (parentHandler) {
-      parentHandler(id);
+    if (changeHandler) {
+      changeHandler(id);
     }
   };
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="org-label">Organization</InputLabel>
+      <InputLabel>Organization</InputLabel>
       <Select
-        labelId="org-label"
         label="Organization"
         value={selectedAccountId}
         onChange={handleSelection}>
         {
-          accounts.map(account => {
+          user.memberOfAccounts.map(account => {
             return (
               <MenuItem
                 key={account.id}

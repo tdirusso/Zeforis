@@ -1,27 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
-import Header from "../../components/core/Header";
-import { Box, createTheme, Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import './styles.css';
 import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import themeConfig from "../../theme";
 import { getActiveClientId, getClientData, getUserClientListForAccount, setActiveClientId } from "../../api/client";
 import AddClientModal from "../../components/admin/AddClientModal";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
 import Loader from "../../components/core/Loader";
 
-export default function Home({ theme, setTheme }) {
+export default function Home() {
   const { search } = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(search);
 
   const accountIdPassed = queryParams.get('accountId');
   const clientIdPassed = queryParams.get('clientId');
+
   if (accountIdPassed && clientIdPassed) {
     setActiveAccountId(accountIdPassed);
     setActiveClientId(clientIdPassed);
@@ -39,7 +39,7 @@ export default function Home({ theme, setTheme }) {
   const [folders, setFolders] = useState(null);
   const [tags, setTags] = useState(null);
   const [accountUsers, setAccountUsers] = useState([]);
-
+  const [triedAccAndClient, setTriedAccAndClient] = useState(false);
 
   const clientMembers = [];
   const clientAdmins = [];
@@ -79,24 +79,25 @@ export default function Home({ theme, setTheme }) {
         });
 
         if (activeClient) {
-          if (activeClient.brandColor) {
-            // document.documentElement.style.setProperty('--colors-primary', activeClient.brandColor);
-            //themeConfig.palette.primary.main = activeClient.brandColor;
-            //setTheme(createTheme(themeConfig));
-          }
-
           setClient(activeClient);
         }
       }
+
+      setTriedAccAndClient(true);
     } else if (authError) {
       openSnackBar(authError, 'error');
     }
   }, [user, authError]);
 
   useEffect(() => {
-    if (client && !tasks) {
-      fetchClientData();
+    if (triedAccAndClient) {
+      if (client && !tasks) {
+        fetchClientData();
+      } else if (!client) {
+        setLoading(false);
+      }
     }
+
 
     async function fetchClientData() {
       const result = await getClientData(client.id, account.id);
@@ -111,7 +112,7 @@ export default function Home({ theme, setTheme }) {
         openSnackBar(message, 'error');
       }
     }
-  }, [client]);
+  }, [triedAccAndClient]);
 
   if (isLoading) {
     return <Loader />;
@@ -138,16 +139,17 @@ export default function Home({ theme, setTheme }) {
   const clients = getUserClientListForAccount(user, activeAccountId);
 
   if (clients.length === 0) {
-    return (
-      <Box className="flex-centered" sx={{ height: '100%' }}>
-        <AddClientModal
-          open={true}
-          setOpen={() => { }}
-          hideCancel={true}
-          accountId={activeAccountId}
-        />
-      </Box>
-    );
+    navigate('/home/create-first-client');
+    // return (
+    //   <Box className="flex-centered" sx={{ height: '100%' }}>
+    //     <AddClientModal
+    //       open={true}
+    //       setOpen={() => { }}
+    //       hideCancel={true}
+    //       accountId={activeAccountId}
+    //     />
+    //   </Box>
+    // );
   }
 
   if (!client) {
@@ -155,11 +157,14 @@ export default function Home({ theme, setTheme }) {
       setActiveClientId(clients[0].id);
       setClient(clients[0]);
     } else {
-      return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectClientModal client={client} clients={clients} />
-        </Box>
-      );
+     return navigate('/home/select-client');
+      // return (
+      //   <Box className="flex-centered" sx={{ height: '100%' }}>
+      //     <SelectClientModal
+      //       client={client}
+      //       clients={clients} />
+      //   </Box>
+      // );
     }
   }
 
@@ -207,7 +212,7 @@ export default function Home({ theme, setTheme }) {
 
   return (
     <Box>
-      <SideNav theme={theme} client={client} />
+      <SideNav client={client} />
       <Box component="main">
         <Box className="main-content">
           <Grid container spacing={3}>

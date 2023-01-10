@@ -10,18 +10,21 @@ import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { inviteClientMember } from '../../api/client';
+import { useOutletContext } from 'react-router-dom';
 
-export default function InviteClientMemberModal(props) {
+export default function InviteClientMemberModal({open, setOpen}) {
+
   const {
-    open,
-    setOpen,
-    clientId,
-    clientName,
-    accountId,
-    accountName,
-    setAccountUsers,
-    accountUsers
-  } = props;
+    client,
+    account,
+    accountUsers,
+    setAccountUsers
+  } = useOutletContext();
+
+  const clientId = client.id;
+  const clientName = client.name;
+  const accountId = account.id;
+  const accountName = account.name;
 
   const email = useRef();
   const firstName = useRef();

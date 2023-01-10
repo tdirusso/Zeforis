@@ -1,7 +1,6 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
@@ -9,17 +8,17 @@ import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { removeTag } from '../../api/client';
+import { useOutletContext } from 'react-router-dom';
 
-export default function RemoveTagModal(props) {
+export default function RemoveTagModal({ open, setOpen, tag }) {
   const {
-    open,
-    setOpen,
-    tag,
+    client,
     setTags,
     tasks,
-    setTasks,
-    clientId
-  } = props;
+    setTasks
+  } = useOutletContext();
+
+  const clientId = client.id;
 
   const [isLoading, setLoading] = useState(false);
 
@@ -79,8 +78,7 @@ export default function RemoveTagModal(props) {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Confirm Tag Removal</DialogTitle>
-        <DialogContent >
+        <DialogContent>
           <DialogContentText sx={{ mb: 5 }}>
             Are you sure you want to remove the <strong>"{tag?.name}"</strong> tag?
             <br></br>

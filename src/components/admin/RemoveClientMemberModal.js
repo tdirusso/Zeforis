@@ -9,18 +9,20 @@ import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { removeClientMember } from '../../api/client';
+import { useOutletContext } from 'react-router-dom';
 
-export default function RemoveClientMemberModal(props) {
+export default function RemoveClientMemberModal({ open, setOpen }) {
   const {
-    open,
-    setOpen,
-    clientId,
-    clientName,
-    accountId,
+    client,
+    account,
     user,
     accountUsers,
     setAccountUsers
-  } = props;
+  } = useOutletContext();
+
+  const clientId = client.id;
+  const clientName = client.name;
+  const accountId = account.id;
 
   const userId = user?.id;
   const name = user?.firstName + ' ' + user?.lastName;
