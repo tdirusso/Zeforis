@@ -4,10 +4,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { Typography } from "@mui/material";
-import { useOutletContext } from "react-router-dom";
 
-export default function ClientMenu({ changeHandler }) {
-  const { clients, client } = useOutletContext();
+export default function ClientMenu({ changeHandler, client, clients }) {
   const [clientId, setClientId] = useState(client?.id || '');
 
   const label = clientId ? 'Current Client' : 'Client';

@@ -7,7 +7,7 @@ import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
 import { setActiveClientId } from '../../api/client';
 
-export default function SelectClientModal() {
+export default function SelectClientModal({ client, clients }) {
   const {
     isOpen,
     openSnackBar,
@@ -34,6 +34,8 @@ export default function SelectClientModal() {
           <br></br>
           <ClientMenu
             changeHandler={handleSelection}
+            client={client}
+            clients={clients}
           />
         </DialogContent>
       </Dialog>

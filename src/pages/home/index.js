@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid } from "@mui/material";
 import './styles.css';
@@ -16,7 +16,6 @@ import Loader from "../../components/core/Loader";
 
 export default function Home() {
   const { search } = useLocation();
-  const navigate = useNavigate();
   const queryParams = new URLSearchParams(search);
 
   const accountIdPassed = queryParams.get('accountId');
@@ -139,17 +138,16 @@ export default function Home() {
   const clients = getUserClientListForAccount(user, activeAccountId);
 
   if (clients.length === 0) {
-    navigate('/home/create-first-client');
-    // return (
-    //   <Box className="flex-centered" sx={{ height: '100%' }}>
-    //     <AddClientModal
-    //       open={true}
-    //       setOpen={() => { }}
-    //       hideCancel={true}
-    //       accountId={activeAccountId}
-    //     />
-    //   </Box>
-    // );
+    return (
+      <Box className="flex-centered" sx={{ height: '100%' }}>
+        <AddClientModal
+          open={true}
+          setOpen={() => { }}
+          hideCancel={true}
+          account={account}
+        />
+      </Box>
+    );
   }
 
   if (!client) {
@@ -157,14 +155,14 @@ export default function Home() {
       setActiveClientId(clients[0].id);
       setClient(clients[0]);
     } else {
-     return navigate('/home/select-client');
-      // return (
-      //   <Box className="flex-centered" sx={{ height: '100%' }}>
-      //     <SelectClientModal
-      //       client={client}
-      //       clients={clients} />
-      //   </Box>
-      // );
+      return (
+        <Box className="flex-centered" sx={{ height: '100%' }}>
+          <SelectClientModal
+            client={client}
+            clients={clients}
+          />
+        </Box>
+      );
     }
   }
 

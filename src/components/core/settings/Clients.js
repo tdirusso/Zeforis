@@ -38,7 +38,9 @@ export default function Clients() {
     clientMembers,
     clientAdmins,
     user,
-    tags
+    tags,
+    account,
+    clients
   } = useOutletContext();
 
   const {
@@ -83,6 +85,8 @@ export default function Clients() {
         <Box maxWidth={360} mt={5} mb={2}>
           <ClientMenu
             changeHandler={handleChangeClient}
+            client={client}
+            clients={clients}
           />
         </Box>
         <Box>
@@ -208,6 +212,7 @@ export default function Clients() {
       <AddClientModal
         open={createClientModalOpen}
         setOpen={setCreateClientModalOpen}
+        account={account}
       />
 
       <EditClientModal

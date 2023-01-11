@@ -11,16 +11,13 @@ import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
 import { addClient, setActiveClientId } from '../../api/client';
-import { useOutletContext } from 'react-router-dom';
 
-export default function AddClientModal({ open, setOpen, hideCancel }) {
+export default function AddClientModal({ open, setOpen, hideCancel, account }) {
   const name = useRef();
   const [brandColor, setBrandColor] = useState('#2399ef');
   const [logoSrc, setLogoSrc] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [isLoading, setLoading] = useState(false);
-
-  const { account } = useOutletContext();
 
   const {
     isOpen,
