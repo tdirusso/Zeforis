@@ -29,43 +29,41 @@ export default function RemoveTagModal({ open, setOpen, tag }) {
     message
   } = useSnackbar();
 
-  const handleRemoveTag = () => {
+  const handleRemoveTag = async () => {
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const result = await removeTag({
-          clientId,
-          tagId: tag.id
+    try {
+      const result = await removeTag({
+        clientId,
+        tagId: tag.id
+      });
+
+      const success = result.success;
+      const resultMessage = result.message;
+
+      if (success) {
+        const tasksClone = [...tasks];
+        tasksClone.forEach(task => {
+          if (task.tags) {
+            task.tags.replace(tag.id, '');
+          }
         });
 
-        const success = result.success;
-        const resultMessage = result.message;
+        setTimeout(() => {
+          openSnackBar('Successully removed.', 'success');
+        }, 250);
 
-        if (success) {
-          const tasksClone = [...tasks];
-          tasksClone.forEach(task => {
-            if (task.tags) {
-              task.tags.replace(tag.id, '');
-            }
-          });
-
-          setTimeout(() => {
-            openSnackBar('Successully removed.', 'success');
-          }, 250);
-
-          setTags(curTags => curTags.filter(t => t.id !== tag.id));
-          setTasks(tasksClone);
-          handleClose();
-        } else {
-          openSnackBar(resultMessage, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+        setTags(curTags => curTags.filter(t => t.id !== tag.id));
+        setTasks(tasksClone);
+        handleClose();
+      } else {
+        openSnackBar(resultMessage, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {

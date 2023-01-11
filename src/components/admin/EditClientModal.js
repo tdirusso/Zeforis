@@ -27,7 +27,7 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
     message
   } = useSnackbar();
 
-  const handleUpdateClient = () => {
+  const handleUpdateClient = async () => {
     const nameVal = name.current.value;
 
     if (!nameVal) {
@@ -36,33 +36,30 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
     }
 
     setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append('logoFile', logoFile);
+      fd.append('name', nameVal);
+      fd.append('brandColor', brandColor);
+      fd.append('isLogoChanged', isLogoChanged);
+      fd.append('clientId', clientToUpdate.id);
 
-    setTimeout(async () => {
-      try {
-        const fd = new FormData();
-        fd.append('logoFile', logoFile);
-        fd.append('name', nameVal);
-        fd.append('brandColor', brandColor);
-        fd.append('isLogoChanged', isLogoChanged);
-        fd.append('clientId', clientToUpdate.id);
+      const { client, message } = await updateClient(fd);
 
-        const { client, message } = await updateClient(fd);
-
-        if (client) {
-          setActiveClientId(client.id);
-          openSnackBar('Client updated.', 'success');
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+      if (client) {
+        setActiveClientId(client.id);
+        openSnackBar('Client updated.', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleLogoChange = e => {
@@ -165,14 +162,17 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
               onLoad={() => setLogoLoading(false)}
             />
           </Box>
-          <DialogActions>
+          <DialogActions sx={{ p: 0 }}>
             <Button
+              fullWidth
+              variant='outlined'
               disabled={isLoading}
               onClick={handleClose}>
               Cancel
             </Button>
             <LoadingButton
               variant='contained'
+              fullWidth
               onClick={handleUpdateClient}
               loading={isLoading}>
               Update

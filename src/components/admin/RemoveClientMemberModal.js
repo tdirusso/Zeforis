@@ -41,44 +41,42 @@ export default function RemoveClientMemberModal({ open, setOpen }) {
 
   const willBeRemovedFromAccount = user?.memberOfClients.map(client => client.id).length === 1;
 
-  const handleRemoveClientMember = () => {
+  const handleRemoveClientMember = async () => {
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const result = await removeClientMember({
-          clientId,
-          accountId,
-          userId
-        });
+    try {
+      const result = await removeClientMember({
+        clientId,
+        accountId,
+        userId
+      });
 
-        const success = result.success;
-        const resultMessage = result.message;
+      const success = result.success;
+      const resultMessage = result.message;
 
-        if (success) {
-          setTimeout(() => {
-            openSnackBar('Successully removed.', 'success');
-          }, 250);
+      if (success) {
+        setTimeout(() => {
+          openSnackBar('Successully removed.', 'success');
+        }, 250);
 
-          if (willBeRemovedFromAccount) {
-            setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
-          } else {
-            const accountUsersClone = [...accountUsers];
-            const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
-            accountUsersClone[theExistingUserIndex].memberOfClients = accountUsersClone[theExistingUserIndex].memberOfClients.filter(client => client.id !== clientId);
-            setAccountUsers(accountUsersClone);
-          }
-
-          handleClose();
+        if (willBeRemovedFromAccount) {
+          setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
         } else {
-          openSnackBar(resultMessage, 'error');
-          setLoading(false);
+          const accountUsersClone = [...accountUsers];
+          const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
+          accountUsersClone[theExistingUserIndex].memberOfClients = accountUsersClone[theExistingUserIndex].memberOfClients.filter(client => client.id !== clientId);
+          setAccountUsers(accountUsersClone);
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+
+        handleClose();
+      } else {
+        openSnackBar(resultMessage, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {

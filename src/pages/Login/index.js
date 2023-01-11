@@ -34,7 +34,7 @@ export default function LoginPage() {
   }, []);
 
 
-  const handleLogin = e => {
+  const handleLogin = async e => {
     e.preventDefault();
 
     const emailVal = email.current.value;
@@ -52,19 +52,17 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      const result = await login({
-        email: emailVal,
-        password: passwordVal
-      });
+    const result = await login({
+      email: emailVal,
+      password: passwordVal
+    });
 
-      if (result.token) {
-        navigate('/home/dashboard');
-      } else {
-        setLoading(false);
-        openSnackBar(result.message, 'error');
-      }
-    }, 1000);
+    if (result.token) {
+      navigate('/home/dashboard');
+    } else {
+      setLoading(false);
+      openSnackBar(result.message, 'error');
+    }
   };
 
   return (

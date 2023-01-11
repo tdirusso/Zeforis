@@ -20,13 +20,15 @@ import RemoveClientMemberModal from "../../admin/RemoveClientMemberModal";
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import RemoveTagModal from "../../admin/RemoveTagModal";
+import RemoveClientModal from "../../admin/RemoveClientModal";
 
 export default function Clients() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const [inviteClientMemberModalOpen, setInviteClientModalOpen] = useState(false);
-  const [removeClientMemberModalOpen, setRemoveClientModalOpen] = useState(false);
+  const [removeClientMemberModalOpen, setRemoveClientMemberModalOpen] = useState(false);
   const [removeTagModalOpen, setRemoveTagModalOpen] = useState(false);
+  const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
 
   const [userToModify, setUserToModify] = useState(null);
   const [tagToDelete, setTagToDelete] = useState(null);
@@ -55,20 +57,18 @@ export default function Clients() {
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
-    }, 1000);
+    }, 500);
   };
 
   const handleRemoveClientMember = (userObject) => {
     setUserToModify(userObject);
-    setRemoveClientModalOpen(true);
+    setRemoveClientMemberModalOpen(true);
   };
-
 
   const handleRemoveTag = (tag) => {
     setTagToDelete(tag);
     setRemoveTagModalOpen(true);
   };
-
 
   return (
     <>
@@ -100,6 +100,7 @@ export default function Clients() {
           <Button
             startIcon={<DeleteIcon />}
             color="error"
+            onClick={() => setRemoveClientModalOpen(true)}
             variant="outlined">
             Delete {client.name}
           </Button>
@@ -228,13 +229,19 @@ export default function Clients() {
 
       <RemoveClientMemberModal
         open={removeClientMemberModalOpen}
-        setOpen={setRemoveClientModalOpen}
+        setOpen={setRemoveClientMemberModalOpen}
       />
 
       <RemoveTagModal
         open={removeTagModalOpen}
         setOpen={setRemoveTagModalOpen}
         tag={tagToDelete}
+      />
+
+
+      <RemoveClientModal
+        open={removeClientModalOpen}
+        setOpen={setRemoveClientModalOpen}
       />
 
       <Snackbar

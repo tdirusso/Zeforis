@@ -26,7 +26,7 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
     message
   } = useSnackbar();
 
-  const handleCreateClient = () => {
+  const handleCreateClient = async () => {
     const nameVal = name.current.value;
 
     if (!nameVal) {
@@ -36,31 +36,29 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const fd = new FormData();
-        fd.append('logoFile', logoFile);
-        fd.append('name', nameVal);
-        fd.append('brandColor', brandColor);
-        fd.append('accountId', account.id);
+    try {
+      const fd = new FormData();
+      fd.append('logoFile', logoFile);
+      fd.append('name', nameVal);
+      fd.append('brandColor', brandColor);
+      fd.append('accountId', account.id);
 
-        const { client, message } = await addClient(fd);
+      const { client, message } = await addClient(fd);
 
-        if (client) {
-          setActiveClientId(client.id);
-          openSnackBar('Client created.', 'success');
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+      if (client) {
+        setActiveClientId(client.id);
+        openSnackBar('Client created.', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -149,9 +147,11 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
               alt=""
               width={125} />
           </Box>
-          <DialogActions>
+          <DialogActions sx={{ p: 0 }}>
             {
               hideCancel ? '' : <Button
+                fullWidth
+                variant='outlined'
                 onClick={handleClose}
                 disabled={isLoading}>
                 Cancel
@@ -159,6 +159,7 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
             }
             <LoadingButton
               variant='contained'
+              fullWidth
               onClick={handleCreateClient}
               loading={isLoading}>
               Create Client

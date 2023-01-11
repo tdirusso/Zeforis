@@ -13,8 +13,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-
-    await pool.query('DELETE FROM task_tags WHERE tag_id = ?', [tagId]);
     await pool.query('DELETE FROM tags WHERE id = ?', [tagId]);
 
     return res.json({ success: true });

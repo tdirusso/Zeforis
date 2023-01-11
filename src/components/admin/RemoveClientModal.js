@@ -7,23 +7,12 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
+import { removeClient } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { removeFoldeer } from '../../api/folder';
 
-export default function RemoveFolderModal(props) {
-
+export default function RemoveClientModal({ open, setOpen }) {
   const {
-    open,
-    setOpen,
-    folder
-  } = props;
-
-  const {
-    client,
-    foldersMap,
-    setFolders,
-    setTasks
+    client
   } = useOutletContext();
 
   const clientId = client.id;
@@ -37,24 +26,19 @@ export default function RemoveFolderModal(props) {
     message
   } = useSnackbar();
 
-  const handleRemoveFolder = async () => {
+  const handleRemoveClient = async () => {
     setLoading(true);
+
     try {
-      const { success, message } = await removeFoldeer({
-        clientId,
-        folderId: folder.id
+      const { success, message } = await removeClient({
+        clientId
       });
 
       if (success) {
         setTimeout(() => {
-          openSnackBar(`Successully removed ${folder.name}.`, 'success');
+          openSnackBar('Successully removed.', 'success');
+          window.location.reload();
         }, 250);
-
-        delete foldersMap[folder.id];
-
-        setTasks(tasks => tasks.filter(t => t.folder_id !== folder.id));
-        setFolders(Object.values(foldersMap));
-        handleClose();
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -76,9 +60,11 @@ export default function RemoveFolderModal(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
-            Are you sure you want to <strong>permanently delete {folder?.name}</strong>?
-            All tasks in this folder will be deleted.
+          <DialogContentText sx={{ mb: 5 }}>
+            Are you sure you want to <strong>permanently remove "{client.name}"?</strong>
+            <br></br>
+            <br></br>
+            If you proceed, ALL folders, tasks and tags will be deleted.
           </DialogContentText>
           <DialogActions sx={{ p: 0 }}>
             <Button
@@ -90,13 +76,12 @@ export default function RemoveFolderModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveFolder}
-              required
               fullWidth
+              onClick={handleRemoveClient}
+              required
               loading={isLoading}
-              startIcon={<DeleteIcon />}
               color="error">
-              Yes, Delete
+              Yes, remove {client.name}
             </LoadingButton>
           </DialogActions>
         </DialogContent>

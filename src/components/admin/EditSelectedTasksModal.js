@@ -54,39 +54,37 @@ export default function EditSelectedTasksModal(props) {
     message
   } = useSnackbar();
 
-  const handleBulkUpdate = () => {
+  const handleBulkUpdate = async () => {
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const { updatedTasks, message } = await bulkUpdateTasks({
-          clientId,
-          taskIds,
-          action,
-          status,
-          folderId: folder?.id,
-          assigneeId: assignee?.id
-        });
+    try {
+      const { updatedTasks, message } = await bulkUpdateTasks({
+        clientId,
+        taskIds,
+        action,
+        status,
+        folderId: folder?.id,
+        assigneeId: assignee?.id
+      });
 
-        if (updatedTasks) {
-          updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
+      if (updatedTasks) {
+        updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
 
-          setTimeout(() => {
-            openSnackBar(`Successully updated ${updatedTasks.length} tasks.`, 'success');
-          }, 250);
+        setTimeout(() => {
+          openSnackBar(`Successully updated ${updatedTasks.length} tasks.`, 'success');
+        }, 250);
 
-          setTasks(Object.values(tasksMap));
-          setSelectedTasks([]);
-          handleClose();
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+        setTasks(Object.values(tasksMap));
+        setSelectedTasks([]);
+        handleClose();
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {

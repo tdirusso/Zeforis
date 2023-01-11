@@ -7,13 +7,11 @@ module.exports = async (req, res) => {
 
   if (!folderId) {
     return res.json({
-      message: 'Missing taskId.'
+      message: 'Missing folderId.'
     });
   }
 
   try {
-    await pool.query('DELETE FROM task_tags WHERE task_id IN (SELECT id FROM tasks WHERE folder_id = ?)', [folderId]);
-    await pool.query('DELETE FROM tasks WHERE folder_id = ?', [folderId]);
     await pool.query('DELETE FROM folders WHERE id = ?', [folderId]);
 
     return res.json({ success: true });

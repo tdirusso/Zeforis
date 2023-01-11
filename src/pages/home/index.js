@@ -34,9 +34,9 @@ export default function Home() {
   const [isLoading, setLoading] = useState(true);
   const [client, setClient] = useState(null);
   const [account, setAccount] = useState(null);
-  const [tasks, setTasks] = useState(null);
-  const [folders, setFolders] = useState(null);
-  const [tags, setTags] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [tags, setTags] = useState([]);
   const [accountUsers, setAccountUsers] = useState([]);
   const [triedAccAndClient, setTriedAccAndClient] = useState(false);
 
@@ -90,26 +90,20 @@ export default function Home() {
 
   useEffect(() => {
     if (triedAccAndClient) {
-      if (client && !tasks) {
+      if (client && tasks.length === 0) {
         fetchClientData();
       } else if (!client) {
         setLoading(false);
       }
     }
 
-
     async function fetchClientData() {
       const result = await getClientData(client.id, account.id);
-
-      if (!tasks) {
-        setTasks(result.tasks);
-        setFolders(result.folders);
-        setTags(result.tags);
-        setAccountUsers(result.accountUsers);
-        setLoading(false);
-      } else {
-        openSnackBar(message, 'error');
-      }
+      setTasks(result.tasks);
+      setFolders(result.folders);
+      setTags(result.tags);
+      setAccountUsers(result.accountUsers);
+      setLoading(false);
     }
   }, [triedAccAndClient]);
 

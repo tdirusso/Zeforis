@@ -1,7 +1,10 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Divider, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Divider, Grid, Paper, TextField } from "@mui/material";
 import { useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { updateProfile } from "../../../api/user";
+import useSnackbar from "../../../hooks/useSnackbar";
+import Snackbar from "../Snackbar";
 
 export default function BasicInformation() {
   const [isLoading, setLoading] = useState(false);
@@ -11,6 +14,48 @@ export default function BasicInformation() {
   const firstName = useRef();
   const lastName = useRef();
   const email = useRef();
+
+  const {
+    isOpen,
+    openSnackBar,
+    type,
+    message
+  } = useSnackbar();
+
+  const handleProfileUpdate = async () => {
+    const firstNameVal = firstName.current.value;
+    const lastNameVal = lastName.current.value;
+
+    if (!firstNameVal || !lastNameVal) {
+      openSnackBar('Please enter a first and last name.', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { success, message } = await updateProfile({
+        firstName: firstNameVal,
+        lastName: lastNameVal
+      });
+
+      if (success) {
+        setUser({
+          ...user,
+          firstName: firstNameVal,
+          lastName: lastNameVal
+        });
+        setLoading(false);
+        openSnackBar('Profile successfully updated.', 'success');
+      } else {
+        openSnackBar(message, 'error');
+        setLoading(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -48,12 +93,20 @@ export default function BasicInformation() {
           </Grid>
           <Grid item xs={12}>
             <LoadingButton
+              onClick={handleProfileUpdate}
+              loading={isLoading}
               variant="contained">
               Save Changes
             </LoadingButton>
           </Grid>
         </Grid>
       </Paper>
+
+      <Snackbar
+        isOpen={isOpen}
+        type={type}
+        message={message}
+      />
     </>
   );
 };

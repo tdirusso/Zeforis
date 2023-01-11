@@ -41,7 +41,7 @@ export default function EditFolderModal(props) {
     message
   } = useSnackbar();
 
-  const handleUpdateFolder = () => {
+  const handleUpdateFolder = async () => {
     const nameVal = name.current.value;
 
     if (!nameVal) {
@@ -51,35 +51,33 @@ export default function EditFolderModal(props) {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const { updatedFolder, message } = await updateFolder({
-          name: nameVal,
-          clientId,
-          isKeyFolder,
-          folderId: folder.id
-        });
+    try {
+      const { updatedFolder, message } = await updateFolder({
+        name: nameVal,
+        clientId,
+        isKeyFolder,
+        folderId: folder.id
+      });
 
-        if (updatedFolder) {
-          setTimeout(() => {
-            setLoading(false);
-            openSnackBar('Folder successfully updated.', 'success');
-          }, 300);
-
-          const theFolder = foldersMap[folder.id];
-          foldersMap[folder.id] = { ...theFolder, ...updatedFolder };
-
-          setFolders(Object.values(foldersMap));
-          setOpen(false);
-        } else {
-          openSnackBar(message, 'error');
+      if (updatedFolder) {
+        setTimeout(() => {
           setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+          openSnackBar('Folder successfully updated.', 'success');
+        }, 300);
+
+        const theFolder = foldersMap[folder.id];
+        foldersMap[folder.id] = { ...theFolder, ...updatedFolder };
+
+        setFolders(Object.values(foldersMap));
+        setOpen(false);
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {

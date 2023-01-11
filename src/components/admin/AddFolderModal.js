@@ -36,7 +36,7 @@ export default function AddFolderModal(props) {
     message
   } = useSnackbar();
 
-  const handleCreateFolder = () => {
+  const handleCreateFolder = async () => {
     const nameVal = name.current.value;
 
     if (!nameVal) {
@@ -45,31 +45,28 @@ export default function AddFolderModal(props) {
     }
 
     setLoading(true);
+    try {
+      const { folder, message } = await addFolder({
+        name: nameVal,
+        clientId,
+        isKeyFolder
+      });
 
-    setTimeout(async () => {
-      try {
-        const { folder, message } = await addFolder({
-          name: nameVal,
-          clientId,
-          isKeyFolder
-        });
+      if (folder) {
+        setTimeout(() => {
+          openSnackBar('Folder created.', 'success');
+        }, 300);
 
-        if (folder) {
-          setTimeout(() => {
-            openSnackBar('Folder created.', 'success');
-          }, 300);
-
-          setFolders(folders => [...folders, folder]);
-          handleClose();
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+        setFolders(folders => [...folders, folder]);
+        handleClose();
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {

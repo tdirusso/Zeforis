@@ -40,52 +40,50 @@ export default function RemoveTasksModal(props) {
     message
   } = useSnackbar();
 
-  const handleRemoveTasks = () => {
+  const handleRemoveTasks = async () => {
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const result = await removeTasks({
-          clientId,
-          taskIds
-        });
+    try {
+      const result = await removeTasks({
+        clientId,
+        taskIds
+      });
 
-        const success = result.success;
-        const resultMessage = result.message;
+      const success = result.success;
+      const resultMessage = result.message;
 
-        if (success) {
-          const removedLength = taskIds.length;
+      if (success) {
+        const removedLength = taskIds.length;
 
-          if (exitPath) {
-            openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
+        if (exitPath) {
+          openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
 
-            setTimeout(() => {
-              navigate(exitPath);
+          setTimeout(() => {
+            navigate(exitPath);
 
-              setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
-            }, 1000);
-          } else {
-            setTimeout(() => {
-              openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
-            }, 250);
-
-            taskIds.forEach(id => delete tasksMap[id]);
-
-            setTasks(Object.values(tasksMap));
-            if (setSelectedTasks) {
-              setSelectedTasks([]);
-            }
-            handleClose();
-          }
+            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
+          }, 1000);
         } else {
-          openSnackBar(resultMessage, 'error');
-          setLoading(false);
+          setTimeout(() => {
+            openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
+          }, 250);
+
+          taskIds.forEach(id => delete tasksMap[id]);
+
+          setTasks(Object.values(tasksMap));
+          if (setSelectedTasks) {
+            setSelectedTasks([]);
+          }
+          handleClose();
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+      } else {
+        openSnackBar(resultMessage, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {

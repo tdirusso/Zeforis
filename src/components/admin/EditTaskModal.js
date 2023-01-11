@@ -86,7 +86,7 @@ export default function EditTaskModal(props) {
     message
   } = useSnackbar();
 
-  const handleUpdateTask = () => {
+  const handleUpdateTask = async () => {
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;
@@ -110,45 +110,43 @@ export default function EditTaskModal(props) {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const { message, updatedTask } = await updateTask({
-          name: nameVal,
-          description: descriptionVal,
-          linkUrl: linkVal,
-          status,
-          assignedToId: assignedToVal,
-          progress,
-          folderId: folderIdVal,
-          clientId,
-          tags: selectedTags,
-          isKeyTask,
-          dueDate,
-          taskId: task.task_id,
-          currentTags: defaultTags
-        });
+    try {
+      const { message, updatedTask } = await updateTask({
+        name: nameVal,
+        description: descriptionVal,
+        linkUrl: linkVal,
+        status,
+        assignedToId: assignedToVal,
+        progress,
+        folderId: folderIdVal,
+        clientId,
+        tags: selectedTags,
+        isKeyTask,
+        dueDate,
+        taskId: task.task_id,
+        currentTags: defaultTags
+      });
 
-        if (updatedTask) {
-          setTimeout(() => {
-            setLoading(false);
-            openSnackBar('Task successfully updated.', 'success');
-          }, 300);
-
-          tasksMap[updatedTask.task_id] = updatedTask;
-          setTasks(Object.values(tasksMap));
-          setOpen(false);
-        } else {
-          openSnackBar(message, 'error');
+      if (updatedTask) {
+        setTimeout(() => {
           setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+          openSnackBar('Task successfully updated.', 'success');
+        }, 300);
+
+        tasksMap[updatedTask.task_id] = updatedTask;
+        setTasks(Object.values(tasksMap));
+        setOpen(false);
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
-  const handleAddTags = () => {
+  const handleAddTags = async () => {
     const newTagsVal = newTags.current.value;
 
     if (newTagsVal) {
@@ -156,23 +154,21 @@ export default function EditTaskModal(props) {
 
       setIsAddingTags(true);
 
-      setTimeout(async () => {
-        const result = await addTags({
-          tags: newTagsArray,
-          clientId
-        });
+      const result = await addTags({
+        tags: newTagsArray,
+        clientId
+      });
 
-        if (result.success) {
-          const insertedTags = result.tags;
-          setTags(tags => [...tags, ...insertedTags]);
-          setSelectedTags(tags => [...tags, ...insertedTags]);
-          setIsAddingTags(false);
-          newTags.current.value = '';
-        } else {
-          openSnackBar(result.message, 'error');
-          setIsAddingTags(false);
-        }
-      }, 1000);
+      if (result.success) {
+        const insertedTags = result.tags;
+        setTags(tags => [...tags, ...insertedTags]);
+        setSelectedTags(tags => [...tags, ...insertedTags]);
+        setIsAddingTags(false);
+        newTags.current.value = '';
+      } else {
+        openSnackBar(result.message, 'error');
+        setIsAddingTags(false);
+      }
     }
   };
 

@@ -30,8 +30,7 @@ export default function CompleteRegistrationPage() {
 
   const navigate = useNavigate();
 
-  const handleCompleteRegistration = e => {
-    e.preventDefault();
+  const handleCompleteRegistration = async () => {
     const passwordVal = password.current.value;
 
     if (!passwordVal) {
@@ -41,23 +40,21 @@ export default function CompleteRegistrationPage() {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      const { success, message } = await completeRegistration({
-        password: passwordVal,
-        clientId,
-        email
-      });
+    const { success, message } = await completeRegistration({
+      password: passwordVal,
+      clientId,
+      email
+    });
 
-      if (success) {
-        openSnackBar('Registration completed successfully.', 'success');
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-      } else {
-        setLoading(false);
-        openSnackBar(message, 'error');
-      }
-    }, 1000);
+    if (success) {
+      openSnackBar('Registration completed successfully.', 'success');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000);
+    } else {
+      setLoading(false);
+      openSnackBar(message, 'error');
+    }
   };
 
   return (

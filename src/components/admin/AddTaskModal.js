@@ -68,9 +68,7 @@ export default function AddTaskModal(props) {
     message
   } = useSnackbar();
 
-  const handleCreateTask = e => {
-    e.preventDefault();
-
+  const handleCreateTask = async () => {
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;
@@ -88,40 +86,38 @@ export default function AddTaskModal(props) {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const { message, task } = await addTask({
-          name: nameVal,
-          description: descriptionVal,
-          linkUrl: linkVal,
-          status,
-          assignedToId,
-          progress,
-          folderId: folderIdVal,
-          clientId,
-          tags: selectedTags,
-          isKeyTask,
-          dueDate
-        });
+    try {
+      const { message, task } = await addTask({
+        name: nameVal,
+        description: descriptionVal,
+        linkUrl: linkVal,
+        status,
+        assignedToId,
+        progress,
+        folderId: folderIdVal,
+        clientId,
+        tags: selectedTags,
+        isKeyTask,
+        dueDate
+      });
 
-        if (task) {
-          setTimeout(() => {
-            openSnackBar('Task created.', 'success');
-          }, 300);
-          setTasks(tasks => [...tasks, task]);
-          handleClose();
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+      if (task) {
+        setTimeout(() => {
+          openSnackBar('Task created.', 'success');
+        }, 300);
+        setTasks(tasks => [...tasks, task]);
+        handleClose();
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
-  const handleAddTags = () => {
+  const handleAddTags = async () => {
     const newTagsVal = newTags.current.value;
 
     if (newTagsVal) {
@@ -129,23 +125,21 @@ export default function AddTaskModal(props) {
 
       setIsAddingTags(true);
 
-      setTimeout(async () => {
-        const result = await addTags({
-          tags: newTagsArray,
-          clientId
-        });
+      const result = await addTags({
+        tags: newTagsArray,
+        clientId
+      });
 
-        if (result.success) {
-          const insertedTags = result.tags;
-          setTags(tags => [...tags, ...insertedTags]);
-          setSelectedTags(tags => [...tags, ...insertedTags]);
-          setIsAddingTags(false);
-          newTags.current.value = '';
-        } else {
-          openSnackBar(result.message, 'error');
-          setIsAddingTags(false);
-        }
-      }, 1000);
+      if (result.success) {
+        const insertedTags = result.tags;
+        setTags(tags => [...tags, ...insertedTags]);
+        setSelectedTags(tags => [...tags, ...insertedTags]);
+        setIsAddingTags(false);
+        newTags.current.value = '';
+      } else {
+        openSnackBar(result.message, 'error');
+        setIsAddingTags(false);
+      }
     }
   };
 
@@ -262,7 +256,7 @@ export default function AddTaskModal(props) {
                     inputFormat="MM/DD/YYYY"
                     value={dueDate}
                     onChange={value => setDueDate(value)}
-                    renderInput={(params) => <TextField {...params} fullWidth/>}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
                   ></DesktopDatePicker>
                 </LocalizationProvider>
               </Grid>

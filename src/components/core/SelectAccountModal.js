@@ -21,7 +21,7 @@ export default function SelectAccountModal({ accounts }) {
     openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
-    }, 1000);
+    }, 500);
   };
 
   return (

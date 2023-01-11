@@ -20,7 +20,7 @@ export default function SelectClientModal({ client, clients }) {
     openSnackBar(`Loading ${clientObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
-    }, 1000);
+    }, 500);
   };
 
   return (

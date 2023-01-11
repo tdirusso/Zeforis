@@ -12,7 +12,7 @@ import useSnackbar from '../../hooks/useSnackbar';
 import { inviteClientMember } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
 
-export default function InviteClientMemberModal({open, setOpen}) {
+export default function InviteClientMemberModal({ open, setOpen }) {
 
   const {
     client,
@@ -42,9 +42,7 @@ export default function InviteClientMemberModal({open, setOpen}) {
     message
   } = useSnackbar();
 
-  const handleInviteClientMember = e => {
-    e.preventDefault();
-
+  const handleInviteClientMember = async () => {
     const emailVal = email.current.value;
     const firstNameVal = firstName.current.value;
     const lastNameVal = lastName.current.value;
@@ -61,51 +59,49 @@ export default function InviteClientMemberModal({open, setOpen}) {
 
     setLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const { success, message, userId } = await inviteClientMember({
-          email: emailVal,
-          clientId,
-          accountId,
-          clientName,
-          accountName,
+    try {
+      const { success, message, userId } = await inviteClientMember({
+        email: emailVal,
+        clientId,
+        accountId,
+        clientName,
+        accountName,
+        firstName: firstNameVal,
+        lastName: lastNameVal
+      });
+
+      if (success) {
+        setTimeout(() => {
+          openSnackBar('Invitation successfully sent.', 'success');
+        }, 250);
+
+        const addedUser = {
+          id: userId,
           firstName: firstNameVal,
-          lastName: lastNameVal
-        });
+          lastName: lastNameVal,
+          email: emailVal
+        };
 
-        if (success) {
-          setTimeout(() => {
-            openSnackBar('Invitation successfully sent.', 'success');
-          }, 250);
-
-          const addedUser = {
-            id: userId,
-            firstName: firstNameVal,
-            lastName: lastNameVal,
-            email: emailVal
-          };
-
-          if (!accountUsersMap[userId]) { // User is new to the account
-            addedUser.memberOfClients = [{ id: clientId, name: clientName }];
-            addedUser.adminOfClients = [];
-            setAccountUsers(members => [...members, addedUser]);
-          } else { // User already exists in the account
-            const accountUsersClone = [...accountUsers];
-            const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
-            accountUsersClone[theExistingUserIndex].memberOfClients.push({ id: clientId, name: clientName });
-            setAccountUsers(accountUsersClone);
-          }
-
-          handleClose();
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
+        if (!accountUsersMap[userId]) { // User is new to the account
+          addedUser.memberOfClients = [{ id: clientId, name: clientName }];
+          addedUser.adminOfClients = [];
+          setAccountUsers(members => [...members, addedUser]);
+        } else { // User already exists in the account
+          const accountUsersClone = [...accountUsers];
+          const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
+          accountUsersClone[theExistingUserIndex].memberOfClients.push({ id: clientId, name: clientName });
+          setAccountUsers(accountUsersClone);
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
+
+        handleClose();
+      } else {
+        openSnackBar(message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
