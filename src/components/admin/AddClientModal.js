@@ -49,7 +49,7 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
         setActiveClientId(client.id);
         openSnackBar('Client created.', 'success');
         setTimeout(() => {
-          window.location.reload();
+          window.location.href = '/home/dashboard';
         }, 500);
       } else {
         openSnackBar(message, 'error');

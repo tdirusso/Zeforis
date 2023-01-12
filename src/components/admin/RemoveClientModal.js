@@ -37,7 +37,7 @@ export default function RemoveClientModal({ open, setOpen }) {
       if (success) {
         setTimeout(() => {
           openSnackBar('Successully removed.', 'success');
-          window.location.reload();
+          window.location.href = '/home/dashboard';
         }, 250);
       } else {
         openSnackBar(message, 'error');

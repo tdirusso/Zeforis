@@ -112,59 +112,58 @@ export default function InviteClientMemberModal({ open, setOpen }) {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Invite someone from {clientName}</DialogTitle>
+        <DialogTitle>Invite someone to {clientName}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the name and email address of the user you would like to invite.
-            They will have <strong>view only</strong> access.
+            Please enter the name, email address and permission of the user you would like to invite.
           </DialogContentText>
-          <form onSubmit={handleInviteClientMember}>
-            <Box sx={{ mt: 3, display: 'flex' }}>
-              <TextField
-                label="First name"
-                sx={{ flexGrow: 1, mr: 2 }}
-                autoFocus
-                disabled={isLoading}
-                inputRef={firstName}
-                required
-              >
-              </TextField>
-              <TextField
-                label="Last name"
-                sx={{ flexGrow: 1, ml: 2 }}
-                disabled={isLoading}
-                inputRef={lastName}
-                required
-              >
-              </TextField>
-            </Box>
-            <Box sx={{ mt: 3, mb: 3 }}>
-              <TextField
-                label="Email"
-                fullWidth
-                disabled={isLoading}
-                inputRef={email}
-                type="email"
-                required
-              >
-              </TextField>
-            </Box>
-            <DialogActions>
-              <Button
-                disabled={isLoading}
-                onClick={handleClose}>
-                Cancel
-              </Button>
-              <LoadingButton
-                variant='contained'
-                type='submit'
-                onClick={handleInviteClientMember}
-                required
-                loading={isLoading}>
-                Send Invite
-              </LoadingButton>
-            </DialogActions>
-          </form>
+          <Box sx={{ mt: 2, display: 'flex' }}>
+            <TextField
+              label="First name"
+              sx={{ flexGrow: 1, mr: 1 }}
+              autoFocus
+              disabled={isLoading}
+              inputRef={firstName}
+              required>
+            </TextField>
+            <TextField
+              label="Last name"
+              sx={{ flexGrow: 1, ml: 1 }}
+              disabled={isLoading}
+              inputRef={lastName}
+              required>
+            </TextField>
+          </Box>
+          <Box sx={{ mt: 2, mb: 3 }}>
+            <TextField
+              label="Email"
+              fullWidth
+              disabled={isLoading}
+              inputRef={email}
+              type="email"
+              required>
+            </TextField>
+          </Box>
+          <Box>
+            
+          </Box>
+          <DialogActions sx={{ p: 0 }}>
+            <Button
+              disabled={isLoading}
+              fullWidth
+              variant='outlined'
+              onClick={handleClose}>
+              Cancel
+            </Button>
+            <LoadingButton
+              variant='contained'
+              onClick={handleInviteClientMember}
+              required
+              fullWidth
+              loading={isLoading}>
+              Send Invite
+            </LoadingButton>
+          </DialogActions>
         </DialogContent>
       </Dialog>
       <Snackbar

@@ -264,6 +264,7 @@ export default function AddTaskModal(props) {
                 <FormControl fullWidth>
                   <Autocomplete
                     multiple
+                    value={selectedTags}
                     options={tags}
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     getOptionLabel={(option) => option.name}

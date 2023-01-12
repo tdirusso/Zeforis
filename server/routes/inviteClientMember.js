@@ -47,7 +47,6 @@ module.exports = async (req, res) => {
         [clientId, user.id]
       );
 
-      //TODO enable account org branding in email
       await sendInvitationEmail({
         email: email.toLowerCase(),
         clientId,

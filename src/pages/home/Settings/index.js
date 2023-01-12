@@ -14,14 +14,14 @@ import Organizations from "../../../components/core/settings/Organizations";
 import LogoutIcon from '@mui/icons-material/Logout';
 
 const settings = [
-  { name: 'Basic Information', icon: <PersonIcon fontSize="small" /> },
   { name: 'Clients', icon: <SwitchAccountIcon fontSize="small" /> },
   { name: 'Organizations', icon: <ApartmentIcon fontSize="small" /> },
+  { name: 'Basic Information', icon: <PersonIcon fontSize="small" /> },
   { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
 ];
 
 export default function Settings() {
-  const [showSetting, setShowSetting] = useState('Basic Information');
+  const [showSetting, setShowSetting] = useState('Clients');
 
   let componentToShow = <></>;
 

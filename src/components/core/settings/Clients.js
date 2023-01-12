@@ -195,8 +195,7 @@ export default function Clients() {
         </Box>
         <Box>
           <Typography variant="caption">New tags can be added when creating a new task.</Typography>
-          <br></br>
-          <br></br>
+          <Divider sx={{ my: 4 }} />
           {
             tags.map(tag =>
               <Chip
