@@ -1,34 +1,27 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { removeClientMember } from '../../api/client';
+import { removeClientUser } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
 
-export default function RemoveClientMemberModal({ open, setOpen }) {
+export default function RemoveClientUserModal({ open, setOpen, user }) {
   const {
     client,
-    account,
-    user,
-    accountUsers,
+    accountUsersMap,
     setAccountUsers
   } = useOutletContext();
 
   const clientId = client.id;
   const clientName = client.name;
-  const accountId = account.id;
 
   const userId = user?.id;
   const name = user?.firstName + ' ' + user?.lastName;
-
-  const accountUsersMap = {};
-  accountUsers.forEach(user => accountUsersMap[user.id] = user);
 
   const [isLoading, setLoading] = useState(false);
 
@@ -39,15 +32,15 @@ export default function RemoveClientMemberModal({ open, setOpen }) {
     message
   } = useSnackbar();
 
-  const willBeRemovedFromAccount = user?.memberOfClients.map(client => client.id).length === 1;
+  const willBeRemovedFromAccount =
+    user?.memberOfClients.length + user?.adminOfClients.length === 1;
 
-  const handleRemoveClientMember = async () => {
+  const handleRemoveClientUser = async () => {
     setLoading(true);
 
     try {
-      const result = await removeClientMember({
+      const result = await removeClientUser({
         clientId,
-        accountId,
         userId
       });
 
@@ -62,10 +55,10 @@ export default function RemoveClientMemberModal({ open, setOpen }) {
         if (willBeRemovedFromAccount) {
           setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
         } else {
-          const accountUsersClone = [...accountUsers];
-          const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
-          accountUsersClone[theExistingUserIndex].memberOfClients = accountUsersClone[theExistingUserIndex].memberOfClients.filter(client => client.id !== clientId);
-          setAccountUsers(accountUsersClone);
+          const theUser = accountUsersMap[user.id];
+          theUser.memberOfClients = theUser.memberOfClients.filter(client => client.id !== clientId);
+          theUser.adminOfClients = theUser.adminOfClients.filter(client => client.id !== clientId);
+          setAccountUsers(Object.values(accountUsersMap));
         }
 
         handleClose();
@@ -87,20 +80,25 @@ export default function RemoveClientMemberModal({ open, setOpen }) {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Confirm Member Removal</DialogTitle>
         <DialogContent >
           <DialogContentText sx={{ mb: 5 }}>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{clientName}?</strong>
+            <br></br>
+            <br></br>
+            You can also manage this user's client access from within the "Organizations" tab.
           </DialogContentText>
-          <DialogActions>
+          <DialogActions sx={{ p: 0 }}>
             <Button
+              fullWidth
               disabled={isLoading}
+              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
             <LoadingButton
+              fullWidth
               variant='contained'
-              onClick={handleRemoveClientMember}
+              onClick={handleRemoveClientUser}
               required
               loading={isLoading}
               color="error">

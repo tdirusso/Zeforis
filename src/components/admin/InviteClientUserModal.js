@@ -5,19 +5,22 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Box, TextField } from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { inviteClientMember } from '../../api/client';
+import { inviteClientUser } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
-export default function InviteClientMemberModal({ open, setOpen }) {
+export default function InviteClientUserModal({ open, setOpen }) {
 
   const {
     client,
     account,
-    accountUsers,
+    accountUsersMap,
     setAccountUsers
   } = useOutletContext();
 
@@ -30,10 +33,7 @@ export default function InviteClientMemberModal({ open, setOpen }) {
   const firstName = useRef();
   const lastName = useRef();
   const [isLoading, setLoading] = useState(false);
-
-  const accountUsersMap = {};
-
-  accountUsers.forEach(user => accountUsersMap[user.id] = user);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const {
     isOpen,
@@ -42,7 +42,7 @@ export default function InviteClientMemberModal({ open, setOpen }) {
     message
   } = useSnackbar();
 
-  const handleInviteClientMember = async () => {
+  const handleInviteClientUser = async () => {
     const emailVal = email.current.value;
     const firstNameVal = firstName.current.value;
     const lastNameVal = lastName.current.value;
@@ -60,14 +60,15 @@ export default function InviteClientMemberModal({ open, setOpen }) {
     setLoading(true);
 
     try {
-      const { success, message, userId } = await inviteClientMember({
+      const { success, message, userId } = await inviteClientUser({
         email: emailVal,
         clientId,
         accountId,
         clientName,
         accountName,
         firstName: firstNameVal,
-        lastName: lastNameVal
+        lastName: lastNameVal,
+        isAdmin
       });
 
       if (success) {
@@ -87,10 +88,29 @@ export default function InviteClientMemberModal({ open, setOpen }) {
           addedUser.adminOfClients = [];
           setAccountUsers(members => [...members, addedUser]);
         } else { // User already exists in the account
-          const accountUsersClone = [...accountUsers];
-          const theExistingUserIndex = accountUsersClone.findIndex(u => u.id === userId);
-          accountUsersClone[theExistingUserIndex].memberOfClients.push({ id: clientId, name: clientName });
-          setAccountUsers(accountUsersClone);
+          const existingUser = accountUsersMap[userId];
+          const userIsMember = existingUser.memberOfClients.find(({ id }) => id === clientId);
+          const userIsAdmin = existingUser.adminOfClients.find(({ id }) => id === clientId);
+
+          if (isAdmin) {
+            if (userIsMember) {
+              existingUser.memberOfClients.filter(({ id }) => id !== clientId);
+            }
+
+            if (!userIsAdmin) {
+              existingUser.adminOfClients.push({ id: clientId, name: clientName });
+            }
+          } else {
+            if (userIsAdmin) {
+              existingUser.adminOfClients.filter(({ id }) => id !== clientId);
+            }
+
+            if (!userIsMember) {
+              existingUser.memberOfClients.push({ id: clientId, name: clientName });
+            }
+          }
+
+          setAccountUsers(Object.values(accountUsersMap));
         }
 
         handleClose();
@@ -134,7 +154,7 @@ export default function InviteClientMemberModal({ open, setOpen }) {
               required>
             </TextField>
           </Box>
-          <Box sx={{ mt: 2, mb: 3 }}>
+          <Box sx={{ mt: 2, mb: 2 }}>
             <TextField
               label="Email"
               fullWidth
@@ -144,8 +164,13 @@ export default function InviteClientMemberModal({ open, setOpen }) {
               required>
             </TextField>
           </Box>
-          <Box>
-            
+          <Box mb={2}>
+            <FormGroup>
+              <FormControlLabel
+                control={<Switch onChange={(_, val) => setIsAdmin(val)} />}
+                label={<Typography variant='body1'>Administrator access?</Typography>}
+              />
+            </FormGroup>
           </Box>
           <DialogActions sx={{ p: 0 }}>
             <Button
@@ -157,7 +182,7 @@ export default function InviteClientMemberModal({ open, setOpen }) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleInviteClientMember}
+              onClick={handleInviteClientUser}
               required
               fullWidth
               loading={isLoading}>

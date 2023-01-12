@@ -25,7 +25,6 @@ export default function Organizations() {
     accountUsers
   } = useOutletContext();
 
-
   const handleAccountSelection = accountId => {
     const selectedAccountObject = user.memberOfAccounts.find(account => account.id === accountId);
     setActiveAccountId(selectedAccountObject.id);

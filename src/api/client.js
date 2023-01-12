@@ -47,14 +47,14 @@ const removeActiveClientId = () => {
   localStorage.removeItem('activeClientId');
 };
 
-const inviteClientMember = async (payload) => {
-  const { data } = await request.post(`inviteClientMember`, payload);
+const inviteClientUser = async (payload) => {
+  const { data } = await request.post(`inviteClientUser`, payload);
 
   return data;
 };
 
-const removeClientMember = async (payload) => {
-  const { data } = await request.delete(`removeClientMember`, { data: payload });
+const removeClientUser = async (payload) => {
+  const { data } = await request.delete(`removeClientUser`, { data: payload });
 
   return data;
 };
@@ -91,8 +91,8 @@ export {
   getActiveClientId,
   getUserClientListForAccount,
   removeActiveClientId,
-  inviteClientMember,
-  removeClientMember,
+  inviteClientUser,
+  removeClientUser,
   getClientData,
   addTags,
   removeTag,

@@ -15,7 +15,8 @@ module.exports = async (req, res) => {
     clientId,
     clientName,
     accountId,
-    accountName
+    accountName,
+    isAdmin = false
   } = req.body;
 
   if (!clientId || !accountId) {
@@ -40,11 +41,12 @@ module.exports = async (req, res) => {
       [email.toLowerCase()]);
 
     const user = userResult[0];
+    const role = isAdmin ? 'admin' : 'member';
 
     if (user) {
       await pool.query(
-        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "member")',
-        [clientId, user.id]
+        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?,?) ON DUPLICATE KEY UPDATE role = ?',
+        [clientId, user.id, role, role]
       );
 
       await sendInvitationEmail({
@@ -76,8 +78,8 @@ module.exports = async (req, res) => {
       const newUserId = newUserResult[0].insertId;
 
       await pool.query(
-        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "member")',
-        [clientId, newUserId]
+        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?,?)',
+        [clientId, newUserId, role]
       );
 
       return res.json({ success: true, userId: newUserId });

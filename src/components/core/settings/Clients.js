@@ -9,31 +9,27 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddClientModal from "../../admin/AddClientModal";
 import EditClientModal from "../../admin/EditClientModal";
 import React, { useState } from "react";
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import InviteClientMemberModal from "../../admin/InviteClientMemberModal";
+import InviteClientUserModal from "../../admin/InviteClientUserModal";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import RemoveClientMemberModal from "../../admin/RemoveClientMemberModal";
+import RemoveClientUserModal from "../../admin/RemoveClientUserModal";
 import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
 import RemoveTagModal from "../../admin/RemoveTagModal";
 import RemoveClientModal from "../../admin/RemoveClientModal";
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function Clients() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const [inviteClientMemberModalOpen, setInviteClientModalOpen] = useState(false);
-  const [removeClientMemberModalOpen, setRemoveClientMemberModalOpen] = useState(false);
+  const [inviteClientUserModalOpen, setInviteClientUserModalOpen] = useState(false);
+  const [removeClientUserModalOpen, setRemoveClientUserModalOpen] = useState(false);
   const [removeTagModalOpen, setRemoveTagModalOpen] = useState(false);
   const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
 
   const [userToModify, setUserToModify] = useState(null);
   const [tagToDelete, setTagToDelete] = useState(null);
-
-  const [tabVal, setTabVal] = useState(0);
 
   const {
     client,
@@ -60,9 +56,9 @@ export default function Clients() {
     }, 500);
   };
 
-  const handleRemoveClientMember = (userObject) => {
+  const handleRemoveClientUser = (userObject) => {
     setUserToModify(userObject);
-    setRemoveClientMemberModalOpen(true);
+    setRemoveClientUserModalOpen(true);
   };
 
   const handleRemoveTag = (tag) => {
@@ -114,16 +110,14 @@ export default function Clients() {
           variant="outlined"
           size="small"
           sx={{ mb: 2 }}
-          onClick={() => setInviteClientModalOpen(true)}
+          onClick={() => setInviteClientUserModalOpen(true)}
           startIcon={<PersonAddIcon />}>
           Invite someone to {client.name}
         </Button>
-        <Tabs value={tabVal} onChange={(_, index) => setTabVal(index)}>
-          <Tab label="Members" />
-          <Tab label="Administrators" />
-        </Tabs>
-
-        <Box hidden={tabVal !== 0}>
+        <Box>
+          <Divider textAlign="left">
+            <Chip label="Members" size="small" />
+          </Divider>
           <List dense>
             {
               clientMembers.map((member, index) => {
@@ -133,8 +127,8 @@ export default function Clients() {
                       secondaryAction={
                         <IconButton
                           edge="end"
-                          onClick={() => handleRemoveClientMember(member)}>
-                          <ClearIcon fontSize="small" />
+                          onClick={() => handleRemoveClientUser(member)}>
+                          <CloseIcon fontSize="small" />
                         </IconButton>
                       }>
                       <ListItemText
@@ -150,7 +144,10 @@ export default function Clients() {
           </List>
         </Box>
 
-        <Box hidden={tabVal !== 1}>
+        <Box>
+          <Divider textAlign="left">
+            <Chip label="Administrators" size="small" />
+          </Divider>
           <List dense>
             {
               clientAdmins.map((member, index) => {
@@ -169,9 +166,15 @@ export default function Clients() {
                   <React.Fragment key={member.id}>
                     <ListItem
                       secondaryAction={
-                        <IconButton edge="end" aria-label="delete">
+                        <IconButton
+                          edge="end"
+                          onClick={() => handleRemoveClientUser(member)}>
                           {
-                            !isYou ? <EditIcon /> : null
+                            !isYou ?
+                              <CloseIcon
+                                fontSize="small"
+                              /> :
+                              null
                           }
                         </IconButton>
                       }>
@@ -221,14 +224,15 @@ export default function Clients() {
         clientToUpdate={client}
       />
 
-      <InviteClientMemberModal
-        open={inviteClientMemberModalOpen}
-        setOpen={setInviteClientModalOpen}
+      <InviteClientUserModal
+        open={inviteClientUserModalOpen}
+        setOpen={setInviteClientUserModalOpen}
       />
 
-      <RemoveClientMemberModal
-        open={removeClientMemberModalOpen}
-        setOpen={setRemoveClientMemberModalOpen}
+      <RemoveClientUserModal
+        open={removeClientUserModalOpen}
+        setOpen={setRemoveClientUserModalOpen}
+        user={userToModify}
       />
 
       <RemoveTagModal

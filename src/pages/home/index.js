@@ -163,6 +163,9 @@ export default function Home() {
   const foldersMap = {};
   const tasksMap = {};
   const tagsMap = {};
+  const accountUsersMap = {};
+
+  accountUsers.forEach(user => accountUsersMap[user.id] = user);
 
   const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
 
@@ -192,6 +195,7 @@ export default function Home() {
     clientMembers,
     clientAdmins,
     accountUsers,
+    accountUsersMap,
     tagsMap,
     foldersMap,
     tasksMap,

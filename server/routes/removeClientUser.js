@@ -3,7 +3,6 @@ const pool = require('../../database');
 module.exports = async (req, res) => {
   const {
     userId,
-    accountId,
     clientId
   } = req.body;
 
@@ -13,23 +12,19 @@ module.exports = async (req, res) => {
     return res.json({ message: 'You cannot remove yourself.' });
   }
 
-  if (!clientId || !accountId || !userId) {
+  if (!clientId || !userId) {
     return res.json({
       message: 'Missing removal parameters.'
     });
   }
 
   try {
-    const [removeResult] = await pool.query(
-      'DELETE FROM client_users WHERE client_id = ? AND user_id = ? AND role = "member"',
+    await pool.query(
+      'DELETE FROM client_users WHERE client_id = ? AND user_id = ?',
       [clientId, userId]
     );
 
-    if (removeResult.affectedRows) {
-      return res.json({ success: true });
-    }
-
-    return res.json({ message: 'User is not a member of this client' });
+    return res.json({ success: true });
   } catch (error) {
     console.log(error);
 
