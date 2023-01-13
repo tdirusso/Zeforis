@@ -22,7 +22,10 @@ const removeTag = require('./routes/removeTag');
 const removeTasks = require('./routes/removeTasks');
 const removeFolder = require('./routes/removeFolder');
 const removeClient = require('./routes/removeClient');
+const removeUser = require('./routes/removeUser');
 const updateTask = require('./routes/updateTask');
+const updatePermission = require('./routes/updatePermission');
+const updateAccess = require('./routes/updateAccess');
 const bulkUpdateTasks = require('./routes/bulkUpdateTasks');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
@@ -65,10 +68,13 @@ const boot = async () => {
   app.delete('/api/removeTasks', checkPermissionsMW, removeTasks);
   app.delete('/api/removeFolder', checkPermissionsMW, removeFolder);
   app.delete('/api/removeClient', checkPermissionsMW, removeClient);
+  app.delete('/api/removeUser', checkPermissionsMW, removeUser);
   app.patch('/api/updateProfile', checkAuth, updateProfile);
   app.patch('/api/updateTask', checkPermissionsMW, updateTask);
   app.patch('/api/bulkUpdateTasks', checkPermissionsMW, bulkUpdateTasks);
   app.patch('/api/updateFolder', checkPermissionsMW, updateFolder);
+  app.patch('/api/updatePermission', checkPermissionsMW, updatePermission);
+  app.patch('/api/updateAccess', checkPermissionsMW, updateAccess);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

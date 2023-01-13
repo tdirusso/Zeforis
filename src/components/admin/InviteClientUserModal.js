@@ -167,7 +167,10 @@ export default function InviteClientUserModal({ open, setOpen }) {
           <Box mb={2}>
             <FormGroup>
               <FormControlLabel
-                control={<Switch onChange={(_, val) => setIsAdmin(val)} />}
+                control={<Switch
+                  disabled={isLoading}
+                  onChange={(_, val) => setIsAdmin(val)}
+                />}
                 label={<Typography variant='body1'>Administrator access?</Typography>}
               />
             </FormGroup>

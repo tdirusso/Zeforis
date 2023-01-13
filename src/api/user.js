@@ -5,6 +5,18 @@ const updateProfile = async (payload) => {
   return data;
 };
 
+const updatePermission = async (payload) => {
+  const { data } = await request.patch(`updatePermission`, payload);
+  return data;
+};
+
+const updateAccess = async (payload) => {
+  const { data } = await request.patch(`updateAccess`, payload);
+  return data;
+};
+
 export {
-  updateProfile
+  updateProfile,
+  updatePermission,
+  updateAccess
 };

@@ -59,6 +59,12 @@ const removeClientUser = async (payload) => {
   return data;
 };
 
+const removeUser = async (payload) => {
+  const { data } = await request.delete(`removeUser`, { data: payload });
+
+  return data;
+};
+
 const getClientData = async (clientId, accountId) => {
   const { data } = await request.get(`getClientData?clientId=${clientId}&accountId=${accountId}`);
 
@@ -81,7 +87,7 @@ const removeClient = async (payload) => {
   const { data } = await request.delete(`removeClient`, { data: payload });
 
   return data;
-}
+};
 
 export {
   addClient,
@@ -96,5 +102,6 @@ export {
   getClientData,
   addTags,
   removeTag,
-  removeClient
+  removeClient,
+  removeUser
 };

@@ -1,6 +1,5 @@
 import { Box, Divider, Paper } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import React from "react";
+import React, { useState } from "react";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -10,8 +9,15 @@ import AccountMenu from "../AccountMenu";
 import { setActiveAccountId } from "../../../api/account";
 import useSnackbar from "../../../hooks/useSnackbar";
 import Snackbar from "../Snackbar";
+import CloseIcon from '@mui/icons-material/Close';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import EditUserPermissionsModal from "../../admin/EditUserPermissionsModal";
+import RemoveUserModal from "../../admin/RemoveUserModal";
 
 export default function Organizations() {
+  const [userToModify, setUserToModify] = useState(null);
+  const [editUserPermissionsModalOpen, setEditUserPermissionsModalOpen] = useState(false);
+  const [removeUserModalOpen, setRemoveUserModalOpen] = useState(false);
 
   const {
     isOpen,
@@ -32,6 +38,16 @@ export default function Organizations() {
     setTimeout(() => {
       window.location.reload();
     }, 500);
+  };
+
+  const handleEditUser = (userObject) => {
+    setUserToModify(userObject);
+    setEditUserPermissionsModalOpen(true);
+  };
+
+  const handleRemoveUser = (userObject) => {
+    setUserToModify(userObject);
+    setRemoveUserModalOpen(true);
   };
 
   return (
@@ -61,11 +77,26 @@ export default function Organizations() {
                 <React.Fragment key={accountUser.id}>
                   <ListItem
                     secondaryAction={
-                      <IconButton edge="end">
+                      <Box>
                         {
-                          !isYou ? <EditIcon fontSize="small" /> : null
+                          !isYou ?
+                            <Box>
+                              <IconButton
+                                edge="end"
+                                sx={{ mr: 0.5 }}
+                                onClick={() => handleEditUser(accountUser)}>
+                                <LockOpenIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                edge="end"
+                                onClick={() => handleRemoveUser(accountUser)}>
+                                <CloseIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                            :
+                            null
                         }
-                      </IconButton>
+                      </Box>
                     }>
                     <ListItemText
                       primary={primaryText}
@@ -79,6 +110,18 @@ export default function Organizations() {
           }
         </List>
       </Paper>
+
+      <EditUserPermissionsModal
+        user={userToModify}
+        open={editUserPermissionsModalOpen}
+        setOpen={setEditUserPermissionsModalOpen}
+      />
+
+      <RemoveUserModal
+        open={removeUserModalOpen}
+        setOpen={setRemoveUserModalOpen}
+        user={userToModify}
+      />
 
       <Snackbar
         isOpen={isOpen}

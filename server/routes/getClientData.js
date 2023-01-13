@@ -35,7 +35,6 @@ module.exports = async (req, res) => {
         LEFT JOIN users ON client_users.user_id = users.id
         LEFT JOIN accounts ON accounts.id = clients.account_id
         WHERE clients.account_id = ?
-        ORDER BY users.first_name
       `,
       [accountId]
     );
@@ -115,11 +114,13 @@ module.exports = async (req, res) => {
       [foldersIds]
     );
 
+    const sortedAccountUsers = Object.values(accountUsersMap).sort((a, b) => a.firstName.localeCompare(b.firstName));
+
     return res.json({
       folders,
       tasks,
       tags,
-      accountUsers: Object.values(accountUsersMap)
+      accountUsers: sortedAccountUsers
     });
 
   } catch (error) {

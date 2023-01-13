@@ -120,6 +120,12 @@ export default function Clients() {
           </Divider>
           <List dense>
             {
+              clientMembers.length === 0 ?
+                <Typography variant="body2">
+                  No client members.
+                </Typography> : ''
+            }
+            {
               clientMembers.map((member, index) => {
                 return (
                   <React.Fragment key={member.id}>
@@ -150,6 +156,12 @@ export default function Clients() {
           </Divider>
           <List dense>
             {
+              clientAdmins.length === 0 ?
+                <Typography variant="body2">
+                  No client administrators.
+                </Typography> : ''
+            }
+            {
               clientAdmins.map((member, index) => {
                 const isYou = member.id === user.id;
 
@@ -165,18 +177,14 @@ export default function Clients() {
                 return (
                   <React.Fragment key={member.id}>
                     <ListItem
-                      secondaryAction={
+                      secondaryAction={isYou ?
                         <IconButton
                           edge="end"
                           onClick={() => handleRemoveClientUser(member)}>
-                          {
-                            !isYou ?
-                              <CloseIcon
-                                fontSize="small"
-                              /> :
-                              null
-                          }
-                        </IconButton>
+                          <CloseIcon
+                            fontSize="small"
+                          />
+                        </IconButton> : null
                       }>
                       <ListItemText
                         primary={primaryText}
