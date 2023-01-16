@@ -199,6 +199,7 @@ export default function AddTaskModal(props) {
                     getOptionLabel={(option) => option.name || ''}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     disabled={Boolean(folderToSet) || isLoading}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                     defaultValue={folderToSet || null}
                     onChange={(_, newVal) => setFolderId(newVal?.id || null)}
                     renderInput={(params) => (
@@ -214,6 +215,7 @@ export default function AddTaskModal(props) {
                 <FormControl fullWidth>
                   <Autocomplete
                     options={[...clientAdmins, ...clientMembers]}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                     getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     disabled={isLoading}
@@ -266,6 +268,7 @@ export default function AddTaskModal(props) {
                     multiple
                     value={selectedTags}
                     options={tags}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions

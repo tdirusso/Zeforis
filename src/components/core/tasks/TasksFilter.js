@@ -95,6 +95,7 @@ export default function TasksFilter(props) {
                 <FormControl fullWidth>
                   <Autocomplete
                     size="small"
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                     options={[...clientAdmins, ...clientMembers]}
                     getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -114,6 +115,7 @@ export default function TasksFilter(props) {
                   <Autocomplete
                     multiple
                     options={tags}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions
@@ -135,6 +137,7 @@ export default function TasksFilter(props) {
                     size="small"
                     options={folders}
                     value={filterFolder}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                     getOptionLabel={(option) => option.name || ''}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     onChange={(_, newVal) => setFilterFolder(newVal)}

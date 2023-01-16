@@ -227,6 +227,7 @@ export default function EditTaskModal(props) {
                 <FormControl fullWidth>
                   <Autocomplete
                     options={folders}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                     disabled={isLoading}
                     getOptionLabel={(option) => option.name || ''}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -245,6 +246,7 @@ export default function EditTaskModal(props) {
                 <FormControl fullWidth>
                   <Autocomplete
                     options={[...clientAdmins, ...clientMembers]}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                     getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     disabled={isLoading}
@@ -297,6 +299,7 @@ export default function EditTaskModal(props) {
                   <Autocomplete
                     multiple
                     options={tags}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions

@@ -63,6 +63,13 @@ export default function RemoveTasksModal(props) {
 
             setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
           }, 1000);
+        } else if (window.location.pathname.includes('/home/task/')) {
+          openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
+
+          setTimeout(() => {
+            navigate('/home/dashboard');
+            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
+          }, 1000);
         } else {
           setTimeout(() => {
             openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');

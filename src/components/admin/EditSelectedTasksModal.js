@@ -122,6 +122,7 @@ export default function EditSelectedTasksModal(props) {
         return (
           <Autocomplete
             value={assignee}
+            renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
             options={[...clientAdmins, ...clientMembers]}
             getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
             isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -142,6 +143,7 @@ export default function EditSelectedTasksModal(props) {
             value={folder}
             options={folders}
             disabled={isLoading}
+            renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
             getOptionLabel={(option) => option.name || ''}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             onChange={(_, newVal) => setFolder(newVal)}

@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Box } from "@mui/material";
+import { Grid, IconButton, Paper, Box, Typography } from "@mui/material";
 import './styles/Header.css';
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
@@ -11,11 +11,13 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddTaskModal from "../admin/AddTaskModal";
 import AddFolderModal from "../admin/AddFolderModal";
+import SearchModal from "./SearchModal";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   const open = Boolean(anchorEl);
 
@@ -43,8 +45,13 @@ export default function Header() {
         sx={{ width: '100%' }}
         className="Header">
         <Box>
-          <IconButton size="large">
-            <SearchIcon color="primary" size="large" />
+          <IconButton
+            onClick={() => setSearchModalOpen(true)}
+            size="large">
+            <SearchIcon
+              color="primary"
+              size="large"
+            />
           </IconButton>
         </Box>
         <Box>
@@ -64,13 +71,17 @@ export default function Header() {
               <ListItemIcon>
                 <AddTaskIcon fontSize="small" />
               </ListItemIcon>
-              <ListItemText>New Task</ListItemText>
+              <ListItemText>
+                <Typography variant="body2">New Task</Typography>
+              </ListItemText>
             </MenuItem>
             <MenuItem onClick={openAddFolder}>
               <ListItemIcon>
                 <FolderIcon fontSize="small" />
               </ListItemIcon>
-              <ListItemText>New Folder</ListItemText>
+              <ListItemText>
+                <Typography variant="body2">New Folder</Typography>
+              </ListItemText>
             </MenuItem>
           </Menu>
         </Box>
@@ -84,6 +95,11 @@ export default function Header() {
       <AddFolderModal
         open={addFolderModalOpen}
         setOpen={setAddFolderModalOpen}
+      />
+
+      <SearchModal
+        open={searchModalOpen}
+        setOpen={setSearchModalOpen}
       />
     </Grid>
   );
