@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Box, Typography } from "@mui/material";
+import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip } from "@mui/material";
 import './styles/Header.css';
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
@@ -45,19 +45,19 @@ export default function Header() {
         sx={{ width: '100%' }}
         className="Header">
         <Box>
-          <IconButton
+          <Button
+            startIcon={<SearchIcon />}
             onClick={() => setSearchModalOpen(true)}
-            size="large">
-            <SearchIcon
-              color="primary"
-              size="large"
-            />
-          </IconButton>
+            variant="outlined">
+            Search
+          </Button>
         </Box>
         <Box>
-          <IconButton onClick={handleMenuClick}>
-            <MoreVertIcon />
-          </IconButton>
+          <Tooltip title="Actions">
+            <IconButton onClick={handleMenuClick}>
+              <MoreVertIcon />
+            </IconButton>
+          </Tooltip>
           <Menu
             anchorEl={anchorEl}
             open={open}

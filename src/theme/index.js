@@ -10,6 +10,12 @@ const theme = {
     fontFamily: 'Montserrat',
   },
   components: {
+    MuiTooltip: {
+      defaultProps: {
+        arrow: true,
+        //enterDelay: 0
+      }
+    },
     MuiMenu: {
       styleOverrides: {
         paper: {

@@ -103,11 +103,6 @@ export default function EditTaskModal(props) {
       return;
     }
 
-    if (!assignedToVal) {
-      openSnackBar('Please select an assignee for the task.', 'error');
-      return;
-    }
-
     setLoading(true);
 
     try {

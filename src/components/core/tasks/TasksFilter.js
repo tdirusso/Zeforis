@@ -76,7 +76,7 @@ export default function TasksFilter(props) {
               }
             }}
             expandIcon={<ExpandMoreIcon />}>
-            <Typography sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+            <Typography sx={{ mr: 1, display: 'flex', alignItems: 'center' }} variant="body1">
               <FilterAltIcon htmlColor="#cbced4" />
               Filters
             </Typography>

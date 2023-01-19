@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, Paper, Typography, IconButton } from "@mui/material";
+import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip } from "@mui/material";
 import './styles.css';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddFolderModal from "../../../components/admin/AddFolderModal";
@@ -184,12 +184,14 @@ function Folder({ folder, handleMenuClick }) {
           position: 'relative',
           minWidth: 180
         }}>
-        <IconButton
-          size="small"
-          className="edit-folder-button"
-          onClick={(e) => handleMenuClick(e, folder)}>
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
+        <Tooltip title="More Options">
+          <IconButton
+            size="small"
+            className="edit-folder-button"
+            onClick={(e) => handleMenuClick(e, folder)}>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
         <Box
           display="flex"
           flexDirection="column"

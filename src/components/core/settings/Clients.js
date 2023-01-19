@@ -1,4 +1,4 @@
-import { Paper, Box, Divider, Button, Chip, Typography } from "@mui/material";
+import { Paper, Box, Divider, Button, Chip, Typography, Tooltip } from "@mui/material";
 import useSnackbar from "../../../hooks/useSnackbar";
 import ClientMenu from "../../admin/ClientMenu";
 import { setActiveClientId } from "../../../api/client";
@@ -121,9 +121,11 @@ export default function Clients() {
           <List dense>
             {
               clientMembers.length === 0 ?
-                <Typography variant="body2">
-                  No client members.
-                </Typography> : ''
+                <ListItem>
+                  <ListItemText>
+                    No client members.
+                  </ListItemText>
+                </ListItem> : ''
             }
             {
               clientMembers.map((member, index) => {
@@ -131,11 +133,13 @@ export default function Clients() {
                   <React.Fragment key={member.id}>
                     <ListItem
                       secondaryAction={
-                        <IconButton
-                          edge="end"
-                          onClick={() => handleRemoveClientUser(member)}>
-                          <CloseIcon fontSize="small" />
-                        </IconButton>
+                        <Tooltip title="Remove Member">
+                          <IconButton
+                            edge="end"
+                            onClick={() => handleRemoveClientUser(member)}>
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       }>
                       <ListItemText
                         primary={`${member.firstName} ${member.lastName}`}
@@ -177,14 +181,16 @@ export default function Clients() {
                 return (
                   <React.Fragment key={member.id}>
                     <ListItem
-                      secondaryAction={isYou ?
-                        <IconButton
-                          edge="end"
-                          onClick={() => handleRemoveClientUser(member)}>
-                          <CloseIcon
-                            fontSize="small"
-                          />
-                        </IconButton> : null
+                      secondaryAction={!isYou ?
+                        <Tooltip title="Remove Administrator">
+                          <IconButton
+                            edge="end"
+                            onClick={() => handleRemoveClientUser(member)}>
+                            <CloseIcon
+                              fontSize="small"
+                            />
+                          </IconButton>
+                        </Tooltip> : null
                       }>
                       <ListItemText
                         primary={primaryText}

@@ -1,4 +1,4 @@
-import { Box, Divider, Paper } from "@mui/material";
+import { Box, Divider, Paper, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -81,17 +81,21 @@ export default function Organizations() {
                         {
                           !isYou ?
                             <Box>
-                              <IconButton
-                                edge="end"
-                                sx={{ mr: 0.5 }}
-                                onClick={() => handleEditUser(accountUser)}>
-                                <LockOpenIcon fontSize="small" />
-                              </IconButton>
-                              <IconButton
-                                edge="end"
-                                onClick={() => handleRemoveUser(accountUser)}>
-                                <CloseIcon fontSize="small" />
-                              </IconButton>
+                              <Tooltip title="Edit Permissions">
+                                <IconButton
+                                  edge="end"
+                                  sx={{ mr: 0.5 }}
+                                  onClick={() => handleEditUser(accountUser)}>
+                                  <LockOpenIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Remove User">
+                                <IconButton
+                                  edge="end"
+                                  onClick={() => handleRemoveUser(accountUser)}>
+                                  <CloseIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
                             </Box>
                             :
                             null

@@ -1,4 +1,4 @@
-import { Chip, Divider, Grid, Paper, IconButton } from "@mui/material";
+import { Chip, Divider, Grid, Paper, IconButton, Tooltip } from "@mui/material";
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Button from '@mui/material/Button';
 import { Box, Typography } from '@mui/material';
@@ -67,11 +67,13 @@ export default function TaskPage() {
               onClick={() => navigate(exitPath)}>
               Back
             </Button>
-            <IconButton
-              onClick={() => setEditTaskModalOpen(true)}
-              size="large">
-              <EditIcon size="large" />
-            </IconButton>
+            <Tooltip title="Edit Task">
+              <IconButton
+                onClick={() => setEditTaskModalOpen(true)}
+                size="large">
+                <EditIcon size="large" />
+              </IconButton>
+            </Tooltip>
           </Box>
           <Box
             my={2}

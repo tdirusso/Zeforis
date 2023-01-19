@@ -7,7 +7,8 @@ import {
   Box,
   Button,
   TablePagination,
-  Typography
+  Typography,
+  Tooltip
 } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -249,7 +250,7 @@ export default function TasksTable({ tasks }) {
                 <TableCell>
                   <Checkbox
                     onChange={handleSelectAll}
-                    checked={selectedTasks.length === filteredTasks.length}
+                    checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '175px' }}>Name</TableCell>
@@ -328,9 +329,11 @@ export default function TasksTable({ tasks }) {
 
                       <TableCell>{foldersMap[task.folder_id].name}</TableCell>
                       <TableCell>
-                        <IconButton onClick={e => handleMenuClick(e, task)}>
-                          <MoreVertIcon />
-                        </IconButton>
+                        <Tooltip title="More Options">
+                          <IconButton onClick={e => handleMenuClick(e, task)}>
+                            <MoreVertIcon />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   );

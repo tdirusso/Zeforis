@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     status = 'New',
     folderId,
     linkUrl,
-    assignedToId,
+    assignedToId = null,
     tags = [],
     isKeyTask = false,
     dueDate,
@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
 
   const creatorUserId = req.userId;
 
-  if (!name || !folderId || !creatorUserId || !assignedToId) {
+  if (!name || !folderId || !creatorUserId) {
     return res.json({
       message: 'Missing task parameters.'
     });
