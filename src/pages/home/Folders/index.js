@@ -71,7 +71,7 @@ export default function FoldersPage() {
           sx={{
             height: '100%',
             position: 'relative',
-            minWidth: 180
+            width: 180
           }}>
           <Box
             display="flex"
@@ -177,6 +177,12 @@ function Folder({ folder, handleMenuClick }) {
   const navigate = useNavigate();
   const { isAdmin } = useOutletContext();
 
+  let folderName = folder.name;
+
+  if (folderName.length > 30) {
+    folderName = folderName.substring(0, 30) + '...';
+  }
+
   return (
     <Grid item>
       <Paper
@@ -185,7 +191,7 @@ function Folder({ folder, handleMenuClick }) {
         sx={{
           height: '100%',
           position: 'relative',
-          minWidth: 180
+          width: 180
         }}>
         {
           isAdmin ?
@@ -214,7 +220,7 @@ function Folder({ folder, handleMenuClick }) {
                 fontSize="small"
                 htmlColor="gold"
               /> : ''}
-              {folder.name}
+              {folderName}
             </Box>
           </Box>
           <Typography

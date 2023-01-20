@@ -286,6 +286,11 @@ export default function TasksTable({ tasks }) {
 
                   const isSelectedRow = selectedTasks.includes(task.task_id);
 
+                  let taskName = task.task_name;
+                  if (taskName.length > 30) {
+                    taskName = taskName.substring(0, 30) + '...';
+                  }
+
                   return (
                     <TableRow
                       hover
@@ -307,7 +312,7 @@ export default function TasksTable({ tasks }) {
                               /> :
                               ''
                           }
-                          {task.task_name}
+                          {taskName}
                         </Box>
 
                       </TableCell>
@@ -354,7 +359,7 @@ export default function TasksTable({ tasks }) {
                                   fontSize="small"
                                 />
                               </IconButton>
-                            </Tooltip> : null
+                            </Tooltip> : <Box height={36}></Box>
                         }
                       </TableCell>
                     </TableRow>
