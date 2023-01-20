@@ -1,4 +1,4 @@
-import { Box, Divider, Paper, Tooltip } from "@mui/material";
+import { Box, Chip, Divider, Paper, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -28,7 +28,9 @@ export default function Organizations() {
 
   const {
     user,
-    accountUsers
+    accountUsers,
+    account,
+    isAdmin
   } = useOutletContext();
 
   const handleAccountSelection = accountId => {
@@ -56,8 +58,16 @@ export default function Organizations() {
         <Box component="h6">Your Organizations</Box>
         <Divider sx={{ my: 4 }} />
         <Box maxWidth={360}>
-          <AccountMenu changeHandler={handleAccountSelection} />
+          <AccountMenu
+            changeHandler={handleAccountSelection}
+          />
         </Box>
+
+        <Divider textAlign="left" sx={{pt: 4}}>
+          <Chip
+            label={`All ${account.name} Users`}
+          />
+        </Divider>
 
         <List dense>
           {
@@ -79,7 +89,7 @@ export default function Organizations() {
                     secondaryAction={
                       <Box>
                         {
-                          !isYou ?
+                          !isYou && isAdmin ?
                             <Box>
                               <Tooltip title="Edit Permissions">
                                 <IconButton

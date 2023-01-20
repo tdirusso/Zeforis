@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
       );
 
       const [ownedAccountsData] = await pool.query(
-        'SELECT id, name, brand_color, logo_url FROM accounts WHERE owner_id = ?',
+        'SELECT id, name, brand_color, logo_url, owner_id FROM accounts WHERE owner_id = ?',
         [userId]
       );
 

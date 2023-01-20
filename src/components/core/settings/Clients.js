@@ -38,7 +38,8 @@ export default function Clients() {
     user,
     tags,
     account,
-    clients
+    clients,
+    isAdmin
   } = useOutletContext();
 
   const {
@@ -69,23 +70,28 @@ export default function Clients() {
   return (
     <>
       <Paper>
-        <Box component="h6">Clients</Box>
+        <Box component="h6">{account.name} Clients</Box>
         <Divider sx={{ my: 4 }} />
 
         <Button
+          hidden={!isAdmin}
           onClick={() => setCreateClientModalOpen(true)}
           variant="contained">
           Create Client
         </Button>
 
-        <Box maxWidth={360} mt={5} mb={2}>
+        <Box
+          maxWidth={360}
+          mt={5}
+          mb={2}>
           <ClientMenu
             changeHandler={handleChangeClient}
             client={client}
             clients={clients}
           />
         </Box>
-        <Box>
+
+        <Box hidden={!isAdmin}>
           <Button
             startIcon={<EditIcon />}
             sx={{ mr: 2 }}
@@ -107,6 +113,7 @@ export default function Clients() {
         <Box component="h6">{client.name} Team</Box>
         <Divider sx={{ my: 4 }} />
         <Button
+          hidden={!isAdmin}
           variant="outlined"
           size="small"
           sx={{ mb: 2 }}
@@ -133,13 +140,14 @@ export default function Clients() {
                   <React.Fragment key={member.id}>
                     <ListItem
                       secondaryAction={
-                        <Tooltip title="Remove Member">
-                          <IconButton
-                            edge="end"
-                            onClick={() => handleRemoveClientUser(member)}>
-                            <CloseIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        isAdmin ?
+                          <Tooltip title="Remove Member">
+                            <IconButton
+                              edge="end"
+                              onClick={() => handleRemoveClientUser(member)}>
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip> : null
                       }>
                       <ListItemText
                         primary={`${member.firstName} ${member.lastName}`}
@@ -181,7 +189,7 @@ export default function Clients() {
                 return (
                   <React.Fragment key={member.id}>
                     <ListItem
-                      secondaryAction={!isYou ?
+                      secondaryAction={!isYou && isAdmin ?
                         <Tooltip title="Remove Administrator">
                           <IconButton
                             edge="end"
@@ -211,16 +219,26 @@ export default function Clients() {
           {client.name} Tags
         </Box>
         <Box>
-          <Typography variant="caption">New tags can be added when creating a new task.</Typography>
+          <Typography
+            hidden={!isAdmin}
+            variant="caption">
+            New tags can be added when creating a new task.
+          </Typography>
           <Divider sx={{ my: 4 }} />
           {
             tags.map(tag =>
-              <Chip
-                label={tag.name}
-                key={tag.id}
-                sx={{ mr: 1, mb: 1 }}
-                onDelete={() => handleRemoveTag(tag)}>
-              </Chip>
+              isAdmin ?
+                <Chip
+                  label={tag.name}
+                  key={tag.id}
+                  sx={{ mr: 1, mb: 1 }}
+                  onDelete={() => handleRemoveTag(tag)}>
+                </Chip> :
+                <Chip
+                  label={tag.name}
+                  key={tag.id}
+                  sx={{ mr: 1, mb: 1 }}>
+                </Chip>
             )
           }
         </Box>

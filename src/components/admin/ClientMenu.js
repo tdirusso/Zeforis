@@ -8,7 +8,7 @@ import { Typography } from "@mui/material";
 export default function ClientMenu({ changeHandler, client, clients }) {
   const [clientId, setClientId] = useState(client?.id || '');
 
-  const label = clientId ? 'Current Client' : 'Client';
+  const label = clientId ? 'Currently Viewing' : 'Client';
 
   const thisHandleChange = e => {
     setClientId(e.target.value);

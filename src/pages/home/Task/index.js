@@ -177,7 +177,11 @@ export default function TaskPage() {
                   <PersonIcon />
                 </Avatar>
                 <Typography mb={0.5}>
-                  {task.assigned_first} {task.assigned_last}
+                  {
+                    task.assigned_to_id ?
+                      `${task.assigned_first} ${task.assigned_last}`
+                      : 'None'
+                  }
                 </Typography>
               </Box>
             </Box>

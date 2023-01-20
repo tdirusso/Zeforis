@@ -243,7 +243,7 @@ export default function TasksTable({ tasks }) {
               label={
                 <Typography
                   variant="body2">
-                  Editting mode
+                  Editing mode
                 </Typography>
               }
             />
