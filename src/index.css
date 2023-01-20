@@ -108,3 +108,7 @@ h5, h6 {
   background-color: #a52a2a12;
   color: brown;
 }
+
+[hidden] {
+  display: none !important;
+}

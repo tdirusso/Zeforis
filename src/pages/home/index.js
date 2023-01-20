@@ -4,7 +4,6 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid } from "@mui/material";
-import './styles.css';
 import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
@@ -39,19 +38,6 @@ export default function Home() {
   const [tags, setTags] = useState([]);
   const [accountUsers, setAccountUsers] = useState([]);
   const [triedAccAndClient, setTriedAccAndClient] = useState(false);
-
-  const clientMembers = [];
-  const clientAdmins = [];
-
-  accountUsers.forEach(accountUser => {
-    if (accountUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientAdmins.push({ ...accountUser, role: 'Administrator' });
-    }
-
-    if (accountUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientMembers.push({ ...accountUser, role: 'Member' });
-    }
-  });
 
   const {
     isOpen,
@@ -107,6 +93,45 @@ export default function Home() {
     }
   }, [triedAccAndClient]);
 
+  const foldersMap = {};
+  const tasksMap = {};
+  const tagsMap = {};
+  const accountUsersMap = {};
+
+  accountUsers.forEach(user => accountUsersMap[user.id] = user);
+
+  const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
+
+  folders.forEach(folder => {
+    foldersMap[String(folder.id)] = { ...folder, tasks: [] };
+  });
+
+  sortedTasks.forEach(task => {
+    foldersMap[task.folder_id].tasks.push(task);
+    tasksMap[task.task_id] = task;
+  });
+
+  tags.forEach(tag => {
+    tagsMap[tag.id] = tag;
+  });
+
+  const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
+
+  let isAdmin = false;
+  const clientMembers = [];
+  const clientAdmins = [];
+
+  accountUsers.forEach(accountUser => {
+    if (accountUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
+      clientAdmins.push({ ...accountUser, role: 'Administrator' });
+      if (accountUser.id === user.id) isAdmin = true;
+    }
+
+    if (accountUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
+      clientMembers.push({ ...accountUser, role: 'Member' });
+    }
+  });
+
   if (isLoading) {
     return <Loader />;
   }
@@ -160,30 +185,6 @@ export default function Home() {
     }
   }
 
-  const foldersMap = {};
-  const tasksMap = {};
-  const tagsMap = {};
-  const accountUsersMap = {};
-
-  accountUsers.forEach(user => accountUsersMap[user.id] = user);
-
-  const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
-
-  folders.forEach(folder => {
-    foldersMap[String(folder.id)] = { ...folder, tasks: [] };
-  });
-
-  sortedTasks.forEach(task => {
-    foldersMap[task.folder_id].tasks.push(task);
-    tasksMap[task.task_id] = task;
-  });
-
-  tags.forEach(tag => {
-    tagsMap[tag.id] = tag;
-  });
-
-  const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
-
   const context = {
     client,
     clients,
@@ -199,6 +200,7 @@ export default function Home() {
     tagsMap,
     foldersMap,
     tasksMap,
+    isAdmin,
     setTags,
     setTasks,
     setFolders,
@@ -209,8 +211,8 @@ export default function Home() {
   return (
     <Box>
       <SideNav client={client} />
-      <Box component="main">
-        <Box className="main-content">
+      <Box component="main" ml={'280px'} px={5}>
+        <Box maxWidth={'1200px'} m='auto' pt={2} pb={5}>
           <Grid container spacing={3}>
             <Outlet context={context} />
           </Grid>

@@ -38,7 +38,8 @@ export default function FoldersPage() {
 
   const {
     client,
-    folders
+    folders,
+    isAdmin
   } = useOutletContext();
 
   const keyFolders = [];
@@ -64,6 +65,7 @@ export default function FoldersPage() {
       <Header />
       <Grid item>
         <Paper
+          hidden={!isAdmin}
           className="folder-item"
           onClick={() => setAddFolderModalOpen(true)}
           sx={{

@@ -12,12 +12,17 @@ import FolderIcon from '@mui/icons-material/Folder';
 import AddTaskModal from "../admin/AddTaskModal";
 import AddFolderModal from "../admin/AddFolderModal";
 import SearchModal from "./SearchModal";
+import { useOutletContext } from "react-router-dom";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+
+  const {
+    isAdmin
+  } = useOutletContext();
 
   const open = Boolean(anchorEl);
 
@@ -52,7 +57,7 @@ export default function Header() {
             Search
           </Button>
         </Box>
-        <Box>
+        <Box hidden={!isAdmin}>
           <Tooltip title="Actions">
             <IconButton onClick={handleMenuClick}>
               <MoreVertIcon />

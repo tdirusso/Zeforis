@@ -54,7 +54,7 @@ const boot = async () => {
   app.post('/api/login', login);
   app.post('/api/authenticate', authenticate);
   app.post('/api/addClient', checkPermissionsMW, addClient);
-  app.get('/api/getClientData', checkPermissionsMW, getClientData);
+  app.get('/api/getClientData', checkAuth, getClientData);
   app.get('/api/verify', verify);
   app.post('/api/addFolder', checkPermissionsMW, addFolder);
   app.post('/api/register', register);

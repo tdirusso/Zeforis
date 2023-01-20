@@ -8,7 +8,10 @@ import {
   Button,
   TablePagination,
   Typography,
-  Tooltip
+  Tooltip,
+  FormGroup,
+  FormControlLabel,
+  Switch
 } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,7 +19,6 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import './styles.css';
 import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
@@ -27,10 +29,6 @@ import TasksFilter from "./TasksFilter";
 import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
 import RemoveTasksModal from "../../admin/RemoveTasksModal";
 import DeleteIcon from '@mui/icons-material/Delete';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 
@@ -41,7 +39,8 @@ export default function TasksTable({ tasks }) {
 
   const {
     foldersMap,
-    tagsMap
+    tagsMap,
+    isAdmin
   } = useOutletContext();
 
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
@@ -50,10 +49,7 @@ export default function TasksTable({ tasks }) {
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  const [taskForMenu, setTaskForMenu] = useState(null);
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const rowMenuOpen = Boolean(anchorEl);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const { search } = useLocation();
 
@@ -78,26 +74,15 @@ export default function TasksTable({ tasks }) {
     setTheTasks(tasks);
   }, [tasks]);
 
-  const handleMenuClick = (e, task) => {
-    e.stopPropagation();
-    setTaskForMenu(task);
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setTaskForMenu(null);
-  };
-
-  const handleViewTask = () => {
-    navigate(`/home/task/${taskForMenu.task_id}?exitPath=/home/tasks${search}`);
-  };
-
   const handleTaskSelection = (taskId) => {
-    if (selectedTasks.includes(taskId)) {
-      setSelectedTasks(selectedTasks.filter(id => id !== taskId));
+    if (isEditMode) {
+      if (selectedTasks.includes(taskId)) {
+        setSelectedTasks(selectedTasks.filter(id => id !== taskId));
+      } else {
+        setSelectedTasks(taskIds => [...taskIds, taskId]);
+      }
     } else {
-      setSelectedTasks(taskIds => [...taskIds, taskId]);
+      navigate(`/home/task/${taskId}?exitPath=/home/tasks`);
     }
   };
 
@@ -107,6 +92,11 @@ export default function TasksTable({ tasks }) {
     } else {
       setSelectedTasks([]);
     }
+  };
+
+  const handleEditModeChange = (_, val) => {
+    setSelectedTasks([]);
+    setIsEditMode(val);
   };
 
   let filteredTasks = [...theTasks];
@@ -199,8 +189,10 @@ export default function TasksTable({ tasks }) {
         sortBy={sortBy}
       />
 
-      <Grid item xs={12}>
-        <Box display="flex" justifyContent="space-between">
+      <Grid item xs={12} hidden={!isAdmin}>
+        <Box
+          display="flex"
+          justifyContent="space-between">
           <Box display="flex" alignItems="center">
             <LoadingButton
               variant="contained"
@@ -239,6 +231,26 @@ export default function TasksTable({ tasks }) {
         </Box>
       </Grid>
 
+      <Grid item xs={12} hidden={!isAdmin}>
+        <Box>
+          <FormGroup>
+            <FormControlLabel
+              fontSize="small"
+              control={<Switch
+                size="small"
+                onChange={handleEditModeChange}
+              />}
+              label={
+                <Typography
+                  variant="body2">
+                  Editting mode
+                </Typography>
+              }
+            />
+          </FormGroup>
+        </Box>
+      </Grid>
+
       <Grid item xs={12}>
         <Paper sx={{ px: 0, overflowX: 'auto' }}>
           <Table
@@ -247,7 +259,7 @@ export default function TasksTable({ tasks }) {
             size="small">
             <TableHead>
               <TableRow sx={{ pb: 3 }}>
-                <TableCell>
+                <TableCell hidden={!isEditMode}>
                   <Checkbox
                     onChange={handleSelectAll}
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
@@ -281,7 +293,7 @@ export default function TasksTable({ tasks }) {
                       key={task.task_id}
                       className={isSelectedRow ? 'selected' : ''}
                       sx={{ position: 'relative', }}>
-                      <TableCell>
+                      <TableCell hidden={!isEditMode}>
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
                       <TableCell scope="row">
@@ -329,10 +341,19 @@ export default function TasksTable({ tasks }) {
 
                       <TableCell>{foldersMap[task.folder_id].name}</TableCell>
                       <TableCell>
-                        <Tooltip title="More Options">
-                          <IconButton onClick={e => handleMenuClick(e, task)}>
-                            <MoreVertIcon />
-                          </IconButton>
+                        <Tooltip title="Open Link" disableHoverListener={!task.link_url}>
+                          <span>
+                            <IconButton
+                              disabled={!task.link_url}
+                              onClick={e => {
+                                e.stopPropagation();
+                                window.open(task.link_url, '_blank');
+                              }}>
+                              <OpenInNewIcon
+                                fontSize="small"
+                              />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                       </TableCell>
                     </TableRow>
@@ -341,36 +362,6 @@ export default function TasksTable({ tasks }) {
                 )}
             </TableBody>
           </Table>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={rowMenuOpen}
-            onClose={handleMenuClose}
-            PaperProps={{
-              style: {
-                width: '20ch',
-              }
-            }}>
-            <MenuItem onClick={handleViewTask}>
-              <ListItemText>
-                <Typography variant="body2">
-                  View Task
-                </Typography>
-              </ListItemText>
-            </MenuItem>
-            <MenuItem
-              onClick={() => window.open(taskForMenu?.link_url, '_blank')}
-              disabled={Boolean(!taskForMenu?.link_url)}>
-              <ListItemText sx={{ flexGrow: 0, mr: 1 }}>
-                <Typography variant="body2">
-                  Open Task Link
-                </Typography>
-              </ListItemText>
-              <ListItemIcon>
-                <OpenInNewIcon fontSize="small" />
-              </ListItemIcon>
-            </MenuItem>
-          </Menu>
 
           <Box mt={2} mr={2}>
             <TablePagination
