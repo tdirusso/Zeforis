@@ -341,20 +341,21 @@ export default function TasksTable({ tasks }) {
 
                       <TableCell>{foldersMap[task.folder_id].name}</TableCell>
                       <TableCell>
-                        <Tooltip title="Open Link" disableHoverListener={!task.link_url}>
-                          <span>
-                            <IconButton
-                              disabled={!task.link_url}
-                              onClick={e => {
-                                e.stopPropagation();
-                                window.open(task.link_url, '_blank');
-                              }}>
-                              <OpenInNewIcon
-                                fontSize="small"
-                              />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
+                        {
+                          task.link_url ?
+                            <Tooltip title="Open Link">
+                              <IconButton
+                                disabled={!task.link_url}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  window.open(task.link_url, '_blank');
+                                }}>
+                                <OpenInNewIcon
+                                  fontSize="small"
+                                />
+                              </IconButton>
+                            </Tooltip> : null
+                        }
                       </TableCell>
                     </TableRow>
                   );

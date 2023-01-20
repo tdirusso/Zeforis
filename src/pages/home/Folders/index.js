@@ -175,6 +175,7 @@ export default function FoldersPage() {
 
 function Folder({ folder, handleMenuClick }) {
   const navigate = useNavigate();
+  const { isAdmin } = useOutletContext();
 
   return (
     <Grid item>
@@ -186,14 +187,17 @@ function Folder({ folder, handleMenuClick }) {
           position: 'relative',
           minWidth: 180
         }}>
-        <Tooltip title="More Options">
-          <IconButton
-            size="small"
-            className="edit-folder-button"
-            onClick={(e) => handleMenuClick(e, folder)}>
-            <MoreVertIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {
+          isAdmin ?
+            <Tooltip title="More Options">
+              <IconButton
+                size="small"
+                className="edit-folder-button"
+                onClick={(e) => handleMenuClick(e, folder)}>
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+            </Tooltip> : null
+        }
         <Box
           display="flex"
           flexDirection="column"

@@ -33,7 +33,8 @@ export default function TaskPage() {
   const {
     tasks,
     foldersMap,
-    tagsMap
+    tagsMap,
+    isAdmin
   } = useOutletContext();
 
   const task = tasks.find(t => t.task_id === Number(taskId));
@@ -67,13 +68,16 @@ export default function TaskPage() {
               onClick={() => navigate(exitPath)}>
               Back
             </Button>
-            <Tooltip title="Edit Task">
-              <IconButton
-                onClick={() => setEditTaskModalOpen(true)}
-                size="large">
-                <EditIcon size="large" />
-              </IconButton>
-            </Tooltip>
+            {
+              isAdmin ?
+                <Tooltip title="Edit Task">
+                  <IconButton
+                    onClick={() => setEditTaskModalOpen(true)}
+                    size="large">
+                    <EditIcon size="large" />
+                  </IconButton>
+                </Tooltip> : null
+            }
           </Box>
           <Box
             my={2}

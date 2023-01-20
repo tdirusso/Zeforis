@@ -1,5 +1,6 @@
-import { Box, Paper, Typography, Button, Grid, Chip } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -77,13 +78,13 @@ function UpcomingTaskRow({ task }) {
       className="task-row"
       onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
       justifyContent="center">
-      <Box flexBasis='45%' minWidth={75}>
+      <Box flexBasis='40%' minWidth={75}>
         <Typography
           variant="body2">
           {taskName}
         </Typography>
         <Typography variant="caption" color="#adadad">
-          Due: &nbsp;{`${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}`}
+          {`${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}`}
         </Typography>
       </Box>
       <Box flex={1} textAlign="center">
@@ -92,18 +93,23 @@ function UpcomingTaskRow({ task }) {
           sx={{ cursor: 'pointer' }}
           className={task.status} />
       </Box>
-      <Button
-        variant="outlined"
-        component="a"
-        href={task.link_url}
-        target="_blank"
-        disabled={task.link_url === '' || task.link_url === null}
-        onClick={e => e.stopPropagation()}
-        size="small">
+      <Box flexBasis={'10%'}>
         {
-          task.link_url ? 'Open Link' : 'No Link'
+          task.link_url ?
+            <Tooltip title="Open Link">
+              <IconButton
+                disabled={!task.link_url}
+                onClick={e => {
+                  e.stopPropagation();
+                  window.open(task.link_url, '_blank');
+                }}>
+                <OpenInNewIcon
+                  fontSize="small"
+                />
+              </IconButton>
+            </Tooltip> : null
         }
-      </Button>
+      </Box>
     </Box>
   );
 }

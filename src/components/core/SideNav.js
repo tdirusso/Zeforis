@@ -80,19 +80,6 @@ export default function SideNav({ client }) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/analytics">
-              <li>
-                <ButtonBase sx={buttonBaseStyles}>
-                  <Typography
-                    variant="body2"
-                    display="flex"
-                    alignItems="center">
-                    <InsightsIcon />
-                    Analytics
-                  </Typography>
-                </ButtonBase>
-              </li>
-            </NavLink>
             <NavLink to="/home/settings">
               <li>
                 <ButtonBase sx={buttonBaseStyles}>

@@ -1,9 +1,10 @@
-import { Box, Paper, Typography, Button, Grid } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
 import { useNavigate } from "react-router-dom";
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import { useState } from "react";
 import AddTaskModal from "../../admin/AddTaskModal";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 export default function KeyFolders({ folders }) {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
@@ -101,6 +102,7 @@ function TaskList({ tasks }) {
         mb={0.25}
         px={1}
         py={0.5}
+        minHeight={40}
         gap={0.5}
         borderRadius='8px'
         onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
@@ -108,18 +110,21 @@ function TaskList({ tasks }) {
         <Typography variant="body2">
           {taskName}
         </Typography>
-        <Button
-          variant="outlined"
-          component="a"
-          href={task.link_url}
-          target="_blank"
-          disabled={task.link_url === '' || task.link_url === null}
-          onClick={e => e.stopPropagation()}
-          size="small">
-          {
-            task.link_url ? 'Open Link' : 'No Link'
-          }
-        </Button>
+        {
+          task.link_url ?
+            <Tooltip title="Open Link">
+              <IconButton
+                disabled={!task.link_url}
+                onClick={e => {
+                  e.stopPropagation();
+                  window.open(task.link_url, '_blank');
+                }}>
+                <OpenInNewIcon
+                  fontSize="small"
+                />
+              </IconButton>
+            </Tooltip> : null
+        }
       </Box>
     );
   });
