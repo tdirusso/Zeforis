@@ -47,7 +47,7 @@ export default function RemoveFolderModal(props) {
 
       if (success) {
         setTimeout(() => {
-          openSnackBar(`Successully removed ${folder.name}.`, 'success');
+          openSnackBar(`Folder successfully removed.`, 'success');
         }, 250);
 
         delete foldersMap[folder.id];

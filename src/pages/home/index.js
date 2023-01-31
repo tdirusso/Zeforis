@@ -8,7 +8,7 @@ import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import { getActiveClientId, getClientData, getUserClientListForAccount, setActiveClientId } from "../../api/client";
-import AddClientModal from "../../components/admin/AddClientModal";
+import AddClientScreen from "../../components/admin/AddClientScreen";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
 import Loader from "../../components/core/Loader";
@@ -159,12 +159,7 @@ export default function Home() {
   if (clients.length === 0) {
     return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
-        <AddClientModal
-          open={true}
-          setOpen={() => { }}
-          hideCancel={true}
-          account={account}
-        />
+        <AddClientScreen account={account} />
       </Box>
     );
   }
@@ -210,7 +205,11 @@ export default function Home() {
 
   return (
     <Box>
-      <SideNav client={client} />
+      <SideNav
+        account={account}
+        isAdmin={isAdmin}
+        client={client}
+      />
       <Box component="main" ml={'280px'} px={5}>
         <Box maxWidth={'1200px'} m='auto' pt={2} pb={5}>
           <Grid container spacing={3}>

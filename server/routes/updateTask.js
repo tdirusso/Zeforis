@@ -77,7 +77,7 @@ module.exports = async (req, res) => {
           SELECT
             tasks.id as task_id,
             tasks.name as task_name,
-            tasks.description as task_description,
+            tasks.description,
             tasks.date_created,
             tasks.created_by_id,
             tasks.status,

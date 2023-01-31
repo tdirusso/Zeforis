@@ -1,5 +1,4 @@
 import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip } from "@mui/material";
-import './styles/Header.css';
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -45,10 +44,18 @@ export default function Header() {
   };
 
   return (
-    <Grid item xs={12} component="header">
+    <Grid
+      item
+      xs={12}
+      component="header">
       <Paper
-        sx={{ width: '100%' }}
-        className="Header">
+        sx={{
+          height: 60,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%'
+        }}>
         <Box>
           <Button
             startIcon={<SearchIcon />}
@@ -77,7 +84,9 @@ export default function Header() {
                 <AddTaskIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>
-                <Typography variant="body2">New Task</Typography>
+                <Typography variant="body2">
+                  New Task
+                </Typography>
               </ListItemText>
             </MenuItem>
             <MenuItem onClick={openAddFolder}>
@@ -85,7 +94,9 @@ export default function Header() {
                 <FolderIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>
-                <Typography variant="body2">New Folder</Typography>
+                <Typography variant="body2">
+                  New Folder
+                </Typography>
               </ListItemText>
             </MenuItem>
           </Menu>

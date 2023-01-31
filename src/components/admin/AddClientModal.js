@@ -6,7 +6,6 @@ import { useRef, useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, TextField } from '@mui/material';
-import { TwitterPicker } from 'react-color';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -14,7 +13,6 @@ import { addClient, setActiveClientId } from '../../api/client';
 
 export default function AddClientModal({ open, setOpen, hideCancel, account }) {
   const name = useRef();
-  const [brandColor, setBrandColor] = useState('#2399ef');
   const [logoSrc, setLogoSrc] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [isLoading, setLoading] = useState(false);
@@ -40,7 +38,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
       const fd = new FormData();
       fd.append('logoFile', logoFile);
       fd.append('name', nameVal);
-      fd.append('brandColor', brandColor);
       fd.append('accountId', account.id);
 
       const { client, message } = await addClient(fd);
@@ -64,7 +61,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
   const handleClose = () => {
     setOpen(false);
     setLoading(false);
-    setBrandColor('#267ffd');
     setLogoSrc('');
     setLogoFile(null);
   };
@@ -99,24 +95,8 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
               fullWidth
               autoFocus
               disabled={isLoading}
-              inputRef={name}
-            >
+              inputRef={name}>
             </TextField>
-          </Box>
-          <Box sx={{ mb: 3, mt: 3, display: 'flex', alignItems: 'center' }}>
-            <TwitterPicker
-              color={brandColor}
-              onChange={color => setBrandColor(color.hex)} />
-            <Box
-              sx={{
-                background: brandColor,
-                borderRadius: '6px',
-                height: '50px',
-                width: '50px',
-                transition: 'background 500ms',
-                ml: 4
-              }}>
-            </Box>
           </Box>
           <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
             <Button
@@ -149,13 +129,14 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
           </Box>
           <DialogActions sx={{ p: 0 }}>
             {
-              hideCancel ? '' : <Button
-                fullWidth
-                variant='outlined'
-                onClick={handleClose}
-                disabled={isLoading}>
-                Cancel
-              </Button>
+              hideCancel ? '' :
+                <Button
+                  fullWidth
+                  variant='outlined'
+                  onClick={handleClose}
+                  disabled={isLoading}>
+                  Cancel
+                </Button>
             }
             <LoadingButton
               variant='contained'

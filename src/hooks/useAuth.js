@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authenticateUser, getToken } from "../api/auth";
+import { authenticate, getToken } from "../api/auth";
 
 export default function useAuth() {
   const [user, setUser] = useState(null);
@@ -15,11 +15,11 @@ export default function useAuth() {
     if (!token) {
       navigate('/login');
     } else {
-      authenticate();
+      authenticateUser();
     }
 
-    async function authenticate() {
-      const { user, message } = await authenticateUser();
+    async function authenticateUser() {
+      const { user, message } = await authenticate();
 
       if (user) {
         setUser(user);

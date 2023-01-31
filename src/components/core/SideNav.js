@@ -4,10 +4,10 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
-import InsightsIcon from '@mui/icons-material/Insights';
+//import InsightsIcon from '@mui/icons-material/Insights';
 import SpeedIcon from '@mui/icons-material/Speed';
 
-export default function SideNav({ client }) {
+export default function SideNav({ client, account, isAdmin }) {
 
   const buttonBaseStyles = {
     width: '100%',
@@ -18,13 +18,16 @@ export default function SideNav({ client }) {
     justifyContent: 'flex-start'
   };
 
+  //console.log(client)
+
   return (
     <Box className="Sidenav">
       <Box className="flex-centered container">
         <img
-          //src={client.logoUrl} 
+          src={client.logo}
           alt=""
-          width={45} />
+          width={60}
+        />
         <Typography
           variant="body1"
           mt={1}>

@@ -7,7 +7,6 @@ const acceptMimes = ['image/png', 'image/jpeg'];
 module.exports = async (req, res) => {
   const {
     name,
-    brandColor,
     clientId,
     isLogoChanged
   } = req.body;
@@ -20,7 +19,7 @@ module.exports = async (req, res) => {
     });
   }
 
-  if (!name || !brandColor) {
+  if (!name) {
     return res.json({
       message: 'Missing client name.'
     });
@@ -39,15 +38,14 @@ module.exports = async (req, res) => {
       let logoUrl = client.logo_url;
 
       if (isLogoChanged) {
-        logoUrl = await updateClientWithLogoChange(name, brandColor, clientId, client.logo_url, logoFile);
+        logoUrl = await updateClientWithLogoChange(name,clientId, client.logo_url, logoFile);
       } else {
-        await updateClient(name, brandColor, clientId);
+        await updateClient(name, clientId);
       }
 
       const clientObject = {
         id: clientId,
         name,
-        brandColor,
         accountId: client.account_id,
         logoUrl
       };
@@ -67,14 +65,14 @@ module.exports = async (req, res) => {
   }
 };
 
-async function updateClient(name, brandColor, clientId) {
+async function updateClient(name, clientId) {
   await pool.query(
-    'UPDATE clients SET name = ?, brand_color = ? WHERE id = ?',
-    [name, brandColor, clientId]
+    'UPDATE clients SET name = ? WHERE id = ?',
+    [name, clientId]
   );
 }
 
-async function updateClientWithLogoChange(name, brandColor, clientId, existingLogoUrl, logoFile) {
+async function updateClientWithLogoChange(name, clientId, existingLogoUrl, logoFile) {
   if (existingLogoUrl) {
     await s3.deleteObject({ Key: existingLogoUrl.split('.com/')[1] }).promise();
   }
@@ -107,8 +105,8 @@ async function updateClientWithLogoChange(name, brandColor, clientId, existingLo
   }
 
   await pool.query(
-    'UPDATE clients SET name = ?, brand_color = ?, logo_url = ? WHERE id = ?',
-    [name, brandColor, updatedLogoUrl, clientId]
+    'UPDATE clients SET name = ?, logo_url = ? WHERE id = ?',
+    [name, updatedLogoUrl, clientId]
   );
 
   return updatedLogoUrl;

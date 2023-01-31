@@ -5,7 +5,6 @@ import { useState, useRef } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, DialogContentText, Skeleton, TextField } from '@mui/material';
-import { TwitterPicker } from 'react-color';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
@@ -13,7 +12,6 @@ import { setActiveClientId, updateClient } from '../../api/client';
 
 export default function EditClientModal({ open, setOpen, clientToUpdate }) {
   const name = useRef(clientToUpdate.name);
-  const [brandColor, setBrandColor] = useState(clientToUpdate.brandColor);
   const [logoSrc, setLogoSrc] = useState(clientToUpdate.logoUrl);
   const [logoFile, setLogoFile] = useState(null);
   const [isLogoChanged, setLogoChanged] = useState(false);
@@ -40,7 +38,6 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
       const fd = new FormData();
       fd.append('logoFile', logoFile);
       fd.append('name', nameVal);
-      fd.append('brandColor', brandColor);
       fd.append('isLogoChanged', isLogoChanged);
       fd.append('clientId', clientToUpdate.id);
 
@@ -85,7 +82,6 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
     setTimeout(() => {
       setLogoSrc(clientToUpdate.logoUrl);
       setLogoFile(null);
-      setBrandColor(clientToUpdate.brandColor);
       setLogoChanged(false);
     }, 500);
   };
@@ -108,21 +104,6 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
               defaultValue={clientToUpdate.name}
             >
             </TextField>
-          </Box>
-          <Box sx={{ mb: 3, mt: 3, display: 'flex', alignItems: 'center' }}>
-            <TwitterPicker
-              color={brandColor}
-              onChange={color => setBrandColor(color.hex)} />
-            <Box
-              sx={{
-                background: brandColor,
-                borderRadius: '6px',
-                height: '50px',
-                width: '50px',
-                transition: 'background 500ms',
-                ml: 4
-              }}>
-            </Box>
           </Box>
           <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
             <Button

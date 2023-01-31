@@ -113,7 +113,7 @@ export default function TaskPage() {
           <Divider sx={{ mt: 4 }} />
           <Box my={4}>
             <Box component="h4" mb={0.5}>Link URL</Box>
-            <Typography mb={1}>
+            <Typography mb={1} sx={{ overflowWrap: 'break-word' }}>
               {
                 task.link_url ? task.link_url : 'None.'
               }

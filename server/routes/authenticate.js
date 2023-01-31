@@ -38,7 +38,6 @@ module.exports = async (req, res) => {
             accounts.logo_url AS account_logo,
             accounts.id AS account_id,
             clients.name AS client_name, 
-            clients.brand_color AS client_brand, 
             clients.logo_url AS client_logo
           FROM client_users
           LEFT JOIN clients ON clients.id = client_users.client_id
@@ -74,7 +73,6 @@ module.exports = async (req, res) => {
           account_logo,
           client_id,
           client_name,
-          client_brand,
           client_logo,
           role
         } = row;
@@ -89,7 +87,6 @@ module.exports = async (req, res) => {
         const clientObject = {
           id: client_id,
           name: client_name,
-          brandColor: client_brand,
           logo: client_logo,
           accountId: account_id
         };

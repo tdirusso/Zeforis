@@ -7,7 +7,6 @@ const acceptMimes = ['image/png', 'image/jpeg'];
 module.exports = async (req, res) => {
   const {
     name,
-    brandColor,
     accountId
   } = req.body;
 
@@ -23,8 +22,8 @@ module.exports = async (req, res) => {
 
   try {
     const newClient = await pool.query(
-      'INSERT INTO clients (name, account_id, brand_color) VALUES (?,?,?)',
-      [name, accountId, brandColor]
+      'INSERT INTO clients (name, account_id) VALUES (?,?)',
+      [name, accountId]
     );
 
     const newClientId = newClient[0].insertId;
@@ -59,7 +58,7 @@ module.exports = async (req, res) => {
           logoUrl = s3Result.Location;
 
           await pool.query(
-            'UPDATE clients SET logo_url = ? WHERE client_id = ?',
+            'UPDATE clients SET logo_url = ? WHERE id = ?',
             [logoUrl, newClientId]
           );
         }
@@ -69,7 +68,6 @@ module.exports = async (req, res) => {
     const clientObject = {
       id: newClientId,
       name,
-      brandColor,
       accountId,
       logoUrl
     };

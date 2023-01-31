@@ -66,7 +66,7 @@ export default function EditUserPermissionsModal(props) {
 
         setAccountUsers(Object.values(accountUsersMap));
         setLoading(false);
-        openSnackBar('Successfully updated.', 'success');
+        openSnackBar('Permission successfully updated.', 'success');
       } else {
         openSnackBar(message, 'error');
         setLoading(false);

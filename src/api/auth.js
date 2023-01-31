@@ -15,7 +15,7 @@ const logout = () => {
   window.location = '/login';
 };
 
-const authenticateUser = async () => {
+const authenticate = async () => {
   const { data } = await request.post(`authenticate`);
 
   if (!data.user) {
@@ -40,7 +40,7 @@ const removeToken = () => {
 export {
   login,
   logout,
-  authenticateUser,
+  authenticate,
   getToken,
   setToken,
   removeToken
