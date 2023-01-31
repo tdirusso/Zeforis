@@ -50,7 +50,7 @@ export default function CompleteRegistrationPage() {
       openSnackBar('Registration completed successfully.', 'success');
       setTimeout(() => {
         navigate('/login');
-      }, 1000);
+      }, 3000);
     } else {
       setLoading(false);
       openSnackBar(message, 'error');
@@ -62,26 +62,27 @@ export default function CompleteRegistrationPage() {
       <Paper sx={{ p: 8, pt: 5 }} className="container">
         <Typography variant="h5" sx={{ mb: 1 }}>Complete Account Registration</Typography>
         <Typography variant="body2" sx={{ mb: 5 }}>Please enter the password that you will use to sign in to the platform.</Typography>
-        <form onSubmit={handleCompleteRegistration} >
-          <TextField
-            label="Password"
-            variant="outlined"
-            type="password"
-            sx={{ mb: 5 }}
-            required
-            inputRef={password}
-            disabled={isLoading}
-          />
-          <LoadingButton
-            loading={isLoading}
-            disabled={isLoading}
-            fullWidth
-            variant="contained"
-            type="submit"
-            sx={{ mb: 4 }}>
-            Complete Registration
-          </LoadingButton>
-        </form>
+        <TextField
+          fullWidth
+          label="Create Password"
+          variant="outlined"
+          type="password"
+          sx={{ mb: 5 }}
+          required
+          autoFocus
+          inputRef={password}
+          disabled={isLoading}
+        />
+        <LoadingButton
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={handleCompleteRegistration}
+          fullWidth
+          variant="contained"
+          type="submit"
+          sx={{ mb: 4 }}>
+          Complete Registration
+        </LoadingButton>
         <Box component="span" sx={{ textAlign: 'right' }}>
           <Typography
             variant="p"
