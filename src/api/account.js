@@ -24,10 +24,17 @@ const completeRegistration = async (payload) => {
   return data;
 };
 
+const updateAccount = async (payload) => {
+  const { data } = await request.patch(`updateAccount`, payload);
+
+  return data;
+};
+
 export {
   register,
   getActiveAccountId,
   setActiveAccountId,
   removeActiveAccountId,
-  completeRegistration
+  completeRegistration,
+  updateAccount
 };

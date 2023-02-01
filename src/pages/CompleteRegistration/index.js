@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import './CompleteRegistration.css';
 import { completeRegistration } from '../../api/account';
 
 export default function CompleteRegistrationPage() {
@@ -60,14 +59,20 @@ export default function CompleteRegistrationPage() {
   };
 
   return (
-    <div className="Register flex-centered">
+    <Box
+      height={'100vh'}
+      width='100%'
+      textAlign='center'
+      className="flex-centered"
+      alignItems='center'>
       <Paper sx={{
         p: 8,
         width: '550px',
-        py: 7
       }}>
         <Typography variant="h5" sx={{ mb: 1 }}>Complete Account Registration</Typography>
-        <Typography variant="body2" sx={{ mb: 5 }}>Please enter the password that you will use to sign in to the platform.</Typography>
+        <Typography variant="body2" sx={{ mb: 5 }}>
+          Please enter the password that you will use to sign in to the platform.
+        </Typography>
         <form onSubmit={handleCompleteRegistration}>
           <TextField
             fullWidth
@@ -75,9 +80,6 @@ export default function CompleteRegistrationPage() {
             variant="outlined"
             type="password"
             sx={{ mb: 5 }}
-            inputProps={{
-              sx: { fontSize: 18 }
-            }}
             autoFocus
             inputRef={password}
             disabled={isLoading}
@@ -106,6 +108,6 @@ export default function CompleteRegistrationPage() {
         type={type}
         message={message}
       />
-    </div>
+    </Box>
   );
 };

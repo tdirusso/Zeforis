@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
     const userId = createUserResult[0].insertId;
 
     await pool.query(
-      'INSERT INTO accounts (name, owner_id) VALUES (?,?)',
+      'INSERT INTO accounts (name, owner_id, brand_color) VALUES (?,?, "#2399ef")',
       [orgName, userId]
     );
 

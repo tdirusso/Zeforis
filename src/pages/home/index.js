@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, createTheme } from "@mui/material";
 import SelectClientModal from "../../components/core/SelectClientModal";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
@@ -12,8 +12,9 @@ import AddClientScreen from "../../components/admin/AddClientScreen";
 import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
 import Loader from "../../components/core/Loader";
+import themeConfig from "../../theme";
 
-export default function Home() {
+export default function Home({ setTheme }) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
@@ -54,6 +55,11 @@ export default function Home() {
         });
 
         if (activeAccount) {
+          const brandRGB = hexToRgb(activeAccount.brandColor);
+          document.documentElement.style.setProperty('--colors-primary', activeAccount.brandColor);
+          document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
+          themeConfig.palette.primary.main = activeAccount.brandColor;
+          setTheme(createTheme(themeConfig));
           setAccount(activeAccount);
         }
       }
@@ -226,3 +232,17 @@ export default function Home() {
     </Box>
   );
 };
+
+function hexToRgb(hex) {
+  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+    return r + r + g + g + b + b;
+  });
+
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}

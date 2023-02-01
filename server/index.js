@@ -26,6 +26,7 @@ const removeUser = require('./routes/removeUser');
 const updateTask = require('./routes/updateTask');
 const updatePermission = require('./routes/updatePermission');
 const updateAccess = require('./routes/updateAccess');
+const updateAccount = require('./routes/updateAccount');
 const bulkUpdateTasks = require('./routes/bulkUpdateTasks');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
@@ -75,6 +76,7 @@ const boot = async () => {
   app.patch('/api/updateFolder', checkPermissionsMW, updateFolder);
   app.patch('/api/updatePermission', checkPermissionsMW, updatePermission);
   app.patch('/api/updateAccess', checkPermissionsMW, updateAccess);
+  app.patch('/api/updateAccount', checkPermissionsMW, updateAccount);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

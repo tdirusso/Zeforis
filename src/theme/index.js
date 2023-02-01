@@ -13,7 +13,6 @@ const theme = {
     MuiTooltip: {
       defaultProps: {
         arrow: true,
-        //enterDelay: 0
       }
     },
     MuiMenu: {

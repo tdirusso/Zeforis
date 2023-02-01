@@ -13,8 +13,6 @@ import { addClient, setActiveClientId } from '../../api/client';
 
 export default function AddClientModal({ open, setOpen, hideCancel, account }) {
   const name = useRef();
-  const [logoSrc, setLogoSrc] = useState('');
-  const [logoFile, setLogoFile] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -36,7 +34,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
 
     try {
       const fd = new FormData();
-      fd.append('logoFile', logoFile);
       fd.append('name', nameVal);
       fd.append('accountId', account.id);
 
@@ -61,33 +58,18 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
   const handleClose = () => {
     setOpen(false);
     setLoading(false);
-    setLogoSrc('');
-    setLogoFile(null);
-  };
-
-  const handleLogoChange = e => {
-    const imageFile = e.target.files[0];
-
-    if (!imageFile) {
-      return;
-    };
-
-    setLogoSrc(URL.createObjectURL(imageFile));
-    setLogoFile(imageFile);
-  };
-
-  const handleLogoClear = () => {
-    setLogoSrc('');
-    setLogoFile(null);
   };
 
   return (
-    <div>
-      <Dialog open={open} onClose={handleClose}>
+    <>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        PaperProps={{ sx: { minWidth: 500 } }}>
         <DialogTitle>Create New Client</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the client name and select a brand color below.
+            Please enter the client name below.
           </DialogContentText>
           <Box sx={{ mt: 3, mb: 3 }}>
             <TextField
@@ -97,35 +79,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
               disabled={isLoading}
               inputRef={name}>
             </TextField>
-          </Box>
-          <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
-            <Button
-              variant='outlined'
-              component='label'
-              sx={{ mr: 1 }}
-              disabled={isLoading}>
-              Upload Logo
-              <input
-                hidden
-                accept="image/png,image/jpeg"
-                type="file"
-                onChange={handleLogoChange}
-                disabled={isLoading}
-              />
-            </Button>
-            <Button
-              sx={{
-                display: logoSrc ? 'block' : 'none',
-                mr: 4
-              }}
-              onClick={handleLogoClear}
-              disabled={isLoading}>
-              Clear
-            </Button>
-            <img
-              src={logoSrc}
-              alt=""
-              width={125} />
           </Box>
           <DialogActions sx={{ p: 0 }}>
             {
@@ -153,6 +106,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
         type={type}
         message={message}
       />
-    </div >
+    </>
   );
 };

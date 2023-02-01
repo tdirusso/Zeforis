@@ -12,7 +12,7 @@
 }
 
 .settings-buttons button.active {
-  background-color: rgba(var(--colors-primary-rgb), 0.1);
+  background-color: rgba(var(--colors-primary-rgb), 0.04);
 }
 
 .settings-buttons button.active::before {
@@ -23,5 +23,5 @@
   border-radius: 16px;
   position: absolute;
   transition: all 0.3s ease 0s;
-  background-color: rgb(36, 153, 239);
+  background-color: var(--colors-primary);
 }

@@ -37,8 +37,7 @@ module.exports = async (req, res) => {
             accounts.brand_color AS account_brand,
             accounts.logo_url AS account_logo,
             accounts.id AS account_id,
-            clients.name AS client_name, 
-            clients.logo_url AS client_logo
+            clients.name AS client_name
           FROM client_users
           LEFT JOIN clients ON clients.id = client_users.client_id
           LEFT JOIN accounts ON accounts.id = clients.account_id

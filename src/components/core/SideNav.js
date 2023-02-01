@@ -4,7 +4,6 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
-//import InsightsIcon from '@mui/icons-material/Insights';
 import SpeedIcon from '@mui/icons-material/Speed';
 
 export default function SideNav({ client, account, isAdmin }) {
@@ -18,16 +17,19 @@ export default function SideNav({ client, account, isAdmin }) {
     justifyContent: 'flex-start'
   };
 
-  //console.log(client)
-
   return (
     <Box className="Sidenav">
       <Box className="flex-centered container">
-        <img
-          src={client.logo}
-          alt=""
-          width={60}
-        />
+        {
+          account.logo ? <img
+            src={account.logo}
+            alt=""
+            width={110}
+          /> :
+            <Typography color="primary" variant="h6" fontWeight={600}>
+              {account.name}
+            </Typography>
+        }
         <Typography
           variant="body1"
           mt={1}>
@@ -65,7 +67,8 @@ export default function SideNav({ client, account, isAdmin }) {
                     variant="body2"
                     display="flex"
                     alignItems="center">
-                    <TaskAltIcon />Tasks
+                    <TaskAltIcon />
+                    Tasks
                   </Typography>
                 </ButtonBase>
               </li>

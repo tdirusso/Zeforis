@@ -1,8 +1,4 @@
-const s3 = require('../../aws/s3');
-const sharp = require('sharp');
 const pool = require('../../database');
-
-const acceptMimes = ['image/png', 'image/jpeg'];
 
 module.exports = async (req, res) => {
   const {
@@ -11,8 +7,6 @@ module.exports = async (req, res) => {
   } = req.body;
 
   const { userId } = req;
-
-  const logoFile = req.files?.logoFile;
 
   if (!name) {
     return res.json({
@@ -33,43 +27,10 @@ module.exports = async (req, res) => {
       [newClientId, userId]
     );
 
-    let logoUrl = '';
-
-    if (logoFile) {
-      if (acceptMimes.includes(logoFile.mimetype)) {
-        const resizedLogoBuffer = await sharp(logoFile.data)
-          .resize({ width: 250 })
-          .toFormat('png')
-          .toBuffer();
-
-        const resizedLogoSize = Buffer.byteLength(resizedLogoBuffer);
-        if (resizedLogoSize <= 250000) { //250,000 bytes -> 250 kb -> 0.25 mb
-          const now = Date.now();
-          const uploadFileName = `client-logos/${newClientId}-${now}.png`;
-
-          const s3ObjectParams = {
-            Key: uploadFileName,
-            Body: resizedLogoBuffer,
-            ACL: 'public-read'
-          };
-
-          const s3Result = await s3.upload(s3ObjectParams).promise();
-
-          logoUrl = s3Result.Location;
-
-          await pool.query(
-            'UPDATE clients SET logo_url = ? WHERE id = ?',
-            [logoUrl, newClientId]
-          );
-        }
-      }
-    }
-
     const clientObject = {
       id: newClientId,
       name,
-      accountId,
-      logoUrl
+      accountId
     };
 
     return res.json({ client: clientObject });

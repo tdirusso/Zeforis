@@ -8,9 +8,6 @@ import { addClient, setActiveClientId } from '../../api/client';
 
 export default function AddClientScreen({ account }) {
   const name = useRef();
-  const logo = useRef();
-  const [logoSrc, setLogoSrc] = useState('');
-  const [logoFile, setLogoFile] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -32,7 +29,6 @@ export default function AddClientScreen({ account }) {
 
     try {
       const fd = new FormData();
-      fd.append('logoFile', logoFile);
       fd.append('name', nameVal);
       fd.append('accountId', account.id);
 
@@ -54,33 +50,13 @@ export default function AddClientScreen({ account }) {
     }
   };
 
-  const handleLogoChange = e => {
-    console.log(e);
-    const imageFile = e.target.files[0];
-
-    if (!imageFile) {
-      return;
-    };
-
-    setLogoSrc(URL.createObjectURL(imageFile));
-    setLogoFile(imageFile);
-  };
-
-  const handleLogoClear = () => {
-    setLogoSrc('');
-    setLogoFile(null);
-    logo.current.value = '';
-  };
-
-  console.log(logoFile);
-
   return (
-    <Paper sx={{ p: 5 }}>
+    <Paper sx={{ p: 5, minWidth: 600 }}>
       <Box component="h3" mb={1}>
         Create a New Client
       </Box>
       <Typography>
-        Please enter the client's name and logo image (optional) below.
+        Please enter the client's name below.
       </Typography>
       <Box sx={{ mt: 3, mb: 3 }}>
         <TextField
@@ -90,36 +66,6 @@ export default function AddClientScreen({ account }) {
           disabled={isLoading}
           inputRef={name}>
         </TextField>
-      </Box>
-      <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
-        <Button
-          variant='outlined'
-          component='label'
-          sx={{ mr: 1 }}
-          disabled={isLoading}>
-          Upload Logo
-          <input
-            hidden
-            ref={logo}
-            accept="image/png,image/jpeg"
-            type="file"
-            onChange={handleLogoChange}
-            disabled={isLoading}
-          />
-        </Button>
-        <Button
-          sx={{
-            display: logoSrc ? 'block' : 'none',
-            mr: 4
-          }}
-          onClick={handleLogoClear}
-          disabled={isLoading}>
-          Clear
-        </Button>
-        <img
-          src={logoSrc}
-          alt=""
-          width={125} />
       </Box>
       <LoadingButton
         variant='contained'

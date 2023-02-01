@@ -3,3 +3,13 @@
   width: 100%;
   text-align: center;
 }
+
+.Register form {
+  display: flex;
+  flex-direction: column;
+}
+
+.Register .container {
+  width: 550px;
+  padding-bottom: 20px;
+}
