@@ -14,15 +14,17 @@ module.exports = async (req, res) => {
     });
   }
 
+  const connection = await pool.getConnection();
+
   try {
-    const newClient = await pool.query(
+    const newClient = await connection.query(
       'INSERT INTO clients (name, account_id) VALUES (?,?)',
       [name, accountId]
     );
 
     const newClientId = newClient[0].insertId;
 
-    await pool.query(
+    await connection.query(
       'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "admin")',
       [newClientId, userId]
     );
@@ -33,9 +35,12 @@ module.exports = async (req, res) => {
       accountId
     };
 
+    connection.release();
+
     return res.json({ client: clientObject });
   } catch (error) {
     console.log(error);
+    connection.release();
 
     return res.json({
       message: error.message

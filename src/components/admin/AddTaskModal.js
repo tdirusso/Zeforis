@@ -37,7 +37,8 @@ export default function AddTaskModal(props) {
     client,
     tags,
     setTags,
-    setTasks
+    setTasks,
+    user
   } = useOutletContext();
 
   const clientId = client.id;
@@ -51,6 +52,7 @@ export default function AddTaskModal(props) {
   const [status, setStatus] = useState('New');
   const [folderId, setFolderId] = useState(null);
   const [assignedToId, setAssignedToId] = useState(null);
+  const [assignedToName, setAssignedToName] = useState(null);
   const [progress, setProgress] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
   const [isAddingTags, setIsAddingTags] = useState(false);
@@ -87,7 +89,7 @@ export default function AddTaskModal(props) {
     setLoading(true);
 
     try {
-      const { message, task } = await addTask({
+      const { message, taskId } = await addTask({
         name: nameVal,
         description: descriptionVal,
         linkUrl: linkVal,
@@ -101,11 +103,37 @@ export default function AddTaskModal(props) {
         dueDate
       });
 
-      if (task) {
+      if (taskId) {
         setTimeout(() => {
           openSnackBar('Task created.', 'success');
         }, 300);
-        setTasks(tasks => [...tasks, task]);
+
+        const now = new Date().toISOString();
+
+        setTasks(tasks => [...tasks, {
+          task_id: taskId,
+          task_name: nameVal,
+          description: descriptionVal,
+          date_created: now,
+          created_by_id: user.id,
+          status: status,
+          folder_id: folderIdVal,
+          link_url: linkVal,
+          assigned_to_id: assignedToId,
+          progress: progress,
+          date_completed: status === 'Complete' ? now : null,
+          is_key_task: Number(isKeyTask),
+          date_due: dueDate ? dueDate.toISOString() : null,
+          date_last_updated: now,
+          tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
+          assigned_first: assignedToName?.firstName || null,
+          assigned_last: assignedToName?.lastName || null,
+          created_first: user.firstName,
+          created_last: user.lastName,
+          updated_by_first: user.firstName,
+          updated_by_last: user.lastName
+        }]);
+
         handleClose();
       } else {
         openSnackBar(message, 'error');
@@ -154,6 +182,17 @@ export default function AddTaskModal(props) {
       setDueDate(null);
       setLoading(false);
     }, 500);
+  };
+
+  const handleAssignedToChange = (_, val) => {
+    setAssignedToName(val ?
+      {
+        firstName: val.firstName,
+        lastName: val.lastName
+      } :
+      null);
+
+    setAssignedToId(val?.id || null);
   };
 
   return (
@@ -220,7 +259,7 @@ export default function AddTaskModal(props) {
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     disabled={isLoading}
                     groupBy={(option) => option.role}
-                    onChange={(_, newVal) => setAssignedToId(newVal?.id || null)}
+                    onChange={handleAssignedToChange}
                     renderInput={(params) => (
                       <TextField
                         {...params}

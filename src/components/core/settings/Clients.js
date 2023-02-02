@@ -1,8 +1,6 @@
 import { Paper, Box, Divider, Button, Chip, Typography, Tooltip } from "@mui/material";
-import useSnackbar from "../../../hooks/useSnackbar";
 import ClientMenu from "../../admin/ClientMenu";
 import { setActiveClientId } from "../../../api/client";
-import Snackbar from "../Snackbar";
 import { useOutletContext } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -42,19 +40,9 @@ export default function Clients() {
     isAdmin
   } = useOutletContext();
 
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
-
   const handleChangeClient = (clientObject) => {
     setActiveClientId(clientObject.id);
-    openSnackBar(`Loading ${clientObject.name}...`, 'info');
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    window.location.reload();
   };
 
   const handleRemoveClientUser = (userObject) => {
@@ -277,12 +265,6 @@ export default function Clients() {
       <RemoveClientModal
         open={removeClientModalOpen}
         setOpen={setRemoveClientModalOpen}
-      />
-
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
       />
     </>
   );

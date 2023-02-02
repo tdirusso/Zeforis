@@ -60,6 +60,7 @@ export default function Home({ setTheme }) {
           document.documentElement.style.setProperty('--colors-primary', activeAccount.brandColor);
           document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
           themeConfig.palette.primary.main = activeAccount.brandColor;
+          document.title = `${activeAccount.name} Portal`;
           setTheme(createTheme(themeConfig));
           setAccount(activeAccount);
         }
@@ -217,6 +218,8 @@ export default function Home({ setTheme }) {
     setAccountUsers,
     setUser
   };
+
+  console.log(sortedTasks)
 
   return (
     <Box>

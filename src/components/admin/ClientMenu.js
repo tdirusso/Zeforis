@@ -24,7 +24,7 @@ export default function ClientMenu({ changeHandler, client, clients }) {
       <InputLabel>{label}</InputLabel>
       <Select
         value={clientId}
-        defaultOpen
+        defaultOpen={!Boolean(clientId)}
         label={label}
         inputProps={{
           sx: {
