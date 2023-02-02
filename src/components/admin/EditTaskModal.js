@@ -38,7 +38,8 @@ export default function EditTaskModal(props) {
     setTags,
     setTasks,
     foldersMap,
-    tasksMap
+    tasksMap,
+    user
   } = useOutletContext();
 
   const clientId = client.id;
@@ -73,6 +74,7 @@ export default function EditTaskModal(props) {
   const [status, setStatus] = useState(task.status);
   const [folder, setFolder] = useState(defaultFolder);
   const [assignedTo, setAssignedTo] = useState(defaultAssignee);
+  const [assignedToName, setAssignedToName] = useState(null);
   const [progress, setProgress] = useState(task.progress);
   const [selectedTags, setSelectedTags] = useState(defaultTags);
   const [isAddingTags, setIsAddingTags] = useState(false);
@@ -106,7 +108,7 @@ export default function EditTaskModal(props) {
     setLoading(true);
 
     try {
-      const { message, updatedTask } = await updateTask({
+      const { message, success } = await updateTask({
         name: nameVal,
         description: descriptionVal,
         linkUrl: linkVal,
@@ -122,13 +124,38 @@ export default function EditTaskModal(props) {
         currentTags: defaultTags
       });
 
-      if (updatedTask) {
+      if (success) {
         setTimeout(() => {
           setLoading(false);
           openSnackBar('Task successfully updated.', 'success');
         }, 300);
 
-        tasksMap[updatedTask.task_id] = updatedTask;
+        const now = new Date().toISOString();
+
+        tasksMap[task.task_id] = {
+          task_id: task.task_id,
+          task_name: nameVal,
+          description: descriptionVal,
+          date_created: task.date_created,
+          created_by_id: task.created_by_id,
+          status: status,
+          folder_id: folderIdVal,
+          link_url: linkVal,
+          assigned_to_id: assignedToVal,
+          progress: progress,
+          date_completed: status === 'Complete' ? now : null,
+          is_key_task: Number(isKeyTask),
+          date_due: dueDate ? dueDate.toISOString() : null,
+          date_last_updated: now,
+          tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
+          assigned_first: assignedToName?.firstName || null,
+          assigned_last: assignedToName?.lastName || null,
+          created_first: task.created_first,
+          created_last: task.created_last,
+          updated_by_first: user.firstName,
+          updated_by_last: user.lastName
+        };
+
         setTasks(Object.values(tasksMap));
         setOpen(false);
       } else {
@@ -179,6 +206,18 @@ export default function EditTaskModal(props) {
       setIsKeyTask(Boolean(task.is_key_task));
       setDueDate(task.date_due);
     }, 500);
+  };
+
+
+  const handleAssignedToChange = (_, val) => {
+    setAssignedToName(val ?
+      {
+        firstName: val.firstName,
+        lastName: val.lastName
+      } :
+      null);
+
+    setAssignedTo(val || null);
   };
 
   return (
@@ -247,7 +286,7 @@ export default function EditTaskModal(props) {
                     disabled={isLoading}
                     groupBy={(option) => option.role}
                     value={assignedTo}
-                    onChange={(_, newVal) => setAssignedTo(newVal || null)}
+                    onChange={handleAssignedToChange}
                     renderInput={(params) => (
                       <TextField
                         {...params}

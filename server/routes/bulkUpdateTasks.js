@@ -17,23 +17,24 @@ module.exports = async (req, res) => {
     });
   }
 
-  try {
+  const connection = await pool.getConnection();
 
+  try {
     switch (action) {
       case 'assignee':
-        await updateAssignees(taskIds, assigneeId, updaterUserId);
+        await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
         break;
       case 'folder':
-        await updateFolders(taskIds, folderId, updaterUserId);
+        await updateFolders(taskIds, folderId, updaterUserId, connection);
         break;
       case 'status':
-        await updateStatuses(taskIds, status, updaterUserId);
+        await updateStatuses(taskIds, status, updaterUserId, connection);
         break;
       default:
         break;
     }
 
-    const [updatedTasks] = await pool.query(
+    const [updatedTasks] = await connection.query(
       `
           SELECT
             tasks.id as task_id,
@@ -69,38 +70,41 @@ module.exports = async (req, res) => {
       [taskIds]
     );
 
+    connection.release();
+
     return res.json({ updatedTasks });
   } catch (error) {
     console.log(error);
 
+    connection.release();
     return res.json({
       message: error.message
     });
   }
 };
 
-async function updateAssignees(taskIds, assigneeId, updaterUserId) {
-  await pool.query(
+async function updateAssignees(taskIds, assigneeId, updaterUserId, connection) {
+  await connection.query(
     'UPDATE tasks SET assigned_to_id = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [assigneeId, updaterUserId, taskIds]
   );
 }
 
-async function updateFolders(taskIds, folderId, updaterUserId) {
-  await pool.query(
+async function updateFolders(taskIds, folderId, updaterUserId, connection) {
+  await connection.query(
     'UPDATE tasks SET folder_id = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [folderId, updaterUserId, taskIds]
   );
 }
 
-async function updateStatuses(taskIds, status, updaterUserId) {
+async function updateStatuses(taskIds, status, updaterUserId, connection) {
   if (status === 'Complete') {
-    await pool.query(
+    await connection.query(
       'UPDATE tasks SET status = ?, last_updated_by_id = ?, progress = 100 WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
     );
   } else {
-    await pool.query(
+    await connection.query(
       'UPDATE tasks SET status = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
     );
