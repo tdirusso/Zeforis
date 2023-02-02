@@ -18,6 +18,7 @@ const updateProfile = require('./routes/updateProfile');
 const updateFolder = require('./routes/updateFolder');
 const addTask = require('./routes/addTask');
 const addTags = require('./routes/addTags');
+const addAccount = require('./routes/addAccount');
 const removeTag = require('./routes/removeTag');
 const removeTasks = require('./routes/removeTasks');
 const removeFolder = require('./routes/removeFolder');
@@ -64,6 +65,7 @@ const boot = async () => {
   app.post('/api/completeRegistration', completeRegistration);
   app.post('/api/addTask', checkPermissionsMW, addTask);
   app.post('/api/addTags', checkPermissionsMW, addTags);
+  app.post('/api/addAccount', addAccount);
   app.delete('/api/removeClientUser', checkPermissionsMW, removeClientUser);
   app.delete('/api/removeTag', checkPermissionsMW, removeTag);
   app.delete('/api/removeTasks', checkPermissionsMW, removeTasks);

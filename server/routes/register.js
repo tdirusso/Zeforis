@@ -9,6 +9,10 @@ const pool = require('../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 
+if (isDev) {
+  require('dotenv').config({ path: __dirname + '/../.env.local' });
+}
+
 module.exports = async (req, res) => {
   const {
     email,
@@ -68,9 +72,7 @@ module.exports = async (req, res) => {
 async function sendVerifyEmail(email, verificationCode) {
   const qs = `email=${email}&verificationCode=${verificationCode}`;
 
-  const verificationUrl = isDev ?
-    `http://localhost:8080/api/verify?${qs}` :
-    `google.com`;
+  const verificationUrl = `${process.env.API_DOMAIN}/api/verify?${qs}`;
 
   const ejsData = {
     verificationUrl

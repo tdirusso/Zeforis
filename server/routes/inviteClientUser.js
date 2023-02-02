@@ -7,6 +7,10 @@ const pool = require('../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 
+if (isDev) {
+  require('dotenv').config({ path: __dirname + '/../.env.local' });
+}
+
 module.exports = async (req, res) => {
   const {
     email,
@@ -95,7 +99,7 @@ module.exports = async (req, res) => {
 async function sendInvitationEmail({ email, clientId, accountName, clientName, accountId, isNewUser, accountBrand }) {
   let qs = `email=${email}&clientId=${clientId}&accountId=${accountId}`;
 
-  let verificationUrl = isDev ? `http://localhost:3000` : 'google.com';
+  let verificationUrl = process.env.APP_DOMAIN;
 
   if (isNewUser) {
     verificationUrl += `/complete-registration?${qs}`;

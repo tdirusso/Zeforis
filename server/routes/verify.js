@@ -2,6 +2,10 @@ const pool = require('../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 
+if (isDev) {
+  require('dotenv').config({ path: __dirname + '/../.env.local' });
+}
+
 module.exports = async (req, res) => {
   const {
     email,
@@ -21,11 +25,7 @@ module.exports = async (req, res) => {
     );
 
     if (result.affectedRows) {
-      return res.redirect(
-        isDev ?
-          'http://localhost:3000/login?postVerify=true' :
-          'google.com'
-      );
+      return res.redirect(`${process.env.APP_DOMAIN}/login?postVerify=true`);
     }
 
     return res.json({

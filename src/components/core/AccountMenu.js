@@ -2,12 +2,15 @@ import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
-export default function AccountMenu({ changeHandler }) {
+export default function AccountMenu(props) {
+
+  const context = useOutletContext() || props;
 
   const {
     user,
-    account
-  } = useOutletContext();
+    account,
+    changeHandler
+  } = context;
 
   const accountId = account.id;
   const [selectedAccountId, setSelectedAccountId] = useState(accountId);

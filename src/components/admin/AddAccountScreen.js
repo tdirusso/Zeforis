@@ -3,9 +3,9 @@ import { Box, Paper, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addClient, setActiveClientId } from '../../api/client';
+import { addAccount, setActiveAccountId } from '../../api/account';
 
-export default function AddClientScreen({ account }) {
+export default function AddAccountScreen({ user }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -16,13 +16,13 @@ export default function AddClientScreen({ account }) {
     message
   } = useSnackbar();
 
-  const handleCreateClient = async e => {
+  const handleCreateAccount = async e => {
     e.preventDefault();
 
     const nameVal = name.current.value;
 
     if (!nameVal) {
-      openSnackBar('Please enter a name for the new client.', 'error');
+      openSnackBar('Please enter a name your organization.', 'error');
       return;
     }
 
@@ -31,16 +31,16 @@ export default function AddClientScreen({ account }) {
     try {
       const fd = new FormData();
       fd.append('name', nameVal);
-      fd.append('accountId', account.id);
+      fd.append('userId', user.id);
 
-      const { client, message } = await addClient(fd);
+      const { accountId, message } = await addAccount(fd);
 
-      if (client) {
-        setActiveClientId(client.id);
-        openSnackBar('Client created.', 'success');
+      if (accountId) {
+        setActiveAccountId(accountId);
+        openSnackBar('Organization created successfully.', 'success');
         setTimeout(() => {
-          window.location.href = '/home/dashboard';
-        }, 500);
+          window.location.reload();
+        }, 1000);
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -54,15 +54,15 @@ export default function AddClientScreen({ account }) {
   return (
     <Paper sx={{ p: 5, width: 600 }}>
       <Box component="h3" mb={1}>
-        Create a New Client
+        Create a New Organization
       </Box>
       <Typography>
-        Please enter the client's name below.
+        You are not a member of any organizations - please create your own organization by entering it's name below.
       </Typography>
-      <form onSubmit={handleCreateClient}>
+      <form onSubmit={handleCreateAccount}>
         <Box sx={{ mt: 3, mb: 3 }}>
           <TextField
-            placeholder="Client Name"
+            placeholder="Organization Name"
             fullWidth
             autoFocus
             disabled={isLoading}
@@ -74,7 +74,7 @@ export default function AddClientScreen({ account }) {
           fullWidth
           type='submit'
           loading={isLoading}>
-          Create Client
+          Create Organization
         </LoadingButton>
       </form>
 

@@ -30,11 +30,18 @@ const updateAccount = async (payload) => {
   return data;
 };
 
+const addAccount = async (payload) => {
+  const { data } = await request.post(`addAccount`, payload);
+
+  return data;
+};
+
 export {
   register,
   getActiveAccountId,
   setActiveAccountId,
   removeActiveAccountId,
   completeRegistration,
-  updateAccount
+  updateAccount,
+  addAccount
 };

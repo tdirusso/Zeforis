@@ -13,6 +13,7 @@ import { getActiveAccountId, setActiveAccountId } from "../../api/account";
 import SelectAccountModal from "../../components/core/SelectAccountModal";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
+import AddAccountScreen from "../../components/admin/AddAccountScreen";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -146,6 +147,12 @@ export default function Home({ setTheme }) {
     if (user.memberOfAccounts.length === 1) {
       setActiveAccountId(user.memberOfAccounts[0].id);
       setAccount(user.memberOfAccounts[0]);
+    } else if (user.memberOfAccounts.length === 0) {
+      return (
+        <Box className="flex-centered" sx={{ height: '100%' }}>
+          <AddAccountScreen user={user} />
+        </Box>
+      );
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
@@ -154,6 +161,8 @@ export default function Home({ setTheme }) {
             setOpen={() => { }}
             hideCancel={true}
             accounts={user.memberOfAccounts}
+            user={user}
+
           />
         </Box>
       );
