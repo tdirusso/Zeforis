@@ -7,7 +7,7 @@ import Header from "../../../components/core/Header";
 import PersonIcon from '@mui/icons-material/Person';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import PaidIcon from '@mui/icons-material/Paid';
+//import PaidIcon from '@mui/icons-material/Paid';
 import BasicInformation from "../../../components/core/settings/BasicInformation";
 import Clients from "../../../components/core/settings/Clients";
 import Organizations from "../../../components/core/settings/Organizations";

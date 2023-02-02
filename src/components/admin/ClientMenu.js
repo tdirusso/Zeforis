@@ -8,7 +8,7 @@ import { Typography } from "@mui/material";
 export default function ClientMenu({ changeHandler, client, clients }) {
   const [clientId, setClientId] = useState(client?.id || '');
 
-  const label = clientId ? 'Currently Viewing' : 'Client';
+  const label = clientId ? 'Currently Viewing' : 'Select Client';
 
   const thisHandleChange = e => {
     setClientId(e.target.value);
@@ -24,6 +24,7 @@ export default function ClientMenu({ changeHandler, client, clients }) {
       <InputLabel>{label}</InputLabel>
       <Select
         value={clientId}
+        defaultOpen
         label={label}
         inputProps={{
           sx: {

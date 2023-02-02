@@ -6,8 +6,9 @@ import ClientMenu from '../admin/ClientMenu';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
 import { setActiveClientId } from '../../api/client';
+import { Box, Paper, Typography } from '@mui/material';
 
-export default function SelectClientModal({ client, clients }) {
+export default function SelectClientScreen({ client, clients }) {
   const {
     isOpen,
     openSnackBar,
@@ -24,27 +25,27 @@ export default function SelectClientModal({ client, clients }) {
   };
 
   return (
-    <div>
-      <Dialog open={true}>
-        <DialogTitle>Select a Client</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please select the client you want to work on from the drop-down list below.
-          </DialogContentText>
-          <br></br>
-          <ClientMenu
-            changeHandler={handleSelection}
-            client={client}
-            clients={clients}
-          />
-        </DialogContent>
-      </Dialog>
+    <>
+      <Paper sx={{ p: 5, width: 600 }}>
+        <Box component="h3" mb={1}>
+          Select a Client
+        </Box>
+        <Typography>
+          Please select which client you would like to work on from the menu below.
+        </Typography>
+        <br></br>
+        <ClientMenu
+          changeHandler={handleSelection}
+          client={client}
+          clients={clients}
+        />
+      </Paper>
 
       <Snackbar
         isOpen={isOpen}
         type={type}
         message={message}
       />
-    </div>
+    </>
   );
 };

@@ -4,7 +4,7 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid, createTheme } from "@mui/material";
-import SelectClientModal from "../../components/core/SelectClientModal";
+import SelectClientScreen from "../../components/core/SelectClientScreen";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import { getActiveClientId, getClientData, getUserClientListForAccount, setActiveClientId } from "../../api/client";
@@ -186,7 +186,7 @@ export default function Home({ setTheme }) {
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectClientModal
+          <SelectClientScreen
             client={client}
             clients={clients}
           />
