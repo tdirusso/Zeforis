@@ -6,7 +6,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
 import SpeedIcon from '@mui/icons-material/Speed';
 
-export default function SideNav({ client, account, isAdmin }) {
+export default function SideNav({ client, account }) {
 
   const buttonBaseStyles = {
     width: '100%',
@@ -104,13 +104,8 @@ export default function SideNav({ client, account, isAdmin }) {
       </Box>
       <Box className="buttons">
         <Button
+          onClick={() => window.location.href = 'mailto:timgdirusso@gmail.com?subject=Client Portal Support Inquiry'}
           variant="contained"
-          fullWidth
-          sx={{ mb: 2 }}>
-          Upgrade Plan
-        </Button>
-        <Button
-          variant="outlined"
           fullWidth>
           Contact Support
         </Button>

@@ -213,7 +213,6 @@ export default function Home({ setTheme }) {
     <Box>
       <SideNav
         account={account}
-        isAdmin={isAdmin}
         client={client}
       />
       <Box component="main" ml={'280px'} px={5}>

@@ -16,6 +16,7 @@ module.exports = async (req, res) => {
     clientName,
     accountId,
     accountName,
+    accountBrand,
     isAdmin = false
   } = req.body;
 
@@ -55,7 +56,7 @@ module.exports = async (req, res) => {
         accountId,
         accountName,
         clientName,
-        templateFile: '../../email/templates/inviteExistingUser.ejs'
+        accountBrand,
       });
 
       return res.json({ success: true, userId: user.id });
@@ -66,7 +67,6 @@ module.exports = async (req, res) => {
         accountId,
         accountName,
         clientName,
-        templateFile: '../../email/templates/inviteNewUser.ejs',
         isNewUser: true
       });
 
@@ -92,7 +92,7 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail({ email, clientId, accountName, templateFile, clientName, accountId, isNewUser }) {
+async function sendInvitationEmail({ email, clientId, accountName, clientName, accountId, isNewUser, accountBrand }) {
   let qs = `email=${email}&clientId=${clientId}&accountId=${accountId}`;
 
   let verificationUrl = isDev ? `http://localhost:3000` : 'google.com';
@@ -106,16 +106,17 @@ async function sendInvitationEmail({ email, clientId, accountName, templateFile,
   const ejsData = {
     verificationUrl,
     accountName,
-    clientName
+    clientName,
+    accountBrand
   };
 
-  const templatePath = path.resolve(__dirname, templateFile);
+  const templatePath = path.resolve(__dirname, '../../email/templates/inviteUser.ejs');
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({
-    from: 'Client Portal',
+    from: `${accountName} Client Portal`,
     to: email,
-    subject: `Client Portal - ${accountName} has invited you to collaborate`,
+    subject: `${accountName} has invited you to collaborate`,
     text: template,
     html: template
   });

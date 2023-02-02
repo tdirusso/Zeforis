@@ -17,7 +17,7 @@ const settings = [
   { name: 'Clients', icon: <SwitchAccountIcon fontSize="small" /> },
   { name: 'Organizations', icon: <ApartmentIcon fontSize="small" /> },
   { name: 'Basic Information', icon: <PersonIcon fontSize="small" /> },
-  { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
+ // { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
 ];
 
 export default function Settings() {

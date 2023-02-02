@@ -28,6 +28,7 @@ export default function InviteClientUserModal({ open, setOpen }) {
   const clientName = client.name;
   const accountId = account.id;
   const accountName = account.name;
+  const accountBrand = account.brandColor;
 
   const email = useRef();
   const firstName = useRef();
@@ -68,7 +69,8 @@ export default function InviteClientUserModal({ open, setOpen }) {
         accountName,
         firstName: firstNameVal,
         lastName: lastNameVal,
-        isAdmin
+        isAdmin,
+        accountBrand
       });
 
       if (success) {

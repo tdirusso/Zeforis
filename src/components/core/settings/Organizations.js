@@ -115,8 +115,6 @@ export default function Organizations() {
     setLogoChanged(true);
   };
 
-  console.log(isLogoChanged);
-
   return (
     <>
       <Paper>
@@ -190,7 +188,7 @@ export default function Organizations() {
         </List>
       </Paper>
 
-      <Paper sx={{ my: 4 }}>
+      <Paper sx={{ my: 4 }} hidden={!isAdmin}>
         <Box component="h6">{account.name} Settings</Box>
         <Divider sx={{ my: 4 }} />
 
