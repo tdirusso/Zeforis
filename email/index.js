@@ -11,7 +11,7 @@ if (isDev) {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'timgdirusso@gmail.com',
+    user: process.env.MAILER_USERNAME,
     pass: process.env.MAILER_PASSWORD
   }
 });
