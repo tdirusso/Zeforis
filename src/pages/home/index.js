@@ -219,8 +219,6 @@ export default function Home({ setTheme }) {
     setUser
   };
 
-  console.log(sortedTasks)
-
   return (
     <Box>
       <SideNav
