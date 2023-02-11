@@ -104,7 +104,7 @@ export default function SideNav({ client, account }) {
       </Box>
       <Box className="buttons">
         <Button
-          onClick={() => window.location.href = 'mailto:timgdirusso@gmail.com?subject=Client Portal Support Inquiry'}
+          onClick={() => window.location.href = 'mailto:timgdirusso@gmail.com?subject=Zeforis Support Inquiry'}
           variant="contained"
           fullWidth>
           Contact Support

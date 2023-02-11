@@ -1,6 +1,6 @@
 {
-  "short_name": "Client Portal",
-  "name": "Client Portal",
+  "short_name": "Zeforis",
+  "name": "Zeforis",
   "icons": [],
   "start_url": ".",
   "display": "standalone",

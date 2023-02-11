@@ -82,9 +82,9 @@ async function sendVerifyEmail(email, verificationCode) {
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({
-    from: 'Client Portal',
+    from: 'Zeforis',
     to: email,
-    subject: `Client Portal - Verify your Email`,
+    subject: `Zeforis - Verify your Email`,
     text: template,
     html: template
   });

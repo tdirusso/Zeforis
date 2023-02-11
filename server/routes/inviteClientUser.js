@@ -118,7 +118,7 @@ async function sendInvitationEmail({ email, clientId, accountName, clientName, a
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({
-    from: `${accountName} Client Portal`,
+    from: `${accountName} Client  - Zeforis`,
     to: email,
     subject: `${accountName} has invited you to collaborate`,
     text: template,
