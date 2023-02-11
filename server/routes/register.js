@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
 async function sendVerifyEmail(email, verificationCode) {
   const qs = `email=${email}&verificationCode=${verificationCode}`;
 
-  const verificationUrl = `${process.env.API_DOMAIN}/api/verify?${qs}`;
+  const verificationUrl = `${process.env.API_DOMAIN}/verify?${qs}`;
 
   const ejsData = {
     verificationUrl
