@@ -5,6 +5,17 @@
   flex-direction: column;
 }
 
+.Login header {
+  position: fixed;
+  top: 0;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  height: auto;
+  padding: 35px 7.5%;
+}
+
 .Login form {
   display: flex;
   flex-direction: column;
@@ -12,4 +23,20 @@
 
 .Login .container {
   width: 450px;
+}
+
+.Login .circle {
+  border-radius: 50%;
+  position: fixed;
+  bottom: -88px;
+  left: -80px;
+  background: var(--colors-primary);
+  height: 360px;
+  width: 360px;
+  z-index: -1;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  transition: all 250ms;
+  border-width: 1px !important;
 }

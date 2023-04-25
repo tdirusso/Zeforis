@@ -7,7 +7,7 @@ const acceptMimes = ['image/png', 'image/jpeg'];
 module.exports = async (req, res) => {
   const {
     name,
-    brandColor = '#2399ef',
+    brandColor = '#3365f6',
     accountId,
     isLogoChanged
   } = req.body;

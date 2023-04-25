@@ -1,7 +1,7 @@
 const theme = {
   palette: {
     primary: {
-      main: '#2399ef',
+      main: '#3365f6',
       contrastText: '#ffffff'
     }
   },
@@ -43,7 +43,7 @@ const theme = {
       styleOverrides: {
         root: {
           boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px',
-          borderRadius: '20px',
+          borderRadius: '24px',
           padding: '24px'
         }
       }

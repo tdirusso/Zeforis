@@ -10,7 +10,9 @@ import Box from '@mui/material/Box';
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
+import zeforisLogo from '../../assets/zeforis-logo.png';
 import './Login.css';
+import { Button } from "@mui/material";
 
 export default function LoginPage() {
   const email = useRef();
@@ -67,31 +69,46 @@ export default function LoginPage() {
 
   return (
     <div className="Login flex-centered">
+      <header>
+        <Box component="a" href="https://www.zeforis.com" target="_blank">
+          <img src={zeforisLogo} alt="Zeforis" height={30} />
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Box mr={1.5}>Don't have an account?</Box>
+          <Button
+            variant="contained"
+            component={Link}
+            to="/register"
+            size="large">
+            Sign Up
+          </Button>
+        </Box>
+      </header>
       <Paper sx={{ p: 8, pt: 5 }} className="container">
         <Typography variant="h5" sx={{ mb: 5 }}>Sign in</Typography>
         <form onSubmit={handleLogin}>
           <TextField
-            label="Email"
+            placeholder="Email"
             variant="outlined"
             sx={{ mb: 4 }}
             type="email"
-            required
+            InputProps={{ required: true }}
             inputRef={email}
             disabled={isLoading}
             autoFocus
           />
           <TextField
-            label="Password"
+            placeholder="Password"
             variant="outlined"
             type="password"
             sx={{ mb: 0.5 }}
-            required
+            InputProps={{ required: true }}
             inputRef={password}
             disabled={isLoading}
           />
           <Box component="span" sx={{ textAlign: 'right', mb: 3.5 }}>
             <Typography
-              variant="p"
+              variant="body2"
               component={Link}
               to=""
               sx={{ mb: 3, }}>
@@ -102,19 +119,15 @@ export default function LoginPage() {
             loading={isLoading}
             disabled={isLoading}
             fullWidth
+            size="large"
+            sx={{ py: 1.3 }}
             variant="contained"
             type="submit">
             Sign in
           </LoadingButton>
         </form>
       </Paper>
-      <Typography
-        variant="p"
-        component={Link}
-        to="/register"
-        sx={{ mt: 3 }}>
-        No account?  Register here.
-      </Typography>
+      <div className="circle"></div>
       <Snackbar
         isOpen={isOpen}
         type={type}

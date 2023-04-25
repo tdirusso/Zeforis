@@ -1,5 +1,5 @@
 :root {
-  --colors-primary: #2399ef;
+  --colors-primary: #3365f6;
   --colors-primary-rgb: 35, 153, 239;
 }
 
@@ -38,6 +38,11 @@ a {
 a, a:visited {
   color: var(--colors-primary);
 }
+
+a.MuiButtonBase-root {
+  color: white;
+}
+
 
 a.MuiListItem-root {
   color: initial;
