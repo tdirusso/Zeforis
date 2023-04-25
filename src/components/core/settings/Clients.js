@@ -63,6 +63,7 @@ export default function Clients() {
 
         <Button
           hidden={!isAdmin}
+          size="large"
           onClick={() => setCreateClientModalOpen(true)}
           variant="contained">
           Create Client
@@ -157,9 +158,11 @@ export default function Clients() {
           <List dense>
             {
               clientAdmins.length === 0 ?
-                <Typography variant="body2">
-                  No client administrators.
-                </Typography> : ''
+                <ListItem>
+                  <ListItemText>
+                    No client administators.
+                  </ListItemText>
+                </ListItem> : ''
             }
             {
               clientAdmins.map((member, index) => {

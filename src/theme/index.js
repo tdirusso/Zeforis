@@ -42,7 +42,7 @@ const theme = {
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: 'rgb(95 116 141 / 3%) 0px 2px 1px -1px, rgb(95 116 141 / 4%) 0px 1px 1px 0px, rgb(95 116 141 / 8%) 0px 1px 3px 0px',
+          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px',
           borderRadius: '20px',
           padding: '24px'
         }
@@ -56,7 +56,7 @@ const theme = {
           whiteSpace: 'nowrap',
           boxShadow: 'none',
           fontWeight: 400,
-          borderRadius: '6px',
+          borderRadius: '12px',
           transitionDuration: '0s',
           '&:hover': {
             boxShadow: 'none'
@@ -70,7 +70,7 @@ const theme = {
           textTransform: 'none',
           boxShadow: 'none',
           fontWeight: 400,
-          borderRadius: '6px',
+          borderRadius: '12px',
           transitionDuration: '0s',
           '&:hover': {
             boxShadow: 'none'
