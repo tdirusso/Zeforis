@@ -163,7 +163,6 @@ export default function Home({ setTheme }) {
             hideCancel={true}
             accounts={user.memberOfAccounts}
             user={user}
-
           />
         </Box>
       );

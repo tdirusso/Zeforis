@@ -7,7 +7,7 @@ import Snackbar from "./Snackbar";
 import { setActiveAccountId } from '../../api/account';
 import AccountMenu from './AccountMenu';
 
-export default function SelectAccountModal({ accounts }) {
+export default function SelectAccountModal({ accounts, user }) {
   const {
     isOpen,
     openSnackBar,
@@ -34,8 +34,9 @@ export default function SelectAccountModal({ accounts }) {
           </DialogContentText>
           <br></br>
           <AccountMenu
-            parentHandler={handleSelection}
+            changeHandler={handleSelection}
             accounts={accounts}
+            user={user}
           />
         </DialogContent>
       </Dialog>

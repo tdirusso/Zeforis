@@ -8,20 +8,18 @@ export default function AccountMenu(props) {
 
   const {
     user,
-    account,
-    changeHandler
+    account
   } = context;
 
-  const accountId = account.id;
-  const [selectedAccountId, setSelectedAccountId] = useState(accountId);
+  const { changeHandler } = props;
+
+  const accountId = account?.id;
+  const [selectedAccountId, setSelectedAccountId] = useState(accountId || '');
 
   const handleSelection = e => {
     const id = e.target.value;
     setSelectedAccountId(id);
-
-    if (changeHandler) {
-      changeHandler(id);
-    }
+    changeHandler(id);
   };
 
   return (

@@ -7,7 +7,7 @@ const theme = {
   },
   typography: {
     fontSize: 14,
-    fontFamily: 'Montserrat',
+    fontFamily: 'Inter',
   },
   components: {
     MuiTooltip: {
@@ -43,7 +43,7 @@ const theme = {
       styleOverrides: {
         root: {
           boxShadow: 'rgb(95 116 141 / 3%) 0px 2px 1px -1px, rgb(95 116 141 / 4%) 0px 1px 1px 0px, rgb(95 116 141 / 8%) 0px 1px 3px 0px',
-          borderRadius: '8px',
+          borderRadius: '20px',
           padding: '24px'
         }
       }
