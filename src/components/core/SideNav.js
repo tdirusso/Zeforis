@@ -5,6 +5,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
 import SpeedIcon from '@mui/icons-material/Speed';
+import zeforisIcon from '../../assets/zeforis-logo.png';
 
 export default function SideNav({ client, account }) {
 
@@ -109,6 +110,9 @@ export default function SideNav({ client, account }) {
           fullWidth>
           Contact Support
         </Button>
+        <Box mt={1.5} textAlign="center">
+          <img src={zeforisIcon} alt="Zeforis" height={15}></img>
+        </Box>
       </Box>
     </Box>
   );

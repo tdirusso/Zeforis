@@ -40,7 +40,9 @@ const getUserClientListForAccount = (user, activeAccountId) => {
     }
   });
 
-  return result;
+  const sortedResult = result.sort((a, b) => a.name.localeCompare(b.name));
+
+  return sortedResult;
 };
 
 const removeActiveClientId = () => {

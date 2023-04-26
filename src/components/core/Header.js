@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip } from "@mui/material";
+import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip, Divider } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -48,21 +48,23 @@ export default function Header() {
       item
       xs={12}
       component="header">
-      <Paper
+      <Box
         sx={{
           height: 60,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'right',
           width: '100%'
         }}>
-        <Box>
-          <Button
-            startIcon={<SearchIcon />}
-            onClick={() => setSearchModalOpen(true)}
-            variant="outlined">
-            Search
-          </Button>
+        <Box mr={2}>
+          <Paper sx={{ p: 0, borderRadius: '50%' }}>
+            <IconButton
+              size="large"
+              onClick={() => setSearchModalOpen(true)}>
+              <SearchIcon />
+            </IconButton>
+          </Paper>
+
         </Box>
         <Box hidden={!isAdmin}>
           <Tooltip title="Actions">
@@ -101,7 +103,8 @@ export default function Header() {
             </MenuItem>
           </Menu>
         </Box>
-      </Paper>
+      </Box>
+      <Divider sx={{ mt: 2.5, mb: 2 }} />
 
       <AddTaskModal
         open={addTaskModalOpen}

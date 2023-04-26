@@ -1,4 +1,4 @@
-import { Chip, Divider, Grid, Paper, IconButton, Tooltip } from "@mui/material";
+import { Chip, Divider, Grid, Paper, IconButton, Tooltip, TextField } from "@mui/material";
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Button from '@mui/material/Button';
 import { Box, Typography } from '@mui/material';
@@ -87,6 +87,12 @@ export default function TaskPage() {
             <Box mr={3}>
               <Box component="h2">
                 {task.task_name}
+                {/* <TextField
+                  label="Standard"
+                  fullWidth
+                  variant="standard"
+                  defaultValue={task.task_name}
+                /> */}
               </Box>
               {
                 task.is_key_task ?
