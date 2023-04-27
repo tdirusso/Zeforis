@@ -35,8 +35,3 @@
   width: 360px;
   z-index: -1;
 }
-
-.MuiOutlinedInput-notchedOutline {
-  transition: all 250ms;
-  border-width: 1px !important;
-}

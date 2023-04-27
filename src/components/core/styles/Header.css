@@ -1,0 +1,11 @@
+.Header .account-circle::after {
+  content: '';
+  height: 8px;
+  width: 8px;
+  background: #43e335;
+  position: absolute;
+  display: block;
+  bottom: 11px;
+  left: 25px;
+  border-radius: 50%;
+}

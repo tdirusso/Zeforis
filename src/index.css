@@ -117,3 +117,8 @@ h5, h6 {
 [hidden] {
   display: none !important;
 }
+
+.MuiOutlinedInput-notchedOutline {
+  transition: all 250ms;
+  border-width: 1px !important;
+}
