@@ -5,8 +5,6 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { bulkUpdateTasks } from '../../api/task';
 import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
@@ -36,7 +34,8 @@ export default function EditSelectedTasksModal(props) {
     folders,
     setTasks,
     client,
-    tasksMap
+    tasksMap,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
@@ -46,13 +45,6 @@ export default function EditSelectedTasksModal(props) {
   const [status, setStatus] = useState('');
   const [assignee, setAssignee] = useState(null);
   const [folder, setFolder] = useState(null);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleBulkUpdate = async () => {
     setLoading(true);
@@ -218,11 +210,6 @@ export default function EditSelectedTasksModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

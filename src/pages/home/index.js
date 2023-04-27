@@ -215,7 +215,8 @@ export default function Home({ setTheme }) {
     setTasks,
     setFolders,
     setAccountUsers,
-    setUser
+    setUser,
+    openSnackBar
   };
 
   return (

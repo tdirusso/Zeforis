@@ -156,11 +156,11 @@ export default function Header() {
 
             <Divider sx={{ my: '8px' }} />
 
-            <Box 
-            py={1}
-            display="flex" 
-            justifyContent="space-around" 
-            textAlign="center">
+            <Box
+              py={1}
+              display="flex"
+              justifyContent="space-around"
+              textAlign="center">
               <Box>
                 <Typography color="#a5a5a5">
                   Client
@@ -224,8 +224,6 @@ export default function Header() {
             </MenuItem>
           </Menu>
         </Box>
-
-
       </Box>
       <Divider sx={{ mt: 2.5, mb: 2 }} />
 

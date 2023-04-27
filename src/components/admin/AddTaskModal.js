@@ -38,7 +38,8 @@ export default function AddTaskModal(props) {
     tags,
     setTags,
     setTasks,
-    user
+    user,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
@@ -62,13 +63,6 @@ export default function AddTaskModal(props) {
   const tagIdNameMap = {};
 
   tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleCreateTask = async () => {
     const nameVal = name.current.value;
@@ -396,11 +390,6 @@ export default function AddTaskModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

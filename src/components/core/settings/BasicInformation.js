@@ -3,24 +3,19 @@ import { Box, Divider, Grid, Paper, TextField } from "@mui/material";
 import { useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { updateProfile } from "../../../api/user";
-import useSnackbar from "../../../hooks/useSnackbar";
-import Snackbar from "../Snackbar";
 
 export default function BasicInformation() {
   const [isLoading, setLoading] = useState(false);
 
-  const { user, setUser } = useOutletContext();
+  const { 
+    user, 
+    setUser,
+    openSnackBar
+  } = useOutletContext();
 
   const firstName = useRef();
   const lastName = useRef();
   const email = useRef();
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleProfileUpdate = async () => {
     const firstNameVal = firstName.current.value;
@@ -101,12 +96,6 @@ export default function BasicInformation() {
           </Grid>
         </Grid>
       </Paper>
-
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </>
   );
 };

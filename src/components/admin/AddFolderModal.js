@@ -7,8 +7,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { addFolder } from '../../api/folder';
 import { useOutletContext } from 'react-router-dom';
 
@@ -24,17 +22,12 @@ export default function AddFolderModal(props) {
   const [isKeyFolder, setIsKeyFolder] = useState(Boolean(willBeKey));
 
   const {
-    client, setFolders
+    client, 
+    setFolders,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleCreateFolder = async () => {
     const nameVal = name.current.value;
@@ -126,11 +119,6 @@ export default function AddFolderModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

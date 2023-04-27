@@ -7,8 +7,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { inviteClientUser } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
 import FormGroup from '@mui/material/FormGroup';
@@ -21,7 +19,8 @@ export default function InviteClientUserModal({ open, setOpen }) {
     client,
     account,
     accountUsersMap,
-    setAccountUsers
+    setAccountUsers,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
@@ -35,13 +34,6 @@ export default function InviteClientUserModal({ open, setOpen }) {
   const lastName = useRef();
   const [isLoading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleInviteClientUser = async () => {
     const emailVal = email.current.value;
@@ -196,11 +188,6 @@ export default function InviteClientUserModal({ open, setOpen }) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

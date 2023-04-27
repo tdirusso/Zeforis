@@ -3,8 +3,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import { Box, Checkbox, CircularProgress, Divider, Typography, } from '@mui/material';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { useOutletContext } from 'react-router-dom';
 import { updateAccess, updatePermission } from '../../api/user';
 import Switch from '@mui/material/Switch';
@@ -24,17 +22,11 @@ export default function EditUserPermissionsModal(props) {
   const {
     clients,
     setAccountUsers,
-    accountUsersMap
+    accountUsersMap,
+    openSnackBar
   } = useOutletContext();
 
   const theUser = accountUsersMap[user?.id];
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleUpdatePermission = async (isAdmin, clientObject) => {
     setLoading(true);
@@ -185,11 +177,6 @@ export default function EditUserPermissionsModal(props) {
           }
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

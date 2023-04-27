@@ -5,8 +5,6 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { useOutletContext } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { removeFoldeer } from '../../api/folder';
@@ -23,19 +21,13 @@ export default function RemoveFolderModal(props) {
     client,
     foldersMap,
     setFolders,
-    setTasks
+    setTasks,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
 
   const [isLoading, setLoading] = useState(false);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleRemoveFolder = async () => {
     setLoading(true);
@@ -101,11 +93,6 @@ export default function RemoveFolderModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

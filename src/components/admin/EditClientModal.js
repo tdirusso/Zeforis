@@ -6,20 +6,14 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, DialogContentText, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { setActiveClientId, updateClient } from '../../api/client';
+import { useOutletContext } from 'react-router-dom';
 
 export default function EditClientModal({ open, setOpen, clientToUpdate }) {
   const name = useRef(clientToUpdate.name);
   const [isLoading, setLoading] = useState(false);
 
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
+  const { openSnackBar } = useOutletContext();
 
   const handleUpdateClient = async () => {
     const nameVal = name.current.value;
@@ -97,11 +91,6 @@ export default function EditClientModal({ open, setOpen, clientToUpdate }) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

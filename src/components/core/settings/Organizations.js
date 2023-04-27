@@ -7,8 +7,6 @@ import IconButton from '@mui/material/IconButton';
 import { useOutletContext } from "react-router-dom";
 import AccountMenu from "../AccountMenu";
 import { setActiveAccountId, updateAccount } from "../../../api/account";
-import useSnackbar from "../../../hooks/useSnackbar";
-import Snackbar from "../Snackbar";
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import EditUserPermissionsModal from "../../admin/EditUserPermissionsModal";
@@ -21,7 +19,8 @@ export default function Organizations() {
     user,
     accountUsers,
     account,
-    isAdmin
+    isAdmin,
+    openSnackBar
   } = useOutletContext();
 
   const [userToModify, setUserToModify] = useState(null);
@@ -35,13 +34,6 @@ export default function Organizations() {
   const [isLogoChanged, setLogoChanged] = useState(false);
   const [isLogoLoading, setLogoLoading] = useState(account.logo !== '');
   const accountName = useRef();
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleAccountSelection = accountId => {
     const selectedAccountObject = user.memberOfAccounts.find(account => account.id === accountId);
@@ -283,12 +275,6 @@ export default function Organizations() {
         open={removeUserModalOpen}
         setOpen={setRemoveUserModalOpen}
         user={userToModify}
-      />
-
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
       />
     </>
   );

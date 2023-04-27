@@ -6,8 +6,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Autocomplete, Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -39,7 +37,8 @@ export default function EditTaskModal(props) {
     setTasks,
     foldersMap,
     tasksMap,
-    user
+    user,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
@@ -80,13 +79,6 @@ export default function EditTaskModal(props) {
   const [isAddingTags, setIsAddingTags] = useState(false);
   const [isKeyTask, setIsKeyTask] = useState(Boolean(task.is_key_task));
   const [dueDate, setDueDate] = useState(task.date_due);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleUpdateTask = async () => {
     const nameVal = name.current.value;
@@ -424,11 +416,6 @@ export default function EditTaskModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

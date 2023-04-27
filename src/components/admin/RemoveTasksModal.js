@@ -5,8 +5,6 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { removeTasks } from '../../api/task';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,7 +22,8 @@ export default function RemoveTasksModal(props) {
   const {
     setTasks,
     client,
-    tasksMap
+    tasksMap,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
@@ -32,13 +31,6 @@ export default function RemoveTasksModal(props) {
   const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleRemoveTasks = async () => {
     setLoading(true);
@@ -128,11 +120,6 @@ export default function RemoveTasksModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

@@ -7,20 +7,14 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { addClient, setActiveClientId } from '../../api/client';
+import { useOutletContext } from 'react-router-dom';
 
 export default function AddClientModal({ open, setOpen, hideCancel, account }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
+  const { openSnackBar } = useOutletContext();
 
   const handleCreateClient = async () => {
     const nameVal = name.current.value;
@@ -101,11 +95,6 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </>
   );
 };

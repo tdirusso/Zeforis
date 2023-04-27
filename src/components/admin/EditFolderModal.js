@@ -6,8 +6,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { updateFolder } from '../../api/folder';
 import { useOutletContext } from 'react-router-dom';
 
@@ -25,7 +23,8 @@ export default function EditFolderModal(props) {
   const {
     client,
     setFolders,
-    foldersMap
+    foldersMap,
+    openSnackBar
   } = useOutletContext();
 
   useEffect(() => {
@@ -34,12 +33,6 @@ export default function EditFolderModal(props) {
 
   const clientId = client.id;
 
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleUpdateFolder = async () => {
     const nameVal = name.current.value;
@@ -139,11 +132,6 @@ export default function EditFolderModal(props) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

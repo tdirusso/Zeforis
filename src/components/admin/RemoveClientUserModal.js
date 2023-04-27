@@ -5,8 +5,6 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { removeClientUser } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
 
@@ -14,7 +12,8 @@ export default function RemoveClientUserModal({ open, setOpen, user }) {
   const {
     client,
     accountUsersMap,
-    setAccountUsers
+    setAccountUsers,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
@@ -24,13 +23,6 @@ export default function RemoveClientUserModal({ open, setOpen, user }) {
   const name = user?.firstName + ' ' + user?.lastName;
 
   const [isLoading, setLoading] = useState(false);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const willBeRemovedFromAccount =
     user?.memberOfClients.length + user?.adminOfClients.length === 1;
@@ -107,11 +99,6 @@ export default function RemoveClientUserModal({ open, setOpen, user }) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };

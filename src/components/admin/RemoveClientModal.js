@@ -5,26 +5,18 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '../core/Snackbar';
-import useSnackbar from '../../hooks/useSnackbar';
 import { removeClient } from '../../api/client';
 import { useOutletContext } from 'react-router-dom';
 
 export default function RemoveClientModal({ open, setOpen }) {
   const {
-    client
+    client,
+    openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
 
   const [isLoading, setLoading] = useState(false);
-
-  const {
-    isOpen,
-    openSnackBar,
-    type,
-    message
-  } = useSnackbar();
 
   const handleRemoveClient = async () => {
     setLoading(true);
@@ -86,11 +78,6 @@ export default function RemoveClientModal({ open, setOpen }) {
           </DialogActions>
         </DialogContent>
       </Dialog>
-      <Snackbar
-        isOpen={isOpen}
-        type={type}
-        message={message}
-      />
     </div>
   );
 };
