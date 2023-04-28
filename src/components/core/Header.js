@@ -50,6 +50,11 @@ export default function Header(props) {
     openDrawer('add-task');
   };
 
+  const openChangeOrgOrClient = () => {
+    setAnchorEl(null);
+    openDrawer('change-org-or-client');
+  };
+
   const openAddFolder = () => {
     setAnchorEl(null);
     setAddFolderModalOpen(true);
@@ -143,8 +148,9 @@ export default function Header(props) {
             open={accountMenuOpen}
             onClose={handleMenuClose}
             PaperProps={{
-              style: {
-                minWidth: '275px',
+              sx: {
+                minWidth: '300px',
+                pb: '15px !important'
               }
             }}>
             <Box p="23px 28px 14px 25px">
@@ -160,33 +166,31 @@ export default function Header(props) {
 
             <Box
               py={1}
-              display="flex"
-              justifyContent="space-around"
-              textAlign="center">
+              justifyContent="space-evenly"
+              display="flex">
               <Box>
-                <Typography color="#a5a5a5">
-                  Client
-                </Typography>
-                <Typography >
-                  {client.name}
-                </Typography>
-                <Button
-                  sx={{ mt: '10px', mb: '5px' }}
-                  size="small"
-                  variant="outlined">
-                  Change
-                </Button>
+                <Box display="flex">
+                  <Typography color="#a5a5a5" mr={1}>
+                    Client:
+                  </Typography>
+                  <Typography >
+                    {client.name}
+                  </Typography>
+                </Box>
+                <Box display="flex">
+                  <Typography color="#a5a5a5" mr={1}>
+                    Org:
+                  </Typography>
+                  <Typography>
+                    {account.name}
+                  </Typography>
+                </Box>
               </Box>
-              <Box>
-                <Typography color="#a5a5a5">
-                  Org
-                </Typography>
-                <Typography>
-                  {account.name}
-                </Typography>
+              <Box textAlign="center">
                 <Button
                   sx={{ mt: '10px', mb: '5px' }}
                   size="small"
+                  onClick={openChangeOrgOrClient}
                   variant="outlined">
                   Change
                 </Button>

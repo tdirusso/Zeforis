@@ -7,24 +7,17 @@ import { LoadingButton } from '@mui/lab';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import Slider from '@mui/material/Slider';
 import { FormControl } from "@mui/material";
 import { addTask } from '../../api/task';
 import InputAdornment from '@mui/material/InputAdornment';
-import Input from '@mui/material/Input';
 import { addTags } from '../../api/client';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import LinkIcon from '@mui/icons-material/Link';
 import FolderIcon from '@mui/icons-material/Folder';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import StarIcon from '@mui/icons-material/Star';
 import CloseIcon from '@mui/icons-material/Close';
 
-export default function AddTaskDrawer(props) {
+export default function ChangeOrgOrClientDrawer(props) {
   const {
     isOpen,
     close,
@@ -137,41 +130,10 @@ export default function AddTaskDrawer(props) {
     }
   };
 
-  const handleAddTags = async () => {
-    const newTagsVal = newTags.current.value;
-
-    if (newTagsVal) {
-      const newTagsArray = newTagsVal.split(',');
-
-      setIsAddingTags(true);
-
-      const result = await addTags({
-        tags: newTagsArray,
-        clientId
-      });
-
-      if (result.success) {
-        const insertedTags = result.tags;
-        setTags(tags => [...tags, ...insertedTags]);
-        setSelectedTags(tags => [...tags, ...insertedTags]);
-        setIsAddingTags(false);
-        newTags.current.value = '';
-      } else {
-        openSnackBar(result.message, 'error');
-        setIsAddingTags(false);
-      }
-    }
-  };
-
   const handleClose = () => {
     close();
     setTimeout(() => {
-      setStatus('New');
-      setFolderId(null);
-      setProgress(0);
-      setAssignedToId(null);
-      setSelectedTags([]);
-      setDueDate(null);
+
       setLoading(false);
     }, 500);
   };
@@ -218,7 +180,7 @@ export default function AddTaskDrawer(props) {
                     sx={{
                       textAlign: 'center',
                     }}>
-                    Create New Task
+                    sdf
                   </DialogTitle>
                 </Box>
               </Grid>
