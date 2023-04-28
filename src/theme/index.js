@@ -94,7 +94,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '8px',
+            borderRadius: '12px',
           }
         }
       }
@@ -117,7 +117,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '8px'
+            borderRadius: '12px'
           }
         }
       }

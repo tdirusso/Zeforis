@@ -14,6 +14,11 @@ import SelectAccountModal from "../../components/core/SelectAccountModal";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
 import AddAccountScreen from "../../components/admin/AddAccountScreen";
+import Header from "../../components/core/Header";
+import Modals from "../../components/core/Modals";
+import useModal from "../../hooks/useModal";
+import Drawers from "../../components/core/Drawers";
+import useDrawer from "../../hooks/useDrawer";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -47,6 +52,18 @@ export default function Home({ setTheme }) {
     type,
     message
   } = useSnackbar();
+
+  const {
+    modalToOpen,
+    openModal,
+    closeModal
+  } = useModal();
+
+  const {
+    drawerToOpen,
+    openDrawer,
+    closeDrawer
+  } = useDrawer();
 
   useEffect(() => {
     if (user) {
@@ -216,7 +233,8 @@ export default function Home({ setTheme }) {
     setFolders,
     setAccountUsers,
     setUser,
-    openSnackBar
+    openSnackBar,
+    openModal
   };
 
   return (
@@ -228,6 +246,26 @@ export default function Home({ setTheme }) {
       <Box component="main" ml={'280px'} px={5}>
         <Box maxWidth={'1200px'} m='auto' pt={2} pb={5}>
           <Grid container spacing={3}>
+            <Header
+              isAdmin={isAdmin}
+              user={user}
+              account={account}
+              client={client}
+              openModal={openModal}
+              openDrawer={openDrawer}
+            />
+
+            <Modals
+              {...context}
+              modalToOpen={modalToOpen}
+              closeModal={closeModal}
+            />
+
+            <Drawers
+              {...context}
+              drawerToOpen={drawerToOpen}
+              closeDrawer={closeDrawer}
+            />
             <Outlet context={context} />
           </Grid>
         </Box>

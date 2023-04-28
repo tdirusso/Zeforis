@@ -6,7 +6,6 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import Divider from '@mui/material/Divider';
 import React from 'react';
-import Header from "../../../components/core/Header";
 import StarIcon from '@mui/icons-material/Star';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditFolderModal from "../../../components/admin/EditFolderModal";
@@ -62,7 +61,6 @@ export default function FoldersPage() {
 
   return (
     <>
-      <Header />
       <Grid item>
         <Paper
           hidden={!isAdmin}

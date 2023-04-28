@@ -3,7 +3,6 @@ import { Box, Button, Divider, Grid, Paper } from "@mui/material";
 import './styles.css';
 import React, { useState } from "react";
 import { logout } from "../../../api/auth";
-import Header from "../../../components/core/Header";
 import PersonIcon from '@mui/icons-material/Person';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import ApartmentIcon from '@mui/icons-material/Apartment';
@@ -41,7 +40,6 @@ export default function Settings() {
 
   return (
     <>
-      <Header />
       <Grid item xs={12} md={3}>
         <Paper sx={{ px: 0 }}>
           <Box className="settings-buttons">

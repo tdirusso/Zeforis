@@ -2,7 +2,6 @@ import { Chip, Divider, Grid, Paper, IconButton, Tooltip, TextField } from "@mui
 import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Button from '@mui/material/Button';
 import { Box, Typography } from '@mui/material';
-import Header from "../../../components/core/Header";
 import Alert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -52,7 +51,6 @@ export default function TaskPage() {
 
   return (
     <>
-      <Header />
       <Grid
         item
         xs={12}

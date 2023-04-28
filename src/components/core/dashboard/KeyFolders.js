@@ -57,11 +57,11 @@ export default function KeyFolders({ folders }) {
         })
       }
 
-      <AddTaskModal
+      {/* <AddTaskModal
         open={addTaskModalOpen}
         setOpen={setAddTaskModalOpen}
         folderToSet={folderToMod}
-      />
+      /> */}
     </>
   );
 };

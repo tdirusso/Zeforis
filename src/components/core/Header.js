@@ -19,7 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-export default function Header() {
+export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
@@ -29,8 +29,10 @@ export default function Header() {
     isAdmin,
     user,
     account,
-    client
-  } = useOutletContext();
+    client,
+    openModal,
+    openDrawer
+  } = props;
 
   const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
   const accountMenuOpen = Boolean(anchorEl?.className.includes('account-menu'));
@@ -45,7 +47,7 @@ export default function Header() {
 
   const openAddTask = () => {
     setAnchorEl(null);
-    setAddTaskModalOpen(true);
+    openDrawer('add-task');
   };
 
   const openAddFolder = () => {
@@ -227,7 +229,7 @@ export default function Header() {
       </Box>
       <Divider sx={{ mt: 2.5, mb: 2 }} />
 
-      <AddTaskModal
+      {/* <AddTaskModal
         open={addTaskModalOpen}
         setOpen={setAddTaskModalOpen}
       />
@@ -240,7 +242,7 @@ export default function Header() {
       <SearchModal
         open={searchModalOpen}
         setOpen={setSearchModalOpen}
-      />
+      /> */}
     </Grid>
   );
 };
