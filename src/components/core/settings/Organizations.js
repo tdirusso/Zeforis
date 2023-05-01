@@ -35,8 +35,8 @@ export default function Organizations() {
   const [isLogoLoading, setLogoLoading] = useState(account.logo !== '');
   const accountName = useRef();
 
-  const handleAccountSelection = accountId => {
-    const selectedAccountObject = user.memberOfAccounts.find(account => account.id === accountId);
+  const handleOrgSelection = ({ id }) => {
+    const selectedAccountObject = user.memberOfAccounts.find(account => account.id === id);
     setActiveAccountId(selectedAccountObject.id);
     openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
     setTimeout(() => {
@@ -114,7 +114,8 @@ export default function Organizations() {
         <Divider sx={{ my: 4 }} />
         <Box maxWidth={360}>
           <AccountMenu
-            changeHandler={handleAccountSelection}
+            changeHandler={handleOrgSelection}
+            curOrgId={account.id}
           />
         </Box>
 

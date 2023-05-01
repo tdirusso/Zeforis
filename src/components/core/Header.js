@@ -166,7 +166,9 @@ export default function Header(props) {
 
             <Box
               py={1}
-              justifyContent="space-evenly"
+              ml={2.25}
+              gap={2.5}
+              mr={2.25}
               display="flex">
               <Box>
                 <Box display="flex">
@@ -186,15 +188,13 @@ export default function Header(props) {
                   </Typography>
                 </Box>
               </Box>
-              <Box textAlign="center">
-                <Button
-                  sx={{ mt: '10px', mb: '5px' }}
-                  size="small"
-                  onClick={openChangeOrgOrClient}
-                  variant="outlined">
-                  Change
-                </Button>
-              </Box>
+              <Button
+                sx={{ mt: '10px', mb: '5px' }}
+                size="small"
+                onClick={openChangeOrgOrClient}
+                variant="outlined">
+                Change
+              </Button>
             </Box>
             <Divider sx={{ my: '8px' }} />
             <MenuItem onClick={openAddTask}>

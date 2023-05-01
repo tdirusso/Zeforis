@@ -1,5 +1,5 @@
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 export default function AccountMenu(props) {
@@ -8,18 +8,26 @@ export default function AccountMenu(props) {
 
   const {
     user,
-    account
+    curOrgId,
+    shouldDisable = false
   } = context;
 
   const { changeHandler } = props;
 
-  const accountId = account?.id;
-  const [selectedAccountId, setSelectedAccountId] = useState(accountId || '');
+  const [orgId, setOrgId] = useState(curOrgId || '');
+
+  useEffect(() => {
+    //need this update since the org ID is programatically reset when drawer to change org/client is cloesd
+    setOrgId(curOrgId);
+  }, [curOrgId]);
 
   const handleSelection = e => {
-    const id = e.target.value;
-    setSelectedAccountId(id);
-    changeHandler(id);
+    setOrgId(e.target.value);
+
+    if (changeHandler) {
+      const orgObject = user.memberOfAccounts.find(org => org.id === e.target.value);
+      changeHandler(orgObject);
+    }
   };
 
   return (
@@ -27,7 +35,8 @@ export default function AccountMenu(props) {
       <InputLabel>Organization</InputLabel>
       <Select
         label="Organization"
-        value={selectedAccountId}
+        value={orgId}
+        disabled={shouldDisable}
         onChange={handleSelection}>
         {
           user.memberOfAccounts.map(account => {

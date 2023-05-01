@@ -15,8 +15,8 @@ export default function SelectAccountModal({ accounts, user }) {
     message
   } = useSnackbar();
 
-  const handleSelection = accountId => {
-    const selectedAccountObject = accounts.find(account => account.id === accountId);
+  const handleOrgSelection = ({ id }) => {
+    const selectedAccountObject = accounts.find(account => account.id === id);
     setActiveAccountId(selectedAccountObject.id);
     openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
     setTimeout(() => {
@@ -34,7 +34,7 @@ export default function SelectAccountModal({ accounts, user }) {
           </DialogContentText>
           <br></br>
           <AccountMenu
-            changeHandler={handleSelection}
+            changeHandler={handleOrgSelection}
             accounts={accounts}
             user={user}
           />

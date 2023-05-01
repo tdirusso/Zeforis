@@ -1,5 +1,5 @@
 import { Paper, Box, Divider, Button, Chip, Typography, Tooltip } from "@mui/material";
-import ClientMenu from "../../admin/ClientMenu";
+import ClientMenu from "../../core/ClientMenu";
 import { setActiveClientId } from "../../../api/client";
 import { useOutletContext } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
@@ -75,7 +75,7 @@ export default function Clients() {
           mb={2}>
           <ClientMenu
             changeHandler={handleChangeClient}
-            client={client}
+            curClientId={client.id}
             clients={clients}
           />
         </Box>
