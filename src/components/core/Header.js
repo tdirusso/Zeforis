@@ -11,19 +11,22 @@ import FolderIcon from '@mui/icons-material/Folder';
 import AddTaskModal from "../admin/AddTaskModal";
 import AddFolderModal from "../admin/AddFolderModal";
 import SearchModal from "./SearchModal";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import './styles/Header.css';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { logout } from "../../api/auth";
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const {
     isAdmin,
@@ -48,6 +51,11 @@ export default function Header(props) {
   const openAddTask = () => {
     setAnchorEl(null);
     openDrawer('add-task');
+  };
+
+  const openSettings = () => {
+    setAnchorEl(null);
+    navigate('/home/settings');
   };
 
   const openChangeOrgOrClient = () => {
@@ -207,7 +215,7 @@ export default function Header(props) {
                 </Typography>
               </ListItemText>
             </MenuItem>
-            <MenuItem onClick={openAddTask}>
+            <MenuItem onClick={openSettings}>
               <ListItemIcon>
                 <SettingsIcon />
               </ListItemIcon>
@@ -218,7 +226,7 @@ export default function Header(props) {
               </ListItemText>
             </MenuItem>
             <Divider />
-            <MenuItem onClick={openAddFolder}>
+            <MenuItem onClick={() => logout()}>
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>
