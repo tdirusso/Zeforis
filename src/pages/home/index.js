@@ -61,6 +61,7 @@ export default function Home({ setTheme }) {
 
   const {
     drawerToOpen,
+    drawerProps,
     openDrawer,
     closeDrawer
   } = useDrawer();
@@ -234,7 +235,8 @@ export default function Home({ setTheme }) {
     setOrgUsers,
     setUser,
     openSnackBar,
-    openModal
+    openModal,
+    openDrawer
   };
 
   return (
@@ -263,6 +265,7 @@ export default function Home({ setTheme }) {
 
             <Drawers
               {...context}
+              {...drawerProps}
               drawerToOpen={drawerToOpen}
               closeDrawer={closeDrawer}
             />

@@ -1,6 +1,6 @@
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Autocomplete, Box, Drawer, Grid, IconButton, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FormControl } from "@mui/material";
@@ -17,7 +17,7 @@ export default function CreateTaskDrawer(props) {
   const {
     isOpen,
     close,
-    folderToSet,
+    defaultFolder,
     folders,
     clientMembers,
     clientAdmins,
@@ -35,26 +35,29 @@ export default function CreateTaskDrawer(props) {
   const linkUrl = useRef();
 
   const [isLoading, setLoading] = useState(false);
-  const [folderId, setFolderId] = useState(null);
-  const [assignedToId, setAssignedToId] = useState(null);
-  const [assignedToName, setAssignedToName] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [assignedTo, setAssignedTo] = useState(null);
+  const [folder, setFolder] = useState(defaultFolder || null);
+
+  useEffect(() => {
+    setFolder(defaultFolder || null);
+  }, [defaultFolder]);
 
   const tagIdNameMap = {};
-
   tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
 
   const handleCreateTask = async () => {
     const nameVal = name.current.value;
     const linkVal = linkUrl.current.value;
-    const folderIdVal = folderId || folderToSet?.id;
+    const folderId = folder?.id;
+    const assignedToId = assignedTo?.id;
 
     if (!nameVal) {
       openSnackBar('Please enter a name for the task.');
       return;
     }
 
-    if (!folderIdVal) {
+    if (!folderId) {
       openSnackBar('Please select a folder for the task');
       return;
     }
@@ -66,7 +69,7 @@ export default function CreateTaskDrawer(props) {
         name: nameVal,
         linkUrl: linkVal,
         assignedToId,
-        folderId: folderIdVal,
+        folderId,
         clientId,
         tags: selectedTags
       });
@@ -85,7 +88,7 @@ export default function CreateTaskDrawer(props) {
           date_created: now,
           created_by_id: user.id,
           status: 'New',
-          folder_id: folderIdVal,
+          folder_id: folderId,
           link_url: linkVal,
           assigned_to_id: assignedToId,
           progress: 0,
@@ -94,8 +97,8 @@ export default function CreateTaskDrawer(props) {
           date_due: null,
           date_last_updated: now,
           tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
-          assigned_first: assignedToName?.firstName || null,
-          assigned_last: assignedToName?.lastName || null,
+          assigned_first: assignedTo?.firstName,
+          assigned_last: assignedTo?.lastName,
           created_first: user.firstName,
           created_last: user.lastName,
           updated_by_first: user.firstName,
@@ -116,22 +119,13 @@ export default function CreateTaskDrawer(props) {
   const handleClose = () => {
     close();
     setTimeout(() => {
-      setFolderId(null);
-      setAssignedToId(null);
+      name.current.value = '';
+      linkUrl.current.value = '';
+      setFolder(null);
+      setAssignedTo(null);
       setSelectedTags([]);
       setLoading(false);
     }, 500);
-  };
-
-  const handleAssignedToChange = (_, val) => {
-    setAssignedToName(val ?
-      {
-        firstName: val.firstName,
-        lastName: val.lastName
-      } :
-      null);
-
-    setAssignedToId(val?.id || null);
   };
 
   const handleCreateTag = async e => {
@@ -220,10 +214,10 @@ export default function CreateTaskDrawer(props) {
                     options={folders}
                     getOptionLabel={(option) => option.name || ''}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
-                    disabled={Boolean(folderToSet) || isLoading}
+                    disabled={isLoading}
+                    value={folder}
                     renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                    defaultValue={folderToSet || null}
-                    onChange={(_, newVal) => setFolderId(newVal?.id || null)}
+                    onChange={(_, val) => setFolder(val)}
                     renderInput={(params) => (
                       <TextField
                         placeholder='Folder'
@@ -249,7 +243,8 @@ export default function CreateTaskDrawer(props) {
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     disabled={isLoading}
                     groupBy={(option) => option.role}
-                    onChange={handleAssignedToChange}
+                    onChange={(_, val) => setAssignedTo(val)}
+                    value={assignedTo}
                     renderInput={(params) => (
                       <TextField
                         {...params}

@@ -1,20 +1,19 @@
 import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import { useState } from "react";
-import AddTaskModal from "../../admin/AddTaskModal";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 export default function KeyFolders({ folders }) {
-  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
-  const [folderToMod, setFolderToMod] = useState(null);
+
+  const {
+    openDrawer
+  } = useOutletContext();
 
   const navigate = useNavigate();
 
-  const handleOpenAddTaskModal = (folder) => {
-    setFolderToMod(folder);
-    setAddTaskModalOpen(true);
+  const handleOpenCreateTaskDrawer = folder => {
+    openDrawer('add-task', { defaultFolder: folder });
   };
 
   return (
@@ -49,24 +48,20 @@ export default function KeyFolders({ folders }) {
                 {
                   taskLength > 0 ?
                     <TaskList tasks={folder.tasks.slice(0, 5)} /> :
-                    <NoTasksMessage handleOpenAddTaskModal={() => handleOpenAddTaskModal(folder)} />
+                    <NoTasksMessage 
+                    handleOpenCreateTaskDrawer={() => handleOpenCreateTaskDrawer(folder)}
+                     />
                 }
               </Paper>
             </Grid>
           );
         })
       }
-
-      {/* <AddTaskModal
-        open={addTaskModalOpen}
-        setOpen={setAddTaskModalOpen}
-        folderToSet={folderToMod}
-      /> */}
     </>
   );
 };
 
-function NoTasksMessage({ handleOpenAddTaskModal }) {
+function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
   return (
     <Box mt={2}>
       <Typography variant="body2">
@@ -75,7 +70,7 @@ function NoTasksMessage({ handleOpenAddTaskModal }) {
       <Button
         sx={{ mt: 1.5 }}
         variant="outlined"
-        onClick={handleOpenAddTaskModal}
+        onClick={handleOpenCreateTaskDrawer}
         startIcon={<AddTaskIcon />}>
         Add Task
       </Button>

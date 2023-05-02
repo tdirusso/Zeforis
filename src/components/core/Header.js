@@ -8,7 +8,6 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FolderIcon from '@mui/icons-material/Folder';
-import AddTaskModal from "../admin/AddTaskModal";
 import AddFolderModal from "../admin/AddFolderModal";
 import SearchModal from "./SearchModal";
 import { useNavigate, useOutletContext } from "react-router-dom";
@@ -22,7 +21,6 @@ import { logout } from "../../api/auth";
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
@@ -246,11 +244,7 @@ export default function Header(props) {
       </Box>
       <Divider sx={{ mt: 2.5, mb: 2 }} />
 
-      {/* <AddTaskModal
-        open={addTaskModalOpen}
-        setOpen={setAddTaskModalOpen}
-      />
-
+      {/* 
       <AddFolderModal
         open={addFolderModalOpen}
         setOpen={setAddFolderModalOpen}
