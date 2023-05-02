@@ -3,15 +3,15 @@ const pool = require('../../../database');
 module.exports = async (req, res) => {
   const {
     name,
-    description,
+    description = '',
     status = 'New',
     folderId,
     linkUrl,
-    assignedToId,
+    assignedToId = null,
     progress = 0,
     tags = [],
     isKeyTask = false,
-    dueDate
+    dueDate = null
   } = req.body;
 
   const creatorUserId = req.userId;
@@ -54,11 +54,29 @@ module.exports = async (req, res) => {
       );
     }
 
-    return res.json({ taskId: newTaskId });
+    const taskObject = {
+      id: newTask,
+      name,
+      description,
+      status,
+      folderId,
+      linkUrl,
+      assignedToId,
+      progress,
+      tags,
+      isKeyTask,
+      dueDate
+    };
+
+    return res.json({
+      success: true,
+      task: taskObject
+    });
   } catch (error) {
     console.log(error);
 
     return res.json({
+      error: true,
       message: error.message
     });
   }

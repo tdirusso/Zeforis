@@ -4,17 +4,15 @@ import { useOutletContext } from "react-router-dom";
 
 export default function OrgMenu(props) {
 
-  const context = useOutletContext() || props;
-
+  const { user } = useOutletContext() || props;
   const {
-    user,
+    changeHandler,
     curOrgId,
-    shouldDisable = false
-  } = context;
-
-  const { changeHandler } = props;
+    shouldDisable
+  } = props;
 
   const [orgId, setOrgId] = useState(curOrgId || '');
+
 
   useEffect(() => {
     //need this update since the org ID is programatically reset when drawer to change org/client is cloesd

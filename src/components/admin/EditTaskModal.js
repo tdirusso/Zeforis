@@ -14,7 +14,7 @@ import { FormControl } from "@mui/material";
 import { updateTask } from '../../api/tasks';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
-import { addTags } from '../../api/clients';
+import { createTag } from '../../api/clients';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
@@ -168,7 +168,7 @@ export default function EditTaskModal(props) {
 
       setIsAddingTags(true);
 
-      const result = await addTags({
+      const result = await createTag({
         tags: newTagsArray,
         clientId
       });

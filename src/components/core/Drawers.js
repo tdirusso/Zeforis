@@ -1,4 +1,4 @@
-import AddTaskDrawer from "../admin/AddTaskDrawer";
+import CreateTaskDrawer from "../admin/CreateTaskDrawer";
 import AddTaskModal from "../admin/AddTaskModal";
 import ChangeOrgOrClientDrawer from "./ChangeOrgOrClientDrawer";
 
@@ -10,7 +10,7 @@ export default function Drawers(props) {
 
   return (
     <>
-      <AddTaskDrawer
+      <CreateTaskDrawer
         {...props}
         isOpen={drawerToOpen === 'add-task'}
         close={closeDrawer}

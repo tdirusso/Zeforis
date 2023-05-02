@@ -16,8 +16,8 @@ const completeRegistration = require('./routes/users/completeRegistration');
 const removeClientUser = require('./routes/users/removeClientUser');
 const updateProfile = require('./routes/users/updateProfile');
 const updateFolder = require('./routes/folders/updateFolder');
-const addTask = require('./routes/tasks/addTask');
-const addTags = require('./routes/tags/addTags');
+const createTask = require('./routes/tasks/createTask');
+const createTag = require('./routes/tags/createTag');
 const addOrg = require('./routes/orgs/addOrg');
 const removeTag = require('./routes/tags/removeTag');
 const removeTasks = require('./routes/tasks/removeTasks');
@@ -74,12 +74,12 @@ const boot = async () => {
   app.delete('/api/folders', checkPermissionsMW, removeFolder);
   app.patch('/api/folders', checkPermissionsMW, updateFolder);
 
-  app.post('/api/tasks', checkPermissionsMW, addTask);
+  app.post('/api/tasks', checkPermissionsMW, createTask);
   app.delete('/api/tasks', checkPermissionsMW, removeTasks);
   app.patch('/api/tasks', checkPermissionsMW, updateTask);
   app.patch('/api/tasks/batch', checkPermissionsMW, bulkUpdateTasks);
 
-  app.post('/api/tags', checkPermissionsMW, addTags);
+  app.post('/api/tags', checkPermissionsMW, createTag);
   app.delete('/api/tags', checkPermissionsMW, removeTag);
 
   app.post('/api/orgs', addOrg);

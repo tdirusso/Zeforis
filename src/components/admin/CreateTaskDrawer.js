@@ -1,30 +1,19 @@
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
-import Button from '@mui/material/Button';
-import { Autocomplete, Box, Checkbox, Divider, Drawer, FormControlLabel, Grid, IconButton, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Drawer, Grid, IconButton, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Slider from '@mui/material/Slider';
 import { FormControl } from "@mui/material";
-import { addTask } from '../../api/tasks';
+import { createTask } from '../../api/tasks';
 import InputAdornment from '@mui/material/InputAdornment';
-import Input from '@mui/material/Input';
-import { addTags } from '../../api/clients';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { createTag } from '../../api/clients';
 import LinkIcon from '@mui/icons-material/Link';
 import FolderIcon from '@mui/icons-material/Folder';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import StarIcon from '@mui/icons-material/Star';
 import CloseIcon from '@mui/icons-material/Close';
 
-export default function AddTaskDrawer(props) {
+export default function CreateTaskDrawer(props) {
   const {
     isOpen,
     close,
@@ -43,20 +32,13 @@ export default function AddTaskDrawer(props) {
   const clientId = client.id;
 
   const name = useRef();
-  const description = useRef();
   const linkUrl = useRef();
-  const newTags = useRef();
 
   const [isLoading, setLoading] = useState(false);
-  const [status, setStatus] = useState('New');
   const [folderId, setFolderId] = useState(null);
   const [assignedToId, setAssignedToId] = useState(null);
   const [assignedToName, setAssignedToName] = useState(null);
-  const [progress, setProgress] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [isAddingTags, setIsAddingTags] = useState(false);
-  const [isKeyTask, setIsKeyTask] = useState(false);
-  const [dueDate, setDueDate] = useState(null);
 
   const tagIdNameMap = {};
 
@@ -64,38 +46,32 @@ export default function AddTaskDrawer(props) {
 
   const handleCreateTask = async () => {
     const nameVal = name.current.value;
-    const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;
     const folderIdVal = folderId || folderToSet?.id;
 
     if (!nameVal) {
-      openSnackBar('Please enter a name for the new task.', 'error');
+      openSnackBar('Please enter a name for the task.');
       return;
     }
 
     if (!folderIdVal) {
-      openSnackBar('Please select which folder the task should reside in.', 'error');
+      openSnackBar('Please select a folder for the task');
       return;
     }
 
     setLoading(true);
 
     try {
-      const { message, taskId } = await addTask({
+      const { message, task } = await createTask({
         name: nameVal,
-        description: descriptionVal,
         linkUrl: linkVal,
-        status,
         assignedToId,
-        progress,
         folderId: folderIdVal,
         clientId,
-        tags: selectedTags,
-        isKeyTask,
-        dueDate
+        tags: selectedTags
       });
 
-      if (taskId) {
+      if (task) {
         setTimeout(() => {
           openSnackBar('Task created.', 'success');
         }, 300);
@@ -103,19 +79,19 @@ export default function AddTaskDrawer(props) {
         const now = new Date().toISOString();
 
         setTasks(tasks => [...tasks, {
-          task_id: taskId,
+          task_id: task.id,
           task_name: nameVal,
-          description: descriptionVal,
+          description: '',
           date_created: now,
           created_by_id: user.id,
-          status: status,
+          status: 'New',
           folder_id: folderIdVal,
           link_url: linkVal,
           assigned_to_id: assignedToId,
-          progress: progress,
-          date_completed: status === 'Complete' ? now : null,
-          is_key_task: Number(isKeyTask),
-          date_due: dueDate ? dueDate.toISOString() : null,
+          progress: 0,
+          date_completed: null,
+          is_key_task: false,
+          date_due: null,
           date_last_updated: now,
           tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
           assigned_first: assignedToName?.firstName || null,
@@ -137,41 +113,12 @@ export default function AddTaskDrawer(props) {
     }
   };
 
-  const handleAddTags = async () => {
-    const newTagsVal = newTags.current.value;
-
-    if (newTagsVal) {
-      const newTagsArray = newTagsVal.split(',');
-
-      setIsAddingTags(true);
-
-      const result = await addTags({
-        tags: newTagsArray,
-        clientId
-      });
-
-      if (result.success) {
-        const insertedTags = result.tags;
-        setTags(tags => [...tags, ...insertedTags]);
-        setSelectedTags(tags => [...tags, ...insertedTags]);
-        setIsAddingTags(false);
-        newTags.current.value = '';
-      } else {
-        openSnackBar(result.message, 'error');
-        setIsAddingTags(false);
-      }
-    }
-  };
-
   const handleClose = () => {
     close();
     setTimeout(() => {
-      setStatus('New');
       setFolderId(null);
-      setProgress(0);
       setAssignedToId(null);
       setSelectedTags([]);
-      setDueDate(null);
       setLoading(false);
     }, 500);
   };
@@ -185,6 +132,26 @@ export default function AddTaskDrawer(props) {
       null);
 
     setAssignedToId(val?.id || null);
+  };
+
+  const handleCreateTag = async e => {
+    const key = e.key;
+    const newTagValue = e.target.value;
+
+    if (key === 'Enter' && newTagValue) {
+      const result = await createTag({
+        name: newTagValue,
+        clientId
+      });
+
+      if (result.success) {
+        const newTag = result.tag;
+        setTags(tags => [...tags, newTag]);
+        setSelectedTags(tags => [...tags, newTag]);
+      } else {
+        openSnackBar(result.message, 'error');
+      }
+    }
   };
 
   return (
@@ -286,7 +253,7 @@ export default function AddTaskDrawer(props) {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        placeholder="Assigned To"
+                        placeholder="Assigned to"
                         InputProps={{
                           ...params.InputProps,
                           startAdornment:
@@ -311,6 +278,7 @@ export default function AddTaskDrawer(props) {
                     getOptionLabel={(option) => option.name}
                     filterSelectedOptions
                     disableCloseOnSelect
+                    onKeyDown={handleCreateTag}
                     disabled={isLoading}
                     onChange={(_, newVal) => setSelectedTags(newVal)}
                     renderInput={(params) => (
@@ -320,9 +288,12 @@ export default function AddTaskDrawer(props) {
                         InputProps={{
                           ...params.InputProps,
                           startAdornment:
-                            <InputAdornment position='start'>
-                              <LocalOfferIcon />
-                            </InputAdornment>
+                            <>
+                              <InputAdornment position='start'>
+                                <LocalOfferIcon />
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
                         }}
                       />
                     )}

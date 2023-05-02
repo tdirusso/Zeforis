@@ -1,6 +1,6 @@
 import request from '../lib/request';
 
-const addTask = async (payload) => {
+const createTask = async (payload) => {
   const { data } = await request.post(`tasks`, payload);
 
   return data;
@@ -23,7 +23,7 @@ const bulkUpdateTasks = async (payload) => {
 };
 
 export {
-  addTask,
+  createTask,
   removeTasks,
   updateTask,
   bulkUpdateTasks

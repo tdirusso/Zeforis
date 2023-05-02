@@ -68,6 +68,11 @@ export default function Header(props) {
     setAddFolderModalOpen(true);
   };
 
+  const openMyAccount = () => {
+    setAnchorEl(null);
+    navigate('/home/settings?tab=Account');
+  };
+
   return (
     <Grid
       item
@@ -205,7 +210,7 @@ export default function Header(props) {
               </Button>
             </Box>
             <Divider sx={{ my: '8px' }} />
-            <MenuItem onClick={openAddTask}>
+            <MenuItem onClick={openMyAccount}>
               <ListItemIcon>
                 <PersonIcon />
               </ListItemIcon>

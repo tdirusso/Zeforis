@@ -12,10 +12,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import { FormControl } from "@mui/material";
-import { addTask } from '../../api/tasks';
+import { createTask } from '../../api/tasks';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
-import { addTags } from '../../api/clients';
+import { createTag } from '../../api/clients';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
@@ -78,7 +78,7 @@ export default function AddTaskModal(props) {
     setLoading(true);
 
     try {
-      const { message, taskId } = await addTask({
+      const { message, taskId } = await createTask({
         name: nameVal,
         description: descriptionVal,
         linkUrl: linkVal,
@@ -142,7 +142,7 @@ export default function AddTaskModal(props) {
 
       setIsAddingTags(true);
 
-      const result = await addTags({
+      const result = await createTag({
         tags: newTagsArray,
         clientId
       });
