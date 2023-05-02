@@ -6,8 +6,8 @@ import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close';
 import OrgMenu from './OrgMenu';
 import ClientMenu from './ClientMenu';
-import { setActiveClientId } from '../../api/client';
-import { setActiveOrgId } from '../../api/org';
+import { setActiveClientId } from '../../api/clients';
+import { setActiveOrgId } from '../../api/orgs';
 
 export default function ChangeOrgOrClientDrawer(props) {
   const {

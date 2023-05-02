@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ClientMenu from '../core/ClientMenu';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
-import { setActiveClientId } from '../../api/client';
+import { setActiveClientId } from '../../api/clients';
 import { Box, Paper, Typography } from '@mui/material';
 
 export default function SelectClientScreen({ client, clients }) {

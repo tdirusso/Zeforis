@@ -4,7 +4,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import { Box, Checkbox, CircularProgress, Divider, Typography, } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-import { updateAccess, updatePermission } from '../../api/user';
+import { updateAccess, updatePermission } from '../../api/users';
 import Switch from '@mui/material/Switch';
 
 export default function EditUserPermissionsModal(props) {

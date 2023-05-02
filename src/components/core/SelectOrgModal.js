@@ -4,7 +4,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
-import { setActiveOrgId } from '../../api/org';
+import { setActiveOrgId } from '../../api/orgs';
 import OrgMenu from './OrgMenu';
 
 export default function SelectOrgModal({ orgs, user }) {

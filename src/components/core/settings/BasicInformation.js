@@ -2,7 +2,7 @@ import { LoadingButton } from "@mui/lab";
 import { Box, Divider, Grid, Paper, TextField } from "@mui/material";
 import { useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { updateProfile } from "../../../api/user";
+import { updateProfile } from "../../../api/users";
 
 export default function BasicInformation() {
   const [isLoading, setLoading] = useState(false);

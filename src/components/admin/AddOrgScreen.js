@@ -3,7 +3,7 @@ import { Box, Paper, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addOrg, setActiveOrgId } from '../../api/org';
+import { addOrg, setActiveOrgId } from '../../api/orgs';
 
 export default function AddOrgScreen({ user }) {
   const name = useRef();

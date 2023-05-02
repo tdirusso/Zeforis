@@ -5,7 +5,7 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { bulkUpdateTasks } from '../../api/task';
+import { bulkUpdateTasks } from '../../api/tasks';
 import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 

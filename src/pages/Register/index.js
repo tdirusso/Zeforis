@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import './Register.css';
-import { register } from '../../api/org';
+import { register } from '../../api/users';
 
 export default function RegisterPage() {
   const email = useRef();

@@ -6,7 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import { useOutletContext } from "react-router-dom";
 import OrgMenu from "../OrgMenu";
-import { setActiveOrgId, updateOrg } from "../../../api/org";
+import { setActiveOrgId, updateOrg } from "../../../api/orgs";
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import EditUserPermissionsModal from "../../admin/EditUserPermissionsModal";

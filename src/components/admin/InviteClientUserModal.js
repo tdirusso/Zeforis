@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { inviteClientUser } from '../../api/client';
+import { inviteClientUser } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';

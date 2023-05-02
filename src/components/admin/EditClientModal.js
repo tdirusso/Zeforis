@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, DialogContentText, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { setActiveClientId, updateClient } from '../../api/client';
+import { setActiveClientId, updateClient } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
 
 export default function EditClientModal({ open, setOpen, clientToUpdate }) {

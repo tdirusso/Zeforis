@@ -1,6 +1,6 @@
 import { Paper, Box, Divider, Button, Chip, Typography, Tooltip } from "@mui/material";
 import ClientMenu from "../../core/ClientMenu";
-import { setActiveClientId } from "../../../api/client";
+import { setActiveClientId } from "../../../api/clients";
 import { useOutletContext } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';

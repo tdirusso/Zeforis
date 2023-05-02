@@ -5,7 +5,7 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeTasks } from '../../api/task';
+import { removeTasks } from '../../api/tasks';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 
