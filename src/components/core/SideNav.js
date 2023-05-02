@@ -7,7 +7,7 @@ import { NavLink } from "react-router-dom";
 import SpeedIcon from '@mui/icons-material/Speed';
 import zeforisIcon from '../../assets/zeforis-logo.png';
 
-export default function SideNav({ client, account }) {
+export default function SideNav({ client, org }) {
 
   const buttonBaseStyles = {
     width: '100%',
@@ -22,13 +22,13 @@ export default function SideNav({ client, account }) {
     <Box className="Sidenav">
       <Box className="flex-centered container">
         {
-          account.logo ? <img
-            src={account.logo}
+          org.logo ? <img
+            src={org.logo}
             alt=""
             width={110}
           /> :
             <Typography color="primary" variant="h6" fontWeight={600}>
-              {account.name}
+              {org.name}
             </Typography>
         }
         <Typography

@@ -18,7 +18,7 @@ const updateProfile = require('./routes/updateProfile');
 const updateFolder = require('./routes/updateFolder');
 const addTask = require('./routes/addTask');
 const addTags = require('./routes/addTags');
-const addAccount = require('./routes/addAccount');
+const addOrg = require('./routes/addOrg');
 const removeTag = require('./routes/removeTag');
 const removeTasks = require('./routes/removeTasks');
 const removeFolder = require('./routes/removeFolder');
@@ -27,7 +27,7 @@ const removeUser = require('./routes/removeUser');
 const updateTask = require('./routes/updateTask');
 const updatePermission = require('./routes/updatePermission');
 const updateAccess = require('./routes/updateAccess');
-const updateAccount = require('./routes/updateAccount');
+const updateOrg = require('./routes/updateOrg');
 const bulkUpdateTasks = require('./routes/bulkUpdateTasks');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
@@ -65,7 +65,7 @@ const boot = async () => {
   app.post('/api/completeRegistration', completeRegistration);
   app.post('/api/addTask', checkPermissionsMW, addTask);
   app.post('/api/addTags', checkPermissionsMW, addTags);
-  app.post('/api/addAccount', addAccount);
+  app.post('/api/addOrg', addOrg);
   app.delete('/api/removeClientUser', checkPermissionsMW, removeClientUser);
   app.delete('/api/removeTag', checkPermissionsMW, removeTag);
   app.delete('/api/removeTasks', checkPermissionsMW, removeTasks);
@@ -78,7 +78,7 @@ const boot = async () => {
   app.patch('/api/updateFolder', checkPermissionsMW, updateFolder);
   app.patch('/api/updatePermission', checkPermissionsMW, updatePermission);
   app.patch('/api/updateAccess', checkPermissionsMW, updateAccess);
-  app.patch('/api/updateAccount', checkPermissionsMW, updateAccount);
+  app.patch('/api/updateOrg', checkPermissionsMW, updateOrg);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

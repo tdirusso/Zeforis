@@ -13,12 +13,12 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const newAccount = await pool.query(
-      'INSERT INTO accounts (name, owner_id, brand_color) VALUES (?,?, "#3365f6")',
+    const newOrg = await pool.query(
+      'INSERT INTO orgs (name, owner_id, brand_color) VALUES (?,?, "#3365f6")',
       [name, userId]
     );
 
-    return res.json({ accountId: newAccount[0].insertId });
+    return res.json({ orgId: newOrg[0].insertId });
   } catch (error) {
     console.log(error);
     return res.json({

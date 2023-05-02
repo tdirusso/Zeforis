@@ -2,7 +2,7 @@ import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
-export default function AccountMenu(props) {
+export default function OrgMenu(props) {
 
   const context = useOutletContext() || props;
 
@@ -18,14 +18,18 @@ export default function AccountMenu(props) {
 
   useEffect(() => {
     //need this update since the org ID is programatically reset when drawer to change org/client is cloesd
-    setOrgId(curOrgId);
+    if (curOrgId) {
+      setOrgId(curOrgId);
+    } else {
+      setOrgId('');
+    }
   }, [curOrgId]);
 
   const handleSelection = e => {
     setOrgId(e.target.value);
 
     if (changeHandler) {
-      const orgObject = user.memberOfAccounts.find(org => org.id === e.target.value);
+      const orgObject = user.memberOfOrgs.find(org => org.id === e.target.value);
       changeHandler(orgObject);
     }
   };
@@ -39,12 +43,12 @@ export default function AccountMenu(props) {
         disabled={shouldDisable}
         onChange={handleSelection}>
         {
-          user.memberOfAccounts.map(account => {
+          user.memberOfOrgs.map(org => {
             return (
               <MenuItem
-                key={account.id}
-                value={account.id}>
-                {account.name}
+                key={org.id}
+                value={org.id}>
+                {org.name}
               </MenuItem>
             );
           })

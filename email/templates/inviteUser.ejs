@@ -2,7 +2,7 @@
 
 <head>
   <title>
-    <%=accountName%> has invited you to collaborate
+    <%=orgName%> has invited you to collaborate
   </title>
 </head>
 
@@ -12,13 +12,13 @@
       <div style="border: 1px solid #e3e3e3; border-radius: 5px;padding: 25px">
         <h1 style="font-weight: 300;font-size: 1.5rem;margin-bottom:50px">
           You have been invited to collaborate in the <strong>
-            <%=accountName%> and <%=clientName%>
+            <%=orgName%> and <%=clientName%>
           </strong> portal.
           <br><br>
           Please click the button below to accept the invitation.
         </h1>
         <div style="margin-bottom: 50px">
-          <a style="background: <%= accountBrand %>;color: white;outline: none;border:none;border-radius:5px;padding: 15px 30px;font-size: 1.2rem;cursor:pointer;text-decoration:none;"
+          <a style="background: <%= orgBrand %>;color: white;outline: none;border:none;border-radius:5px;padding: 15px 30px;font-size: 1.2rem;cursor:pointer;text-decoration:none;"
             href="<%= verificationUrl %>">
             Click to Accept
           </a>

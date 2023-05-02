@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
     }
 
     if (user.password) {
-      return res.json({ message: 'Account already fully registered - please sign in instead.' });
+      return res.json({ message: 'You\'re already fully registered - please sign in instead.' });
     }
 
     const [isAdminOrMemberResult] = await pool.query(

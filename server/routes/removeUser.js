@@ -3,10 +3,10 @@ const pool = require('../../database');
 module.exports = async (req, res) => {
   const {
     userId,
-    accountId
+    orgId
   } = req.body;
 
-  if (!userId || !accountId) {
+  if (!userId || !orgId) {
     return res.json({
       message: 'Missing user deletion parameters.'
     });
@@ -20,15 +20,15 @@ module.exports = async (req, res) => {
         WHERE assigned_to_id = ? AND folder_id IN 
           (
             SELECT id FROM folders WHERE client_id IN 
-            (SELECT id FROM clients WHERE account_id = ?)
+            (SELECT id FROM clients WHERE org_id = ?)
           )
       `,
-      [userId, accountId]
+      [userId, orgId]
     );
 
     await pool.query(
-      `DELETE FROM client_users WHERE user_id = ? AND client_id IN (SELECT id FROM clients WHERE account_id = ?)`,
-      [userId, accountId]
+      `DELETE FROM client_users WHERE user_id = ? AND client_id IN (SELECT id FROM clients WHERE org_id = ?)`,
+      [userId, orgId]
     );
 
     return res.json({ success: true });

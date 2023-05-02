@@ -8,38 +8,37 @@ module.exports = async (req, res) => {
   const {
     name,
     brandColor = '#3365f6',
-    accountId,
+    orgId,
     isLogoChanged
   } = req.body;
 
   const logoFile = req.files?.logoFile;
 
-  if (!accountId) {
+  if (!orgId) {
     return res.json({
-      message: 'No account ID supplied.'
+      message: 'No Org ID supplied.'
     });
   }
 
   if (!name) {
     return res.json({
-      message: 'Missing account name.'
+      message: 'Missing Org name.'
     });
   }
 
   try {
-
-    const [accountResult] = await pool.query(
-      'SELECT logo_url, id FROM accounts WHERE id = ?',
-      [accountId]
+    const [orgResult] = await pool.query(
+      'SELECT logo_url, id FROM orgs WHERE id = ?',
+      [orgId]
     );
 
-    const account = accountResult[0];
+    const org = orgResult[0];
 
-    if (account) {
+    if (org) {
       if (isLogoChanged === 'true') {
-        await updateAccountWithLogoChange(name, brandColor, accountId, account.logo_url, logoFile);
+        await updateOrgWithLogoChange(name, brandColor, orgId, org.logo_url, logoFile);
       } else {
-        await updateAccount(name, brandColor, accountId);
+        await updateOrg(name, brandColor, orgId);
       }
 
       return res.json({
@@ -47,7 +46,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    return res.json({ message: 'Account does not exist.' });
+    return res.json({ message: 'Org does not exist.' });
   } catch (error) {
     console.log(error);
 
@@ -57,14 +56,14 @@ module.exports = async (req, res) => {
   }
 };
 
-async function updateAccount(name, brandColor, accountId) {
+async function updateOrg(name, brandColor, orgId) {
   await pool.query(
-    'UPDATE accounts SET name = ?, brand_color = ? WHERE id = ?',
-    [name, brandColor, accountId]
+    'UPDATE orgs SET name = ?, brand_color = ? WHERE id = ?',
+    [name, brandColor, orgId]
   );
 }
 
-async function updateAccountWithLogoChange(name, brandColor, accountId, existingLogoUrl, logoFile) {
+async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl, logoFile) {
   if (existingLogoUrl) {
     await s3.deleteObject({ Key: existingLogoUrl.split('.com/')[1] }).promise();
   }
@@ -81,7 +80,7 @@ async function updateAccountWithLogoChange(name, brandColor, accountId, existing
       const resizedLogoSize = Buffer.byteLength(resizedLogoBuffer);
       if (resizedLogoSize <= 250000) { //250,000 bytes -> 250 kb -> 0.25 mb
         const now = Date.now();
-        const uploadFileName = `account-logos/${accountId}-${now}.png`;
+        const uploadFileName = `org-logos/${orgId}-${now}.png`;
 
         const s3ObjectParams = {
           Key: uploadFileName,
@@ -97,7 +96,7 @@ async function updateAccountWithLogoChange(name, brandColor, accountId, existing
   }
 
   await pool.query(
-    'UPDATE accounts SET name = ?, brand_color = ?, logo_url = ? WHERE id = ?',
-    [name, brandColor, updatedLogoUrl, accountId]
+    'UPDATE orgs SET name = ?, brand_color = ?, logo_url = ? WHERE id = ?',
+    [name, brandColor, updatedLogoUrl, orgId]
   );
 }

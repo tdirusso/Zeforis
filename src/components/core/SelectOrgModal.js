@@ -4,10 +4,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
-import { setActiveAccountId } from '../../api/account';
-import AccountMenu from './AccountMenu';
+import { setActiveOrgId } from '../../api/org';
+import OrgMenu from './OrgMenu';
 
-export default function SelectAccountModal({ accounts, user }) {
+export default function SelectOrgModal({ orgs, user }) {
   const {
     isOpen,
     openSnackBar,
@@ -16,9 +16,9 @@ export default function SelectAccountModal({ accounts, user }) {
   } = useSnackbar();
 
   const handleOrgSelection = ({ id }) => {
-    const selectedAccountObject = accounts.find(account => account.id === id);
-    setActiveAccountId(selectedAccountObject.id);
-    openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
+    const selectedOrgObject = orgs.find(org => org.id === id);
+    setActiveOrgId(selectedOrgObject.id);
+    openSnackBar(`Loading ${selectedOrgObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
     }, 500);
@@ -33,9 +33,9 @@ export default function SelectAccountModal({ accounts, user }) {
             Please select an organization from the drop-down list below.
           </DialogContentText>
           <br></br>
-          <AccountMenu
+          <OrgMenu
             changeHandler={handleOrgSelection}
-            accounts={accounts}
+            orgs={orgs}
             user={user}
           />
         </DialogContent>

@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import { completeRegistration } from '../../api/account';
+import { completeRegistration } from '../../api/org';
 
 export default function CompleteRegistrationPage() {
   const { search } = useLocation();

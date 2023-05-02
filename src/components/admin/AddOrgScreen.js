@@ -3,9 +3,9 @@ import { Box, Paper, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addAccount, setActiveAccountId } from '../../api/account';
+import { addOrg, setActiveOrgId } from '../../api/org';
 
-export default function AddAccountScreen({ user }) {
+export default function AddOrgScreen({ user }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -16,7 +16,7 @@ export default function AddAccountScreen({ user }) {
     message
   } = useSnackbar();
 
-  const handleCreateAccount = async e => {
+  const handleCreateOrg = async e => {
     e.preventDefault();
 
     const nameVal = name.current.value;
@@ -33,10 +33,10 @@ export default function AddAccountScreen({ user }) {
       fd.append('name', nameVal);
       fd.append('userId', user.id);
 
-      const { accountId, message } = await addAccount(fd);
+      const { orgId, message } = await addOrg(fd);
 
-      if (accountId) {
-        setActiveAccountId(accountId);
+      if (orgId) {
+        setActiveOrgId(orgId);
         openSnackBar('Organization created successfully.', 'success');
         setTimeout(() => {
           window.location.reload();
@@ -59,7 +59,7 @@ export default function AddAccountScreen({ user }) {
       <Typography>
         You are not a member of any organizations - please create your own organization by entering it's name below.
       </Typography>
-      <form onSubmit={handleCreateAccount}>
+      <form onSubmit={handleCreateOrg}>
         <Box sx={{ mt: 3, mb: 3 }}>
           <TextField
             placeholder="Organization Name"

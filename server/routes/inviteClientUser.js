@@ -18,15 +18,15 @@ module.exports = async (req, res) => {
     lastName,
     clientId,
     clientName,
-    accountId,
-    accountName,
-    accountBrand,
+    orgId,
+    orgName,
+    orgBrand,
     isAdmin = false
   } = req.body;
 
-  if (!clientId || !accountId) {
+  if (!clientId || !orgId) {
     return res.json({
-      message: 'Missing clientId or accountId.'
+      message: 'Missing clientId or orgId.'
     });
   }
 
@@ -57,10 +57,10 @@ module.exports = async (req, res) => {
       await sendInvitationEmail({
         email: email.toLowerCase(),
         clientId,
-        accountId,
-        accountName,
+        orgId,
+        orgName,
         clientName,
-        accountBrand,
+        orgBrand,
       });
 
       return res.json({ success: true, userId: user.id });
@@ -68,8 +68,8 @@ module.exports = async (req, res) => {
       await sendInvitationEmail({
         email: email.toLowerCase(),
         clientId,
-        accountId,
-        accountName,
+        orgId,
+        orgName,
         clientName,
         isNewUser: true
       });
@@ -96,8 +96,8 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail({ email, clientId, accountName, clientName, accountId, isNewUser, accountBrand }) {
-  let qs = `email=${email}&clientId=${clientId}&accountId=${accountId}`;
+async function sendInvitationEmail({ email, clientId, orgName, clientName, orgId, isNewUser, orgBrand }) {
+  let qs = `email=${email}&clientId=${clientId}&orgId=${orgId}`;
 
   let verificationUrl = process.env.APP_DOMAIN;
 
@@ -109,18 +109,18 @@ async function sendInvitationEmail({ email, clientId, accountName, clientName, a
 
   const ejsData = {
     verificationUrl,
-    accountName,
+    orgName,
     clientName,
-    accountBrand
+    orgBrand
   };
 
   const templatePath = path.resolve(__dirname, '../../email/templates/inviteUser.ejs');
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({
-    from: `${accountName} Client  - Zeforis`,
+    from: `${orgName} Client  - Zeforis`,
     to: email,
-    subject: `${accountName} has invited you to collaborate`,
+    subject: `${orgName} has invited you to collaborate`,
     text: template,
     html: template
   });

@@ -4,14 +4,14 @@ import { useState } from 'react';
 import { Box, Drawer, Grid, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close';
-import AccountMenu from './AccountMenu';
+import OrgMenu from './OrgMenu';
 import ClientMenu from './ClientMenu';
 import { setActiveClientId } from '../../api/client';
-import { setActiveAccountId } from '../../api/account';
+import { setActiveOrgId } from '../../api/org';
 
 export default function ChangeOrgOrClientDrawer(props) {
   const {
-    account,
+    org,
     isOpen,
     close,
     clients,
@@ -22,7 +22,7 @@ export default function ChangeOrgOrClientDrawer(props) {
 
   const [isLoading, setLoading] = useState(false);
   const [clientId, setClientId] = useState(client.id);
-  const [orgId, setOrgId] = useState(account.id);
+  const [orgId, setOrgId] = useState(org.id);
   const [clientsList, setClientsList] = useState(clients);
 
   const allClients = [...user.adminOfClients, ...user.memberOfClients];
@@ -31,7 +31,7 @@ export default function ChangeOrgOrClientDrawer(props) {
     close();
     setTimeout(() => {
       setClientId(client.id);
-      setOrgId(account.id);
+      setOrgId(org.id);
       setClientsList(clients);
       setLoading(false);
     }, 500);
@@ -42,7 +42,7 @@ export default function ChangeOrgOrClientDrawer(props) {
   };
 
   const handleOrgChange = ({ id }) => {
-    setClientsList(allClients.filter(({ accountId }) => accountId === id));
+    setClientsList(allClients.filter(({ orgId }) => orgId === id));
     setClientId('');
     setOrgId(id);
   };
@@ -60,7 +60,7 @@ export default function ChangeOrgOrClientDrawer(props) {
 
     setLoading(true);
     setActiveClientId(clientId);
-    setActiveAccountId(orgId);
+    setActiveOrgId(orgId);
 
     setTimeout(() => {
       window.location.reload();
@@ -111,7 +111,7 @@ export default function ChangeOrgOrClientDrawer(props) {
                 />
               </Grid>
               <Grid item xs={12}>
-                <AccountMenu
+                <OrgMenu
                   changeHandler={handleOrgChange}
                   user={user}
                   curOrgId={orgId}

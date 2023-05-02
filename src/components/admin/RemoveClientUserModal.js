@@ -11,8 +11,8 @@ import { useOutletContext } from 'react-router-dom';
 export default function RemoveClientUserModal({ open, setOpen, user }) {
   const {
     client,
-    accountUsersMap,
-    setAccountUsers,
+    orgUsersMap,
+    setOrgUsers,
     openSnackBar
   } = useOutletContext();
 
@@ -24,7 +24,7 @@ export default function RemoveClientUserModal({ open, setOpen, user }) {
 
   const [isLoading, setLoading] = useState(false);
 
-  const willBeRemovedFromAccount =
+  const willBeRemovedFromOrg =
     user?.memberOfClients.length + user?.adminOfClients.length === 1;
 
   const handleRemoveClientUser = async () => {
@@ -44,13 +44,13 @@ export default function RemoveClientUserModal({ open, setOpen, user }) {
           openSnackBar('Successully removed.', 'success');
         }, 250);
 
-        if (willBeRemovedFromAccount) {
-          setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
+        if (willBeRemovedFromOrg) {
+          setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== user.id));
         } else {
-          const theUser = accountUsersMap[user.id];
+          const theUser = orgUsersMap[user.id];
           theUser.memberOfClients = theUser.memberOfClients.filter(client => client.id !== clientId);
           theUser.adminOfClients = theUser.adminOfClients.filter(client => client.id !== clientId);
-          setAccountUsers(Object.values(accountUsersMap));
+          setOrgUsers(Object.values(orgUsersMap));
         }
 
         handleClose();

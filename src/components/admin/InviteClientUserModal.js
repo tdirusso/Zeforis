@@ -17,17 +17,17 @@ export default function InviteClientUserModal({ open, setOpen }) {
 
   const {
     client,
-    account,
-    accountUsersMap,
-    setAccountUsers,
+    org,
+    orgUsersMap,
+    setOrgUsers,
     openSnackBar
   } = useOutletContext();
 
   const clientId = client.id;
   const clientName = client.name;
-  const accountId = account.id;
-  const accountName = account.name;
-  const accountBrand = account.brandColor;
+  const orgId = org.id;
+  const orgName = org.name;
+  const orgBrand = org.brandColor;
 
   const email = useRef();
   const firstName = useRef();
@@ -56,13 +56,13 @@ export default function InviteClientUserModal({ open, setOpen }) {
       const { success, message, userId } = await inviteClientUser({
         email: emailVal,
         clientId,
-        accountId,
+        orgId,
         clientName,
-        accountName,
+        orgName,
         firstName: firstNameVal,
         lastName: lastNameVal,
         isAdmin,
-        accountBrand
+        orgBrand
       });
 
       if (success) {
@@ -77,12 +77,12 @@ export default function InviteClientUserModal({ open, setOpen }) {
           email: emailVal
         };
 
-        if (!accountUsersMap[userId]) { // User is new to the account
+        if (!orgUsersMap[userId]) { // User is new to the org
           addedUser.memberOfClients = [{ id: clientId, name: clientName }];
           addedUser.adminOfClients = [];
-          setAccountUsers(members => [...members, addedUser]);
-        } else { // User already exists in the account
-          const existingUser = accountUsersMap[userId];
+          setOrgUsers(members => [...members, addedUser]);
+        } else { // User already exists in the org
+          const existingUser = orgUsersMap[userId];
           const userIsMember = existingUser.memberOfClients.find(({ id }) => id === clientId);
           const userIsAdmin = existingUser.adminOfClients.find(({ id }) => id === clientId);
 
@@ -104,7 +104,7 @@ export default function InviteClientUserModal({ open, setOpen }) {
             }
           }
 
-          setAccountUsers(Object.values(accountUsersMap));
+          setOrgUsers(Object.values(orgUsersMap));
         }
 
         handleClose();

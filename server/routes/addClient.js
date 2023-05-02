@@ -3,7 +3,7 @@ const pool = require('../../database');
 module.exports = async (req, res) => {
   const {
     name,
-    accountId
+    orgId
   } = req.body;
 
   const { userId } = req;
@@ -18,8 +18,8 @@ module.exports = async (req, res) => {
 
   try {
     const newClient = await connection.query(
-      'INSERT INTO clients (name, account_id) VALUES (?,?)',
-      [name, accountId]
+      'INSERT INTO clients (name, org_id) VALUES (?,?)',
+      [name, orgId]
     );
 
     const newClientId = newClient[0].insertId;
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
     const clientObject = {
       id: newClientId,
       name,
-      accountId
+      orgId
     };
 
     connection.release();

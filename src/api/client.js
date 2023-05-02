@@ -25,17 +25,17 @@ const getActiveClientId = () => {
   return Number(localStorage.getItem('activeClientId'));
 };
 
-const getUserClientListForAccount = (user, activeAccountId) => {
+const getUserClientListForOrg = (user, activeOrgId) => {
   const result = [];
 
   user.adminOfClients.forEach(client => {
-    if (client.accountId === activeAccountId) {
+    if (client.orgId === activeOrgId) {
       result.push({ ...client, access: 'admin' });
     }
   });
 
   user.memberOfClients.forEach(client => {
-    if (client.accountId === activeAccountId) {
+    if (client.orgId === activeOrgId) {
       result.push({ ...client, access: 'member' });
     }
   });
@@ -67,8 +67,8 @@ const removeUser = async (payload) => {
   return data;
 };
 
-const getClientData = async (clientId, accountId) => {
-  const { data } = await request.get(`getClientData?clientId=${clientId}&accountId=${accountId}`);
+const getClientData = async (clientId, orgId) => {
+  const { data } = await request.get(`getClientData?clientId=${clientId}&orgId=${orgId}`);
 
   return data;
 };
@@ -97,7 +97,7 @@ export {
   updateClient,
   setActiveClientId,
   getActiveClientId,
-  getUserClientListForAccount,
+  getUserClientListForOrg,
   removeActiveClientId,
   inviteClientUser,
   removeClientUser,

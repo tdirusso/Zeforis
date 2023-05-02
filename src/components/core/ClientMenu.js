@@ -15,7 +15,6 @@ export default function ClientMenu(props) {
   } = props;
 
   const [clientId, setClientId] = useState(curClientId || '');
-  const [defaultOpenMenu] = useState(!Boolean(clientId));
 
   const label = clientId ? 'Client' : 'Select Client';
 
@@ -44,7 +43,6 @@ export default function ClientMenu(props) {
       <InputLabel>{label}</InputLabel>
       <Select
         value={clientId}
-        defaultOpen={defaultOpenMenu}
         label={label}
         disabled={shouldDisable}
         inputProps={{

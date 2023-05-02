@@ -2,7 +2,7 @@ const pool = require('../../database');
 
 module.exports = async (req, res) => {
 
-  const { clientId, accountId } = req.query;
+  const { clientId, orgId } = req.query;
 
   if (!clientId) {
     return res.json({ message: 'No clientId provided.' });
@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
       [clientId]
     );
 
-    const [accountUsers] = await pool.query(
+    const [orgUsers] = await pool.query(
       `
         SELECT 
           users.id as user_id,
@@ -33,15 +33,15 @@ module.exports = async (req, res) => {
         FROM client_users
         LEFT JOIN clients ON client_users.client_id = clients.id
         LEFT JOIN users ON client_users.user_id = users.id
-        LEFT JOIN accounts ON accounts.id = clients.account_id
-        WHERE clients.account_id = ?
+        LEFT JOIN orgs ON orgs.id = clients.org_id
+        WHERE clients.org_id = ?
       `,
-      [accountId]
+      [orgId]
     );
 
-    const accountUsersMap = {};
+    const orgUsersMap = {};
 
-    accountUsers.forEach(row => {
+    orgUsers.forEach(row => {
       const {
         client_id,
         client_name,
@@ -52,8 +52,8 @@ module.exports = async (req, res) => {
         email
       } = row;
 
-      if (!accountUsersMap[user_id]) {
-        accountUsersMap[user_id] = {
+      if (!orgUsersMap[user_id]) {
+        orgUsersMap[user_id] = {
           firstName: first_name,
           lastName: last_name,
           email,
@@ -64,12 +64,12 @@ module.exports = async (req, res) => {
       }
 
       if (role === 'admin') {
-        accountUsersMap[user_id].adminOfClients.push({
+        orgUsersMap[user_id].adminOfClients.push({
           id: client_id,
           name: client_name
         });
       } else {
-        accountUsersMap[user_id].memberOfClients.push({
+        orgUsersMap[user_id].memberOfClients.push({
           id: client_id,
           name: client_name
         });
@@ -114,13 +114,13 @@ module.exports = async (req, res) => {
       [foldersIds]
     );
 
-    const sortedAccountUsers = Object.values(accountUsersMap).sort((a, b) => a.firstName.localeCompare(b.firstName));
+    const sortedOrgUsers = Object.values(orgUsersMap).sort((a, b) => a.firstName.localeCompare(b.firstName));
 
     return res.json({
       folders,
       tasks,
       tags,
-      accountUsers: sortedAccountUsers
+      orgUsers: sortedOrgUsers
     });
 
   } catch (error) {

@@ -21,12 +21,12 @@ export default function EditUserPermissionsModal(props) {
 
   const {
     clients,
-    setAccountUsers,
-    accountUsersMap,
+    setOrgUsers,
+    orgUsersMap,
     openSnackBar
   } = useOutletContext();
 
-  const theUser = accountUsersMap[user?.id];
+  const theUser = orgUsersMap[user?.id];
 
   const handleUpdatePermission = async (isAdmin, clientObject) => {
     setLoading(true);
@@ -56,7 +56,7 @@ export default function EditUserPermissionsModal(props) {
           });
         }
 
-        setAccountUsers(Object.values(accountUsersMap));
+        setOrgUsers(Object.values(orgUsersMap));
         setLoading(false);
         openSnackBar('Permission successfully updated.', 'success');
       } else {
@@ -93,7 +93,7 @@ export default function EditUserPermissionsModal(props) {
           theUser.memberOfClients = theUser.memberOfClients.filter(c => c.id !== clientId);
         }
 
-        setAccountUsers(Object.values(accountUsersMap));
+        setOrgUsers(Object.values(orgUsersMap));
         setLoading(false);
         openSnackBar('Successfully updated.', 'success');
       } else {

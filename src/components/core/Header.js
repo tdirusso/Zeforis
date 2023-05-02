@@ -31,14 +31,14 @@ export default function Header(props) {
   const {
     isAdmin,
     user,
-    account,
+    org,
     client,
     openModal,
     openDrawer
   } = props;
 
   const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
-  const accountMenuOpen = Boolean(anchorEl?.className.includes('account-menu'));
+  const orgMenuOpen = Boolean(anchorEl?.className.includes('org-menu'));
 
   const handleMenuClick = (e) => {
     setAnchorEl(e.currentTarget);
@@ -137,14 +137,14 @@ export default function Header(props) {
         </Box>
 
         <Box>
-          <Tooltip title="Account">
+          <Tooltip title="Organization">
             <Paper sx={{ p: 0, borderRadius: '24px' }}>
               <IconButton
-                className="account-menu"
+                className="org-menu"
                 sx={{ borderRadius: '24px' }}
                 size="large"
                 onClick={handleMenuClick}>
-                <Box className="account-circle" display="flex">
+                <Box className="org-circle" display="flex">
                   <AccountCircleRoundedIcon />
                 </Box>
                 <KeyboardArrowDownRoundedIcon />
@@ -153,7 +153,7 @@ export default function Header(props) {
           </Tooltip>
           <Menu
             anchorEl={anchorEl}
-            open={accountMenuOpen}
+            open={orgMenuOpen}
             onClose={handleMenuClose}
             PaperProps={{
               sx: {
@@ -192,7 +192,7 @@ export default function Header(props) {
                     Org:
                   </Typography>
                   <Typography>
-                    {account.name}
+                    {org.name}
                   </Typography>
                 </Box>
               </Box>

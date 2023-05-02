@@ -33,30 +33,30 @@ module.exports = async (req, res) => {
             client_users.client_id, 
             client_users.user_id,
             client_users.role,
-            accounts.name AS account_name,
-            accounts.brand_color AS account_brand,
-            accounts.logo_url AS account_logo,
-            accounts.id AS account_id,
+            orgs.name AS org_name,
+            orgs.brand_color AS org_brand,
+            orgs.logo_url AS org_logo,
+            orgs.id AS org_id,
             clients.name AS client_name
           FROM client_users
           LEFT JOIN clients ON clients.id = client_users.client_id
-          LEFT JOIN accounts ON accounts.id = clients.account_id
+          LEFT JOIN orgs ON orgs.id = clients.org_id
           WHERE user_id = ?
         `,
         [userId]
       );
 
-      const [ownedAccountsData] = await pool.query(
-        'SELECT id, name, brand_color, logo_url, owner_id FROM accounts WHERE owner_id = ?',
+      const [ownedOrgsData] = await pool.query(
+        'SELECT id, name, brand_color, logo_url, owner_id FROM orgs WHERE owner_id = ?',
         [userId]
       );
 
-      const memberOfAccounts = {};
+      const memberOfOrgs = {};
       const memberOfClients = [];
       const adminOfClients = [];
 
-      ownedAccountsData.forEach(row => {
-        memberOfAccounts[row.id] = {
+      ownedOrgsData.forEach(row => {
+        memberOfOrgs[row.id] = {
           id: row.id,
           name: row.name,
           brandColor: row.brand_color,
@@ -66,28 +66,28 @@ module.exports = async (req, res) => {
 
       clientMemberData.forEach(row => {
         const {
-          account_id,
-          account_name,
-          account_brand,
-          account_logo,
+          org_id,
+          org_name,
+          org_brand,
+          org_logo,
           client_id,
           client_name,
           client_logo,
           role
         } = row;
 
-        memberOfAccounts[account_id] = {
-          id: account_id,
-          name: account_name,
-          brandColor: account_brand,
-          logo: account_logo
+        memberOfOrgs[org_id] = {
+          id: org_id,
+          name: org_name,
+          brandColor: org_brand,
+          logo: org_logo
         };
 
         const clientObject = {
           id: client_id,
           name: client_name,
           logo: client_logo,
-          accountId: account_id
+          orgId: org_id
         };
 
         if (role === 'admin') {
@@ -104,7 +104,7 @@ module.exports = async (req, res) => {
           lastName: user.last_name,
           email: user.email,
           dateCreated: user.date_created,
-          memberOfAccounts: Object.values(memberOfAccounts),
+          memberOfOrgs: Object.values(memberOfOrgs),
           adminOfClients,
           memberOfClients
         }

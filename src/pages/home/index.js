@@ -7,13 +7,13 @@ import { Box, Grid, createTheme } from "@mui/material";
 import SelectClientScreen from "../../components/core/SelectClientScreen";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { getActiveClientId, getClientData, getUserClientListForAccount, setActiveClientId } from "../../api/client";
+import { getActiveClientId, getClientData, getUserClientListForOrg, setActiveClientId } from "../../api/client";
 import AddClientScreen from "../../components/admin/AddClientScreen";
-import { getActiveAccountId, setActiveAccountId } from "../../api/account";
-import SelectAccountModal from "../../components/core/SelectAccountModal";
+import { getActiveOrgId, setActiveOrgId } from "../../api/org";
+import SelectOrgModal from "../../components/core/SelectOrgModal";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
-import AddAccountScreen from "../../components/admin/AddAccountScreen";
+import AddOrgScreen from "../../components/admin/AddOrgScreen";
 import Header from "../../components/core/Header";
 import Modals from "../../components/core/Modals";
 import useModal from "../../hooks/useModal";
@@ -24,27 +24,27 @@ export default function Home({ setTheme }) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
-  const accountIdPassed = queryParams.get('accountId');
+  const orgIdPassed = queryParams.get('orgId');
   const clientIdPassed = queryParams.get('clientId');
 
-  if (accountIdPassed && clientIdPassed) {
-    setActiveAccountId(accountIdPassed);
+  if (orgIdPassed && clientIdPassed) {
+    setActiveOrgId(orgIdPassed);
     setActiveClientId(clientIdPassed);
     window.location = window.location.href.split('?')[0];
   }
 
-  let activeAccountId = getActiveAccountId();
+  let activeOrgId = getActiveOrgId();
   let activeClientId = getActiveClientId();
 
   const { user, authError, setUser } = useAuth();
   const [isLoading, setLoading] = useState(true);
   const [client, setClient] = useState(null);
-  const [account, setAccount] = useState(null);
+  const [org, setOrg] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [tags, setTags] = useState([]);
-  const [accountUsers, setAccountUsers] = useState([]);
-  const [triedAccAndClient, setTriedAccAndClient] = useState(false);
+  const [orgUsers, setOrgUsers] = useState([]);
+  const [triedOrgAndClient, setTriedOrgAndClient] = useState(false);
 
   const {
     isOpen,
@@ -67,19 +67,19 @@ export default function Home({ setTheme }) {
 
   useEffect(() => {
     if (user) {
-      if (activeAccountId) {
-        const activeAccount = user.memberOfAccounts.find(account => {
-          return account.id === activeAccountId;
+      if (activeOrgId) {
+        const activeOrg = user.memberOfOrgs.find(org => {
+          return org.id === activeOrgId;
         });
 
-        if (activeAccount) {
-          const brandRGB = hexToRgb(activeAccount.brandColor);
-          document.documentElement.style.setProperty('--colors-primary', activeAccount.brandColor);
+        if (activeOrg) {
+          const brandRGB = hexToRgb(activeOrg.brandColor);
+          document.documentElement.style.setProperty('--colors-primary', activeOrg.brandColor);
           document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
-          themeConfig.palette.primary.main = activeAccount.brandColor;
-          document.title = `${activeAccount.name} Portal`;
+          themeConfig.palette.primary.main = activeOrg.brandColor;
+          document.title = `${activeOrg.name} Portal`;
           setTheme(createTheme(themeConfig));
-          setAccount(activeAccount);
+          setOrg(activeOrg);
         }
       }
 
@@ -93,14 +93,14 @@ export default function Home({ setTheme }) {
         }
       }
 
-      setTriedAccAndClient(true);
+      setTriedOrgAndClient(true);
     } else if (authError) {
       openSnackBar(authError, 'error');
     }
   }, [user, authError]);
 
   useEffect(() => {
-    if (triedAccAndClient) {
+    if (triedOrgAndClient) {
       if (client && tasks.length === 0) {
         fetchClientData();
       } else if (!client) {
@@ -109,21 +109,21 @@ export default function Home({ setTheme }) {
     }
 
     async function fetchClientData() {
-      const result = await getClientData(client.id, account.id);
+      const result = await getClientData(client.id, org.id);
       setTasks(result.tasks);
       setFolders(result.folders);
       setTags(result.tags);
-      setAccountUsers(result.accountUsers);
+      setOrgUsers(result.orgUsers);
       setLoading(false);
     }
-  }, [triedAccAndClient]);
+  }, [triedOrgAndClient]);
 
   const foldersMap = {};
   const tasksMap = {};
   const tagsMap = {};
-  const accountUsersMap = {};
+  const orgUsersMap = {};
 
-  accountUsers.forEach(user => accountUsersMap[user.id] = user);
+  orgUsers.forEach(user => orgUsersMap[user.id] = user);
 
   const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
 
@@ -146,14 +146,14 @@ export default function Home({ setTheme }) {
   const clientMembers = [];
   const clientAdmins = [];
 
-  accountUsers.forEach(accountUser => {
-    if (accountUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientAdmins.push({ ...accountUser, role: 'Administrator' });
-      if (accountUser.id === user.id) isAdmin = true;
+  orgUsers.forEach(orgUser => {
+    if (orgUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
+      clientAdmins.push({ ...orgUser, role: 'Administrator' });
+      if (orgUser.id === user.id) isAdmin = true;
     }
 
-    if (accountUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientMembers.push({ ...accountUser, role: 'Member' });
+    if (orgUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
+      clientMembers.push({ ...orgUser, role: 'Member' });
     }
   });
 
@@ -161,24 +161,24 @@ export default function Home({ setTheme }) {
     return <Loader />;
   }
 
-  if (!account) {
-    if (user.memberOfAccounts.length === 1) {
-      setActiveAccountId(user.memberOfAccounts[0].id);
-      setAccount(user.memberOfAccounts[0]);
-    } else if (user.memberOfAccounts.length === 0) {
+  if (!org) {
+    if (user.memberOfOrgs.length === 1) {
+      setActiveOrgId(user.memberOfOrgs[0].id);
+      setOrg(user.memberOfOrgs[0]);
+    } else if (user.memberOfOrgs.length === 0) {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <AddAccountScreen user={user} />
+          <AddOrgScreen user={user} />
         </Box>
       );
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectAccountModal
+          <SelectOrgModal
             open={true}
             setOpen={() => { }}
             hideCancel={true}
-            accounts={user.memberOfAccounts}
+            orgs={user.memberOfOrgs}
             user={user}
           />
         </Box>
@@ -186,12 +186,12 @@ export default function Home({ setTheme }) {
     }
   }
 
-  const clients = getUserClientListForAccount(user, activeAccountId);
+  const clients = getUserClientListForOrg(user, activeOrgId);
 
   if (clients.length === 0) {
     return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
-        <AddClientScreen account={account} />
+        <AddClientScreen org={org} />
       </Box>
     );
   }
@@ -215,15 +215,15 @@ export default function Home({ setTheme }) {
   const context = {
     client,
     clients,
-    account,
+    org,
     user,
     folders: sortedFolders,
     tasks: sortedTasks,
     tags,
     clientMembers,
     clientAdmins,
-    accountUsers,
-    accountUsersMap,
+    orgUsers,
+    orgUsersMap,
     tagsMap,
     foldersMap,
     tasksMap,
@@ -231,7 +231,7 @@ export default function Home({ setTheme }) {
     setTags,
     setTasks,
     setFolders,
-    setAccountUsers,
+    setOrgUsers,
     setUser,
     openSnackBar,
     openModal
@@ -240,7 +240,7 @@ export default function Home({ setTheme }) {
   return (
     <Box>
       <SideNav
-        account={account}
+        org={org}
         client={client}
       />
       <Box component="main" ml={'280px'} px={5}>
@@ -249,7 +249,7 @@ export default function Home({ setTheme }) {
             <Header
               isAdmin={isAdmin}
               user={user}
-              account={account}
+              org={org}
               client={client}
               openModal={openModal}
               openDrawer={openDrawer}

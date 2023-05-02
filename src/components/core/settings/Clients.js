@@ -35,7 +35,7 @@ export default function Clients() {
     clientAdmins,
     user,
     tags,
-    account,
+    org,
     clients,
     isAdmin
   } = useOutletContext();
@@ -58,7 +58,7 @@ export default function Clients() {
   return (
     <>
       <Paper>
-        <Box component="h6">{account.name} Clients</Box>
+        <Box component="h6">{org.name} Clients</Box>
         <Divider sx={{ my: 4 }} />
 
         <Button
@@ -238,7 +238,7 @@ export default function Clients() {
       <AddClientModal
         open={createClientModalOpen}
         setOpen={setCreateClientModalOpen}
-        account={account}
+        org={org}
       />
 
       <EditClientModal

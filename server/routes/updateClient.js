@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
 
   try {
     const [clientResult] = await pool.query(
-      'SELECT account_id FROM clients WHERE id = ?',
+      'SELECT org_id FROM clients WHERE id = ?',
       [clientId]
     );
 
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
       const clientObject = {
         id: clientId,
         name,
-        accountId: client.account_id
+        orgId: client.org_id
       };
 
       return res.json({
