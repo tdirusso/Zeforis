@@ -8,9 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FolderIcon from '@mui/icons-material/Folder';
-import AddFolderModal from "../admin/AddFolderModal";
-import SearchModal from "./SearchModal";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import './styles/Header.css';
@@ -21,9 +19,7 @@ import { logout } from "../../api/auth";
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
-  const [searchModalOpen, setSearchModalOpen] = useState(false);
-
+  
   const navigate = useNavigate();
 
   const {
@@ -46,9 +42,9 @@ export default function Header(props) {
     setAnchorEl(null);
   };
 
-  const openAddTask = () => {
+  const openCreateTaskDrawer = () => {
     setAnchorEl(null);
-    openDrawer('add-task');
+    openDrawer('create-task');
   };
 
   const openSettings = () => {
@@ -61,14 +57,19 @@ export default function Header(props) {
     openDrawer('change-org-or-client');
   };
 
-  const openAddFolder = () => {
+  const openCreateFolderDrawer = () => {
     setAnchorEl(null);
-    setAddFolderModalOpen(true);
+    openDrawer('create-folder');
   };
 
   const openMyAccount = () => {
     setAnchorEl(null);
     navigate('/home/settings?tab=Account');
+  };
+
+  const openSearch = () => {
+    setAnchorEl(null);
+    openModal('search');
   };
 
   return (
@@ -90,7 +91,7 @@ export default function Header(props) {
             <Paper sx={{ p: 0, borderRadius: '50%' }}>
               <IconButton
                 size="large"
-                onClick={() => setSearchModalOpen(true)}>
+                onClick={openSearch}>
                 <SearchIcon />
               </IconButton>
             </Paper>
@@ -116,7 +117,7 @@ export default function Header(props) {
                 width: '20ch',
               }
             }}>
-            <MenuItem onClick={openAddTask}>
+            <MenuItem onClick={openCreateTaskDrawer}>
               <ListItemIcon>
                 <AddTaskIcon />
               </ListItemIcon>
@@ -126,7 +127,7 @@ export default function Header(props) {
                 </Typography>
               </ListItemText>
             </MenuItem>
-            <MenuItem onClick={openAddFolder}>
+            <MenuItem onClick={openCreateFolderDrawer}>
               <ListItemIcon>
                 <FolderIcon />
               </ListItemIcon>
@@ -243,17 +244,6 @@ export default function Header(props) {
         </Box>
       </Box>
       <Divider sx={{ mt: 2.5, mb: 2 }} />
-
-      {/* 
-      <AddFolderModal
-        open={addFolderModalOpen}
-        setOpen={setAddFolderModalOpen}
-      />
-
-      <SearchModal
-        open={searchModalOpen}
-        setOpen={setSearchModalOpen}
-      /> */}
     </Grid>
   );
 };

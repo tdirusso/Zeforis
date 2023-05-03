@@ -13,7 +13,7 @@ export default function KeyFolders({ folders }) {
   const navigate = useNavigate();
 
   const handleOpenCreateTaskDrawer = folder => {
-    openDrawer('add-task', { defaultFolder: folder });
+    openDrawer('create-task', { defaultFolder: folder });
   };
 
   return (

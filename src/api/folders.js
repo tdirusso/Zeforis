@@ -1,6 +1,6 @@
 import request from '../lib/request';
 
-const addFolder = async (payload) => {
+const createFolder = async (payload) => {
   const { data } = await request.post('folders', payload);
   return data;
 };
@@ -17,7 +17,7 @@ const removeFoldeer = async (payload) => {
 };
 
 export {
-  addFolder,
+  createFolder,
   updateFolder,
   removeFoldeer
 };

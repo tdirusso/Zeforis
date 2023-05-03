@@ -75,10 +75,6 @@ export default function CreateTaskDrawer(props) {
       });
 
       if (task) {
-        setTimeout(() => {
-          openSnackBar('Task created.', 'success');
-        }, 300);
-
         const now = new Date().toISOString();
 
         setTasks(tasks => [...tasks, {
@@ -105,6 +101,7 @@ export default function CreateTaskDrawer(props) {
           updated_by_last: user.lastName
         }]);
 
+        openSnackBar('Task created.', 'success');
         handleClose();
       } else {
         openSnackBar(message, 'error');

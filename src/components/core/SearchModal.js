@@ -2,7 +2,7 @@ import { Divider, TextField, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { Box } from '@mui/system';
 import { useState } from 'react';
-import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -11,7 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 
-export default function SearchModal({ open, setOpen }) {
+export default function SearchModal(props) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -19,8 +19,10 @@ export default function SearchModal({ open, setOpen }) {
 
   const {
     folders,
-    tasks
-  } = useOutletContext();
+    tasks,
+    isOpen,
+    close
+  } = props;
 
   const filteredTasks = tasks.filter(task => {
     if (!query) {
@@ -42,14 +44,16 @@ export default function SearchModal({ open, setOpen }) {
 
   const handleTaskClick = (task) => {
     navigate(`/home/task/${task.task_id}?exitPath=${pathname}`);
+    handleClose();
   };
 
   const handleFolderClick = (folder) => {
     navigate(`/home/tasks?folderId=${folder.id}`);
+    handleClose();
   };
 
   const handleClose = () => {
-    setOpen(false);
+    close();
     setTimeout(() => {
       setQuery('');
     }, 500);
@@ -64,7 +68,7 @@ export default function SearchModal({ open, setOpen }) {
             overflowX: 'hidden'
           }
         }}
-        open={open}
+        open={isOpen}
         onClose={handleClose}>
         <Box minWidth={500}>
           <TextField

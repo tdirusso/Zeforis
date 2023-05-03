@@ -6,15 +6,12 @@ import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
 import './styles.css';
 import { Paper, Typography, Button, Grid } from "@mui/material";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-import { useState } from "react";
-import AddFolderModal from "../../../components/admin/AddFolderModal";
 
 export default function Dashboard() {
-  const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
-
   const {
     tasks,
-    folders
+    folders,
+    openDrawer
   } = useOutletContext();
 
   const tasksSortedByDate = tasks.sort((a, b) => {
@@ -59,19 +56,15 @@ export default function Dashboard() {
       {
         keyFolders.length > 0 ?
           <KeyFolders folders={keyFolders} /> :
-          <NoFoldersMessage setAddFolderModalOpen={setAddFolderModalOpen} />
+          <NoFoldersMessage
+            openDrawer={openDrawer}
+          />
       }
-
-      <AddFolderModal
-        open={addFolderModalOpen}
-        setOpen={setAddFolderModalOpen}
-        willBeKey={true}
-      />
     </>
   );
 };
 
-function NoFoldersMessage({ setAddFolderModalOpen }) {
+function NoFoldersMessage({ openDrawer }) {
   return (
     <Grid item xs={12} md={4}>
       <Paper sx={{ height: '100%' }}>
@@ -81,9 +74,9 @@ function NoFoldersMessage({ setAddFolderModalOpen }) {
         <Button
           sx={{ mt: 1.5 }}
           variant="outlined"
-          onClick={() => setAddFolderModalOpen(true)}
+          onClick={() => openDrawer('create-folder')}
           startIcon={<CreateNewFolderIcon />}>
-          Create Key Folder
+          Create Folder
         </Button>
       </Paper>
     </Grid>

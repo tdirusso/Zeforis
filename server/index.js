@@ -7,7 +7,7 @@ const login = require('./routes/users/login');
 const authenticate = require('./routes/users/authenticate');
 const addClient = require('./routes/clients/addClient');
 const getClient = require('./routes/clients/getClientData');
-const addFolder = require('./routes/folders/addFolder');
+const createFolder = require('./routes/folders/createFolder');
 const updateClient = require('./routes/clients/updateClient');
 const register = require('./routes/users/register');
 const verify = require('./routes/users/verify');
@@ -70,7 +70,7 @@ const boot = async () => {
   app.patch('/api/clients', checkPermissionsMW, updateClient);
   app.delete('/api/clients', checkPermissionsMW, removeClient);
 
-  app.post('/api/folders', checkPermissionsMW, addFolder);
+  app.post('/api/folders', checkPermissionsMW, createFolder);
   app.delete('/api/folders', checkPermissionsMW, removeFolder);
   app.patch('/api/folders', checkPermissionsMW, updateFolder);
 

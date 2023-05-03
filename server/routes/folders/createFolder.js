@@ -26,11 +26,15 @@ module.exports = async (req, res) => {
       is_key_folder: isKeyFolder
     };
 
-    return res.json({ folder: folderObject });
+    return res.json({
+      success: true,
+      folder: folderObject
+    });
   } catch (error) {
     console.log(error);
 
     return res.json({
+      error: true,
       message: error.message
     });
   }
