@@ -41,7 +41,11 @@ export default function CreateTaskDrawer(props) {
 
   useEffect(() => {
     setFolder(defaultFolder || null);
-  }, [defaultFolder]);
+
+    if (isOpen) {
+      name.current.focus();
+    }
+  }, [defaultFolder, isOpen]);
 
   const tagIdNameMap = {};
   tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);

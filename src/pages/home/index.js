@@ -19,6 +19,7 @@ import Modals from "../../components/core/Modals";
 import useModal from "../../hooks/useModal";
 import Drawers from "../../components/core/Drawers";
 import useDrawer from "../../hooks/useDrawer";
+import useSideNav from "../../hooks/useSideNav";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -58,6 +59,11 @@ export default function Home({ setTheme }) {
     openModal,
     closeModal
   } = useModal();
+
+  const {
+    isSideNavOpen,
+    toggleSideNav
+  } = useSideNav();
 
   const {
     drawerToOpen,
@@ -244,9 +250,18 @@ export default function Home({ setTheme }) {
       <SideNav
         org={org}
         client={client}
+        isSideNavOpen={isSideNavOpen}
       />
-      <Box component="main" ml={'280px'} px={5}>
-        <Box maxWidth={'1200px'} m='auto' pt={2} pb={5}>
+      <Box
+        component="main"
+        ml={isSideNavOpen ? '280px' : '0px'}
+        sx={{ transition: 'margin 200ms' }}
+        px={5}>
+        <Box
+          maxWidth={isSideNavOpen ? '1200px' : '1450px'}
+          m='auto'
+          pt={2}
+          pb={5}>
           <Grid container spacing={3}>
             <Header
               isAdmin={isAdmin}
@@ -255,6 +270,8 @@ export default function Home({ setTheme }) {
               client={client}
               openModal={openModal}
               openDrawer={openDrawer}
+              toggleSideNav={toggleSideNav}
+              isSideNavOpen={isSideNavOpen}
             />
 
             <Modals
@@ -279,7 +296,7 @@ export default function Home({ setTheme }) {
         type={type}
         message={message}
       />
-    </Box>
+    </Box >
   );
 };
 

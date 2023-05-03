@@ -1,6 +1,6 @@
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, Checkbox, Drawer, FormControlLabel, Grid, IconButton, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createFolder } from '../../api/folders';
@@ -23,6 +23,12 @@ export default function CreateFolderDrawer(props) {
 
   const [isLoading, setLoading] = useState(false);
   const [isKeyFolder, setIsKeyFolder] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      name.current.focus();
+    }
+  }, [isOpen]);
 
   const handleCreateFolder = async () => {
     const nameVal = name.current.value;

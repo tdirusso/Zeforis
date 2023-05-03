@@ -7,7 +7,13 @@ import { NavLink } from "react-router-dom";
 import SpeedIcon from '@mui/icons-material/Speed';
 import zeforisIcon from '../../assets/zeforis-logo.png';
 
-export default function SideNav({ client, org }) {
+export default function SideNav(props) {
+
+  const {
+    client,
+    org,
+    isSideNavOpen
+  } = props;
 
   const buttonBaseStyles = {
     width: '100%',
@@ -18,8 +24,13 @@ export default function SideNav({ client, org }) {
     justifyContent: 'flex-start'
   };
 
+  const sideNavPosition = isSideNavOpen ? '0px' : '-281px';
+
   return (
-    <Box className="Sidenav">
+    <Box
+      className="Sidenav"
+      sx={{ left: sideNavPosition }}
+    >
       <Box className="flex-centered container">
         {
           org.logo ? <img
