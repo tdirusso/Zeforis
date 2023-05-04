@@ -1,37 +1,36 @@
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Autocomplete,
   Box,
   Button,
   Drawer,
-  Grid,
   IconButton,
   TextField,
   Typography,
   Chip,
   Divider,
-  LinearProgress,
-  Alert
+  Alert,
+  Menu,
+  MenuItem,
+  Slider
 } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
 import { FormControl } from "@mui/material";
-import { createTask } from '../../api/tasks';
 import InputAdornment from '@mui/material/InputAdornment';
 import { createTag } from '../../api/clients';
 import LinkIcon from '@mui/icons-material/Link';
 import FolderIcon from '@mui/icons-material/Folder';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import CloseIcon from '@mui/icons-material/Close';
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { useNavigate } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
-import PersonIcon from '@mui/icons-material/Person';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import './styles/TaskDrawer.css';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { statuses } from '../../lib/constants';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const defaultTask = {
   task_id: null,
@@ -61,7 +60,6 @@ export default function TaskDrawer(props) {
   const {
     isOpen,
     close,
-    defaultFolder,
     folders,
     clientMembers,
     clientAdmins,
@@ -80,22 +78,33 @@ export default function TaskDrawer(props) {
 
   const clientId = client.id;
 
-  const linkUrl = useRef();
-  const navigate = useNavigate();
-
   const [isLoading, setLoading] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [assignedTo, setAssignedTo] = useState(null);
-  const [folder, setFolder] = useState(defaultFolder || null);
+  const [folder, setFolder] = useState(null);
   const [name, setName] = useState('');
-  const [copyButtonText, setCopyButtonText] = useState('Copy Link URL');
+  const [description, setDescription] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [copyButtonText, setCopyButtonText] = useState('Copy Link');
   const [task, setTask] = useState(defaultTask);
+  const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
+  const [dateDue, setDateDue] = useState(null);
+
+  const statusMenuOpen = Boolean(statusMenuAnchor);
 
   useEffect(() => {
     setTask(taskProp || defaultTask);
     if (taskProp) {
       setTask(taskProp);
       setName(taskProp.task_name);
+      setDescription(taskProp.description);
+      setLinkUrl(taskProp.link_url);
+      setProgress(taskProp.progress);
+      setDateDue(taskProp.date_due || null);
+      setFolder(foldersMap[taskProp.folder_id] || null);
+      setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
     }
   }, [taskProp]);
 
@@ -109,7 +118,7 @@ export default function TaskDrawer(props) {
     window.navigator.clipboard.writeText(task.link_url);
     setCopyButtonText('Copied!');
     setTimeout(() => {
-      setCopyButtonText('Copy Link URL');
+      setCopyButtonText('Copy Link');
     }, 500);
   };
 
@@ -121,6 +130,10 @@ export default function TaskDrawer(props) {
       setSelectedTags([]);
       setLoading(false);
     }, 500);
+  };
+
+  const handleStatusMenuClose = () => {
+    setStatusMenuAnchor(null);
   };
 
   const handleCreateTag = async e => {
@@ -144,12 +157,24 @@ export default function TaskDrawer(props) {
   };
 
   const handleNameChange = e => {
-
     setName(e.target.value);
+  };
+
+  const handleDescriptionChange = e => {
+    setDescription(e.target.value);
+  };
+
+  const handleUpdateStatus = () => {
+    setStatusMenuAnchor(null);
+  };
+
+  const handleLinkChange = e => {
+    setLinkUrl(e.target.value);
   };
 
   return (
     <Drawer
+      className='task-drawer'
       anchor="right"
       open={isOpen}
       onClose={handleClose}
@@ -188,9 +213,20 @@ export default function TaskDrawer(props) {
               value={name}
               multiline
               onChange={handleNameChange}
+              sx={{}}
               inputProps={{
                 sx: { fontSize: '1.25rem' }
               }}
+            />
+          </Box>
+          <Box my={2}>
+            <TextField
+              fullWidth
+              placeholder='Description'
+              variant="standard"
+              value={description}
+              multiline
+              onChange={handleDescriptionChange}
             />
           </Box>
           {
@@ -205,23 +241,50 @@ export default function TaskDrawer(props) {
         </Box>
         <Chip
           label={task.status}
+          deleteIcon={<MoreVertIcon />}
+          onClick={e => setStatusMenuAnchor(e.currentTarget)}
+          onDelete={() => { }}
           className={task.status}>
         </Chip>
-        <Box my={2}>
-          <Typography variant="body1">
-            {
-              task.description ? task.description : 'No description.'
-            }
-          </Typography>
-        </Box>
+        <Menu
+          anchorEl={statusMenuAnchor}
+          open={statusMenuOpen}
+          onClose={() => setStatusMenuAnchor(null)}
+        >
+          {
+            statuses.map(statusName => {
+              return (
+                <MenuItem
+                  key={statusName}
+                  onClick={() => handleUpdateStatus(statusName)}>
+                  <Chip
+                    label={statusName}
+                    className={statusName}
+                    onClick={() => { }}
+                  />
+                </MenuItem>
+              );
+            })
+          }
+        </Menu>
         <Divider sx={{ mt: 4 }} />
         <Box my={4}>
-          <Box component="h4" mb={0.5}>Link URL</Box>
-          <Typography mb={1} sx={{ overflowWrap: 'break-word' }}>
-            {
-              task.link_url ? task.link_url : 'None.'
-            }
-          </Typography>
+          <Box my={2}>
+            <TextField
+              fullWidth
+              placeholder='https://'
+              variant="standard"
+              value={linkUrl}
+              multiline
+              onChange={handleLinkChange}
+              InputProps={{
+                startAdornment:
+                  <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
+                    <LinkIcon />
+                  </InputAdornment>
+              }}
+            />
+          </Box>
           <Box>
             <Button
               disabled={!Boolean(task.link_url)}
@@ -229,7 +292,7 @@ export default function TaskDrawer(props) {
               onClick={() => window.open(task.link_url, '_blank')}
               endIcon={<OpenInNewIcon />}
               variant="outlined">
-              Open Link URL
+              Open
             </Button>
             <Button
               onClick={handleCopyLink}
@@ -240,93 +303,130 @@ export default function TaskDrawer(props) {
           </Box>
         </Box>
         <Divider />
+        <Box my={4} maxWidth="300px">
+          <Box my={2}>
+            <FormControl fullWidth>
+              <Autocomplete
+                options={folders}
+                getOptionLabel={(option) => option.name || ''}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                disabled={isLoading}
+                value={folder}
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+                onChange={(_, val) => setFolder(val)}
+                renderInput={(params) => (
+                  <TextField
+                    placeholder='Folder'
+                    {...params}
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment:
+                        <InputAdornment position='start'>
+                          <FolderIcon />
+                        </InputAdornment>
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+
+          <Box my={2}>
+            <FormControl fullWidth>
+              <Autocomplete
+                options={membersAndAdmins}
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                disabled={isLoading}
+                groupBy={(option) => option.role}
+                onChange={(_, val) => setAssignedTo(val)}
+                value={assignedTo}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Assigned to"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment:
+                        <InputAdornment position='start'>
+                          <AccountCircleIcon />
+                        </InputAdornment>
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+
+          <Box my={2}>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                format="MM/DD/YYYY"
+                value={dateDue}
+                InputProps={{
+                  sx: {
+                    flexDirection: 'row-reverse'
+                  }
+                }}
+                onChange={value => setDateDue(value)}
+                renderInput={(params) => <TextField
+                  {...params}
+                  fullWidth
+                  helperText='Date due'
+                />}
+              ></DatePicker>
+            </LocalizationProvider>
+          </Box>
+        </Box>
+        <Divider />
         <Box my={4}>
           <Box component="h4" mb={2}>Progress</Box>
-          <Box display="flex" alignItems="center">
-            <LinearProgress
-              variant="determinate"
-              value={task.progress}
-              sx={{
-                height: 10,
-                width: '100%',
-                mr: 1.5,
-                borderRadius: 25
-              }}
+          <Box display="flex" alignItems="center" width="96%">
+            <Slider
+              valueLabelDisplay="auto"
+              step={5}
+              marks={[
+                { value: 3, label: '0%' },
+                { value: 96, label: '100%' }
+              ]}
+              min={0}
+              max={100}
+              value={progress}
+              onChange={e => setProgress(e.target.value)}
+              valueLabelFormat={val => `${val}%`}
             />
-            <Typography variant="body2">
-              {task.progress}%
-            </Typography>
-          </Box>
-        </Box>
-
-        <Divider />
-
-        <Box my={4}
-          display="flex"
-          justifyContent="space-evenly"
-          textAlign="center"
-          flexWrap="wrap"
-          gap={2}>
-          <Box>
-            <Box component="h4" mb={1}>Folder</Box>
-            <Button
-              variant="outlined"
-              size="large"
-              onClick={() => navigate(`/home/tasks?folderId=${task.folder_id}`)}
-              startIcon={<FolderIcon />}>
-              {foldersMap[task.folder_id]?.name}
-            </Button>
-          </Box>
-
-          <Box>
-            <Box component="h4" mb={1}>Assigned To</Box>
-            <Box display="flex" alignItems="center">
-              <Avatar sx={{ mr: 1 }}>
-                <PersonIcon />
-              </Avatar>
-              <Typography mb={0.5}>
-                {
-                  task.assigned_to_id ?
-                    `${task.assigned_first} ${task.assigned_last}`
-                    : 'None'
-                }
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box>
-            <Box component="h4" mb={1}>Date Due</Box>
-            <Box display="flex" alignItems="center">
-              <Avatar sx={{ mr: 1 }}>
-                <CalendarTodayIcon />
-              </Avatar>
-              <Typography mb={0.5}>
-                {
-                  task.date_due ? new Date(task.date_due).toLocaleDateString() : 'None'
-                }
-              </Typography>
-            </Box>
           </Box>
         </Box>
         <Divider />
-
         <Box my={4}>
           <Box component="h4" mb={2}>Tags</Box>
           <Box>
-            {
-              taskTags.length > 0 ?
-                taskTags.map(tag => <Chip
-                  label={tag}
-                  key={tag}
-                  sx={{ m: 0.5 }}
-                />) :
-                'None.'
-            }
+            <FormControl fullWidth>
+              <Autocomplete
+                multiple
+                value={selectedTags}
+                options={tags}
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+                isOptionEqualToValue={(option, value) => option.name === value.name}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                disableCloseOnSelect
+                onKeyDown={handleCreateTag}
+                disabled={isLoading}
+                onChange={(_, newVal) => setSelectedTags(newVal)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant='standard'
+                    placeholder={selectedTags.length === 0 ? 'Add tags' : ''}
+                  />
+                )}
+              />
+            </FormControl>
           </Box>
         </Box>
-        <Divider />
-
-        <Box my={4}>
+        <Box my={6}>
           <Alert severity="info">
             Last updated by {task.updated_by_first} {task.updated_by_last} on
             &nbsp;{new Date(new Date(task.date_last_updated).toLocaleString() + ' UTC').toLocaleString()}

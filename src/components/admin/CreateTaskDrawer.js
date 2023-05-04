@@ -38,6 +38,7 @@ export default function CreateTaskDrawer(props) {
   const [selectedTags, setSelectedTags] = useState([]);
   const [assignedTo, setAssignedTo] = useState(null);
   const [folder, setFolder] = useState(defaultFolder || null);
+  const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
 
   useEffect(() => {
     setFolder(defaultFolder || null);
@@ -237,7 +238,7 @@ export default function CreateTaskDrawer(props) {
             <Grid item xs={12}>
               <FormControl fullWidth>
                 <Autocomplete
-                  options={[...clientAdmins, ...clientMembers]}
+                  options={membersAndAdmins}
                   renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                   getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                   isOptionEqualToValue={(option, value) => option.id === value.id}
