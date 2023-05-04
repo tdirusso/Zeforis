@@ -70,80 +70,78 @@ export default function CreateFolderDrawer(props) {
   };
 
   return (
-    <div>
-      <Drawer
-        anchor="right"
-        open={isOpen}
-        onClose={handleClose}
-        hideBackdrop
-        variant='persistent'
-        PaperProps={{ sx: { width: '450px' } }}>
-        <DialogContent>
-          <Box sx={{ mb: 3 }}>
-            <Grid container rowSpacing={0} columnSpacing={1.5}>
-              <Grid item xs={12} mb={2}>
-                <Box
-                  mb={4}
-                  display="flex"
-                  position="relative"
-                  alignItems="center"
-                  justifyContent="center">
-                  <IconButton
-                    size='large'
-                    onClick={handleClose}
-                    sx={{
-                      position: 'absolute',
-                      left: '-8px',
-                    }}>
-                    <CloseIcon />
-                  </IconButton>
-                  <DialogTitle
-                    sx={{
-                      textAlign: 'center',
-                    }}>
-                    Create New Folder
-                  </DialogTitle>
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  autoFocus
-                  disabled={isLoading}
-                  inputRef={name}
-                  placeholder='Folder name'
-                  required>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  componentsProps={{ typography: { fontWeight: '300' } }}
-                  sx={{ mt: 1.5 }}
-                  control={<Checkbox
-                    icon={<StarBorderIcon />}
-                    checkedIcon={<StarIcon />}
-                    checked={isKeyFolder}
-                    onChange={(_, val) => setIsKeyFolder(val)}
-                    disabled={isLoading}
-                  />}
-                  label="Key folder"
-                />
-              </Grid>
+    <Drawer
+      anchor="right"
+      open={isOpen}
+      onClose={handleClose}
+      hideBackdrop
+      variant='persistent'
+      PaperProps={{ sx: { width: '450px', py: 0 } }}>
+      <DialogContent>
+        <Box sx={{ mb: 3 }}>
+          <Grid container rowSpacing={0} columnSpacing={1.5}>
+            <Grid item xs={12} mb={2}>
+              <Box
+                mb={4}
+                display="flex"
+                position="relative"
+                alignItems="center"
+                justifyContent="center">
+                <IconButton
+                  size='large'
+                  onClick={handleClose}
+                  sx={{
+                    position: 'absolute',
+                    left: '-8px',
+                  }}>
+                  <CloseIcon />
+                </IconButton>
+                <DialogTitle
+                  sx={{
+                    textAlign: 'center',
+                  }}>
+                  Create New Folder
+                </DialogTitle>
+              </Box>
             </Grid>
-          </Box>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                autoFocus
+                disabled={isLoading}
+                inputRef={name}
+                placeholder='Folder name'
+                required>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                componentsProps={{ typography: { fontWeight: '300' } }}
+                sx={{ mt: 1.5 }}
+                control={<Checkbox
+                  icon={<StarBorderIcon />}
+                  checkedIcon={<StarIcon htmlColor='gold' />}
+                  checked={isKeyFolder}
+                  onChange={(_, val) => setIsKeyFolder(val)}
+                  disabled={isLoading}
+                />}
+                label="Key folder"
+              />
+            </Grid>
+          </Grid>
+        </Box>
 
-          <LoadingButton
-            sx={{ mt: '10px' }}
-            variant='contained'
-            onClick={handleCreateFolder}
-            type='submit'
-            fullWidth
-            size='large'
-            loading={isLoading}>
-            Create Folder
-          </LoadingButton>
-        </DialogContent>
-      </Drawer>
-    </div>
+        <LoadingButton
+          sx={{ mt: '10px' }}
+          variant='contained'
+          onClick={handleCreateFolder}
+          type='submit'
+          fullWidth
+          size='large'
+          loading={isLoading}>
+          Create Folder
+        </LoadingButton>
+      </DialogContent>
+    </Drawer>
   );
 };

@@ -7,8 +7,6 @@ export default function useSideNav() {
     setSideNavOpen(!isSideNavOpen);
   };
 
-  console.log(isSideNavOpen);
-
   return {
     isSideNavOpen,
     toggleSideNav

@@ -47,10 +47,13 @@ export default function KeyFolders({ folders }) {
                 </Box>
                 {
                   taskLength > 0 ?
-                    <TaskList tasks={folder.tasks.slice(0, 5)} /> :
-                    <NoTasksMessage 
-                    handleOpenCreateTaskDrawer={() => handleOpenCreateTaskDrawer(folder)}
-                     />
+                    <TaskList
+                      tasks={folder.tasks.slice(0, 5)}
+                      openDrawer={openDrawer}
+                    /> :
+                    <NoTasksMessage
+                      handleOpenCreateTaskDrawer={() => handleOpenCreateTaskDrawer(folder)}
+                    />
                 }
               </Paper>
             </Grid>
@@ -78,9 +81,7 @@ function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
   );
 }
 
-function TaskList({ tasks }) {
-  const navigate = useNavigate();
-
+function TaskList({ tasks, openDrawer }) {
   return tasks.map(task => {
     let taskName = task.task_name;
 
@@ -100,7 +101,7 @@ function TaskList({ tasks }) {
         minHeight={40}
         gap={0.5}
         borderRadius='8px'
-        onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
+        onClick={() => openDrawer('task', { taskProp: task })}
         key={task.task_id}>
         <Typography variant="body2">
           {taskName}

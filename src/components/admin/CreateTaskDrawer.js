@@ -150,167 +150,165 @@ export default function CreateTaskDrawer(props) {
   };
 
   return (
-    <div>
-      <Drawer
-        anchor="right"
-        open={isOpen}
-        onClose={handleClose}
-        hideBackdrop
-        variant='persistent'
-        PaperProps={{ sx: { width: '450px' } }}>
-        <DialogContent>
-          <Box sx={{ mb: 3 }}>
-            <Grid container rowSpacing={2} columnSpacing={1.5}>
-              <Grid item xs={12} mb={2}>
-                <Box
-                  display="flex"
-                  position="relative"
-                  alignItems="center"
-                  justifyContent="center">
-                  <IconButton
-                    size='large'
-                    onClick={handleClose}
-                    sx={{
-                      position: 'absolute',
-                      left: '-8px',
-                    }}>
-                    <CloseIcon />
-                  </IconButton>
-                  <DialogTitle
-                    sx={{
-                      textAlign: 'center',
-                    }}>
-                    Create New Task
-                  </DialogTitle>
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  autoFocus
-                  disabled={isLoading}
-                  inputRef={name}
-                  placeholder='Task name'
-                  required>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  placeholder='https://'
-                  InputProps={{
-                    startAdornment:
-                      <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
-                        <LinkIcon />
-                      </InputAdornment>
-                  }}
-                  disabled={isLoading}
-                  inputRef={linkUrl}>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}></Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <Autocomplete
-                    options={folders}
-                    getOptionLabel={(option) => option.name || ''}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    disabled={isLoading}
-                    value={folder}
-                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                    onChange={(_, val) => setFolder(val)}
-                    renderInput={(params) => (
-                      <TextField
-                        placeholder='Folder'
-                        {...params}
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment:
-                            <InputAdornment position='start'>
-                              <FolderIcon />
-                            </InputAdornment>
-                        }}
-                      />
-                    )}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <Autocomplete
-                    options={[...clientAdmins, ...clientMembers]}
-                    renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
-                    getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    disabled={isLoading}
-                    groupBy={(option) => option.role}
-                    onChange={(_, val) => setAssignedTo(val)}
-                    value={assignedTo}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Assigned to"
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment:
-                            <InputAdornment position='start'>
-                              <AccountCircleIcon />
-                            </InputAdornment>
-                        }}
-                      />
-                    )}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}></Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <Autocomplete
-                    multiple
-                    value={selectedTags}
-                    options={tags}
-                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                    isOptionEqualToValue={(option, value) => option.name === value.name}
-                    getOptionLabel={(option) => option.name}
-                    filterSelectedOptions
-                    disableCloseOnSelect
-                    onKeyDown={handleCreateTag}
-                    disabled={isLoading}
-                    onChange={(_, newVal) => setSelectedTags(newVal)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Tags"
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment:
-                            <>
-                              <InputAdornment position='start'>
-                                <LocalOfferIcon />
-                              </InputAdornment>
-                              {params.InputProps.startAdornment}
-                            </>
-                        }}
-                      />
-                    )}
-                  />
-                </FormControl>
-              </Grid>
+    <Drawer
+      anchor="right"
+      open={isOpen}
+      onClose={handleClose}
+      hideBackdrop
+      variant='persistent'
+      PaperProps={{ sx: { width: '450px', pb: 0 } }}>
+      <DialogContent>
+        <Box sx={{ mb: 3 }}>
+          <Grid container rowSpacing={2} columnSpacing={1.5}>
+            <Grid item xs={12} mb={2}>
+              <Box
+                display="flex"
+                position="relative"
+                alignItems="center"
+                justifyContent="center">
+                <IconButton
+                  size='large'
+                  onClick={handleClose}
+                  sx={{
+                    position: 'absolute',
+                    left: '-8px',
+                  }}>
+                  <CloseIcon />
+                </IconButton>
+                <DialogTitle
+                  sx={{
+                    textAlign: 'center',
+                  }}>
+                  Create New Task
+                </DialogTitle>
+              </Box>
             </Grid>
-          </Box>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                autoFocus
+                disabled={isLoading}
+                inputRef={name}
+                placeholder='Task name'
+                required>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                placeholder='https://'
+                InputProps={{
+                  startAdornment:
+                    <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
+                      <LinkIcon />
+                    </InputAdornment>
+                }}
+                disabled={isLoading}
+                inputRef={linkUrl}>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}></Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  options={folders}
+                  getOptionLabel={(option) => option.name || ''}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  disabled={isLoading}
+                  value={folder}
+                  renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+                  onChange={(_, val) => setFolder(val)}
+                  renderInput={(params) => (
+                    <TextField
+                      placeholder='Folder'
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment:
+                          <InputAdornment position='start'>
+                            <FolderIcon />
+                          </InputAdornment>
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  options={[...clientAdmins, ...clientMembers]}
+                  renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
+                  getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  disabled={isLoading}
+                  groupBy={(option) => option.role}
+                  onChange={(_, val) => setAssignedTo(val)}
+                  value={assignedTo}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Assigned to"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment:
+                          <InputAdornment position='start'>
+                            <AccountCircleIcon />
+                          </InputAdornment>
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}></Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  multiple
+                  value={selectedTags}
+                  options={tags}
+                  renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+                  isOptionEqualToValue={(option, value) => option.name === value.name}
+                  getOptionLabel={(option) => option.name}
+                  filterSelectedOptions
+                  disableCloseOnSelect
+                  onKeyDown={handleCreateTag}
+                  disabled={isLoading}
+                  onChange={(_, newVal) => setSelectedTags(newVal)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Tags"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment:
+                          <>
+                            <InputAdornment position='start'>
+                              <LocalOfferIcon />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                          </>
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Box>
 
-          <LoadingButton
-            sx={{ mt: '10px' }}
-            variant='contained'
-            onClick={handleCreateTask}
-            type='submit'
-            fullWidth
-            size='large'
-            loading={isLoading}>
-            Create Task
-          </LoadingButton>
-        </DialogContent>
-      </Drawer>
-    </div>
+        <LoadingButton
+          sx={{ mt: '10px' }}
+          variant='contained'
+          onClick={handleCreateTask}
+          type='submit'
+          fullWidth
+          size='large'
+          loading={isLoading}>
+          Create Task
+        </LoadingButton>
+      </DialogContent>
+    </Drawer>
   );
 };

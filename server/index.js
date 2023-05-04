@@ -41,7 +41,13 @@ if (process.env.NODE_ENV === 'development') {
   const cors = require('cors');
 
   app.use(cors({
-    origin: ['http://localhost:3000'],
+    origin: (origin, callback) => {
+      const domainRegex = new RegExp(/http:\/\/.*.localhost:3000/);
+
+      if (domainRegex.test(origin) || origin === 'http://localhost:3000') {
+        callback(null, true);
+      }
+    },
     credentials: true
   }));
 }

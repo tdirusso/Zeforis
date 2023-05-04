@@ -1,6 +1,7 @@
 import CreateFolderDrawer from "../admin/CreateFolderDrawer";
 import CreateTaskDrawer from "../admin/CreateTaskDrawer";
 import ChangeOrgOrClientDrawer from "./ChangeOrgOrClientDrawer";
+import TaskDrawer from "./TaskDrawer";
 
 export default function Drawers(props) {
   const {
@@ -25,6 +26,12 @@ export default function Drawers(props) {
       <CreateFolderDrawer
         {...props}
         isOpen={drawerToOpen === 'create-folder'}
+        close={closeDrawer}
+      />
+
+      <TaskDrawer
+        {...props}
+        isOpen={drawerToOpen === 'task'}
         close={closeDrawer}
       />
     </>

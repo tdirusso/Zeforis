@@ -54,16 +54,20 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    const result = await login({
-      email: emailVal,
-      password: passwordVal
-    });
+    try {
+      const result = await login({
+        email: emailVal,
+        password: passwordVal
+      });
 
-    if (result.token) {
-      navigate('/home/dashboard');
-    } else {
-      setLoading(false);
-      openSnackBar(result.message, 'error');
+      if (result.token) {
+        navigate('/home/dashboard');
+      } else {
+        setLoading(false);
+        openSnackBar(result.message, 'error');
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error')
     }
   };
 
