@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import { useEffect, useState } from 'react';
 import {
@@ -7,13 +8,14 @@ import {
   Drawer,
   IconButton,
   TextField,
-  Typography,
   Chip,
   Divider,
   Alert,
   Menu,
   MenuItem,
-  Slider
+  Slider,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -31,6 +33,8 @@ import { statuses } from '../../lib/constants';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { updateTask } from '../../api/tasks';
 
 const defaultTask = {
   task_id: null,
@@ -66,19 +70,16 @@ export default function TaskDrawer(props) {
     client,
     tags,
     setTags,
+    openSnackBar,
+    foldersMap,
+    taskProp,
     setTasks,
     user,
-    openSnackBar,
-    tasks,
-    foldersMap,
-    tagsMap,
-    isAdmin,
-    taskProp
+    tasksMap
   } = props;
 
   const clientId = client.id;
 
-  const [isLoading, setLoading] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [assignedTo, setAssignedTo] = useState(null);
   const [folder, setFolder] = useState(null);
@@ -91,6 +92,9 @@ export default function TaskDrawer(props) {
   const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [dateDue, setDateDue] = useState(null);
+  const [isKeyTask, setIsKeyTask] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [needsUpdating, setNeedsUpdating] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
 
@@ -103,16 +107,23 @@ export default function TaskDrawer(props) {
       setLinkUrl(taskProp.link_url);
       setProgress(taskProp.progress);
       setDateDue(taskProp.date_due || null);
+      setIsKeyTask(Boolean(taskProp.is_key_task));
       setFolder(foldersMap[taskProp.folder_id] || null);
+      setStatus(taskProp.status);
       setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
     }
   }, [taskProp]);
 
-  const taskTagIds = task.tags?.split(',').filter(Boolean) || [];
-  const taskTags = taskTagIds.map(id => tagsMap[id].name);
-
   const tagIdNameMap = {};
   tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
+
+  const curTagsIds = task.tags?.split(',').filter(Boolean) || [];
+
+  const curTags = curTagsIds.length > 0 ? curTagsIds.map(tagId => ({
+    id: Number(tagId),
+    name: tagIdNameMap[tagId],
+    client_id: clientId
+  })) : [];
 
   const handleCopyLink = () => {
     window.navigator.clipboard.writeText(task.link_url);
@@ -128,12 +139,7 @@ export default function TaskDrawer(props) {
       setFolder(null);
       setAssignedTo(null);
       setSelectedTags([]);
-      setLoading(false);
     }, 500);
-  };
-
-  const handleStatusMenuClose = () => {
-    setStatusMenuAnchor(null);
   };
 
   const handleCreateTag = async e => {
@@ -164,12 +170,89 @@ export default function TaskDrawer(props) {
     setDescription(e.target.value);
   };
 
-  const handleUpdateStatus = () => {
-    setStatusMenuAnchor(null);
-  };
-
   const handleLinkChange = e => {
     setLinkUrl(e.target.value);
+  };
+
+  const handleStatusChange = status => {
+    setStatus(status);
+    setStatusMenuAnchor(null);
+    setNeedsUpdating(true);
+  };
+
+  useEffect(() => {
+    if (needsUpdating) {
+      handleUpdateTask();
+      setNeedsUpdating(false);
+    }
+  }, [needsUpdating]);
+
+  const handleUpdateTask = async () => {
+    const folderId = folder?.id;
+    const assignedToId = assignedTo?.id;
+
+    if (!name) {
+      openSnackBar('Please enter a name for the task.');
+      return;
+    }
+
+    if (!folderId) {
+      openSnackBar('Please select a folder for the task.');
+      return;
+    }
+
+    try {
+      const { message, success } = await updateTask({
+        name,
+        description,
+        linkUrl,
+        status,
+        assignedToId,
+        progress,
+        folderId,
+        clientId,
+        tags: selectedTags,
+        isKeyTask,
+        dateDue,
+        taskId: task.task_id,
+        currentTags: curTags
+      });
+
+      if (success) {
+        openSnackBar('Task successfully updated.', 'success');
+        const now = new Date().toISOString();
+
+        tasksMap[task.task_id] = {
+          task_id: task.task_id,
+          task_name: name,
+          description,
+          date_created: task.date_created,
+          created_by_id: task.created_by_id,
+          status: status,
+          folder_id: folderId,
+          link_url: linkUrl,
+          assigned_to_id: assignedToId,
+          progress: progress,
+          date_completed: status === 'Complete' ? now : null,
+          is_key_task: Number(isKeyTask),
+          date_due: dateDue ? dateDue.toISOString() : null,
+          date_last_updated: now,
+          tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
+          assigned_first: assignedTo?.firstName || null,
+          assigned_last: assignedTo?.lastName || null,
+          created_first: task.created_first,
+          created_last: task.created_last,
+          updated_by_first: user.firstName,
+          updated_by_last: user.lastName
+        };
+
+        setTasks(Object.values(tasksMap));
+      } else {
+        openSnackBar(message, 'error');
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+    }
   };
 
   return (
@@ -219,55 +302,59 @@ export default function TaskDrawer(props) {
               }}
             />
           </Box>
-          <Box my={2}>
-            <TextField
-              fullWidth
-              placeholder='Description'
-              variant="standard"
-              value={description}
-              multiline
-              onChange={handleDescriptionChange}
-            />
-          </Box>
-          {
-            task.is_key_task ?
-              <Box display="flex" alignItems="center" mt={0.5}>
-                <StarIcon htmlColor="gold" fontSize="small" />
-                <Typography variant="caption">Key Task</Typography>
-              </Box>
-              :
-              ''
-          }
         </Box>
-        <Chip
-          label={task.status}
-          deleteIcon={<MoreVertIcon />}
-          onClick={e => setStatusMenuAnchor(e.currentTarget)}
-          onDelete={() => { }}
-          className={task.status}>
-        </Chip>
-        <Menu
-          anchorEl={statusMenuAnchor}
-          open={statusMenuOpen}
-          onClose={() => setStatusMenuAnchor(null)}
-        >
-          {
-            statuses.map(statusName => {
-              return (
-                <MenuItem
-                  key={statusName}
-                  onClick={() => handleUpdateStatus(statusName)}>
-                  <Chip
-                    label={statusName}
-                    className={statusName}
-                    onClick={() => { }}
-                  />
-                </MenuItem>
-              );
-            })
-          }
-        </Menu>
+        <Box display="flex" alignItems="center" mt={2.5}>
+          <Chip
+            label={status}
+            deleteIcon={<MoreVertIcon />}
+            onClick={e => setStatusMenuAnchor(e.currentTarget)}
+            sx={{ mr: 4 }}
+            onDelete={e => setStatusMenuAnchor(e.currentTarget)}
+            className={status}>
+          </Chip>
+          <Menu
+            anchorEl={statusMenuAnchor}
+            open={statusMenuOpen}
+            onClose={() => setStatusMenuAnchor(null)}>
+            {
+              statuses.map(statusName => {
+                return (
+                  <MenuItem
+                    key={statusName}
+                    onClick={() => handleStatusChange(statusName)}>
+                    <Chip
+                      label={statusName}
+                      className={statusName}
+                      sx={{ cursor: 'pointer' }}
+                    />
+                  </MenuItem>
+                );
+              })
+            }
+          </Menu>
+          <FormControlLabel
+            componentsProps={{ typography: { fontWeight: '300' } }}
+            control={<Checkbox
+              icon={<StarBorderIcon />}
+              checkedIcon={<StarIcon htmlColor='gold' />}
+              checked={isKeyTask}
+              onChange={(_, val) => setIsKeyTask(val)}
+            />}
+            label="Key task"
+          />
+        </Box>
         <Divider sx={{ mt: 4 }} />
+        <Box my={3}>
+          <TextField
+            fullWidth
+            placeholder='Description'
+            variant="standard"
+            value={description}
+            multiline
+            onChange={handleDescriptionChange}
+          />
+        </Box>
+        <Divider />
         <Box my={4}>
           <Box my={2}>
             <TextField
@@ -310,7 +397,6 @@ export default function TaskDrawer(props) {
                 options={folders}
                 getOptionLabel={(option) => option.name || ''}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                disabled={isLoading}
                 value={folder}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                 onChange={(_, val) => setFolder(val)}
@@ -338,7 +424,6 @@ export default function TaskDrawer(props) {
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                disabled={isLoading}
                 groupBy={(option) => option.role}
                 onChange={(_, val) => setAssignedTo(val)}
                 value={assignedTo}
@@ -413,7 +498,6 @@ export default function TaskDrawer(props) {
                 filterSelectedOptions
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
-                disabled={isLoading}
                 onChange={(_, newVal) => setSelectedTags(newVal)}
                 renderInput={(params) => (
                   <TextField
@@ -433,6 +517,6 @@ export default function TaskDrawer(props) {
           </Alert>
         </Box>
       </DialogContent>
-    </Drawer>
+    </Drawer >
   );
 };
