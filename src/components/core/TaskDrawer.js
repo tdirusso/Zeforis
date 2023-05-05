@@ -101,6 +101,8 @@ export default function TaskDrawer(props) {
   useEffect(() => {
     setTask(taskProp || defaultTask);
     if (taskProp) {
+      const tagIds = taskProp.tags?.split(',').filter(Boolean) || [];
+
       setTask(taskProp);
       setName(taskProp.task_name);
       setDescription(taskProp.description);
@@ -110,6 +112,11 @@ export default function TaskDrawer(props) {
       setIsKeyTask(Boolean(taskProp.is_key_task));
       setFolder(foldersMap[taskProp.folder_id] || null);
       setStatus(taskProp.status);
+      setSelectedTags(tagIds.map(tagId => ({
+        id: Number(tagId),
+        name: tagIdNameMap[tagId],
+        client_id: clientId
+      })));
       setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
     }
   }, [taskProp]);
@@ -119,11 +126,11 @@ export default function TaskDrawer(props) {
 
   const curTagsIds = task.tags?.split(',').filter(Boolean) || [];
 
-  const curTags = curTagsIds.length > 0 ? curTagsIds.map(tagId => ({
+  const curTags = curTagsIds.map(tagId => ({
     id: Number(tagId),
     name: tagIdNameMap[tagId],
     client_id: clientId
-  })) : [];
+  }));
 
   const handleCopyLink = () => {
     window.navigator.clipboard.writeText(task.link_url);
@@ -135,11 +142,6 @@ export default function TaskDrawer(props) {
 
   const handleClose = () => {
     close();
-    setTimeout(() => {
-      setFolder(null);
-      setAssignedTo(null);
-      setSelectedTags([]);
-    }, 500);
   };
 
   const handleCreateTag = async e => {
@@ -156,27 +158,89 @@ export default function TaskDrawer(props) {
         const newTag = result.tag;
         setTags(tags => [...tags, newTag]);
         setSelectedTags(tags => [...tags, newTag]);
+        setNeedsUpdating(true);
       } else {
         openSnackBar(result.message, 'error');
       }
     }
   };
 
-  const handleNameChange = e => {
-    setName(e.target.value);
+  const handleNameChange = () => {
+    if (!name) {
+      openSnackBar('Please enter a task name.');
+      return;
+    } else if (name !== task.task_name) {
+      setNeedsUpdating(true);
+    }
   };
 
-  const handleDescriptionChange = e => {
-    setDescription(e.target.value);
+  const handleDescriptionChange = () => {
+    if (description !== task.description) {
+      setNeedsUpdating(true);
+    }
   };
 
-  const handleLinkChange = e => {
-    setLinkUrl(e.target.value);
+  const handleLinkChange = () => {
+    if (linkUrl !== task.link_url) {
+      setNeedsUpdating(true);
+    }
   };
 
   const handleStatusChange = status => {
     setStatus(status);
+
+    if (status === 'Complete') {
+      setProgress(100);
+    }
+
     setStatusMenuAnchor(null);
+    setNeedsUpdating(true);
+  };
+
+  const handleIsKeyChange = (_, val) => {
+    setIsKeyTask(val);
+    setNeedsUpdating(true);
+  };
+
+  const handleAssignedToChange = () => {
+    const assignedToId = assignedTo?.id || null;
+
+    if (!assignedToId && task.assigned_to_id) {
+      setNeedsUpdating(true);
+    } else if (assignedToId !== task.assigned_to_id) {
+      setNeedsUpdating(true);
+    }
+  };
+
+  const handleDateDueChange = () => {
+    if (dateDue !== task.date_due) {
+      const newDate = new Date(dateDue);
+      if (!isNaN(newDate.getTime())) {
+        setNeedsUpdating(true);
+      } else {
+        openSnackBar('Invalid due date format.');
+      }
+    }
+  };
+
+  const handleProgressChange = () => {
+    if (progress === 100) {
+      setStatus('Complete');
+    }
+    setNeedsUpdating(true);
+  };
+
+  const handleFolderChange = () => {
+    if (!folder) {
+      openSnackBar('Please select a folder for the task.');
+      return;
+    } else if (folder.id !== task.folder_id) {
+      setNeedsUpdating(true);
+    }
+  };
+
+  const handleTagsChange = (_, newTagsArray) => {
+    setSelectedTags(newTagsArray);
     setNeedsUpdating(true);
   };
 
@@ -222,7 +286,7 @@ export default function TaskDrawer(props) {
         openSnackBar('Task successfully updated.', 'success');
         const now = new Date().toISOString();
 
-        tasksMap[task.task_id] = {
+        const newTaskObject = {
           task_id: task.task_id,
           task_name: name,
           description,
@@ -246,6 +310,8 @@ export default function TaskDrawer(props) {
           updated_by_last: user.lastName
         };
 
+        tasksMap[task.task_id] = newTaskObject;
+        setTask(newTaskObject);
         setTasks(Object.values(tasksMap));
       } else {
         openSnackBar(message, 'error');
@@ -295,7 +361,8 @@ export default function TaskDrawer(props) {
               variant="standard"
               value={name}
               multiline
-              onChange={handleNameChange}
+              onBlur={handleNameChange}
+              onChange={e => setName(e.target.value)}
               sx={{}}
               inputProps={{
                 sx: { fontSize: '1.25rem' }
@@ -338,7 +405,7 @@ export default function TaskDrawer(props) {
               icon={<StarBorderIcon />}
               checkedIcon={<StarIcon htmlColor='gold' />}
               checked={isKeyTask}
-              onChange={(_, val) => setIsKeyTask(val)}
+              onChange={handleIsKeyChange}
             />}
             label="Key task"
           />
@@ -351,7 +418,8 @@ export default function TaskDrawer(props) {
             variant="standard"
             value={description}
             multiline
-            onChange={handleDescriptionChange}
+            onBlur={handleDescriptionChange}
+            onChange={e => setDescription(e.target.value)}
           />
         </Box>
         <Divider />
@@ -363,7 +431,8 @@ export default function TaskDrawer(props) {
               variant="standard"
               value={linkUrl}
               multiline
-              onChange={handleLinkChange}
+              onBlur={handleLinkChange}
+              onChange={e => setLinkUrl(e.target.value)}
               InputProps={{
                 startAdornment:
                   <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
@@ -400,6 +469,7 @@ export default function TaskDrawer(props) {
                 value={folder}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                 onChange={(_, val) => setFolder(val)}
+                onBlur={handleFolderChange}
                 renderInput={(params) => (
                   <TextField
                     placeholder='Folder'
@@ -425,6 +495,7 @@ export default function TaskDrawer(props) {
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 groupBy={(option) => option.role}
+                onBlur={handleAssignedToChange}
                 onChange={(_, val) => setAssignedTo(val)}
                 value={assignedTo}
                 renderInput={(params) => (
@@ -455,9 +526,11 @@ export default function TaskDrawer(props) {
                   }
                 }}
                 onChange={value => setDateDue(value)}
+                onAccept={handleDateDueChange}
                 renderInput={(params) => <TextField
                   {...params}
                   fullWidth
+                  onBlur={handleDateDueChange}
                   helperText='Date due'
                 />}
               ></DatePicker>
@@ -478,6 +551,7 @@ export default function TaskDrawer(props) {
               min={0}
               max={100}
               value={progress}
+              onChangeCommitted={handleProgressChange}
               onChange={e => setProgress(e.target.value)}
               valueLabelFormat={val => `${val}%`}
             />
@@ -498,7 +572,12 @@ export default function TaskDrawer(props) {
                 filterSelectedOptions
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
-                onChange={(_, newVal) => setSelectedTags(newVal)}
+                onChange={handleTagsChange}
+                componentsProps={{
+                  popper: {
+                    placement: 'top'
+                  }
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}

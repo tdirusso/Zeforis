@@ -4,7 +4,6 @@ module.exports = async (req, res) => {
   const {
     name,
     description,
-    status = 'New',
     folderId,
     linkUrl,
     assignedToId = null,
@@ -15,7 +14,10 @@ module.exports = async (req, res) => {
     currentTags = []
   } = req.body;
 
-  let { progress = 0 } = req.body;
+  let {
+    progress = 0,
+    status = 'New'
+  } = req.body;
 
   const creatorUserId = req.userId;
 
@@ -28,6 +30,10 @@ module.exports = async (req, res) => {
   try {
     if (status === 'Complete') {
       progress = 100;
+    }
+
+    if (progress === 100) {
+      status = 'Complete';
     }
 
     const [updatedTaskResult] = await pool.query(
