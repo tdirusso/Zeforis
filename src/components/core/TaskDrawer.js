@@ -222,14 +222,19 @@ export default function TaskDrawer(props) {
     }
   };
 
-  const handleDateDueChange = () => {
-    if (dateDue !== task.date_due) {
-      const newDate = new Date(dateDue);
-      if (!isNaN(newDate.getTime())) {
-        setNeedsUpdating(true);
-      } else {
-        openSnackBar('Invalid due date format.');
+  const handleDateDueChange = (eventOrVal) => {
+    if (eventOrVal.type === 'blur') {
+      if (dateDue !== task.date_due) {
+        const newDate = new Date(dateDue);
+        if (!isNaN(newDate.getTime())) {
+          setNeedsUpdating(true);
+        } else {
+          openSnackBar('Invalid due date format.');
+        }
       }
+    } else {
+      setDateDue(eventOrVal);
+      setNeedsUpdating(true);
     }
   };
 

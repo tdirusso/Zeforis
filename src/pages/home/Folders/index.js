@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip } from "@mui/material";
+import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
 import './styles.css';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddFolderModal from "../../../components/admin/AddFolderModal";
@@ -38,7 +38,8 @@ export default function FoldersPage() {
   const {
     client,
     folders,
-    isAdmin
+    isAdmin,
+    openDrawer
   } = useOutletContext();
 
   const keyFolders = [];
@@ -62,32 +63,12 @@ export default function FoldersPage() {
   return (
     <>
       <Grid item>
-        <Paper
-          hidden={!isAdmin}
-          className="folder-item"
-          onClick={() => setAddFolderModalOpen(true)}
-          sx={{
-            height: '100%',
-            position: 'relative',
-            width: 180
-          }}>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center">
-            <FolderIcon
-              fontSize="large"
-              color="primary"
-            />
-            <Box
-              component="h6"
-              mt={1}
-              color="var(--colors-primary)">
-              + New Folder
-            </Box>
-          </Box>
-        </Paper>
+        <Button
+          onClick={() => openDrawer('create-folder')}
+          size="large"
+          variant="contained">
+          New Folder
+        </Button>
       </Grid>
       <Grid item xs={12}>
         <Divider textAlign="left">

@@ -265,11 +265,11 @@ export default function TasksTable({ tasks }) {
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '400px' }}>Name</TableCell>
+                <TableCell sx={{ width: '350px' }}>Name</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell sx={{ width: '160px' }}>Due</TableCell>
-                <TableCell sx={{ width: '175px' }}>Tags</TableCell>
                 <TableCell>Folder</TableCell>
+                <TableCell>Due</TableCell>
+                <TableCell sx={{ width: '175px' }}>Tags</TableCell>
                 <TableCell sx={{ width: '30px' }}></TableCell>
               </TableRow>
             </TableHead>
@@ -321,6 +321,7 @@ export default function TasksTable({ tasks }) {
                           size="small"
                         />
                       </TableCell>
+                      <TableCell>{foldersMap[task.folder_id].name}</TableCell>
                       <TableCell>
                         {
                           task.date_due ?
@@ -328,7 +329,6 @@ export default function TasksTable({ tasks }) {
                             'None'
                         }
                       </TableCell>
-
                       <TableCell>{
                         tagsArray.map(tagId =>
                           <Chip
@@ -338,8 +338,6 @@ export default function TasksTable({ tasks }) {
                             sx={{ m: 0.5 }}
                           />)}
                       </TableCell>
-
-                      <TableCell>{foldersMap[task.folder_id].name}</TableCell>
                       <TableCell>
                         {
                           task.link_url ?
