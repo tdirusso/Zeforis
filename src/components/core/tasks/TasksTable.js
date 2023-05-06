@@ -184,6 +184,9 @@ export default function TasksTable({ tasks }) {
         filterFolder={filterFolder}
         setSortBy={setSortBy}
         sortBy={sortBy}
+        filterName={filterName}
+        filterAssignedTo={filterAssignedTo}
+        filterTags={filterTags}
       />
 
       <Grid item xs={12} hidden={!isAdmin}>

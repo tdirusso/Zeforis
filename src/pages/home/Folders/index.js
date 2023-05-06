@@ -84,7 +84,7 @@ export default function FoldersPage() {
               component="h6"
               mt={1}
               color="var(--colors-primary)">
-              Add Folder +
+              + New Folder
             </Box>
           </Box>
         </Paper>

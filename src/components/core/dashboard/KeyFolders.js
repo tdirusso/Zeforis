@@ -75,7 +75,7 @@ function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
         variant="outlined"
         onClick={handleOpenCreateTaskDrawer}
         startIcon={<AddTaskIcon />}>
-        Add Task
+        New Task
       </Button>
     </Box>
   );

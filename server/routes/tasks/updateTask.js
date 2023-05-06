@@ -28,12 +28,20 @@ module.exports = async (req, res) => {
   }
 
   try {
+    if (status === 'Complete' && progress !== 100) {
+      status = 'In Progress';
+    }
+
+    let isCompleted = false;
+
     if (status === 'Complete') {
       progress = 100;
+      isCompleted = true;
     }
 
     if (progress === 100) {
       status = 'Complete';
+      isCompleted = true;
     }
 
     const [updatedTaskResult] = await pool.query(
@@ -48,10 +56,23 @@ module.exports = async (req, res) => {
             progress = ?,
             is_key_task = ?,
             date_due = ?,
-            last_updated_by_id = ?
+            last_updated_by_id = ?,
+            date_completed = ${isCompleted ? 'CURRENT_TIMESTAMP' : 'NULL'}
          WHERE id = ? 
       `,
-      [name, description, status, folderId, linkUrl, assignedToId, progress, isKeyTask, dueDate, creatorUserId, taskId]
+      [
+        name,
+        description,
+        status,
+        folderId,
+        linkUrl,
+        assignedToId,
+        progress,
+        isKeyTask,
+        dueDate,
+        creatorUserId,
+        taskId
+      ]
     );
 
     if (updatedTaskResult.affectedRows) {

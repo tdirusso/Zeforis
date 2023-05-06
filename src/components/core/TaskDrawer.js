@@ -199,6 +199,8 @@ export default function TaskDrawer(props) {
 
     if (status === 'Complete') {
       setProgress(100);
+    } else if (progress === 100) {
+      setProgress(0);
     }
 
     setStatusMenuAnchor(null);
@@ -234,6 +236,8 @@ export default function TaskDrawer(props) {
   const handleProgressChange = () => {
     if (progress === 100) {
       setStatus('Complete');
+    } else if (status === 'Complete') {
+      setStatus('In Progress');
     }
     setNeedsUpdating(true);
   };
