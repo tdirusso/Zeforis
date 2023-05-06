@@ -15,7 +15,10 @@ import {
   MenuItem,
   Slider,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  Tooltip,
+  Typography,
+  CircularProgress
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -35,6 +38,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { updateTask } from '../../api/tasks';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { deleteTasks } from '../../api/tasks';
 
 const defaultTask = {
   task_id: null,
@@ -91,12 +96,15 @@ export default function TaskDrawer(props) {
   const [task, setTask] = useState(defaultTask);
   const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
+  const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
   const [dateDue, setDateDue] = useState(null);
   const [isKeyTask, setIsKeyTask] = useState(false);
   const [status, setStatus] = useState(null);
   const [needsUpdating, setNeedsUpdating] = useState(false);
+  const [isDeleting, setDeleting] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
+  const deleteMenuOpen = Boolean(deleteMenuAnchor);
 
   useEffect(() => {
     setTask(taskProp || defaultTask);
@@ -112,12 +120,12 @@ export default function TaskDrawer(props) {
       setIsKeyTask(Boolean(taskProp.is_key_task));
       setFolder(foldersMap[taskProp.folder_id] || null);
       setStatus(taskProp.status);
+      setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
       setSelectedTags(tagIds.map(tagId => ({
         id: Number(tagId),
         name: tagIdNameMap[tagId],
         client_id: clientId
-      })));
-      setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
+      })).sort((a, b) => a.name.localeCompare(b.name)));
     }
   }, [taskProp]);
 
@@ -321,6 +329,35 @@ export default function TaskDrawer(props) {
     }
   };
 
+  const handleDeleteTask = async () => {
+    setDeleting(true);
+
+    try {
+      const result = await deleteTasks({
+        clientId,
+        taskIds: [task.task_id]
+      });
+
+      const success = result.success;
+      const resultMessage = result.message;
+
+      if (success) {
+        openSnackBar(`Successully deleted.`, 'success');
+        delete tasksMap[task.task_id];
+        handleClose();
+        setDeleteMenuAnchor(null);
+        setDeleting(false);
+        setTasks(Object.values(tasksMap));
+      } else {
+        openSnackBar(resultMessage, 'error');
+        setDeleting(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setDeleting(false);
+    }
+  };
+
   return (
     <Drawer
       className='task-drawer'
@@ -332,26 +369,66 @@ export default function TaskDrawer(props) {
       PaperProps={{
         sx: {
           width: '550px',
-          pb: 0
+          py: 0
         }
       }}>
       <DialogContent>
         <Box
-          mb={4}
-          mt={1}
+          mb={5}
+          mt={3}
           display="flex"
           position="relative"
           alignItems="center"
           justifyContent="center">
-          <IconButton
-            size='large'
-            onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              left: '-8px',
-            }}>
-            <CloseIcon />
-          </IconButton>
+          <Tooltip title='Close'>
+            <IconButton
+              size='large'
+              onClick={handleClose}
+              sx={{
+                position: 'absolute',
+                left: '-8px',
+              }}>
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Delete task'>
+            <IconButton
+              size='large'
+              onClick={e => setDeleteMenuAnchor(e.currentTarget)}
+              sx={{
+                position: 'absolute',
+                right: '-8px',
+              }}>
+              <DeleteOutlineIcon htmlColor="red" />
+            </IconButton>
+          </Tooltip>
+          <Menu
+            anchorEl={deleteMenuAnchor}
+            open={deleteMenuOpen}
+            onClose={() => setDeleteMenuAnchor(null)}>
+            <MenuItem
+              disabled={isDeleting}
+              sx={{ color: 'red' }}
+              onClick={() => handleDeleteTask()}>
+              <Box display="flex" alignItems="center">
+                <Typography>Delete</Typography>
+                <CircularProgress
+                  sx={{
+                    color: 'red',
+                    width: '20px !important',
+                    height: '20px !important',
+                    ml: 1,
+                    display: isDeleting ? 'block' : 'none'
+                  }}
+                />
+              </Box>
+            </MenuItem>
+            <MenuItem
+              disabled={isDeleting}
+              onClick={() => setDeleteMenuAnchor(null)}>
+              Cancel
+            </MenuItem>
+          </Menu>
         </Box>
         <Box mt={2}>
           <Box>
@@ -592,7 +669,7 @@ export default function TaskDrawer(props) {
         <Box my={6}>
           <Alert severity="info">
             Last updated by {task.updated_by_first} {task.updated_by_last} on
-            &nbsp;{new Date(new Date(task.date_last_updated).toLocaleString() + ' UTC').toLocaleString()}
+            &nbsp;{new Date(task.date_last_updated).toLocaleString()}
           </Alert>
         </Box>
       </DialogContent>

@@ -5,11 +5,11 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeTasks } from '../../api/tasks';
+import { deleteTasks } from '../../api/tasks';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-export default function RemoveTasksModal(props) {
+export default function DeleteTasksModal(props) {
 
   const {
     open,
@@ -32,11 +32,11 @@ export default function RemoveTasksModal(props) {
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleRemoveTasks = async () => {
+  const handleDeleteTasks = async () => {
     setLoading(true);
 
     try {
-      const result = await removeTasks({
+      const result = await deleteTasks({
         clientId,
         taskIds
       });
@@ -45,10 +45,10 @@ export default function RemoveTasksModal(props) {
       const resultMessage = result.message;
 
       if (success) {
-        const removedLength = taskIds.length;
+        const deletedLength = taskIds.length;
 
         if (exitPath) {
-          openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
+          openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
 
           setTimeout(() => {
             navigate(exitPath);
@@ -56,7 +56,7 @@ export default function RemoveTasksModal(props) {
             setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
           }, 1000);
         } else if (window.location.pathname.includes('/home/task/')) {
-          openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
+          openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
 
           setTimeout(() => {
             navigate('/home/dashboard');
@@ -64,7 +64,7 @@ export default function RemoveTasksModal(props) {
           }, 1000);
         } else {
           setTimeout(() => {
-            openSnackBar(`Successully removed ${removedLength} tasks.`, 'success');
+            openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
           }, 250);
 
           taskIds.forEach(id => delete tasksMap[id]);
@@ -109,7 +109,7 @@ export default function RemoveTasksModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveTasks}
+              onClick={handleDeleteTasks}
               required
               fullWidth
               loading={isLoading}

@@ -18,16 +18,15 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import './styles.css';
 import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import EditIcon from '@mui/icons-material/Edit';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import AddTaskModal from "../../admin/AddTaskModal";
 import TasksFilter from "./TasksFilter";
 import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
-import RemoveTasksModal from "../../admin/RemoveTasksModal";
+import DeleteTasksModal from "../../admin/DeleteTasksModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -40,12 +39,12 @@ export default function TasksTable({ tasks }) {
   const {
     foldersMap,
     tagsMap,
-    isAdmin
+    isAdmin,
+    openDrawer
   } = useOutletContext();
 
-  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
-  const [removeTasksModalOpen, setRemoveTasksModalOpen] = useState(false);
+  const [deleteTasksModalOpen, setDeleteTasksModalOpen] = useState(false);
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -68,21 +67,19 @@ export default function TasksTable({ tasks }) {
   const [sortBy, setSortBy] = useState(preSort);
   const [theTasks, setTheTasks] = useState(tasks);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     setTheTasks(tasks);
   }, [tasks]);
 
-  const handleTaskSelection = (taskId) => {
+  const handleTaskSelection = task => {
     if (isEditMode) {
-      if (selectedTasks.includes(taskId)) {
-        setSelectedTasks(selectedTasks.filter(id => id !== taskId));
+      if (selectedTasks.includes(task.task_id)) {
+        setSelectedTasks(selectedTasks.filter(id => id !== task.task_id));
       } else {
-        setSelectedTasks(taskIds => [...taskIds, taskId]);
+        setSelectedTasks(taskIds => [...taskIds, task.task_id]);
       }
     } else {
-      navigate(`/home/task/${taskId}?exitPath=/home/tasks`);
+      openDrawer('task', { taskProp: task });
     }
   };
 
@@ -191,9 +188,15 @@ export default function TasksTable({ tasks }) {
 
       <Grid item xs={12} hidden={!isAdmin}>
         <Box
-          display="flex"
-          justifyContent="space-between">
+          display="flex">
           <Box display="flex" alignItems="center">
+            <Button
+              variant="outlined"
+              sx={{ mr: 5 }}
+              onClick={() => openDrawer('create-task')}
+              startIcon={<AddTaskIcon />}>
+              New Task
+            </Button>
             <LoadingButton
               variant="contained"
               sx={{ mr: 1.5 }}
@@ -207,7 +210,7 @@ export default function TasksTable({ tasks }) {
                 <Button
                   variant="outlined"
                   sx={{ mr: 1.5 }}
-                  onClick={() => setRemoveTasksModalOpen(true)}
+                  onClick={() => setDeleteTasksModalOpen(true)}
                   startIcon={<DeleteIcon />}
                   color="error">
                   Delete Selected
@@ -222,16 +225,10 @@ export default function TasksTable({ tasks }) {
                 ''
             }
           </Box>
-          <Button
-            variant="outlined"
-            onClick={() => setAddTaskModalOpen(true)}
-            startIcon={<AddTaskIcon />}>
-            New Task
-          </Button>
         </Box>
       </Grid>
 
-      <Grid item xs={12} hidden={!isAdmin}>
+      <Grid item xs={2} hidden={!isAdmin}>
         <Box>
           <FormGroup>
             <FormControlLabel
@@ -265,8 +262,7 @@ export default function TasksTable({ tasks }) {
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '175px' }}>Name</TableCell>
-                <TableCell>Assigned To</TableCell>
+                <TableCell sx={{ width: '400px' }}>Name</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell sx={{ width: '160px' }}>Due</TableCell>
                 <TableCell sx={{ width: '175px' }}>Tags</TableCell>
@@ -277,7 +273,7 @@ export default function TasksTable({ tasks }) {
 
             <TableBody>
               {
-                filteredTasks.slice(page * 25, (page * 25) + 25).map((task) => {
+                filteredTasks.slice(page * 25, (page * 25) + 25).map(task => {
                   const dateDue = new Date(task.date_due);
                   const dateDueDay = days[dateDue.getDay()];
                   const dateDueMonth = months[dateDue.getMonth()];
@@ -287,14 +283,14 @@ export default function TasksTable({ tasks }) {
                   const isSelectedRow = selectedTasks.includes(task.task_id);
 
                   let taskName = task.task_name;
-                  if (taskName.length > 30) {
-                    taskName = taskName.substring(0, 30) + '...';
+                  if (taskName.length > 100) {
+                    taskName = taskName.substring(0, 100) + '...';
                   }
 
                   return (
                     <TableRow
                       hover
-                      onClick={() => handleTaskSelection(task.task_id)}
+                      onClick={() => handleTaskSelection(task)}
                       key={task.task_id}
                       className={isSelectedRow ? 'selected' : ''}
                       sx={{ position: 'relative', }}>
@@ -314,10 +310,6 @@ export default function TasksTable({ tasks }) {
                           }
                           {taskName}
                         </Box>
-
-                      </TableCell>
-                      <TableCell>
-                        {task.assigned_first} {task.assigned_last}
                       </TableCell>
                       <TableCell>
                         <Chip
@@ -382,11 +374,6 @@ export default function TasksTable({ tasks }) {
         </Paper>
       </Grid>
 
-      <AddTaskModal
-        open={addTaskModalOpen}
-        setOpen={setAddTaskModalOpen}
-      />
-
       <EditSelectedTasksModal
         taskIds={selectedTasks}
         open={editSelectedTasksModalOpen}
@@ -394,9 +381,9 @@ export default function TasksTable({ tasks }) {
         setSelectedTasks={setSelectedTasks}
       />
 
-      <RemoveTasksModal
-        open={removeTasksModalOpen}
-        setOpen={setRemoveTasksModalOpen}
+      <DeleteTasksModal
+        open={deleteTasksModalOpen}
+        setOpen={setDeleteTasksModalOpen}
         taskIds={selectedTasks}
         setSelectedTasks={setSelectedTasks}
       />

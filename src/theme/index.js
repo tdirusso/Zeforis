@@ -23,7 +23,8 @@ const theme = {
         }
       },
       defaultProps: {
-        transitionDuration: 150
+        transitionDuration: 150,
+        disableScrollLock: true
       }
     },
     MuiAutocomplete: {
