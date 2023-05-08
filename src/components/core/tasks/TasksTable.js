@@ -282,7 +282,6 @@ export default function TasksTable({ tasks }) {
                   const dateDueMonth = months[dateDue.getMonth()];
 
                   const tagsArray = task.tags?.split(',') || [];
-
                   const isSelectedRow = selectedTasks.includes(task.task_id);
 
                   let taskName = task.task_name;

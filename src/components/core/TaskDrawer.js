@@ -16,9 +16,7 @@ import {
   Slider,
   FormControlLabel,
   Checkbox,
-  Tooltip,
-  Typography,
-  CircularProgress
+  Tooltip
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -40,6 +38,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { updateTask } from '../../api/tasks';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { deleteTasks } from '../../api/tasks';
+import { LoadingButton } from '@mui/lab';
 
 const defaultTask = {
   task_id: null,
@@ -415,28 +414,22 @@ export default function TaskDrawer(props) {
             anchorEl={deleteMenuAnchor}
             open={deleteMenuOpen}
             onClose={() => setDeleteMenuAnchor(null)}>
-            <MenuItem
-              disabled={isDeleting}
-              sx={{ color: 'red' }}
-              onClick={() => handleDeleteTask()}>
-              <Box display="flex" alignItems="center">
-                <Typography>Delete</Typography>
-                <CircularProgress
-                  sx={{
-                    color: 'red',
-                    width: '20px !important',
-                    height: '20px !important',
-                    ml: 1,
-                    display: isDeleting ? 'block' : 'none'
-                  }}
-                />
-              </Box>
-            </MenuItem>
-            <MenuItem
-              disabled={isDeleting}
-              onClick={() => setDeleteMenuAnchor(null)}>
-              Cancel
-            </MenuItem>
+            <Box px={2} py={1}>
+              <Button
+                sx={{ mr: 0.5 }}
+                disabled={isDeleting}
+                onClick={() => setDeleteMenuAnchor(null)}>
+                Cancel
+              </Button>
+              <LoadingButton
+                disabled={isDeleting}
+                color='error'
+                variant='contained'
+                loading={isDeleting}
+                onClick={() => handleDeleteTask()}>
+                Delete
+              </LoadingButton>
+            </Box>
           </Menu>
         </Box>
         <Box mt={2}>
