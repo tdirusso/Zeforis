@@ -100,7 +100,6 @@ export default function TasksTable({ tasks }) {
 
   filteredTasks = filteredTasks.filter(task => {
     let shouldReturnTask = true;
-    const tagIds = task.tags?.split(',') || [];
 
     if (filterName) {
       shouldReturnTask = task.task_name.toLowerCase().includes(filterName.toLowerCase());
@@ -117,6 +116,8 @@ export default function TasksTable({ tasks }) {
     }
 
     if (filterTags.length > 0) {
+      const tagIds = task.tags?.split(',').filter(Boolean) || [];
+
       shouldReturnTask = filterTags.every(({ id }) => tagIds.includes(String(id)));
       if (!shouldReturnTask) {
         return false;
@@ -281,7 +282,7 @@ export default function TasksTable({ tasks }) {
                   const dateDueDay = days[dateDue.getDay()];
                   const dateDueMonth = months[dateDue.getMonth()];
 
-                  const tagsArray = task.tags?.split(',') || [];
+                  const tagsArray = task.tags?.split(',').filter(Boolean) || [];
                   const isSelectedRow = selectedTasks.includes(task.task_id);
 
                   let taskName = task.task_name;

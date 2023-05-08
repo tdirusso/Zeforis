@@ -377,24 +377,24 @@ export default function TaskDrawer(props) {
       PaperProps={{
         sx: {
           width: '550px',
-          py: 0
+          py: 0,
+          pt: 7
         }
       }}>
       <DialogContent>
         <Box
           mb={5}
-          mt={3}
-          display="flex"
-          position="relative"
-          alignItems="center"
-          justifyContent="center">
+          mt={1}
+          width={'450px'}
+          top={0}
+          position="absolute">
           <Tooltip title='Close'>
             <IconButton
               size='large'
               onClick={handleClose}
               sx={{
                 position: 'absolute',
-                left: '-8px',
+                left: '-15px',
               }}>
               <CloseIcon />
             </IconButton>
@@ -405,7 +405,7 @@ export default function TaskDrawer(props) {
               onClick={e => setDeleteMenuAnchor(e.currentTarget)}
               sx={{
                 position: 'absolute',
-                right: '-8px',
+                right: '0',
               }}>
               <DeleteOutlineIcon htmlColor="red" />
             </IconButton>
@@ -432,7 +432,7 @@ export default function TaskDrawer(props) {
             </Box>
           </Menu>
         </Box>
-        <Box mt={2}>
+        <Box>
           <Box>
             <TextField
               fullWidth
