@@ -1,5 +1,5 @@
 import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -53,7 +53,9 @@ function NoUpcomingTasksMessage() {
 const UpcomingTasksList = ({ tasks }) => tasks.map(task => <UpcomingTaskRow task={task} key={task.task_id} />);
 
 function UpcomingTaskRow({ task }) {
-  const navigate = useNavigate();
+  const {
+    openDrawer
+  } = useOutletContext();
 
   let taskName = task.task_name;
 
@@ -76,7 +78,7 @@ function UpcomingTaskRow({ task }) {
       borderRadius='8px'
       key={task.task_id}
       className="task-row"
-      onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
+      onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="center">
       <Box flexBasis='40%' minWidth={75}>
         <Typography

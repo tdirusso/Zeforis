@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
-import { createTag } from '../../api/clients';
+import { createTag } from '../../api/tags';
 import LinkIcon from '@mui/icons-material/Link';
 import FolderIcon from '@mui/icons-material/Folder';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';

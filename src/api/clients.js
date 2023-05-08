@@ -68,18 +68,6 @@ const getClientData = async (clientId, orgId) => {
   return data;
 };
 
-const createTag = async (payload) => {
-  const { data } = await request.post(`tags`, payload);
-
-  return data;
-};
-
-const removeTag = async (payload) => {
-  const { data } = await request.delete(`tags`, { data: payload });
-
-  return data;
-};
-
 const removeClient = async (payload) => {
   const { data } = await request.delete(`clients`, { data: payload });
 
@@ -96,8 +84,6 @@ export {
   inviteClientUser,
   removeClientUser,
   getClientData,
-  createTag,
-  removeTag,
   removeClient,
   removeUser
 };

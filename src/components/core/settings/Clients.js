@@ -1,4 +1,4 @@
-import { Paper, Box, Divider, Button, Chip, Typography, Tooltip } from "@mui/material";
+import { Paper, Box, Divider, Button, Chip, Tooltip, Menu, TextField } from "@mui/material";
 import ClientMenu from "../../core/ClientMenu";
 import { setActiveClientId } from "../../../api/clients";
 import { useOutletContext } from "react-router-dom";
@@ -14,20 +14,28 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import RemoveClientUserModal from "../../admin/RemoveClientUserModal";
 import IconButton from '@mui/material/IconButton';
-import RemoveTagModal from "../../admin/RemoveTagModal";
+import DeleteTagModal from "../../admin/DeleteTagModal";
 import RemoveClientModal from "../../admin/RemoveClientModal";
 import CloseIcon from '@mui/icons-material/Close';
+import { LoadingButton } from "@mui/lab";
+import { updateTag } from "../../../api/tags";
 
 export default function Clients() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const [inviteClientUserModalOpen, setInviteClientUserModalOpen] = useState(false);
   const [removeClientUserModalOpen, setRemoveClientUserModalOpen] = useState(false);
-  const [removeTagModalOpen, setRemoveTagModalOpen] = useState(false);
+  const [deleteTagModalOpen, setDeleteTagModalOpen] = useState(false);
   const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
+  const [tagMenuAnchor, setTagMenuAnchor] = useState(null);
+  const [updatingTag, setUpdatingTag] = useState(false);
 
   const [userToModify, setUserToModify] = useState(null);
   const [tagToDelete, setTagToDelete] = useState(null);
+  const [tagToEdit, setTagToEdit] = useState(null);
+  const [editingTagName, setEditingTagName] = useState('');
+
+  const tagMenuOpen = Boolean(tagMenuAnchor);
 
   const {
     client,
@@ -37,7 +45,10 @@ export default function Clients() {
     tags,
     org,
     clients,
-    isAdmin
+    isAdmin,
+    openSnackBar,
+    tagsMap,
+    setTags
   } = useOutletContext();
 
   const handleChangeClient = (clientObject) => {
@@ -52,7 +63,42 @@ export default function Clients() {
 
   const handleRemoveTag = (tag) => {
     setTagToDelete(tag);
-    setRemoveTagModalOpen(true);
+    setDeleteTagModalOpen(true);
+  };
+
+  const handleEditTag = (e, tag) => {
+    setTagToEdit(tag);
+    setEditingTagName(tag.name);
+    setTagMenuAnchor(e.currentTarget);
+  };
+
+  const handleUpdateTag = async () => {
+    if (!editingTagName) {
+      openSnackBar('Please enter a tag name.');
+      return;
+    }
+
+    setUpdatingTag(true);
+
+    try {
+      const { message, success } = await updateTag({
+        name: editingTagName,
+        tagId: tagToEdit.id,
+        clientId: client.id
+      });
+
+      if (success) {
+        setTagMenuAnchor(null);
+        openSnackBar('Tag successfully updated.', 'success');
+        tagsMap[tagToEdit.id].name = editingTagName;
+        setTags(Object.values(tagsMap));
+        setUpdatingTag(false);
+      } else {
+        openSnackBar(message, 'error');
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+    }
   };
 
   return (
@@ -210,11 +256,6 @@ export default function Clients() {
           {client.name} Tags
         </Box>
         <Box>
-          <Typography
-            hidden={!isAdmin}
-            variant="caption">
-            New tags can be added when creating a new task.
-          </Typography>
           <Divider sx={{ my: 4 }} />
           {
             tags.map(tag =>
@@ -223,6 +264,7 @@ export default function Clients() {
                   label={tag.name}
                   key={tag.id}
                   sx={{ mr: 1, mb: 1 }}
+                  onClick={e => handleEditTag(e, tag)}
                   onDelete={() => handleRemoveTag(tag)}>
                 </Chip> :
                 <Chip
@@ -233,6 +275,47 @@ export default function Clients() {
             )
           }
         </Box>
+        <Menu
+          anchorEl={tagMenuAnchor}
+          open={tagMenuOpen}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          onClose={() => setTagMenuAnchor(null)}>
+          <Box px={2} py={1}>
+            <TextField
+              value={editingTagName}
+              onChange={e => setEditingTagName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' ? handleUpdateTag() : null}
+              size="small"
+              disabled={updatingTag}
+              placeholder="Tag name"
+              fullWidth sx={{ mb: 1 }}>
+            </TextField>
+            <Box>
+              <Button
+                onClick={() => setTagMenuAnchor(null)}
+                size="small"
+                disabled={updatingTag}
+                sx={{ mr: 0.5 }}>
+                Cancel
+              </Button>
+              <LoadingButton
+                disabled={updatingTag}
+                size="small"
+                loading={updatingTag}
+                onClick={handleUpdateTag}
+                variant="contained">
+                Save
+              </LoadingButton>
+            </Box>
+          </Box>
+        </Menu>
       </Paper>
 
       <AddClientModal
@@ -258,9 +341,9 @@ export default function Clients() {
         user={userToModify}
       />
 
-      <RemoveTagModal
-        open={removeTagModalOpen}
-        setOpen={setRemoveTagModalOpen}
+      <DeleteTagModal
+        open={deleteTagModalOpen}
+        setOpen={setDeleteTagModalOpen}
         tag={tagToDelete}
       />
 

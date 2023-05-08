@@ -5,10 +5,10 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeTag } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
+import { deleteTag } from '../../api/tags';
 
-export default function RemoveTagModal({ open, setOpen, tag }) {
+export default function DeleteTagModal({ open, setOpen, tag }) {
   const {
     client,
     setTags,
@@ -21,11 +21,11 @@ export default function RemoveTagModal({ open, setOpen, tag }) {
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleRemoveTag = async () => {
+  const handleDeleteTag = async () => {
     setLoading(true);
 
     try {
-      const result = await removeTag({
+      const result = await deleteTag({
         clientId,
         tagId: tag.id
       });
@@ -42,7 +42,7 @@ export default function RemoveTagModal({ open, setOpen, tag }) {
         });
 
         setTimeout(() => {
-          openSnackBar('Successully removed.', 'success');
+          openSnackBar('Successully deleted.', 'success');
         }, 250);
 
         setTags(curTags => curTags.filter(t => t.id !== tag.id));
@@ -70,7 +70,7 @@ export default function RemoveTagModal({ open, setOpen, tag }) {
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <DialogContentText sx={{ mb: 5 }}>
-            Are you sure you want to remove the <strong>"{tag?.name}"</strong> tag?
+            Are you sure you want to delete the <strong>"{tag?.name}"</strong> tag?
             <br></br>
             <br></br>
             If you proceed, the tag will be removed from all tasks in which is it currently placed.
@@ -83,11 +83,11 @@ export default function RemoveTagModal({ open, setOpen, tag }) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveTag}
+              onClick={handleDeleteTag}
               required
               loading={isLoading}
               color="error">
-              Yes, remove "{tag?.name}"
+              Yes, delete "{tag?.name}"
             </LoadingButton>
           </DialogActions>
         </DialogContent>

@@ -148,6 +148,7 @@ export default function Home({ setTheme }) {
   });
 
   const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
+  const sortedTags = Object.values(tagsMap).sort((a, b) => a.name.localeCompare(b.name));
 
   let isAdmin = false;
   const clientMembers = [];
@@ -226,7 +227,7 @@ export default function Home({ setTheme }) {
     user,
     folders: sortedFolders,
     tasks: sortedTasks,
-    tags,
+    tags: sortedTags,
     clientMembers,
     clientAdmins,
     orgUsers,
