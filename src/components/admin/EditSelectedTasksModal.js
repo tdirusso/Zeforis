@@ -8,17 +8,7 @@ import { LoadingButton } from '@mui/lab';
 import { bulkUpdateTasks } from '../../api/tasks';
 import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-
-const statuses = [
-  'New',
-  'Next Up',
-  'In Progress',
-  'Currently Writing',
-  'Pending Approval',
-  'Approved',
-  'Ready to Implement',
-  'Complete'
-];
+import { statuses } from '../../lib/constants';
 
 export default function EditSelectedTasksModal(props) {
   const {
@@ -100,11 +90,11 @@ export default function EditSelectedTasksModal(props) {
               disabled={isLoading}
               onChange={e => setStatus(e.target.value)}>
               {
-                statuses.map(status =>
+                statuses.map(({ name }) =>
                   <MenuItem
-                    key={status}
-                    value={status}>
-                    {status}
+                    key={name}
+                    value={name}>
+                    {name}
                   </MenuItem>)
               }
             </Select>

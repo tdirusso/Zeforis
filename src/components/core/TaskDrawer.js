@@ -463,14 +463,14 @@ export default function TaskDrawer(props) {
             open={statusMenuOpen}
             onClose={() => setStatusMenuAnchor(null)}>
             {
-              statuses.map(statusName => {
+              statuses.map(({name}) => {
                 return (
                   <MenuItem
-                    key={statusName}
-                    onClick={() => handleStatusChange(statusName)}>
+                    key={name}
+                    onClick={() => handleStatusChange(name)}>
                     <Chip
-                      label={statusName}
-                      className={statusName}
+                      label={name}
+                      className={name}
                       sx={{ cursor: 'pointer' }}
                     />
                   </MenuItem>

@@ -100,12 +100,12 @@ async function updateFolders(taskIds, folderId, updaterUserId, connection) {
 async function updateStatuses(taskIds, status, updaterUserId, connection) {
   if (status === 'Complete') {
     await connection.query(
-      'UPDATE tasks SET status = ?, last_updated_by_id = ?, progress = 100 WHERE tasks.id IN (?)',
+      'UPDATE tasks SET status = ?, last_updated_by_id = ?, progress = 100, date_completed = CURRENT_TIMESTAMP WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
     );
   } else {
     await connection.query(
-      'UPDATE tasks SET status = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
+      'UPDATE tasks SET status = ?, last_updated_by_id = ?, date_completed = NULL WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
     );
   }

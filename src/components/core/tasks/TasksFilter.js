@@ -24,17 +24,7 @@ import { useOutletContext } from "react-router-dom";
 import Switch from '@mui/material/Switch';
 import StarIcon from '@mui/icons-material/Star';
 import ReplayIcon from '@mui/icons-material/Replay';
-
-const statuses = [
-  'New',
-  'Next Up',
-  'In Progress',
-  'Currently Writing',
-  'Pending Approval',
-  'Approved',
-  'Ready to Implement',
-  'Complete'
-];
+import { statuses } from "../../../lib/constants";
 
 export default function TasksFilter(props) {
 
@@ -178,11 +168,11 @@ export default function TasksFilter(props) {
                     onChange={e => setFilterStatus(e.target.value)}>
                     <MenuItem value='all'>All</MenuItem>
                     {
-                      statuses.map(status =>
+                      statuses.map(({ name }) =>
                         <MenuItem
-                          key={status}
-                          value={status}>
-                          {status}
+                          key={name}
+                          value={name}>
+                          {name}
                         </MenuItem>)
                     }
                   </Select>
