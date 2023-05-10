@@ -115,7 +115,7 @@ export default function TaskDrawer(props) {
       setDescription(taskProp.description);
       setLinkUrl(taskProp.link_url);
       setProgress(taskProp.progress);
-      setDateDue(taskProp.date_due || null);
+      setDateDue(taskProp.date_due ? new Date(taskProp.date_due) : null);
       setIsKeyTask(Boolean(taskProp.is_key_task));
       setFolder(foldersMap[taskProp.folder_id] || null);
       setStatus(taskProp.status);
@@ -463,7 +463,7 @@ export default function TaskDrawer(props) {
             open={statusMenuOpen}
             onClose={() => setStatusMenuAnchor(null)}>
             {
-              statuses.map(({name}) => {
+              statuses.map(({ name }) => {
                 return (
                   <MenuItem
                     key={name}

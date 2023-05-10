@@ -45,10 +45,20 @@ export default function AnalyticsPage() {
   let countThis = 2;
 
   const statusCount = {};
-  statuses.forEach(({ name }) => statusCount[name] = 0);
+  statuses.forEach(({ name }) => {
+    statusCount[name] = {
+      total: 0,
+      dueThisWeek: 0,
+      due1Week: 0,
+      due2Week: 0,
+      due3Week: 0,
+      due4Week: 0,
+      due5Week: 0,
+    };
+  });
 
   tasks.forEach(task => {
-    statusCount[task.status]++;
+    statusCount[task.status].total++;
     if (task.status === 'Complete' && task.date_completed) {
       const dateCompleted = moment(task.date_completed);
 
@@ -66,7 +76,26 @@ export default function AnalyticsPage() {
         countThis++;
       }
     }
+
+    if (task.date_due) {
+      const dateDue = moment(task.date_due);
+      if (dateDue.isBetween(_thisWeekStart, _thisWeekEnd)) {
+        statusCount[task.status].dueThisWeek++;
+      } else if (dateDue.isBetween(_1weekFromNowStart, _1weekFromNowEnd)) {
+        statusCount[task.status].due1Week++;
+      } else if (dateDue.isBetween(_2weekFromNowStart, _2weekFromNowEnd)) {
+        statusCount[task.status].due2Week++;
+      } else if (dateDue.isBetween(_3weekFromNowStart, _3weekFromNowEnd)) {
+        statusCount[task.status].due3Week++;
+      } else if (dateDue.isBetween(_4weekFromNowStart, _4weekFromNowEnd)) {
+        statusCount[task.status].due4Week++;
+      } else if (dateDue.isBetween(_5weekFromNowStart, _5weekFromNowEnd)) {
+        statusCount[task.status].due5Week++;
+      }
+    }
   });
+
+  const statusColors = statuses.map(({ color }) => color);
 
   const barOptions = {
     series: [
@@ -120,7 +149,7 @@ export default function AnalyticsPage() {
 
   const pieOptions = {
     labels: Object.keys(statusCount),
-    colors: statuses.map(({ color }) => color),
+    colors: statusColors,
     fill: {
       opacity: 0.9
     },
@@ -147,7 +176,7 @@ export default function AnalyticsPage() {
         dataLabels: {
           total: {
             enabled: true,
-            offsetX: 0, 
+            offsetX: 0,
             style: {
               fontWeight: 400
             }
@@ -158,8 +187,39 @@ export default function AnalyticsPage() {
     },
     chart: {
       stacked: true,
-      fontFamily: 'Inter'
-    }
+      fontFamily: 'Inter',
+      toolbar: {
+        show: false
+      }
+    },
+    legend: {
+      position: 'top'
+    },
+    xaxis: {
+      categories: [
+        `This week`,
+        `Next week`,
+        `Wk. of ${_2weekFromNowStart.format('MM/DD')}`,
+        `Wk. of ${_3weekFromNowStart.format('MM/DD')}`,
+        `Wk. of ${_4weekFromNowStart.format('MM/DD')}`,
+        `Wk. of ${_5weekFromNowStart.format('MM/DD')}`
+      ]
+    },
+    series: Object.keys(statusCount).map(status => {
+      const statusObj = statusCount[status];
+      return {
+        name: status,
+        data: [
+          statusObj.dueThisWeek,
+          statusObj.due1Week,
+          statusObj.due2Week,
+          statusObj.due3Week,
+          statusObj.due4Week,
+          statusObj.due5Week
+        ]
+      };
+    }),
+    colors: statusColors
   };
 
   return (
@@ -185,18 +245,19 @@ export default function AnalyticsPage() {
           <Box
             component="h4"
             mb={2} >
-            Overall Status Breakdown
+            Task Status Breakdown
           </Box>
           <Chart
             options={pieOptions}
-            series={Object.keys(statusCount).map(status => statusCount[status])}
+            series={Object.keys(statusCount).map(status => statusCount[status].total)}
             type="pie"
             height={'100%'}>
           </Chart>
         </Paper>
       </Grid>
+
       <Grid item xs={12}>
-        <Paper>
+        <Paper sx={{ maxHeight: '700px', minHeight: '450px' }}>
           <Box
             component="h4"
             mb={2}>
@@ -204,7 +265,9 @@ export default function AnalyticsPage() {
           </Box>
           <Chart
             options={stackedBarOptions}
-            series={barOptions.series}
+            series={stackedBarOptions.series}
+            height={'100%'}
+
             type="bar">
           </Chart>
         </Paper>

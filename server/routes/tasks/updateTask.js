@@ -1,4 +1,5 @@
 const pool = require('../../../database');
+const moment = require('moment');
 
 module.exports = async (req, res) => {
   const {
@@ -9,7 +10,7 @@ module.exports = async (req, res) => {
     assignedToId = null,
     tags = [],
     isKeyTask = false,
-    dueDate,
+    dateDue,
     taskId,
     currentTags = []
   } = req.body;
@@ -69,7 +70,7 @@ module.exports = async (req, res) => {
         assignedToId,
         progress,
         isKeyTask,
-        dueDate,
+        dateDue ? moment(dateDue).format('YYYY-MM-DD HH:mm:ss') : null,
         creatorUserId,
         taskId
       ]
