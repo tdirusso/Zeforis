@@ -1,4 +1,4 @@
-import { Paper, Box, Divider, Button, Chip, Tooltip, Menu, TextField, Typography } from "@mui/material";
+import { Paper, Box, Divider, Button, Chip, Tooltip, Menu, TextField } from "@mui/material";
 import ClientMenu from "../../core/ClientMenu";
 import { setActiveClientId } from "../../../api/clients";
 import { useOutletContext } from "react-router-dom";
@@ -375,15 +375,15 @@ export default function Clients() {
               <Button
                 onClick={() => setDeleteTagMenuAnchor(null)}
                 size="small"
-                disabled={updatingTag}
+                disabled={deletingTag}
                 sx={{ mr: 0.5 }}>
                 Cancel
               </Button>
               <LoadingButton
-                disabled={updatingTag}
+                disabled={deletingTag}
                 size="small"
                 color="error"
-                loading={updatingTag}
+                loading={deletingTag}
                 onClick={handleDeleteTag}
                 variant="contained">
                 Delete

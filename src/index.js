@@ -17,7 +17,7 @@ import Settings from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders';
 import TasksPage from './pages/Home/Tasks';
 import ToolsPage from './pages/Tools';
-import AnalyticsPage from './pages/Analytics';
+import AnalyticsPage from './pages/Home/Analytics';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 
