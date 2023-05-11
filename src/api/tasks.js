@@ -17,7 +17,7 @@ const updateTask = async (payload) => {
   return data;
 };
 
-const bulkUpdateTasks = async (payload) => {
+const batchUpdateTasks = async (payload) => {
   const { data } = await request.patch(`tasks/batch`, payload);
   return data;
 };
@@ -26,5 +26,5 @@ export {
   createTask,
   deleteTasks,
   updateTask,
-  bulkUpdateTasks
+  batchUpdateTasks
 };

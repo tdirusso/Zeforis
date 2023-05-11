@@ -1,4 +1,5 @@
 const pool = require('../../../database');
+const moment = require('moment');
 
 module.exports = async (req, res) => {
   const {
@@ -6,12 +7,13 @@ module.exports = async (req, res) => {
     folderId,
     assigneeId,
     status,
-    taskIds
+    taskIds,
+    dateDue
   } = req.body;
 
   const updaterUserId = req.userId;
 
-  if (!action || !taskIds || taskIds.length === 0 || (!folderId && !assigneeId && !status)) {
+  if (!action || !taskIds || taskIds.length === 0 || (action !== 'dateDue' && (!folderId && !assigneeId && !status))) {
     return res.json({
       message: 'Missing task parameters.'
     });
@@ -29,6 +31,9 @@ module.exports = async (req, res) => {
         break;
       case 'status':
         await updateStatuses(taskIds, status, updaterUserId, connection);
+        break;
+      case 'dateDue':
+        await updateDateDue(taskIds, dateDue, updaterUserId, connection);
         break;
       default:
         break;
@@ -82,6 +87,17 @@ module.exports = async (req, res) => {
     });
   }
 };
+
+async function updateDateDue(taskIds, dateDue, updaterUserId, connection) {
+  await connection.query(
+    'UPDATE tasks SET date_due = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
+    [
+      dateDue ? moment(dateDue).format('YYYY-MM-DD HH:mm:ss') : null,
+      updaterUserId,
+      taskIds
+    ]
+  );
+}
 
 async function updateAssignees(taskIds, assigneeId, updaterUserId, connection) {
   await connection.query(

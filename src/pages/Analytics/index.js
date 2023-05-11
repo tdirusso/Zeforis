@@ -126,15 +126,6 @@ export default function AnalyticsPage() {
         show: false
       }
     },
-    plotOptions: {
-      bar: {
-        borderRadius: 8,
-        borderRadiusApplication: 'end',
-        dataLabels: {
-          position: 'top'
-        }
-      },
-    },
     grid: {
       show: false
     },
@@ -219,7 +210,10 @@ export default function AnalyticsPage() {
         ]
       };
     }),
-    colors: statusColors
+    colors: statusColors,
+    fill: {
+      opacity: 0.9
+    }
   };
 
   return (
@@ -267,7 +261,6 @@ export default function AnalyticsPage() {
             options={stackedBarOptions}
             series={stackedBarOptions.series}
             height={'100%'}
-
             type="bar">
           </Chart>
         </Paper>
