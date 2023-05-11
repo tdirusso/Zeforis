@@ -5,8 +5,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import { useOutletContext } from "react-router-dom";
-import AccountMenu from "../AccountMenu";
-import { setActiveAccountId, updateAccount } from "../../../api/account";
+import OrgMenu from "../OrgMenu";
+import { setActiveOrgId, updateOrg } from "../../../api/orgs";
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import EditUserPermissionsModal from "../../admin/EditUserPermissionsModal";
@@ -17,8 +17,8 @@ import { TwitterPicker } from 'react-color';
 export default function Organizations() {
   const {
     user,
-    accountUsers,
-    account,
+    orgUsers,
+    org,
     isAdmin,
     openSnackBar
   } = useOutletContext();
@@ -28,17 +28,17 @@ export default function Organizations() {
   const [removeUserModalOpen, setRemoveUserModalOpen] = useState(false);
 
   const [isLoading, setLoading] = useState(false);
-  const [brandColor, setBrandColor] = useState(account.brandColor);
-  const [logoSrc, setLogoSrc] = useState(account.logo);
+  const [brandColor, setBrandColor] = useState(org.brandColor);
+  const [logoSrc, setLogoSrc] = useState(org.logo);
   const [logoFile, setLogoFile] = useState(null);
   const [isLogoChanged, setLogoChanged] = useState(false);
-  const [isLogoLoading, setLogoLoading] = useState(account.logo !== '');
-  const accountName = useRef();
+  const [isLogoLoading, setLogoLoading] = useState(org.logo !== '');
+  const orgName = useRef();
 
-  const handleAccountSelection = accountId => {
-    const selectedAccountObject = user.memberOfAccounts.find(account => account.id === accountId);
-    setActiveAccountId(selectedAccountObject.id);
-    openSnackBar(`Loading ${selectedAccountObject.name}...`, 'info');
+  const handleOrgSelection = ({ id }) => {
+    const selectedOrgObject = user.memberOfOrgs.find(org => org.id === id);
+    setActiveOrgId(selectedOrgObject.id);
+    openSnackBar(`Loading ${selectedOrgObject.name}...`, 'info');
     setTimeout(() => {
       window.location.reload();
     }, 500);
@@ -54,8 +54,8 @@ export default function Organizations() {
     setRemoveUserModalOpen(true);
   };
 
-  const handleAccountUpdate = async () => {
-    const nameVal = accountName.current.value;
+  const handleOrgUpdate = async () => {
+    const nameVal = orgName.current.value;
 
     if (!nameVal) {
       openSnackBar('Your organization name cannot be blank.', 'error');
@@ -70,9 +70,9 @@ export default function Organizations() {
       fd.append('name', nameVal);
       fd.append('brandColor', brandColor);
       fd.append('isLogoChanged', isLogoChanged);
-      fd.append('accountId', account.id);
+      fd.append('orgId', org.id);
 
-      const { success, message } = await updateAccount(fd);
+      const { success, message } = await updateOrg(fd);
 
       if (success) {
         openSnackBar('Organization updated successfully.', 'success');
@@ -113,33 +113,34 @@ export default function Organizations() {
         <Box component="h6">Your Organizations</Box>
         <Divider sx={{ my: 4 }} />
         <Box maxWidth={360}>
-          <AccountMenu
-            changeHandler={handleAccountSelection}
+          <OrgMenu
+            changeHandler={handleOrgSelection}
+            curOrgId={org.id}
           />
         </Box>
 
         <Divider textAlign="left" sx={{ pt: 4 }}>
           <Chip
-            label={`All ${account.name} Users`}
+            label={`All ${org.name} Users`}
           />
         </Divider>
 
         <List dense>
           {
-            accountUsers.map((accountUser, index) => {
-              const isYou = accountUser.id === user.id;
+            orgUsers.map((orgUser, index) => {
+              const isYou = orgUser.id === user.id;
 
-              let primaryText = <span>{accountUser.firstName} {accountUser.lastName}</span>;
+              let primaryText = <span>{orgUser.firstName} {orgUser.lastName}</span>;
 
               if (isYou) {
                 primaryText = <span>
-                  {accountUser.firstName} {accountUser.lastName}
+                  {orgUser.firstName} {orgUser.lastName}
                   <span style={{ color: '#bababa' }}>{` (you)`}</span>
                 </span>;
               }
 
               return (
-                <React.Fragment key={accountUser.id}>
+                <React.Fragment key={orgUser.id}>
                   <ListItem
                     secondaryAction={
                       <Box>
@@ -150,14 +151,14 @@ export default function Organizations() {
                                 <IconButton
                                   edge="end"
                                   sx={{ mr: 0.5 }}
-                                  onClick={() => handleEditUser(accountUser)}>
+                                  onClick={() => handleEditUser(orgUser)}>
                                   <LockOpenIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Remove User">
                                 <IconButton
                                   edge="end"
-                                  onClick={() => handleRemoveUser(accountUser)}>
+                                  onClick={() => handleRemoveUser(orgUser)}>
                                   <CloseIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
@@ -169,10 +170,10 @@ export default function Organizations() {
                     }>
                     <ListItemText
                       primary={primaryText}
-                      secondary={accountUser.email}
+                      secondary={orgUser.email}
                     />
                   </ListItem>
-                  {index !== accountUsers.length - 1 ? <Divider /> : null}
+                  {index !== orgUser.length - 1 ? <Divider /> : null}
                 </React.Fragment>
               );
             })
@@ -181,7 +182,7 @@ export default function Organizations() {
       </Paper>
 
       <Paper sx={{ my: 4 }} hidden={!isAdmin}>
-        <Box component="h6">{account.name} Settings</Box>
+        <Box component="h6">{org.name} Settings</Box>
         <Divider sx={{ my: 4 }} />
 
         <Box>
@@ -189,8 +190,8 @@ export default function Organizations() {
             sx={{ minWidth: '50%' }}
             label="Organization Name"
             disabled={isLoading}
-            defaultValue={account.name}
-            inputRef={accountName}>
+            defaultValue={org.name}
+            inputRef={orgName}>
           </TextField>
         </Box>
 
@@ -257,7 +258,7 @@ export default function Organizations() {
 
         <Box my={2}>
           <LoadingButton
-            onClick={handleAccountUpdate}
+            onClick={handleOrgUpdate}
             loading={isLoading}
             variant="contained">
             Save Changes

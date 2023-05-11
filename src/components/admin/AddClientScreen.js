@@ -3,9 +3,9 @@ import { Box, Paper, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addClient, setActiveClientId } from '../../api/client';
+import { addClient, setActiveClientId } from '../../api/clients';
 
-export default function AddClientScreen({ account }) {
+export default function AddClientScreen({ org }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -31,7 +31,7 @@ export default function AddClientScreen({ account }) {
     try {
       const fd = new FormData();
       fd.append('name', nameVal);
-      fd.append('accountId', account.id);
+      fd.append('orgId', org.id);
 
       const { client, message } = await addClient(fd);
 

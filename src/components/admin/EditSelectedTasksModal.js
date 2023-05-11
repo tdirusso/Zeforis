@@ -5,20 +5,13 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { bulkUpdateTasks } from '../../api/task';
-import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField } from '@mui/material';
+import { batchUpdateTasks } from '../../api/tasks';
+import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-
-const statuses = [
-  'New',
-  'Next Up',
-  'In Progress',
-  'Currently Writing',
-  'Pending Approval',
-  'Approved',
-  'Ready to Implement',
-  'Complete'
-];
+import { statuses } from '../../lib/constants';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 
 export default function EditSelectedTasksModal(props) {
   const {
@@ -45,29 +38,27 @@ export default function EditSelectedTasksModal(props) {
   const [status, setStatus] = useState('');
   const [assignee, setAssignee] = useState(null);
   const [folder, setFolder] = useState(null);
+  const [dateDue, setDateDue] = useState(null);
 
-  const handleBulkUpdate = async () => {
+  const handleBatchUpdate = async () => {
     setLoading(true);
 
     try {
-      const { updatedTasks, message } = await bulkUpdateTasks({
+      const { updatedTasks, message } = await batchUpdateTasks({
         clientId,
         taskIds,
         action,
         status,
+        dateDue,
         folderId: folder?.id,
         assigneeId: assignee?.id
       });
 
       if (updatedTasks) {
         updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
-
-        setTimeout(() => {
-          openSnackBar(`Successully updated ${updatedTasks.length} tasks.`, 'success');
-        }, 250);
-
         setTasks(Object.values(tasksMap));
         setSelectedTasks([]);
+        openSnackBar(`Successully updated ${updatedTasks.length} tasks.`, 'success');
         handleClose();
       } else {
         openSnackBar(message, 'error');
@@ -78,12 +69,16 @@ export default function EditSelectedTasksModal(props) {
       setLoading(false);
     }
   };
-
+  
   const handleClose = () => {
     setOpen(false);
     setTimeout(() => {
       setLoading(false);
       setAction('');
+      setStatus('');
+      setFolder(null);
+      setAssignee(null);
+      setDateDue(null);
     }, 500);
   };
 
@@ -97,16 +92,20 @@ export default function EditSelectedTasksModal(props) {
               labelId="to-label"
               value={status}
               label="To"
-              disabled={isLoading}
-              onChange={e => setStatus(e.target.value)}>
+              disabled={isLoading}>
               {
-                statuses.map(status =>
+                statuses.map(({ name }) =>
                   <MenuItem
-                    key={status}
-                    value={status}>
-                    {status}
-                  </MenuItem>)
-              }
+                    value={name}
+                    onClick={() => setStatus(name)}
+                    key={name}>
+                    <Chip
+                      label={name}
+                      className={name}
+                      sx={{ cursor: 'pointer' }}
+                    />
+                  </MenuItem>
+                )}
             </Select>
           </>
         );
@@ -147,6 +146,22 @@ export default function EditSelectedTasksModal(props) {
             )}
           />
         );
+      case 'dateDue':
+        return (
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker
+              disabled={isLoading}
+              format="MM/DD/YYYY"
+              value={dateDue}
+              onChange={value => setDateDue(value)}
+              renderInput={(params) => <TextField
+                {...params}
+                fullWidth
+                label='To'
+              />}
+            ></DatePicker>
+          </LocalizationProvider>
+        );
       default:
         break;
     }
@@ -180,6 +195,7 @@ export default function EditSelectedTasksModal(props) {
                   <MenuItem value="assignee">Assignee</MenuItem>
                   <MenuItem value="folder">Folder</MenuItem>
                   <MenuItem value="status">Status</MenuItem>
+                  <MenuItem value="dateDue">Due Date</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -201,7 +217,7 @@ export default function EditSelectedTasksModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleBulkUpdate}
+              onClick={handleBatchUpdate}
               required
               fullWidth
               loading={isLoading}>

@@ -21,6 +21,10 @@ const theme = {
           boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
           padding: '0 !important'
         }
+      },
+      defaultProps: {
+        transitionDuration: 150,
+        disableScrollLock: true
       }
     },
     MuiAutocomplete: {
@@ -94,7 +98,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '8px',
+            borderRadius: '12px',
           }
         }
       }
@@ -117,7 +121,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '8px'
+            borderRadius: '12px'
           }
         }
       }

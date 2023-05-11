@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { addFolder } from '../../api/folder';
+import { createFolder } from '../../api/folders';
 import { useOutletContext } from 'react-router-dom';
 
 export default function AddFolderModal(props) {
@@ -39,7 +39,7 @@ export default function AddFolderModal(props) {
 
     setLoading(true);
     try {
-      const { folder, message } = await addFolder({
+      const { folder, message } = await createFolder({
         name: nameVal,
         clientId,
         isKeyFolder

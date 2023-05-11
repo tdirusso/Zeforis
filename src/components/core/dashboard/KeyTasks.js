@@ -1,5 +1,5 @@
 import { Box, LinearProgress, Paper, Typography, Button, Grid, Tooltip, IconButton } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
@@ -56,7 +56,9 @@ function NoKeyTasksMessage() {
 const KeyTasksList = ({ tasks }) => tasks.map(task => <KeyTaskRow task={task} key={task.task_id} />);
 
 function KeyTaskRow({ task }) {
-  const navigate = useNavigate();
+  const {
+    openDrawer
+  } = useOutletContext();
 
   let taskName = task.task_name;
 
@@ -76,7 +78,7 @@ function KeyTaskRow({ task }) {
       borderRadius='8px'
       key={task.task_id}
       className="task-row"
-      onClick={() => navigate(`/home/task/${task.task_id}?exitPath=/home/dashboard`)}
+      onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="center">
       <Typography
         flexBasis='25%'

@@ -1,6 +1,6 @@
-import { Paper, Box, Divider, Button, Chip, Typography, Tooltip } from "@mui/material";
-import ClientMenu from "../../admin/ClientMenu";
-import { setActiveClientId } from "../../../api/client";
+import { Paper, Box, Divider, Button, Chip, Tooltip, Menu, TextField } from "@mui/material";
+import ClientMenu from "../../core/ClientMenu";
+import { setActiveClientId } from "../../../api/clients";
 import { useOutletContext } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,20 +14,29 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import RemoveClientUserModal from "../../admin/RemoveClientUserModal";
 import IconButton from '@mui/material/IconButton';
-import RemoveTagModal from "../../admin/RemoveTagModal";
 import RemoveClientModal from "../../admin/RemoveClientModal";
 import CloseIcon from '@mui/icons-material/Close';
+import { LoadingButton } from "@mui/lab";
+import { deleteTag, updateTag } from "../../../api/tags";
 
 export default function Clients() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const [inviteClientUserModalOpen, setInviteClientUserModalOpen] = useState(false);
   const [removeClientUserModalOpen, setRemoveClientUserModalOpen] = useState(false);
-  const [removeTagModalOpen, setRemoveTagModalOpen] = useState(false);
   const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
+  const [editTagMenuAnchor, setEditTagMenuAnchor] = useState(null);
+  const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState(null);
+  const [updatingTag, setUpdatingTag] = useState(false);
+  const [deletingTag, setDeletingTag] = useState(false);
 
   const [userToModify, setUserToModify] = useState(null);
   const [tagToDelete, setTagToDelete] = useState(null);
+  const [tagToEdit, setTagToEdit] = useState(null);
+  const [editingTagName, setEditingTagName] = useState('');
+
+  const editTagMenuOpen = Boolean(editTagMenuAnchor);
+  const deleteTagMenuOpen = Boolean(deleteTagMenuAnchor);
 
   const {
     client,
@@ -35,9 +44,14 @@ export default function Clients() {
     clientAdmins,
     user,
     tags,
-    account,
+    org,
     clients,
-    isAdmin
+    isAdmin,
+    openSnackBar,
+    tagsMap,
+    setTags,
+    tasks,
+    setTasks
   } = useOutletContext();
 
   const handleChangeClient = (clientObject) => {
@@ -50,15 +64,89 @@ export default function Clients() {
     setRemoveClientUserModalOpen(true);
   };
 
-  const handleRemoveTag = (tag) => {
+  const handleDeleteTag = async () => {
+    setDeletingTag(true);
+
+    try {
+      const result = await deleteTag({
+        clientId: client.id,
+        tagId: tagToDelete.id
+      });
+
+      const success = result.success;
+      const resultMessage = result.message;
+
+      if (success) {
+        delete tagsMap[tagToDelete];
+
+        const tasksClone = [...tasks];
+        tasksClone.forEach(task => {
+          if (task.tags) {
+            task.tags = task.tags.replace(tagToDelete.id, '') || null;
+          }
+        });
+
+        setTasks(tasksClone);
+        setTags(curTags => curTags.filter(t => t.id !== tagToDelete.id));
+        setDeletingTag(false);
+        setDeleteTagMenuAnchor(null);
+        openSnackBar('Successully deleted.', 'success');
+      } else {
+        openSnackBar(resultMessage, 'error');
+        setDeletingTag(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setDeletingTag(false);
+    }
+  };
+
+  const handleEditTag = (e, tag) => {
+    setTagToEdit(tag);
+    setEditingTagName(tag.name);
+    setEditTagMenuAnchor(e.currentTarget);
+  };
+
+  const handleUpdateTag = async () => {
+    if (!editingTagName) {
+      openSnackBar('Please enter a tag name.');
+      return;
+    }
+
+    setUpdatingTag(true);
+
+    try {
+      const { message, success } = await updateTag({
+        name: editingTagName,
+        tagId: tagToEdit.id,
+        clientId: client.id
+      });
+
+      if (success) {
+        setEditTagMenuAnchor(null);
+        openSnackBar('Tag successfully updated.', 'success');
+        tagsMap[tagToEdit.id].name = editingTagName;
+        setTags(Object.values(tagsMap));
+        setUpdatingTag(false);
+      } else {
+        openSnackBar(message, 'error');
+        setUpdatingTag(false);
+      }
+    } catch (error) {
+      setUpdatingTag(false);
+      openSnackBar(error.message, 'error');
+    }
+  };
+
+  const openDeleteTagConfirmation = (e, tag) => {
     setTagToDelete(tag);
-    setRemoveTagModalOpen(true);
+    setDeleteTagMenuAnchor(e.currentTarget);
   };
 
   return (
     <>
       <Paper>
-        <Box component="h6">{account.name} Clients</Box>
+        <Box component="h6">{org.name} Clients</Box>
         <Divider sx={{ my: 4 }} />
 
         <Button
@@ -75,7 +163,7 @@ export default function Clients() {
           mb={2}>
           <ClientMenu
             changeHandler={handleChangeClient}
-            client={client}
+            curClientId={client.id}
             clients={clients}
           />
         </Box>
@@ -210,11 +298,6 @@ export default function Clients() {
           {client.name} Tags
         </Box>
         <Box>
-          <Typography
-            hidden={!isAdmin}
-            variant="caption">
-            New tags can be added when creating a new task.
-          </Typography>
           <Divider sx={{ my: 4 }} />
           {
             tags.map(tag =>
@@ -223,7 +306,8 @@ export default function Clients() {
                   label={tag.name}
                   key={tag.id}
                   sx={{ mr: 1, mb: 1 }}
-                  onDelete={() => handleRemoveTag(tag)}>
+                  onClick={e => handleEditTag(e, tag)}
+                  onDelete={e => openDeleteTagConfirmation(e, tag)}>
                 </Chip> :
                 <Chip
                   label={tag.name}
@@ -233,12 +317,86 @@ export default function Clients() {
             )
           }
         </Box>
+        <Menu
+          anchorEl={editTagMenuAnchor}
+          open={editTagMenuOpen}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          onClose={() => setEditTagMenuAnchor(null)}>
+          <Box px={2} py={1}>
+            <TextField
+              value={editingTagName}
+              onChange={e => setEditingTagName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' ? handleUpdateTag() : null}
+              size="small"
+              disabled={updatingTag}
+              placeholder="Tag name"
+              fullWidth sx={{ mb: 1 }}>
+            </TextField>
+            <Box>
+              <Button
+                onClick={() => setEditTagMenuAnchor(null)}
+                size="small"
+                disabled={updatingTag}
+                sx={{ mr: 0.5 }}>
+                Cancel
+              </Button>
+              <LoadingButton
+                disabled={updatingTag}
+                size="small"
+                loading={updatingTag}
+                onClick={handleUpdateTag}
+                variant="contained">
+                Save
+              </LoadingButton>
+            </Box>
+          </Box>
+        </Menu>
+        <Menu
+          anchorEl={deleteTagMenuAnchor}
+          open={deleteTagMenuOpen}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          onClose={() => setDeleteTagMenuAnchor(null)}>
+          <Box px={2} py={1}>
+            <Box>
+              <Button
+                onClick={() => setDeleteTagMenuAnchor(null)}
+                size="small"
+                disabled={deletingTag}
+                sx={{ mr: 0.5 }}>
+                Cancel
+              </Button>
+              <LoadingButton
+                disabled={deletingTag}
+                size="small"
+                color="error"
+                loading={deletingTag}
+                onClick={handleDeleteTag}
+                variant="contained">
+                Delete
+              </LoadingButton>
+            </Box>
+          </Box>
+        </Menu>
       </Paper>
 
       <AddClientModal
         open={createClientModalOpen}
         setOpen={setCreateClientModalOpen}
-        account={account}
+        org={org}
       />
 
       <EditClientModal
@@ -257,13 +415,6 @@ export default function Clients() {
         setOpen={setRemoveClientUserModalOpen}
         user={userToModify}
       />
-
-      <RemoveTagModal
-        open={removeTagModalOpen}
-        setOpen={setRemoveTagModalOpen}
-        tag={tagToDelete}
-      />
-
 
       <RemoveClientModal
         open={removeClientModalOpen}

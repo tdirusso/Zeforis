@@ -6,7 +6,8 @@ import {
   Autocomplete,
   MenuItem,
   Select,
-  InputLabel
+  InputLabel,
+  Button
 } from "@mui/material";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -22,17 +23,8 @@ import FormLabel from '@mui/material/FormLabel';
 import { useOutletContext } from "react-router-dom";
 import Switch from '@mui/material/Switch';
 import StarIcon from '@mui/icons-material/Star';
-
-const statuses = [
-  'New',
-  'Next Up',
-  'In Progress',
-  'Currently Writing',
-  'Pending Approval',
-  'Approved',
-  'Ready to Implement',
-  'Complete'
-];
+import ReplayIcon from '@mui/icons-material/Replay';
+import { statuses } from "../../../lib/constants";
 
 export default function TasksFilter(props) {
 
@@ -47,7 +39,10 @@ export default function TasksFilter(props) {
     filterStatus,
     filterFolder,
     setSortBy,
-    sortBy
+    sortBy,
+    filterName,
+    filterAssignedTo,
+    filterTags
   } = props;
 
   const {
@@ -56,6 +51,16 @@ export default function TasksFilter(props) {
     clientMembers,
     folders
   } = useOutletContext();
+
+  const handleResetFilters = () => {
+    setFilterName('');
+    setFilterTags([]);
+    setFilterAssignedTo(null);
+    setFilterFolder(null);
+    setFilterStatus('all');
+    setFilterKeyTasks(false);
+    setSortBy('name');
+  };
 
   return (
     <Grid item xs={12}>
@@ -88,6 +93,7 @@ export default function TasksFilter(props) {
                   fullWidth
                   size="small"
                   label='Task Name'
+                  value={filterName}
                   onChange={e => setFilterName(e.target.value)}
                 />
               </Grid>
@@ -101,6 +107,7 @@ export default function TasksFilter(props) {
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     groupBy={(option) => option.role}
                     onChange={(_, newVal) => setFilterAssignedTo(newVal)}
+                    value={filterAssignedTo}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -122,6 +129,7 @@ export default function TasksFilter(props) {
                     disableCloseOnSelect
                     size="small"
                     onChange={(_, newVal) => setFilterTags(newVal)}
+                    value={filterTags}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -160,11 +168,11 @@ export default function TasksFilter(props) {
                     onChange={e => setFilterStatus(e.target.value)}>
                     <MenuItem value='all'>All</MenuItem>
                     {
-                      statuses.map(status =>
+                      statuses.map(({ name }) =>
                         <MenuItem
-                          key={status}
-                          value={status}>
-                          {status}
+                          key={name}
+                          value={name}>
+                          {name}
                         </MenuItem>)
                     }
                   </Select>
@@ -185,7 +193,7 @@ export default function TasksFilter(props) {
                   }
                 />
               </Grid>
-              <Grid item xs>
+              <Grid item xs={12}>
                 <FormControl className="filter-sort-buttons">
                   <FormLabel>Sort by</FormLabel>
                   <RadioGroup
@@ -215,6 +223,14 @@ export default function TasksFilter(props) {
                     />
                   </RadioGroup>
                 </FormControl>
+              </Grid>
+              <Grid item xs mt={1}>
+                <Button
+                  onClick={handleResetFilters}
+                  startIcon={<ReplayIcon />}
+                  variant="contained">
+                  Reset
+                </Button>
               </Grid>
             </Grid>
           </AccordionDetails>

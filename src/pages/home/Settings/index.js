@@ -3,31 +3,36 @@ import { Box, Button, Divider, Grid, Paper } from "@mui/material";
 import './styles.css';
 import React, { useState } from "react";
 import { logout } from "../../../api/auth";
-import Header from "../../../components/core/Header";
 import PersonIcon from '@mui/icons-material/Person';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 //import PaidIcon from '@mui/icons-material/Paid';
-import BasicInformation from "../../../components/core/settings/BasicInformation";
+import Account from "../../../components/core/settings/Account";
 import Clients from "../../../components/core/settings/Clients";
 import Organizations from "../../../components/core/settings/Organizations";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useLocation } from "react-router-dom";
 
 const settings = [
   { name: 'Clients', icon: <SwitchAccountIcon fontSize="small" /> },
   { name: 'Organizations', icon: <ApartmentIcon fontSize="small" /> },
-  { name: 'Basic Information', icon: <PersonIcon fontSize="small" /> },
- // { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
+  { name: 'Account', icon: <PersonIcon fontSize="small" /> },
+  // { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
 ];
 
 export default function Settings() {
-  const [showSetting, setShowSetting] = useState('Clients');
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+
+  const defaultTab = queryParams.get('tab');
+
+  const [tab, setTab] = useState(defaultTab || 'Clients');
 
   let componentToShow = <></>;
 
-  switch (showSetting) {
-    case 'Basic Information':
-      componentToShow = <BasicInformation />;
+  switch (tab) {
+    case 'Account':
+      componentToShow = <Account />;
       break;
     case 'Clients':
       componentToShow = <Clients />;
@@ -41,7 +46,6 @@ export default function Settings() {
 
   return (
     <>
-      <Header />
       <Grid item xs={12} md={3}>
         <Paper sx={{ px: 0 }}>
           <Box className="settings-buttons">
@@ -51,9 +55,9 @@ export default function Settings() {
                   <Button
                     fullWidth
                     size="small"
-                    className={showSetting === setting.name ? 'active' : ''}
+                    className={tab === setting.name ? 'active' : ''}
                     key={setting.name}
-                    onClick={() => setShowSetting(setting.name)}
+                    onClick={() => setTab(setting.name)}
                     sx={{
                       px: 3,
                       py: 1.5

@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { TextField, Checkbox, FormControlLabel, Grid, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { updateFolder } from '../../api/folder';
+import { updateFolder } from '../../api/folders';
 import { useOutletContext } from 'react-router-dom';
 
 export default function EditFolderModal(props) {

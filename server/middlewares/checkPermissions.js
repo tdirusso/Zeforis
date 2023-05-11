@@ -12,12 +12,12 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Unauthorized.' });
   }
 
-  let { clientId, accountId } = req.body;
+  let { clientId, orgId } = req.body;
 
-  if (!clientId && !accountId) {
-    ({ clientId, accountId } = req.query);
+  if (!clientId && !orgId) {
+    ({ clientId, orgId } = req.query);
 
-    if (!clientId && !accountId) {
+    if (!clientId && !orgId) {
       return res.json({ message: 'Unauthorized.' });
     }
   }
@@ -40,12 +40,12 @@ module.exports = async (req, res, next) => {
         return res.json({ message: 'Unauthorized.' });
       }
     } else {
-      const [isOwnerOfAccountResult] = await pool.query(
-        'SELECT 1 FROM accounts WHERE id = ? AND owner_id = ?',
-        [accountId, userId]
+      const [isOwnerOfOrgResult] = await pool.query(
+        'SELECT 1 FROM orgs WHERE id = ? AND owner_id = ?',
+        [orgId, userId]
       );
 
-      if (isOwnerOfAccountResult.length) {
+      if (isOwnerOfOrgResult.length) {
         req.userId = userId;
         return next();
       } else {

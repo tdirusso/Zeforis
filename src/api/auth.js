@@ -1,7 +1,7 @@
 import request from '../lib/request';
 
 const login = async (payload) => {
-  const { data } = await request.post(`login`, payload);
+  const { data } = await request.post(`users/login`, payload);
 
   if (data.token) {
     setToken(data.token);
@@ -16,7 +16,7 @@ const logout = () => {
 };
 
 const authenticate = async () => {
-  const { data } = await request.post(`authenticate`);
+  const { data } = await request.post(`users/authenticate`);
 
   if (!data.user) {
     removeToken();

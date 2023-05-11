@@ -122,3 +122,8 @@ h5, h6 {
   transition: all 250ms;
   border-width: 1px !important;
 }
+
+.MuiDrawer-paperAnchorRight {
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}

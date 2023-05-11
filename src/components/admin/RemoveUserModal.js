@@ -5,18 +5,18 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeUser } from '../../api/client';
+import { removeUser } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
 
 export default function RemoveUserModal({ open, setOpen, user }) {
   const {
-    account,
-    setAccountUsers,
+    org,
+    setOrgUsers,
     openSnackBar
   } = useOutletContext();
 
-  const accountId = account.id;
-  const accountName = account.name;
+  const orgId = org.id;
+  const orgName = org.name;
   const userId = user?.id;
   const name = user?.firstName + ' ' + user?.lastName;
 
@@ -27,7 +27,7 @@ export default function RemoveUserModal({ open, setOpen, user }) {
 
     try {
       const result = await removeUser({
-        accountId,
+        orgId,
         userId
       });
 
@@ -39,7 +39,7 @@ export default function RemoveUserModal({ open, setOpen, user }) {
           openSnackBar('Successully removed.', 'success');
         }, 250);
 
-        setAccountUsers(accountUsers => accountUsers.filter(u => u.id !== user.id));
+        setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== user.id));
         handleClose();
       } else {
         openSnackBar(resultMessage, 'error');
@@ -61,10 +61,10 @@ export default function RemoveUserModal({ open, setOpen, user }) {
       <Dialog open={open} onClose={handleClose}>
         <DialogContent >
           <DialogContentText sx={{ mb: 5 }}>
-            Are you sure you want to remove <strong>{name}</strong> from <strong>{accountName}?</strong>
+            Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>
             <br></br>
             <br></br>
-            Proceeding will remove them from all clients within {accountName} and unassign all tasks that are currently assigned to them.
+            Proceeding will remove them from all clients within {orgName} and unassign all tasks that are currently assigned to them.
           </DialogContentText>
           <DialogActions sx={{ p: 0 }}>
             <Button

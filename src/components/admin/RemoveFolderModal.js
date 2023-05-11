@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { useOutletContext } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { removeFoldeer } from '../../api/folder';
+import { removeFoldeer } from '../../api/folders';
 
 export default function RemoveFolderModal(props) {
 

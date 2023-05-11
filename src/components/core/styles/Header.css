@@ -1,4 +1,4 @@
-.Header .account-circle::after {
+.Header .org-circle::after {
   content: '';
   height: 8px;
   width: 8px;

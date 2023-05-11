@@ -7,10 +7,10 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { addClient, setActiveClientId } from '../../api/client';
+import { addClient, setActiveClientId } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
 
-export default function AddClientModal({ open, setOpen, hideCancel, account }) {
+export default function AddClientModal({ open, setOpen, hideCancel, org }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export default function AddClientModal({ open, setOpen, hideCancel, account }) {
     try {
       const fd = new FormData();
       fd.append('name', nameVal);
-      fd.append('accountId', account.id);
+      fd.append('orgid', org.id);
 
       const { client, message } = await addClient(fd);
 

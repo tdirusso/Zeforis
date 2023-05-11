@@ -5,7 +5,7 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeClient } from '../../api/client';
+import { removeClient } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
 
 export default function RemoveClientModal({ open, setOpen }) {

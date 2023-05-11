@@ -2,10 +2,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import ClientMenu from '../admin/ClientMenu';
+import ClientMenu from '../core/ClientMenu';
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "./Snackbar";
-import { setActiveClientId } from '../../api/client';
+import { setActiveClientId } from '../../api/clients';
 import { Box, Paper, Typography } from '@mui/material';
 
 export default function SelectClientScreen({ client, clients }) {
@@ -36,7 +36,7 @@ export default function SelectClientScreen({ client, clients }) {
         <br></br>
         <ClientMenu
           changeHandler={handleSelection}
-          client={client}
+          curClientId={client?.id}
           clients={clients}
         />
       </Paper>
