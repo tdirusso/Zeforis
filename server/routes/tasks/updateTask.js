@@ -16,7 +16,6 @@ module.exports = async (req, res) => {
   } = req.body;
 
   let {
-    progress = 0,
     status = 'New'
   } = req.body;
 
@@ -29,22 +28,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    if (status === 'Complete' && progress !== 100) {
-      status = 'In Progress';
-    }
-
-    let isCompleted = false;
-
-    if (status === 'Complete') {
-      progress = 100;
-      isCompleted = true;
-    }
-
-    if (progress === 100) {
-      status = 'Complete';
-      isCompleted = true;
-    }
-
     const [updatedTaskResult] = await pool.query(
       `
         UPDATE tasks SET 
@@ -54,11 +37,10 @@ module.exports = async (req, res) => {
             folder_id = ?,
             link_url = ?,
             assigned_to_id = ?,
-            progress = ?,
             is_key_task = ?,
             date_due = ?,
             last_updated_by_id = ?,
-            date_completed = ${isCompleted ? 'CURRENT_TIMESTAMP' : 'NULL'}
+            date_completed = ${status === 'Complete' ? 'CURRENT_TIMESTAMP' : 'NULL'}
          WHERE id = ? 
       `,
       [
@@ -68,7 +50,6 @@ module.exports = async (req, res) => {
         folderId,
         linkUrl,
         assignedToId,
-        progress,
         isKeyTask,
         dateDue ? moment(dateDue).format('YYYY-MM-DD HH:mm:ss') : null,
         creatorUserId,

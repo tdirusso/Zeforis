@@ -90,7 +90,6 @@ module.exports = async (req, res) => {
           tasks.folder_id,
           tasks.link_url,
           tasks.assigned_to_id,
-          tasks.progress,
           tasks.date_completed,
           tasks.is_key_task,
           tasks.date_due,

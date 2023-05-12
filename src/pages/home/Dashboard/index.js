@@ -35,7 +35,7 @@ export default function Dashboard() {
       numTasksCompleted++;
     }
 
-    if (dateDue && dateDue < now) {
+    if (dateDue && (dateDue < now && task.status !== 'Complete')) {
       numTasksPastDue++;
     }
 

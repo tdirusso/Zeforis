@@ -1,4 +1,4 @@
-import { Box, Grid, Paper, Tab, Tabs } from "@mui/material";
+import { Box, Grid, Paper } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import moment from 'moment';
 import { statuses } from "../../../lib/constants";
@@ -40,7 +40,6 @@ export default function AnalyticsPage() {
     tasks,
   } = useOutletContext();
 
-  const [tabVal, setTabVal] = useState(0);
   const [analyticsData, setAnalyticsData] = useState({});
 
   let completed5WeeksAgo = 0;
@@ -115,29 +114,14 @@ export default function AnalyticsPage() {
 
   return (
     <>
-      <Grid item xs={12}>
-        <Paper>
-          <Tabs
-            variant="fullWidth"
-            value={tabVal}
-            onChange={(_, val) => setTabVal(val)}>
-            <Tab label="Analytics" />
-            <Tab label="Reports" />
-          </Tabs>
-        </Paper>
-      </Grid>
-      {
-        tabVal === 0 ?
-          <AnalyticsTab
-            analyticsData={analyticsData}
-          />
-          : 'test'
-      }
+      <AnalyticsCharts
+        analyticsData={analyticsData}
+      />
     </>
   );
 };
 
-function AnalyticsTab(props) {
+function AnalyticsCharts(props) {
 
   const {
     analyticsData: {

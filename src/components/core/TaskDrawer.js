@@ -13,7 +13,6 @@ import {
   Alert,
   Menu,
   MenuItem,
-  Slider,
   FormControlLabel,
   Checkbox,
   Tooltip
@@ -50,7 +49,6 @@ const defaultTask = {
   folder_id: null,
   link_url: null,
   assigned_to_id: null,
-  progress: 0,
   date_completed: null,
   is_key_task: 0,
   date_due: null,
@@ -90,7 +88,6 @@ export default function TaskDrawer(props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
-  const [progress, setProgress] = useState(0);
   const [copyButtonText, setCopyButtonText] = useState('Copy Link');
   const [task, setTask] = useState(defaultTask);
   const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
@@ -114,7 +111,6 @@ export default function TaskDrawer(props) {
       setName(taskProp.task_name);
       setDescription(taskProp.description);
       setLinkUrl(taskProp.link_url);
-      setProgress(taskProp.progress);
       setDateDue(taskProp.date_due ? new Date(taskProp.date_due) : null);
       setIsKeyTask(Boolean(taskProp.is_key_task));
       setFolder(foldersMap[taskProp.folder_id] || null);
@@ -195,13 +191,6 @@ export default function TaskDrawer(props) {
 
   const handleStatusChange = status => {
     setStatus(status);
-
-    if (status === 'Complete') {
-      setProgress(100);
-    } else if (progress === 100) {
-      setProgress(0);
-    }
-
     setStatusMenuAnchor(null);
     setNeedsUpdating(true);
   };
@@ -235,15 +224,6 @@ export default function TaskDrawer(props) {
       setDateDue(eventOrVal);
       setNeedsUpdating(true);
     }
-  };
-
-  const handleProgressChange = () => {
-    if (progress === 100) {
-      setStatus('Complete');
-    } else if (status === 'Complete') {
-      setStatus('In Progress');
-    }
-    setNeedsUpdating(true);
   };
 
   const handleFolderChange = () => {
@@ -288,7 +268,6 @@ export default function TaskDrawer(props) {
         linkUrl,
         status,
         assignedToId,
-        progress,
         folderId,
         clientId,
         tags: selectedTags,
@@ -312,7 +291,6 @@ export default function TaskDrawer(props) {
           folder_id: folderId,
           link_url: linkUrl,
           assigned_to_id: assignedToId,
-          progress: progress,
           date_completed: status === 'Complete' ? now : null,
           is_key_task: Number(isKeyTask),
           date_due: dateDue ? dateDue.toISOString() : null,
@@ -614,26 +592,6 @@ export default function TaskDrawer(props) {
                 />}
               ></DatePicker>
             </LocalizationProvider>
-          </Box>
-        </Box>
-        <Divider />
-        <Box my={4}>
-          <Box component="h4" mb={2}>Progress</Box>
-          <Box display="flex" alignItems="center" width="96%">
-            <Slider
-              valueLabelDisplay="auto"
-              step={5}
-              marks={[
-                { value: 3, label: '0%' },
-                { value: 96, label: '100%' }
-              ]}
-              min={0}
-              max={100}
-              value={progress}
-              onChangeCommitted={handleProgressChange}
-              onChange={e => setProgress(e.target.value)}
-              valueLabelFormat={val => `${val}%`}
-            />
           </Box>
         </Box>
         <Divider />

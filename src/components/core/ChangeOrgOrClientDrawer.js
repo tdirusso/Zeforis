@@ -24,8 +24,9 @@ export default function ChangeOrgOrClientDrawer(props) {
   const [clientId, setClientId] = useState(client.id);
   const [orgId, setOrgId] = useState(org.id);
   const [clientsList, setClientsList] = useState(clients);
-
-  const allClients = [...user.adminOfClients, ...user.memberOfClients];
+  const [allClients] = useState(
+    [...user.adminOfClients, ...user.memberOfClients].sort((a, b) => a.name.localeCompare(b.name))
+  );
 
   const handleClose = () => {
     close();

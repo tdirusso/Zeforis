@@ -85,21 +85,6 @@ function KeyTaskRow({ task }) {
         variant="body2">
         {taskName}
       </Typography>
-      <Box flex={1}>
-        <Box display="flex" alignItems="center">
-          <LinearProgress
-            variant="determinate"
-            value={task.progress}
-            sx={{
-              height: 10,
-              width: '100%',
-              mr: 1.5,
-              borderRadius: 25
-            }}
-          />
-          <Typography variant="body2">{task.progress}%</Typography>
-        </Box>
-      </Box>
       <Box flexBasis={'10%'} textAlign="right">
         {
           task.link_url ?

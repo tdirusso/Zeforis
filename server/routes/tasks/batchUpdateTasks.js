@@ -51,7 +51,6 @@ module.exports = async (req, res) => {
             tasks.folder_id,
             tasks.link_url,
             tasks.assigned_to_id,
-            tasks.progress,
             tasks.date_completed,
             tasks.is_key_task,
             tasks.date_due,
@@ -116,7 +115,7 @@ async function updateFolders(taskIds, folderId, updaterUserId, connection) {
 async function updateStatuses(taskIds, status, updaterUserId, connection) {
   if (status === 'Complete') {
     await connection.query(
-      'UPDATE tasks SET status = ?, last_updated_by_id = ?, progress = 100, date_completed = CURRENT_TIMESTAMP WHERE tasks.id IN (?)',
+      'UPDATE tasks SET status = ?, last_updated_by_id = ?, date_completed = CURRENT_TIMESTAMP WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
     );
   } else {

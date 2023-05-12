@@ -8,7 +8,6 @@ module.exports = async (req, res) => {
     folderId,
     linkUrl,
     assignedToId = null,
-    progress = 0,
     tags = [],
     isKeyTask = false,
     dueDate = null
@@ -32,7 +31,6 @@ module.exports = async (req, res) => {
           folder_id, 
           link_url,
           assigned_to_id, 
-          progress, 
           created_by_id,
           is_key_task,
           date_due, 
@@ -40,7 +38,7 @@ module.exports = async (req, res) => {
         ) 
         VALUES
         (?,?,?,?,?,?,?,?,?,?,?)`,
-      [name, description, status, folderId, linkUrl, assignedToId, progress, creatorUserId, isKeyTask, dueDate, creatorUserId]
+      [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
     );
 
     const newTaskId = newTask[0].insertId;
@@ -62,7 +60,6 @@ module.exports = async (req, res) => {
       folderId,
       linkUrl,
       assignedToId,
-      progress,
       tags,
       isKeyTask,
       dueDate

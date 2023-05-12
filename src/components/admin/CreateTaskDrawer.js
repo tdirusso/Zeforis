@@ -92,7 +92,6 @@ export default function CreateTaskDrawer(props) {
           folder_id: folderId,
           link_url: linkVal,
           assigned_to_id: assignedToId,
-          progress: 0,
           date_completed: null,
           is_key_task: false,
           date_due: null,
