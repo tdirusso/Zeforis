@@ -128,12 +128,12 @@ export default function ReportGeneratorTab() {
         <Paper>
           <Typography variant="body2">
             The Report Generator is a powerful tool allows you to effortlessly customize and generate reports for efficient client communications.
-            You can define date ranges and select relevant fields to curate a report that provides valuable insights to your client.
+            You can define date ranges and select relevant fields to curate a report that provides valuable task insights to your client.
             <br></br><br></br>
             Our generator includes seamless integration with
             your organization's brand, ensuring consistent and professional representation to your clients.
             <br></br><br></br>
-            After generating the report, a downloadable PDF will be created as well as inline text that can be copied into emails and other documents.
+            After generating the report, it will be displayed below in-line where it can then be copied into emails and other documents.
           </Typography>
           <Divider sx={{ my: 4 }} />
           <Box component='h4'>Date Range</Box>
@@ -291,14 +291,14 @@ function ReportDataPage(props) {
   } = props;
 
   const reportContainer = useRef();
-  const [copyButtonText, setCopyButtonText] = useState('Copy Report Contents');
+  const [copyButtonText, setCopyButtonText] = useState('Copy Report');
 
   const {
     org,
     client
   } = useOutletContext();
 
-  const highlightReport = async () => {
+  const copyReport = async () => {
     await window.navigator.clipboard.write([
       new ClipboardItem({
         'text/html': new Blob([reportContainer.current.innerHTML], { type: 'text/html' }),
@@ -307,23 +307,27 @@ function ReportDataPage(props) {
     ]);
     setCopyButtonText('Copied!');
     setTimeout(() => {
-      setCopyButtonText('Copy Report Contents');
+      setCopyButtonText('Copy Report');
     }, 750);
   };
 
   return (
     <Grid item xs={12}>
       <Paper>
+        <Box mb={2}>
+          <Button
+            size="large"
+            variant="contained"
+            onClick={() => setComplete(false)}>
+            New Report
+          </Button>
+        </Box>
         <Button
-          startIcon={<ContentCopyIcon />}
-          onClick={highlightReport}>
-          {copyButtonText}
-        </Button>
-        <Button
+          variant="outlined"
           size="large"
-          variant="contained"
-          onClick={() => setComplete(false)}>
-          New Report
+          startIcon={<ContentCopyIcon />}
+          onClick={copyReport}>
+          {copyButtonText}
         </Button>
         <Divider sx={{ my: 4 }} />
         <Box ref={reportContainer}>
