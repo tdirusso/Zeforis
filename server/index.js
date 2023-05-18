@@ -30,6 +30,7 @@ const updateAccess = require('./routes/users/updateAccess');
 const updateOrg = require('./routes/orgs/updateOrg');
 const batchUpdateTasks = require('./routes/tasks/batchUpdateTasks');
 const updateTag = require('./routes/tags/updateTag');
+const importTasks = require('./routes/tasks/importTasks');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -85,6 +86,7 @@ const boot = async () => {
   app.delete('/api/tasks', checkPermissionsMW, deleteTasks);
   app.patch('/api/tasks', checkPermissionsMW, updateTask);
   app.patch('/api/tasks/batch', checkPermissionsMW, batchUpdateTasks);
+  app.post('/api/tasks/import', checkPermissionsMW, importTasks);
 
   app.post('/api/tags', checkPermissionsMW, createTag);
   app.delete('/api/tags', checkPermissionsMW, removeTag);

@@ -8,7 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { statuses } from "../../../lib/constants";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Papa from "papaparse";
@@ -16,20 +16,118 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useOutletContext } from "react-router-dom";
 
 const statusesString = statuses.map(({ name }) => name).join(', ');
+const statusesSet = new Set(statuses.map(({ name }) => name.toLowerCase()));
 
 export default function ImportTab() {
+
+  const {
+    tags,
+    folders
+  } = useOutletContext();
 
   const [previewData, setPreviewData] = useState(null);
   const [createNewFolders, setCreateNewFolders] = useState(true);
   const [createNewTags, setCreateNewTags] = useState(true);
   const [readyToImport, setReadyToImport] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [folderNames] = useState(new Set(folders.map(({ name }) => name.toLowerCase())));
+  const [tagNames] = useState(new Set(tags.map(({ name }) => name.toLowerCase())));
+  const [csvData, setCsvData] = useState(null);
 
   const fileRef = useRef();
 
+  useEffect(() => {
+    if (csvData) {
+      const errors = [];
+
+      const { meta, data } = csvData;
+
+      if (!meta.fields.includes('name')) {
+        errors.push('Uploaded file does not contain a "name" header column.');
+      }
+
+      if (!meta.fields.includes('folder')) {
+        errors.push('Uploaded file does not contain a "folder" header column.');
+      }
+
+      if (errors.length) {
+        setPreviewData({ errors });
+        return;
+      }
+
+      const tagsToCreate = [];
+      const foldersToCreate = [];
+      const importRows = [];
+
+      data.forEach((row, index) => {
+        let name = row.name?.trim();
+        let folder = row.folder?.trim();
+        let description = row.description?.trim();
+        let status = row.status?.trim();
+        let url = row.url?.trim();
+        let isKeyTask = row.is_key_task?.trim();
+        let tagsArray = row.tags ? row.tags.trim().split(',').map(tag => tag.trim()) : [];
+
+
+        if (!name) {
+          errors.push(`Row ${index + 2} has no name value.`);
+        }
+
+        if (!folder) {
+          errors.push(`Row ${index + 2} has no folder value.`);
+        }
+
+        if (status && !statusesSet.has(status.toLowerCase())) {
+          errors.push(`Row ${index + 2} contains invalid status: "${row.status}".`);
+        }
+
+        if (folder && createNewFolders) {
+          foldersToCreate.push(folder);
+        } else if (folder && !folderNames.has(folder.toLowerCase())) {
+          errors.push(`Row ${index + 2} contains invalid folder: "${folder}".`);
+        }
+
+        if (tagsArray.length > 0) {
+          if (createNewTags) {
+            tagsArray.forEach(tag => {
+              if (!tagNames.has(tag.toLowerCase())) {
+                tagsToCreate.push(row.folder);
+              }
+            });
+          } else {
+            tagsArray.forEach(tag => {
+              if (!tagNames.has(tag.toLowerCase())) {
+                errors.push(`Row ${index + 2} contains invalid tag: "${tag}".`);
+              }
+            });
+          }
+        }
+
+        importRows.push({
+          name,
+          description,
+          status,
+          folder,
+          tagsArray,
+          url,
+          isKeyTask
+        });
+      });
+
+      setPreviewData({
+        errors,
+        tagsToCreate,
+        foldersToCreate,
+        importRows
+      });
+    }
+  }, [csvData, createNewFolders, createNewTags]);
+
   const handleImport = () => {
+    setLoading(true);
 
   };
 
@@ -41,23 +139,7 @@ export default function ImportTab() {
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
-          const errors = [];
-
-          const { meta, data } = results;
-          if (!meta.fields.includes('name')) {
-            errors.push('Uploaded file does not contain a "name" header column.');
-          }
-
-          if (!meta.fields.includes('folder')) {
-            errors.push('Uploaded file does not contain a "folder" header column.');
-          }
-
-          if (errors.length) {
-            setPreviewData({ errors });
-            return;
-          }
-
-          setPreviewData({});
+          setCsvData(results);
         }
       });
     }
@@ -83,7 +165,7 @@ export default function ImportTab() {
               href={importTemplate}
               download='Import Tasks Template'>
               <DownloadIcon fontSize="small" sx={{ mr: 0.25 }} />
-              Download Template
+              Download Import Template
             </Box>
           </Button>
         </Box>
@@ -198,6 +280,7 @@ export default function ImportTab() {
             variant="outlined"
             onClick={() => fileRef.current.value = null}
             startIcon={<UploadFileIcon />}
+            disabled={isLoading}
             component="label">
             Upload File
             <input
@@ -214,7 +297,7 @@ export default function ImportTab() {
           {
             !previewData ? <Typography variant="body2">Waiting for file...</Typography>
               :
-              <PreviewData data={previewData} />
+              <PreviewData previewData={previewData} />
           }
         </Box>
         <Box mt={5} width={'100%'}>
@@ -223,7 +306,7 @@ export default function ImportTab() {
             size="large"
             onClick={handleImport}
             loading={isLoading}
-            disabled={!readyToImport}
+            disabled={!(previewData && previewData.errors.length === 0)}
             variant="contained">
             Import
           </LoadingButton>
@@ -234,17 +317,20 @@ export default function ImportTab() {
   );
 };
 
-function PreviewData({ data }) {
+function PreviewData({ previewData }) {
 
   const {
-    errors
-  } = data;
+    errors,
+    tagsToCreate,
+    foldersToCreate,
+    importRows
+  } = previewData;
 
-  if (errors) {
+  if (errors && errors.length > 0) {
     return (
       <Box mt={1}>
         <Typography color="error" fontWeight={600}>
-          {errors.length} Errors:
+          {errors.length} Errors
         </Typography>
         <Box>
           <ul>
@@ -265,7 +351,16 @@ function PreviewData({ data }) {
 
   return (
     <Box>
-      success
+      <Typography color="#4caf50" fontWeight={600}>
+        Successfully parsed
+      </Typography>
+      <Box>
+        <ul>
+          <li style={{ color: '#4caf50' }}><b>{importRows.length} tasks</b> will be imported</li>
+          <li style={{ color: '#4caf50' }}><b>{foldersToCreate.length} folders</b> will be created</li>
+          <li style={{ color: '#4caf50' }}><b>{tagsToCreate.length} tags</b> will be created</li>
+        </ul>
+      </Box>
     </Box>
   );
 }
