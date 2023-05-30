@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Button, Checkbox, FormControlLabel, FormHelperText, Grid, Paper, Typography } from "@mui/material";
 import importTemplate from '../../../assets/import-template.csv';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -28,9 +29,7 @@ export default function ImportTab() {
     tags,
     folders,
     openSnackBar,
-    client,
-    tasksMap,
-    setTasks
+    client
   } = useOutletContext();
 
   const clientId = client.id;
@@ -90,7 +89,9 @@ export default function ImportTab() {
         }
 
         if (folder && createNewFolders) {
-          foldersToCreate.push(folder);
+          if (!folderNames.has(folder)) {
+            foldersToCreate.push(folder);
+          }
         } else if (folder && !folderNames.has(folder)) {
           errors.push(`Row ${index + 2} contains invalid folder: "${folder}".`);
         }
@@ -153,33 +154,9 @@ export default function ImportTab() {
 
       if (success) {
         openSnackBar('Tasks successfully imported.', 'success');
-        const now = new Date().toISOString();
-
-        // const newTaskObject = {
-        //   task_id: task.task_id,
-        //   task_name: name,
-        //   description,
-        //   date_created: task.date_created,
-        //   created_by_id: task.created_by_id,
-        //   status: status,
-        //   folder_id: folderId,
-        //   link_url: linkUrl,
-        //   assigned_to_id: assignedToId,
-        //   date_completed: status === 'Complete' ? now : null,
-        //   is_key_task: Number(isKeyTask),
-        //   date_due: dateDue ? dateDue.toISOString() : null,
-        //   date_last_updated: now,
-        //   tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
-        //   assigned_first: assignedTo?.firstName || null,
-        //   assigned_last: assignedTo?.lastName || null,
-        //   created_first: task.created_first,
-        //   created_last: task.created_last,
-        //   updated_by_first: user.firstName,
-        //   updated_by_last: user.lastName
-        // };
-
-        // tasksMap[task.task_id] = newTaskObject;
-        //setTasks(Object.values(tasksMap));
+        setTimeout(() => {
+          window.location.href = '/home/tasks';
+        }, 1000);
       } else {
         openSnackBar(message, 'error');
       }
