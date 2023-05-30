@@ -17,6 +17,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useOutletContext } from "react-router-dom";
+import { importTasks } from "../../../api/tasks";
 
 const statusesString = statuses.map(({ name }) => name).join(', ');
 const statusesSet = new Set(statuses.map(({ name }) => name.toLowerCase()));
@@ -25,16 +26,21 @@ export default function ImportTab() {
 
   const {
     tags,
-    folders
+    folders,
+    openSnackBar,
+    client,
+    tasksMap,
+    setTasks
   } = useOutletContext();
 
-  const [previewData, setPreviewData] = useState(null);
+  const clientId = client.id;
+
+  const [importData, setImportData] = useState(null);
   const [createNewFolders, setCreateNewFolders] = useState(true);
   const [createNewTags, setCreateNewTags] = useState(true);
-  const [readyToImport, setReadyToImport] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [folderNames] = useState(new Set(folders.map(({ name }) => name.toLowerCase())));
-  const [tagNames] = useState(new Set(tags.map(({ name }) => name.toLowerCase())));
+  const [folderNames] = useState(new Set(folders.map(({ name }) => name)));
+  const [tagNames] = useState(new Set(tags.map(({ name }) => name)));
   const [csvData, setCsvData] = useState(null);
 
   const fileRef = useRef();
@@ -54,7 +60,7 @@ export default function ImportTab() {
       }
 
       if (errors.length) {
-        setPreviewData({ errors });
+        setImportData({ errors });
         return;
       }
 
@@ -71,7 +77,6 @@ export default function ImportTab() {
         let isKeyTask = row.is_key_task?.trim();
         let tagsArray = row.tags ? row.tags.trim().split(',').map(tag => tag.trim()) : [];
 
-
         if (!name) {
           errors.push(`Row ${index + 2} has no name value.`);
         }
@@ -86,20 +91,20 @@ export default function ImportTab() {
 
         if (folder && createNewFolders) {
           foldersToCreate.push(folder);
-        } else if (folder && !folderNames.has(folder.toLowerCase())) {
+        } else if (folder && !folderNames.has(folder)) {
           errors.push(`Row ${index + 2} contains invalid folder: "${folder}".`);
         }
 
         if (tagsArray.length > 0) {
           if (createNewTags) {
             tagsArray.forEach(tag => {
-              if (!tagNames.has(tag.toLowerCase())) {
+              if (!tagNames.has(tag)) {
                 tagsToCreate.push(row.folder);
               }
             });
           } else {
             tagsArray.forEach(tag => {
-              if (!tagNames.has(tag.toLowerCase())) {
+              if (!tagNames.has(tag)) {
                 errors.push(`Row ${index + 2} contains invalid tag: "${tag}".`);
               }
             });
@@ -117,7 +122,7 @@ export default function ImportTab() {
         });
       });
 
-      setPreviewData({
+      setImportData({
         errors,
         tagsToCreate,
         foldersToCreate,
@@ -126,8 +131,62 @@ export default function ImportTab() {
     }
   }, [csvData, createNewFolders, createNewTags]);
 
-  const handleImport = () => {
+  const handleImport = async () => {
+
+    if (!importData || importData.importRows.length === 0) {
+      openSnackBar('Please upload a file with more than 1 task to import.');
+      return;
+    }
+
+    if (importData.errors.length > 0) {
+      openSnackBar('Please resolve the errors displayed in the preview.');
+      return;
+    }
+
     setLoading(true);
+
+    try {
+      const { success, message } = await importTasks({
+        clientId,
+        importRows: importData.importRows
+      });
+
+      if (success) {
+        openSnackBar('Tasks successfully imported.', 'success');
+        const now = new Date().toISOString();
+
+        // const newTaskObject = {
+        //   task_id: task.task_id,
+        //   task_name: name,
+        //   description,
+        //   date_created: task.date_created,
+        //   created_by_id: task.created_by_id,
+        //   status: status,
+        //   folder_id: folderId,
+        //   link_url: linkUrl,
+        //   assigned_to_id: assignedToId,
+        //   date_completed: status === 'Complete' ? now : null,
+        //   is_key_task: Number(isKeyTask),
+        //   date_due: dateDue ? dateDue.toISOString() : null,
+        //   date_last_updated: now,
+        //   tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
+        //   assigned_first: assignedTo?.firstName || null,
+        //   assigned_last: assignedTo?.lastName || null,
+        //   created_first: task.created_first,
+        //   created_last: task.created_last,
+        //   updated_by_first: user.firstName,
+        //   updated_by_last: user.lastName
+        // };
+
+        // tasksMap[task.task_id] = newTaskObject;
+        //setTasks(Object.values(tasksMap));
+      } else {
+        openSnackBar(message, 'error');
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
 
   };
 
@@ -258,7 +317,7 @@ export default function ImportTab() {
             label="Create new folders"
           />
           <FormHelperText>
-            A new folder will be created if it does not currently exist during the import (case insensitive).
+            A new folder will be created if it does not currently exist during the import (case sensitive).
           </FormHelperText>
         </Box>
         <Box>
@@ -271,7 +330,7 @@ export default function ImportTab() {
             label="Create new tags"
           />
           <FormHelperText>
-            New tags will be created if one does not currently exist during the import (case insensitive).
+            New tags will be created if one does not currently exist during the import (case sensitive).
           </FormHelperText>
         </Box>
         <Box my={4}>
@@ -292,12 +351,12 @@ export default function ImportTab() {
             />
           </Button>
         </Box>
-        <Box component='h4' mt={5}>Preview</Box>
+        <Box component='h4' mt={5}>Import Preview</Box>
         <Box mt={2}>
           {
-            !previewData ? <Typography variant="body2">Waiting for file...</Typography>
+            !importData ? <Typography variant="body2">Waiting for file...</Typography>
               :
-              <PreviewData previewData={previewData} />
+              <ImportData importData={importData} />
           }
         </Box>
         <Box mt={5} width={'100%'}>
@@ -306,7 +365,7 @@ export default function ImportTab() {
             size="large"
             onClick={handleImport}
             loading={isLoading}
-            disabled={!(previewData && previewData.errors.length === 0)}
+            disabled={!(importData && importData.errors.length === 0)}
             variant="contained">
             Import
           </LoadingButton>
@@ -317,14 +376,14 @@ export default function ImportTab() {
   );
 };
 
-function PreviewData({ previewData }) {
+function ImportData({ importData }) {
 
   const {
     errors,
     tagsToCreate,
     foldersToCreate,
     importRows
-  } = previewData;
+  } = importData;
 
   if (errors && errors.length > 0) {
     return (

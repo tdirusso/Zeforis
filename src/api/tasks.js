@@ -22,9 +22,15 @@ const batchUpdateTasks = async (payload) => {
   return data;
 };
 
+const importTasks = async (payload) => {
+  const { data } = await request.post(`tasks/import`, payload);
+  return data;
+};
+
 export {
   createTask,
   deleteTasks,
   updateTask,
-  batchUpdateTasks
+  batchUpdateTasks,
+  importTasks
 };
