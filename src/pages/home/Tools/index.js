@@ -6,6 +6,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import ReportGeneratorTab from "../../../components/admin/tools/ReportGeneratorTab";
 import ImportTab from "../../../components/admin/tools/ImportTab";
+import ExportTab from "../../../components/admin/tools/ExportTab";
 export default function ToolsPage() {
 
   const [tabVal, setTabVal] = useState(0);
@@ -18,6 +19,8 @@ export default function ToolsPage() {
         return null;
       case 2:
         return <ImportTab />;
+      case 3:
+        return <ExportTab />;
       default:
         break;
     }
