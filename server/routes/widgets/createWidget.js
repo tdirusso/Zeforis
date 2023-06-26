@@ -10,13 +10,7 @@ module.exports = async (req, res) => {
     backgroundColor = '#ffffff',
     textColor = '#000000'
   } = req.body;
-
-  if (!clientId) {
-    return res.json({
-      message: 'Missing clientId.'
-    });
-  }
-
+  
   if (!name) {
     return res.json({
       message: 'Missing widget name.'

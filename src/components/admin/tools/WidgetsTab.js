@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { LoadingButton } from "@mui/lab";
-import { Box, FormControlLabel, FormGroup, Grid, IconButton, List, ListItem, ListItemButton, ListItemText, ListSubheader, Menu, Paper, Switch, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Divider, FormControlLabel, FormGroup, Grid, IconButton, List, ListItem, ListItemButton, ListItemText, ListSubheader, Menu, Paper, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { ChromePicker } from "react-color";
 import { useOutletContext } from "react-router-dom";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { createWidget } from "../../../api/widgets";
+import { createWidget, updateWidget } from "../../../api/widgets";
 
 export default function WidgetsTab() {
 
@@ -58,6 +58,7 @@ export default function WidgetsTab() {
     }
 
     setLoading(true);
+
     try {
       const { widget, message } = await createWidget({
         clientId: client.id,
@@ -71,8 +72,8 @@ export default function WidgetsTab() {
 
       if (widget) {
         openSnackBar('Widget created.', 'success');
-        setLoading(false);
         setWidgets([...widgets, widget]);
+        setLoading(false);
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -84,7 +85,49 @@ export default function WidgetsTab() {
   };
 
   const handleUpdateWidget = async () => {
-    alert();
+    if (!widgetName) {
+      openSnackBar('Please enter a name for the widget.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const widgetParams = {
+        widgetId: selectedWidget.id,
+        clientId: client.id,
+        name: widgetName,
+        title: widgetTitle,
+        body: widgetBody,
+        backgroundColor,
+        textColor,
+        isEnabled
+      };
+
+      const { success, message } = await updateWidget(widgetParams);
+
+      if (success) {
+        openSnackBar('Widget updated.', 'success');
+
+        const updatedWidgets = widgets.map(widget => {
+          if (widget.id === selectedWidget.id) {
+            return { ...widgetParams, id: selectedWidget.id };
+          }
+          return widget;
+        });
+
+        console.log(updatedWidgets);
+
+        setWidgets(updatedWidgets);
+        setLoading(false);
+      } else {
+        openSnackBar(message, 'error');
+        setLoading(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   return (
@@ -100,6 +143,7 @@ export default function WidgetsTab() {
       <Grid item xs={3}>
         <Paper sx={{ px: 0 }}>
           <Box component="h5" mx={2}>Your Widgets</Box>
+          <Divider sx={{ py: 1 }} />
           <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
             <List dense>
               <ListSubheader sx={{ px: 0 }}>
@@ -113,7 +157,9 @@ export default function WidgetsTab() {
                 widgets.map((widget) => {
                   return (
                     <ListItem key={widget.id} sx={{ px: 0, py: 0 }}>
-                      <ListItemButton onClick={() => setSelectedWidget(widget)}>
+                      <ListItemButton
+                        selected={selectedWidget?.id === widget.id}
+                        onClick={() => setSelectedWidget(widget)}>
                         <ListItemText>
                           {widget.name}
                         </ListItemText>

@@ -32,6 +32,7 @@ const batchUpdateTasks = require('./routes/tasks/batchUpdateTasks');
 const updateTag = require('./routes/tags/updateTag');
 const importTasks = require('./routes/tasks/importTasks');
 const createWidget = require('./routes/widgets/createWidget');
+const updatedWidget = require('./routes/widgets/updateWidget');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -97,6 +98,7 @@ const boot = async () => {
   app.patch('/api/orgs', checkPermissionsMW, updateOrg);
 
   app.post('/api/widgets', checkPermissionsMW, createWidget);
+  app.patch('/api/widgets', checkPermissionsMW, updatedWidget);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));
