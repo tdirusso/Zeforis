@@ -31,6 +31,7 @@ const updateOrg = require('./routes/orgs/updateOrg');
 const batchUpdateTasks = require('./routes/tasks/batchUpdateTasks');
 const updateTag = require('./routes/tags/updateTag');
 const importTasks = require('./routes/tasks/importTasks');
+const createWidget = require('./routes/widgets/createWidget');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -94,6 +95,8 @@ const boot = async () => {
 
   app.post('/api/orgs', addOrg);
   app.patch('/api/orgs', checkPermissionsMW, updateOrg);
+
+  app.post('/api/widgets', checkPermissionsMW, createWidget);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

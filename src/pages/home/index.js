@@ -44,6 +44,7 @@ export default function Home({ setTheme }) {
   const [tasks, setTasks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [tags, setTags] = useState([]);
+  const [widgets, setWidgets] = useState([]);
   const [orgUsers, setOrgUsers] = useState([]);
   const [triedOrgAndClient, setTriedOrgAndClient] = useState(false);
 
@@ -121,6 +122,7 @@ export default function Home({ setTheme }) {
       setFolders(result.folders);
       setTags(result.tags);
       setOrgUsers(result.orgUsers);
+      setWidgets(result.widgets);
       setLoading(false);
     }
   }, [triedOrgAndClient]);
@@ -149,6 +151,7 @@ export default function Home({ setTheme }) {
 
   const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
   const sortedTags = Object.values(tagsMap).sort((a, b) => a.name.localeCompare(b.name));
+  const sortedWidgets = widgets.sort((a, b) => a.name.localeCompare(b.name));
 
   let isAdmin = false;
   const clientMembers = [];
@@ -236,10 +239,12 @@ export default function Home({ setTheme }) {
     foldersMap,
     tasksMap,
     isAdmin,
+    widgets: sortedWidgets,
     setTags,
     setTasks,
     setFolders,
     setOrgUsers,
+    setWidgets,
     setUser,
     openSnackBar,
     openModal,

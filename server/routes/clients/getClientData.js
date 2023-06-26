@@ -8,19 +8,21 @@ module.exports = async (req, res) => {
     return res.json({ message: 'No clientId provided.' });
   }
 
+  const connection = await pool.getConnection();
+
   try {
 
-    const [folders] = await pool.query(
+    const [folders] = await connection.query(
       'SELECT * FROM folders WHERE client_id = ?',
       [clientId]
     );
 
-    const [tags] = await pool.query(
+    const [tags] = await connection.query(
       'SELECT * FROM tags WHERE client_id = ? ORDER BY tags.name',
       [clientId]
     );
 
-    const [orgUsers] = await pool.query(
+    const [orgUsers] = await connection.query(
       `
         SELECT 
           users.id as user_id,
@@ -76,9 +78,11 @@ module.exports = async (req, res) => {
       }
     });
 
+    const sortedOrgUsers = Object.values(orgUsersMap).sort((a, b) => a.firstName.localeCompare(b.firstName));
+
     const foldersIds = folders.length > 0 ? folders.map(folder => folder.id) : null;
 
-    const [tasks] = await pool.query(
+    const [tasks] = await connection.query(
       `
         SELECT
           tasks.id as task_id,
@@ -113,17 +117,36 @@ module.exports = async (req, res) => {
       [foldersIds]
     );
 
-    const sortedOrgUsers = Object.values(orgUsersMap).sort((a, b) => a.firstName.localeCompare(b.firstName));
+    const [widgets] = await connection.query(
+      `
+        SELECT
+        id,
+        client_id AS clientId,
+        name,
+        title,
+        body,
+        background_color AS backgroundColor,
+        text_color AS textColor,
+        is_enabled AS isEnabled
+        FROM widgets
+        WHERE client_id = ?
+      `,
+      [clientId]
+    );
+
+    connection.release();
 
     return res.json({
       folders,
       tasks,
       tags,
+      widgets,
       orgUsers: sortedOrgUsers
     });
 
   } catch (error) {
     console.log(error);
+    connection.release();
     return res.json({ message: error.message });
   }
 };

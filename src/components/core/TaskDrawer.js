@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -99,6 +99,8 @@ export default function TaskDrawer(props) {
   const [needsUpdating, setNeedsUpdating] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
 
+  const descriptionTextarea = useRef();
+
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const deleteMenuOpen = Boolean(deleteMenuAnchor);
 
@@ -145,6 +147,9 @@ export default function TaskDrawer(props) {
 
   const handleClose = () => {
     close();
+    setTimeout(() => {
+      descriptionTextarea.current.style.height = 'auto';
+    }, 500);
   };
 
   const handleCreateTag = async e => {
@@ -475,6 +480,8 @@ export default function TaskDrawer(props) {
             variant="standard"
             value={description}
             multiline
+            inputRef={descriptionTextarea}
+            inputProps={{ sx: { resize: 'vertical' } }}
             onBlur={handleDescriptionChange}
             onChange={e => setDescription(e.target.value)}
           />
