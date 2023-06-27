@@ -8,14 +8,23 @@ module.exports = async (req, res) => {
     assigneeId,
     status,
     taskIds,
-    dateDue
+    dateDue,
+    isKey
   } = req.body;
 
   const updaterUserId = req.userId;
 
-  if (!action || !taskIds || taskIds.length === 0 || (action !== 'dateDue' && (!folderId && !assigneeId && !status))) {
+  console.log(action, taskIds, isKey);
+
+  if (!action) {
     return res.json({
-      message: 'Missing task parameters.'
+      message: 'Missing action.'
+    });
+  }
+
+  if (!taskIds || taskIds.length === 0) {
+    return res.json({
+      message: 'Missing taskIds.'
     });
   }
 
@@ -24,16 +33,43 @@ module.exports = async (req, res) => {
   try {
     switch (action) {
       case 'assignee':
-        await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
+        if (!assigneeId) {
+          return res.json({
+            message: 'Missing assigneeId.'
+          });
+        } else {
+          await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
+        }
         break;
       case 'folder':
-        await updateFolders(taskIds, folderId, updaterUserId, connection);
+        if (!folderId) {
+          return res.json({
+            message: 'Missing folderId.'
+          });
+        } else {
+          await updateFolders(taskIds, folderId, updaterUserId, connection);
+        }
         break;
       case 'status':
-        await updateStatuses(taskIds, status, updaterUserId, connection);
+        if (!status) {
+          return res.json({
+            message: 'Missing status.'
+          });
+        } else {
+          await updateStatuses(taskIds, status, updaterUserId, connection);
+        }
         break;
       case 'dateDue':
         await updateDateDue(taskIds, dateDue, updaterUserId, connection);
+        break;
+      case 'keyTask':
+        if (!isKey) {
+          return res.json({
+            message: 'Missing isKey.'
+          });
+        } else {
+          await updateKeyTask(taskIds, isKey, updaterUserId, connection);
+        }
         break;
       default:
         break;
@@ -124,4 +160,12 @@ async function updateStatuses(taskIds, status, updaterUserId, connection) {
       [status, updaterUserId, taskIds]
     );
   }
+}
+
+
+async function updateKeyTask(taskIds, isKey, updaterUserId, connection) {
+  await connection.query(
+    'UPDATE tasks SET is_key_task = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
+    [isKey === 'yes' ? 1 : 0, updaterUserId, taskIds]
+  );
 }

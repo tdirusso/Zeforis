@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
         orgId,
         orgName,
         clientName,
-        orgBrand,
+        orgBrand
       });
 
       return res.json({ success: true, userId: user.id });
@@ -71,7 +71,8 @@ module.exports = async (req, res) => {
         orgId,
         orgName,
         clientName,
-        isNewUser: true
+        isNewUser: true,
+        orgBrand
       });
 
       const newUserResult = await pool.query(
@@ -114,7 +115,7 @@ async function sendInvitationEmail({ email, clientId, orgName, clientName, orgId
     orgBrand
   };
 
-  const templatePath = path.resolve(__dirname, '../../email/templates/inviteUser.ejs');
+  const templatePath = path.resolve(__dirname, '../../../email/templates/inviteUser.ejs');
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({

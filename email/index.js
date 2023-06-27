@@ -8,6 +8,8 @@ if (isDev) {
   });
 }
 
+console.log(process.env.MAILER_PASSWORD);
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {

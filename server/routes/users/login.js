@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     password
   } = req.body;
 
-  if (!email || !password || email !== 'timgdirusso@gmail.com') {
+  if (!email || !password) {
     return res.json({
       message: 'Missing credentials, please try again.'
     });

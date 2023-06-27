@@ -6,12 +6,14 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { batchUpdateTasks } from '../../api/tasks';
-import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip } from '@mui/material';
+import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip, ListItemIcon, ListItemText } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import { statuses } from '../../lib/constants';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarIcon from '@mui/icons-material/Star';
 
 export default function EditSelectedTasksModal(props) {
   const {
@@ -39,6 +41,7 @@ export default function EditSelectedTasksModal(props) {
   const [assignee, setAssignee] = useState(null);
   const [folder, setFolder] = useState(null);
   const [dateDue, setDateDue] = useState(null);
+  const [isKey, setIsKey] = useState('');
 
   const handleBatchUpdate = async () => {
     setLoading(true);
@@ -51,7 +54,8 @@ export default function EditSelectedTasksModal(props) {
         status,
         dateDue,
         folderId: folder?.id,
-        assigneeId: assignee?.id
+        assigneeId: assignee?.id,
+        isKey
       });
 
       if (updatedTasks) {
@@ -69,7 +73,7 @@ export default function EditSelectedTasksModal(props) {
       setLoading(false);
     }
   };
-  
+
   const handleClose = () => {
     setOpen(false);
     setTimeout(() => {
@@ -79,6 +83,7 @@ export default function EditSelectedTasksModal(props) {
       setFolder(null);
       setAssignee(null);
       setDateDue(null);
+      setIsKey('');
     }, 500);
   };
 
@@ -162,6 +167,41 @@ export default function EditSelectedTasksModal(props) {
             ></DatePicker>
           </LocalizationProvider>
         );
+      case 'keyTask':
+        return (
+          <>
+            <InputLabel id="to-label">To</InputLabel>
+            <Select
+              labelId="to-label"
+              value={isKey}
+              label="To"
+              sx={{
+                '& .MuiSelect-select': {
+                  display: 'flex'
+                }
+              }}
+              disabled={isLoading}>
+              <MenuItem
+                value='yes'
+                onClick={() => setIsKey('yes')}
+              >
+                <ListItemIcon sx={{ alignSelf: 'center' }}>
+                  <StarIcon fontSize="small" htmlColor='gold' />
+                </ListItemIcon>
+                <ListItemText>Yes</ListItemText>
+              </MenuItem>
+              <MenuItem
+                value='no'
+                onClick={() => setIsKey('no')}
+              >
+                <ListItemIcon sx={{ alignSelf: 'center' }}>
+                  <StarBorderIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>No</ListItemText>
+              </MenuItem>
+            </Select>
+          </>
+        );
       default:
         break;
     }
@@ -172,6 +212,7 @@ export default function EditSelectedTasksModal(props) {
     setFolder(null);
     setStatus('');
     setAction(e.target.value);
+    setIsKey('');
   };
 
   return (
@@ -196,6 +237,7 @@ export default function EditSelectedTasksModal(props) {
                   <MenuItem value="folder">Folder</MenuItem>
                   <MenuItem value="status">Status</MenuItem>
                   <MenuItem value="dateDue">Due Date</MenuItem>
+                  <MenuItem value="keyTask">Key Task</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
