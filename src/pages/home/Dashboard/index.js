@@ -6,12 +6,14 @@ import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
 import './styles.css';
 import { Paper, Typography, Button, Grid } from "@mui/material";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import CustomWidgets from "../../../components/core/dashboard/CustomWidgets";
 
 export default function Dashboard() {
   const {
     tasks,
     folders,
-    openDrawer
+    openDrawer,
+    widgets
   } = useOutletContext();
 
   const tasksSortedByDate = tasks.sort((a, b) => {
@@ -48,6 +50,7 @@ export default function Dashboard() {
     <>
       <KeyTasks tasks={keyTasks.slice(0, 5)} />
       <UpcomingTasks tasks={tasksSortedByDate.slice(0, 5)} />
+      <CustomWidgets widgets={widgets} />
       <TaskStats
         numComplete={numTasksCompleted}
         numPastDue={numTasksPastDue}

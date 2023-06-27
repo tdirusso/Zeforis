@@ -1,6 +1,7 @@
 import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -22,6 +23,11 @@ export default function UpcomingTasks({ tasks }) {
             component="h5"
             display="flex"
             alignItems="center">
+            <AccessAlarmIcon
+              fontSize="small"
+              color="primary"
+              sx={{ mr: 0.6 }}
+            />
             Upcoming Tasks
           </Box>
           <Button
