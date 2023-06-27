@@ -5,10 +5,10 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeClient } from '../../api/clients';
+import { deleteClient } from '../../api/clients';
 import { useOutletContext } from 'react-router-dom';
 
-export default function RemoveClientModal({ open, setOpen }) {
+export default function DeleteClientModal({ open, setOpen }) {
   const {
     client,
     openSnackBar
@@ -18,17 +18,17 @@ export default function RemoveClientModal({ open, setOpen }) {
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleRemoveClient = async () => {
+  const handleDeleteClient = async () => {
     setLoading(true);
 
     try {
-      const { success, message } = await removeClient({
+      const { success, message } = await deleteClient({
         clientId
       });
 
       if (success) {
         setTimeout(() => {
-          openSnackBar('Successully removed.', 'success');
+          openSnackBar('Successully deleted.', 'success');
           window.location.href = '/home/dashboard';
         }, 250);
       } else {
@@ -53,7 +53,7 @@ export default function RemoveClientModal({ open, setOpen }) {
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <DialogContentText sx={{ mb: 5 }}>
-            Are you sure you want to <strong>permanently remove "{client.name}"?</strong>
+            Are you sure you want to <strong>permanently delete "{client.name}"?</strong>
             <br></br>
             <br></br>
             If you proceed, ALL folders, tasks and tags will be deleted.
@@ -69,11 +69,11 @@ export default function RemoveClientModal({ open, setOpen }) {
             <LoadingButton
               variant='contained'
               fullWidth
-              onClick={handleRemoveClient}
+              onClick={handleDeleteClient}
               required
               loading={isLoading}
               color="error">
-              Yes, remove {client.name}
+              Yes, delete {client.name}
             </LoadingButton>
           </DialogActions>
         </DialogContent>

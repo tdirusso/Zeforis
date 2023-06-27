@@ -5,7 +5,7 @@ const fileUpload = require('express-fileupload');
 
 const login = require('./routes/users/login');
 const authenticate = require('./routes/users/authenticate');
-const addClient = require('./routes/clients/addClient');
+const createClient = require('./routes/clients/createClient');
 const getClient = require('./routes/clients/getClientData');
 const createFolder = require('./routes/folders/createFolder');
 const updateClient = require('./routes/clients/updateClient');
@@ -18,11 +18,11 @@ const updateProfile = require('./routes/users/updateProfile');
 const updateFolder = require('./routes/folders/updateFolder');
 const createTask = require('./routes/tasks/createTask');
 const createTag = require('./routes/tags/createTag');
-const addOrg = require('./routes/orgs/addOrg');
-const removeTag = require('./routes/tags/removeTag');
+const createOrg = require('./routes/orgs/createOrg');
+const deleteTag = require('./routes/tags/deleteTag');
 const deleteTasks = require('./routes/tasks/deleteTasks');
-const removeFolder = require('./routes/folders/removeFolder');
-const removeClient = require('./routes/clients/removeClient');
+const deleteFolder = require('./routes/folders/deleteFolder');
+const deleteClient = require('./routes/clients/deleteClient');
 const removeUser = require('./routes/users/removeUser');
 const updateTask = require('./routes/tasks/updateTask');
 const updatePermission = require('./routes/users/updatePermission');
@@ -76,13 +76,13 @@ const boot = async () => {
   app.patch('/api/users/permissions', checkPermissionsMW, updatePermission);
   app.patch('/api/users/access', checkPermissionsMW, updateAccess);
 
-  app.post('/api/clients', checkPermissionsMW, addClient);
+  app.post('/api/clients', checkPermissionsMW, createClient);
   app.get('/api/clients', checkAuth, getClient);
   app.patch('/api/clients', checkPermissionsMW, updateClient);
-  app.delete('/api/clients', checkPermissionsMW, removeClient);
+  app.delete('/api/clients', checkPermissionsMW, deleteClient);
 
   app.post('/api/folders', checkPermissionsMW, createFolder);
-  app.delete('/api/folders', checkPermissionsMW, removeFolder);
+  app.delete('/api/folders', checkPermissionsMW, deleteFolder);
   app.patch('/api/folders', checkPermissionsMW, updateFolder);
 
   app.post('/api/tasks', checkPermissionsMW, createTask);
@@ -92,10 +92,10 @@ const boot = async () => {
   app.post('/api/tasks/import', checkPermissionsMW, importTasks);
 
   app.post('/api/tags', checkPermissionsMW, createTag);
-  app.delete('/api/tags', checkPermissionsMW, removeTag);
+  app.delete('/api/tags', checkPermissionsMW, deleteTag);
   app.patch('/api/tags', checkPermissionsMW, updateTag);
 
-  app.post('/api/orgs', addOrg);
+  app.post('/api/orgs', createOrg);
   app.patch('/api/orgs', checkPermissionsMW, updateOrg);
 
   app.post('/api/widgets', checkPermissionsMW, createWidget);

@@ -8,7 +8,7 @@ const setActiveOrgId = orgId => {
   localStorage.setItem('activeOrgId', orgId);
 };
 
-const removeActiveOrgId = () => {
+const deleteActiveOrgId = () => {
   localStorage.removeItem('activeOrgId');
 };
 
@@ -18,7 +18,7 @@ const updateOrg = async (payload) => {
   return data;
 };
 
-const addOrg = async (payload) => {
+const createOrg = async (payload) => {
   const { data } = await request.post(`orgs`, payload);
 
   return data;
@@ -27,7 +27,7 @@ const addOrg = async (payload) => {
 export {
   getActiveOrgId,
   setActiveOrgId,
-  removeActiveOrgId,
+  deleteActiveOrgId,
   updateOrg,
-  addOrg
+  createOrg
 };

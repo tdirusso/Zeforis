@@ -4,7 +4,7 @@ import { setActiveClientId } from "../../../api/clients";
 import { useOutletContext } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddClientModal from "../../admin/AddClientModal";
+import CreateClientModal from "../../admin/CreateClientModal";
 import EditClientModal from "../../admin/EditClientModal";
 import React, { useState } from "react";
 import InviteClientUserModal from "../../admin/InviteClientUserModal";
@@ -393,7 +393,7 @@ export default function Clients() {
         </Menu>
       </Paper>
 
-      <AddClientModal
+      <CreateClientModal
         open={createClientModalOpen}
         setOpen={setCreateClientModalOpen}
         org={org}

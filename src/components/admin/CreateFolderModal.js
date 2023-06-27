@@ -10,7 +10,7 @@ import { LoadingButton } from '@mui/lab';
 import { createFolder } from '../../api/folders';
 import { useOutletContext } from 'react-router-dom';
 
-export default function AddFolderModal(props) {
+export default function CreateFolderModal(props) {
   const {
     open,
     setOpen,

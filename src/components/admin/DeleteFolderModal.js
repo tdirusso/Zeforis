@@ -7,9 +7,9 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { useOutletContext } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { removeFoldeer } from '../../api/folders';
+import { deleteFolder } from '../../api/folders';
 
-export default function RemoveFolderModal(props) {
+export default function DeleteFolderModal(props) {
 
   const {
     open,
@@ -29,17 +29,17 @@ export default function RemoveFolderModal(props) {
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleRemoveFolder = async () => {
+  const handleDeleteFolder = async () => {
     setLoading(true);
     try {
-      const { success, message } = await removeFoldeer({
+      const { success, message } = await deleteFolder({
         clientId,
         folderId: folder.id
       });
 
       if (success) {
         setTimeout(() => {
-          openSnackBar(`Folder successfully removed.`, 'success');
+          openSnackBar(`Successfully deleted.`, 'success');
         }, 250);
 
         delete foldersMap[folder.id];
@@ -82,7 +82,7 @@ export default function RemoveFolderModal(props) {
             </Button>
             <LoadingButton
               variant='contained'
-              onClick={handleRemoveFolder}
+              onClick={handleDeleteFolder}
               required
               fullWidth
               loading={isLoading}

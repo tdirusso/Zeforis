@@ -8,12 +8,12 @@ import SelectClientScreen from "../../components/core/SelectClientScreen";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import { getActiveClientId, getClientData, getUserClientListForOrg, setActiveClientId } from "../../api/clients";
-import AddClientScreen from "../../components/admin/AddClientScreen";
+import CreateClientScreen from "../../components/admin/CreateClientScreen";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import SelectOrgModal from "../../components/core/SelectOrgModal";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
-import AddOrgScreen from "../../components/admin/AddOrgScreen";
+import CreateOrgScreen from "../../components/admin/CreateOrgScreen";
 import Header from "../../components/core/Header";
 import Modals from "../../components/core/Modals";
 import useModal from "../../hooks/useModal";
@@ -179,7 +179,7 @@ export default function Home({ setTheme }) {
     } else if (user.memberOfOrgs.length === 0) {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <AddOrgScreen user={user} />
+          <CreateOrgScreen user={user} />
         </Box>
       );
     } else {
@@ -202,7 +202,7 @@ export default function Home({ setTheme }) {
   if (clients.length === 0) {
     return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
-        <AddClientScreen org={org} />
+        <CreateClientScreen org={org} />
       </Box>
     );
   }

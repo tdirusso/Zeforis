@@ -1,6 +1,6 @@
 import request from '../lib/request';
 
-const addClient = async (payload) => {
+const createClient = async (payload) => {
   const { data } = await request.post(`clients`, payload);
 
   return data;
@@ -40,7 +40,7 @@ const getUserClientListForOrg = (user, activeOrgId) => {
   return sortedResult;
 };
 
-const removeActiveClientId = () => {
+const deleteActiveClientId = () => {
   localStorage.removeItem('activeClientId');
 };
 
@@ -68,22 +68,22 @@ const getClientData = async (clientId, orgId) => {
   return data;
 };
 
-const removeClient = async (payload) => {
+const deleteClient = async (payload) => {
   const { data } = await request.delete(`clients`, { data: payload });
 
   return data;
 };
 
 export {
-  addClient,
+  createClient,
   updateClient,
   setActiveClientId,
   getActiveClientId,
   getUserClientListForOrg,
-  removeActiveClientId,
+  deleteActiveClientId,
   inviteClientUser,
   removeClientUser,
   getClientData,
-  removeClient,
+  deleteClient,
   removeUser
 };

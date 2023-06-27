@@ -3,9 +3,9 @@ import { Box, Paper, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addOrg, setActiveOrgId } from '../../api/orgs';
+import { createOrg, setActiveOrgId } from '../../api/orgs';
 
-export default function AddOrgScreen({ user }) {
+export default function CreateOrgScreen({ user }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ export default function AddOrgScreen({ user }) {
       fd.append('name', nameVal);
       fd.append('userId', user.id);
 
-      const { orgId, message } = await addOrg(fd);
+      const { orgId, message } = await createOrg(fd);
 
       if (orgId) {
         setActiveOrgId(orgId);

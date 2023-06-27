@@ -3,9 +3,9 @@ import { Box, Paper, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../core/Snackbar';
 import useSnackbar from '../../hooks/useSnackbar';
-import { addClient, setActiveClientId } from '../../api/clients';
+import { createClient, setActiveClientId } from '../../api/clients';
 
-export default function AddClientScreen({ org }) {
+export default function CreateClientScreen({ org }) {
   const name = useRef();
   const [isLoading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ export default function AddClientScreen({ org }) {
       fd.append('name', nameVal);
       fd.append('orgId', org.id);
 
-      const { client, message } = await addClient(fd);
+      const { client, message } = await createClient(fd);
 
       if (client) {
         setActiveClientId(client.id);

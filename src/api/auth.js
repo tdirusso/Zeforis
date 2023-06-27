@@ -11,7 +11,7 @@ const login = async (payload) => {
 };
 
 const logout = () => {
-  removeToken();
+  deleteToken();
   window.location = '/login';
 };
 
@@ -19,7 +19,7 @@ const authenticate = async () => {
   const { data } = await request.post(`users/authenticate`);
 
   if (!data.user) {
-    removeToken();
+    deleteToken();
   }
 
   return data;
@@ -33,7 +33,7 @@ const setToken = (token) => {
   localStorage.setItem('token', token);
 };
 
-const removeToken = () => {
+const deleteToken = () => {
   localStorage.removeItem('token');
 };
 
@@ -43,5 +43,5 @@ export {
   authenticate,
   getToken,
   setToken,
-  removeToken
+  deleteToken
 };

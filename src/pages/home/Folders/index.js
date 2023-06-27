@@ -1,7 +1,7 @@
 import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
 import './styles.css';
 import FolderIcon from '@mui/icons-material/Folder';
-import AddFolderModal from "../../../components/admin/AddFolderModal";
+import CreateFolderModal from "../../../components/admin/CreateFolderModal";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import Divider from '@mui/material/Divider';
@@ -9,16 +9,16 @@ import React from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditFolderModal from "../../../components/admin/EditFolderModal";
-import RemoveFolderModal from "../../../components/admin/RemoveFolderModal";
+import DeleteFolderModal from "../../../components/admin/DeleteFolderModal";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 export default function FoldersPage() {
-  const [addFolderModalOpen, setAddFolderModalOpen] = useState(false);
+  const [createFolderModalOpen, setCreateFolderModalOpen] = useState(false);
   const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
-  const [removeFolderModalOpen, setRemoveFolderModalOpen] = useState(false);
+  const [deleteFolderModalOpen, setDeleteFolderModalOpen] = useState(false);
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -56,7 +56,7 @@ export default function FoldersPage() {
   };
 
   const handleDeleteClick = () => {
-    setRemoveFolderModalOpen(true);
+    setDeleteFolderModalOpen(true);
     setAnchorEl(null);
   };
 
@@ -130,9 +130,9 @@ export default function FoldersPage() {
         </MenuItem>
       </Menu>
 
-      <AddFolderModal
-        open={addFolderModalOpen}
-        setOpen={setAddFolderModalOpen}
+      <CreateFolderModal
+        open={createFolderModalOpen}
+        setOpen={setCreateFolderModalOpen}
         clientId={client.id}
       />
 
@@ -142,9 +142,9 @@ export default function FoldersPage() {
         folder={folderToEdit}
       />
 
-      <RemoveFolderModal
-        open={removeFolderModalOpen}
-        setOpen={setRemoveFolderModalOpen}
+      <DeleteFolderModal
+        open={deleteFolderModalOpen}
+        setOpen={setDeleteFolderModalOpen}
         folder={folderToEdit}
       />
     </>
