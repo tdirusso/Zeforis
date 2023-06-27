@@ -33,6 +33,7 @@ const updateTag = require('./routes/tags/updateTag');
 const importTasks = require('./routes/tasks/importTasks');
 const createWidget = require('./routes/widgets/createWidget');
 const updatedWidget = require('./routes/widgets/updateWidget');
+const deleteWidget = require('./routes/widgets/deleteWidget');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -99,6 +100,7 @@ const boot = async () => {
 
   app.post('/api/widgets', checkPermissionsMW, createWidget);
   app.patch('/api/widgets', checkPermissionsMW, updatedWidget);
+  app.delete('/api/widgets', checkPermissionsMW, deleteWidget);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

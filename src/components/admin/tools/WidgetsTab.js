@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { LoadingButton } from "@mui/lab";
-import { Box, Divider, FormControlLabel, FormGroup, Grid, IconButton, List, ListItem, ListItemButton, ListItemText, ListSubheader, Menu, Paper, Switch, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Divider, FormControlLabel, FormGroup, Grid, IconButton, List, ListItem, ListItemButton, ListItemText, ListSubheader, Menu, Paper, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { ChromePicker } from "react-color";
 import { useOutletContext } from "react-router-dom";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { createWidget, updateWidget } from "../../../api/widgets";
+import { createWidget, deleteWidget, updateWidget } from "../../../api/widgets";
 
 export default function WidgetsTab() {
 
@@ -25,11 +25,13 @@ export default function WidgetsTab() {
   const [textColorMenu, setTextColorMenu] = useState(null);
   const [isEnabled, setIsEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
-
+  const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
   const [selectedWidget, setSelectedWidget] = useState(null);
 
   const bgColorMenuOpen = Boolean(bgColorMenu);
   const textColorMenuOpen = Boolean(textColorMenu);
+
+  const deleteMenuOpen = Boolean(deleteMenuAnchor);
 
   useEffect(() => {
     if (selectedWidget) {
@@ -116,9 +118,33 @@ export default function WidgetsTab() {
           return widget;
         });
 
-        console.log(updatedWidgets);
-
         setWidgets(updatedWidgets);
+        setLoading(false);
+      } else {
+        openSnackBar(message, 'error');
+        setLoading(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteWidget = async () => {
+    setLoading(true);
+
+    try {
+      const { success, message } = await deleteWidget({
+        widgetId: selectedWidget.id,
+        clientId: client.id
+      });
+
+      if (success) {
+        openSnackBar('Widget deleted.', 'success');
+
+        setWidgets(widgets => widgets.filter(widget => widget.id !== selectedWidget.id));
+        setSelectedWidget(null);
+        setDeleteMenuAnchor(null);
         setLoading(false);
       } else {
         openSnackBar(message, 'error');
@@ -147,7 +173,9 @@ export default function WidgetsTab() {
           <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
             <List dense>
               <ListSubheader sx={{ px: 0 }}>
-                <ListItemButton onClick={() => setSelectedWidget({ id: 'new' })}>
+                <ListItemButton
+                  disabled={loading}
+                  onClick={() => setSelectedWidget({ id: 'new' })}>
                   <ListItemText sx={{ color: '#bebebe' }}>
                     + New Widget
                   </ListItemText>
@@ -158,6 +186,7 @@ export default function WidgetsTab() {
                   return (
                     <ListItem key={widget.id} sx={{ px: 0, py: 0 }}>
                       <ListItemButton
+                        disabled={loading}
                         selected={selectedWidget?.id === widget.id}
                         onClick={() => setSelectedWidget(widget)}>
                         <ListItemText>
@@ -265,11 +294,11 @@ export default function WidgetsTab() {
               </LoadingButton>
               <Tooltip title="Delete Widget" hidden={selectedWidget?.id === 'new'}>
                 <IconButton
+                  onClick={e => setDeleteMenuAnchor(e.currentTarget)}
                   disabled={loading}
                   size="large"
                   edge="end"
-                  sx={{ mr: 0.5 }}
-                  onClick={() => { }}>
+                  sx={{ mr: 0.5 }}>
                   <DeleteOutlineIcon color="error" />
                 </IconButton>
               </Tooltip>
@@ -348,6 +377,28 @@ export default function WidgetsTab() {
           disableAlpha
           onChange={color => setTextColor(color.hex)}
         />
+      </Menu>
+
+      <Menu
+        anchorEl={deleteMenuAnchor}
+        open={deleteMenuOpen}
+        onClose={() => setDeleteMenuAnchor(null)}>
+        <Box px={2} py={1}>
+          <Button
+            sx={{ mr: 0.5 }}
+            disabled={loading}
+            onClick={() => setDeleteMenuAnchor(null)}>
+            Cancel
+          </Button>
+          <LoadingButton
+            disabled={loading}
+            color='error'
+            variant='contained'
+            loading={loading}
+            onClick={handleDeleteWidget}>
+            Delete
+          </LoadingButton>
+        </Box>
       </Menu>
     </>
   );

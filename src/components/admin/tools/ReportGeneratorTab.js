@@ -215,7 +215,7 @@ export default function ReportGeneratorTab() {
           </Box>
           <Box component='h4' mt={4}>Status Criteria</Box>
           <Box my={2} mt={3}>
-            <FormControl sx={{ width: 500 }}>
+            <FormControl sx={{ width: 550 }}>
               <InputLabel id="to-label">Select statuses</InputLabel>
               <Select
                 renderValue={(selected) => (

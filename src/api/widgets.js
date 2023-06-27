@@ -13,7 +13,7 @@ const updateWidget = async (payload) => {
 };
 
 const deleteWidget = async (payload) => {
-  const { data } = await request.delete(`widgets`, payload);
+  const { data } = await request.delete(`widgets`, { data: payload });
   return data;
 };
 
