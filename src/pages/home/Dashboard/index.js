@@ -13,7 +13,8 @@ export default function Dashboard() {
     tasks,
     folders,
     openDrawer,
-    widgets
+    widgets,
+    isAdmin
   } = useOutletContext();
 
   const tasksSortedByDate = tasks.sort((a, b) => {
@@ -60,6 +61,7 @@ export default function Dashboard() {
         keyFolders.length > 0 ?
           <KeyFolders folders={keyFolders} /> :
           <NoFoldersMessage
+            isAdmin={isAdmin}
             openDrawer={openDrawer}
           />
       }
@@ -67,7 +69,7 @@ export default function Dashboard() {
   );
 };
 
-function NoFoldersMessage({ openDrawer }) {
+function NoFoldersMessage({ openDrawer, isAdmin }) {
   return (
     <Grid item xs={12} md={4}>
       <Paper sx={{ height: '100%' }}>
@@ -75,6 +77,7 @@ function NoFoldersMessage({ openDrawer }) {
           There are currently no key folders.
         </Typography>
         <Button
+          hidden={!isAdmin}
           sx={{ mt: 1.5 }}
           variant="outlined"
           onClick={() => openDrawer('create-folder')}

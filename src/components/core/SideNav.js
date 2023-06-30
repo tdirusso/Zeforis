@@ -14,7 +14,8 @@ export default function SideNav(props) {
   const {
     client,
     org,
-    isSideNavOpen
+    isSideNavOpen,
+    isAdmin
   } = props;
 
   const buttonBaseStyles = {
@@ -113,19 +114,22 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/tools">
-              <li>
-                <ButtonBase sx={buttonBaseStyles}>
-                  <Typography
-                    variant="body2"
-                    display="flex"
-                    alignItems="center">
-                    <BuildIcon />
-                    Tools
-                  </Typography>
-                </ButtonBase>
-              </li>
-            </NavLink>
+            {
+              isAdmin ? <NavLink to="/home/tools">
+                <li>
+                  <ButtonBase sx={buttonBaseStyles}>
+                    <Typography
+                      variant="body2"
+                      display="flex"
+                      alignItems="center">
+                      <BuildIcon />
+                      Tools
+                    </Typography>
+                  </ButtonBase>
+                </li>
+              </NavLink> :
+                null
+            }
             <NavLink to="/home/settings">
               <li>
                 <ButtonBase sx={buttonBaseStyles}>

@@ -2,7 +2,7 @@ import { Divider, TextField, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { Box } from '@mui/system';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -12,7 +12,6 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 
 export default function SearchModal(props) {
-  const { pathname } = useLocation();
   const navigate = useNavigate();
 
   const [query, setQuery] = useState('');
@@ -21,7 +20,8 @@ export default function SearchModal(props) {
     folders,
     tasks,
     isOpen,
-    close
+    close,
+    openDrawer
   } = props;
 
   const filteredTasks = tasks.filter(task => {
@@ -30,8 +30,7 @@ export default function SearchModal(props) {
     }
 
     return task.task_name.toLowerCase().includes(query.toLowerCase());
-  }
-  );
+  });
 
   const filteredFolders = folders.filter(folder => {
     if (!query) {
@@ -39,21 +38,27 @@ export default function SearchModal(props) {
     }
 
     return folder.name.toLowerCase().includes(query.toLowerCase());
-  }
-  );
+  });
 
   const handleTaskClick = (task) => {
-    navigate(`/home/task/${task.task_id}?exitPath=${pathname}`);
-    handleClose();
+    openDrawer('task', { taskProp: task });
+    close();
+    setTimeout(() => {
+      setQuery('');
+    }, 500);
   };
 
   const handleFolderClick = (folder) => {
     navigate(`/home/tasks?folderId=${folder.id}`);
-    handleClose();
+    close();
+    setTimeout(() => {
+      setQuery('');
+    }, 500);
   };
 
   const handleClose = () => {
     close();
+    setQuery('');
     setTimeout(() => {
       setQuery('');
     }, 500);
@@ -65,11 +70,12 @@ export default function SearchModal(props) {
         PaperProps={{
           sx: {
             height: 400,
-            overflowX: 'hidden'
+            overflow: 'hidden'
           }
         }}
         open={isOpen}
         onClose={handleClose}>
+
         <Box minWidth={500}>
           <TextField
             autoFocus
@@ -80,46 +86,47 @@ export default function SearchModal(props) {
           />
         </Box>
         <Divider sx={{ my: 2 }} />
-
-        <Typography variant='caption'>
-          Folders
-        </Typography>
-        <List dense>
-          {
-            filteredFolders.map(folder => {
-              return (
-                <ListItem disablePadding key={folder.id}>
-                  <ListItemButton onClick={() => handleFolderClick(folder)}>
-                    <ListItemIcon>
-                      <FolderIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={folder.name} />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })
-          }
-        </List>
-        <Divider sx={{ my: 2 }} />
-        <Typography variant='caption'>
-          Tasks
-        </Typography>
-        <List dense>
-          {
-            filteredTasks.map(task => {
-              return (
-                <ListItem disablePadding key={task.task_id}>
-                  <ListItemButton onClick={() => handleTaskClick(task)}>
-                    <ListItemIcon>
-                      <TaskAltIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={task.task_name} />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })
-          }
-        </List>
+        <Box overflow='auto'>
+          <Typography variant='caption'>
+            Folders
+          </Typography>
+          <List dense>
+            {
+              filteredFolders.map(folder => {
+                return (
+                  <ListItem disablePadding key={folder.id}>
+                    <ListItemButton onClick={() => handleFolderClick(folder)}>
+                      <ListItemIcon>
+                        <FolderIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={folder.name} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })
+            }
+          </List>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant='caption'>
+            Tasks
+          </Typography>
+          <List dense>
+            {
+              filteredTasks.map(task => {
+                return (
+                  <ListItem disablePadding key={task.task_id}>
+                    <ListItemButton onClick={() => handleTaskClick(task)}>
+                      <ListItemIcon>
+                        <TaskAltIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={task.task_name} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })
+            }
+          </List>
+        </Box>
       </Dialog>
     </div>
   );

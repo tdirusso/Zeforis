@@ -257,6 +257,7 @@ export default function Home({ setTheme }) {
         org={org}
         client={client}
         isSideNavOpen={isSideNavOpen}
+        isAdmin={isAdmin}
       />
       <Box
         component="main"
@@ -284,6 +285,7 @@ export default function Home({ setTheme }) {
               {...context}
               modalToOpen={modalToOpen}
               closeModal={closeModal}
+              openDrawer={openDrawer}
             />
 
             <Drawers

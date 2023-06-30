@@ -64,6 +64,7 @@ export default function FoldersPage() {
     <>
       <Grid item>
         <Button
+          hidden={!isAdmin}
           onClick={() => openDrawer('create-folder')}
           size="large"
           variant="contained">
@@ -72,9 +73,18 @@ export default function FoldersPage() {
       </Grid>
       <Grid item xs={12}>
         <Divider textAlign="left">
-          <Chip label="Key Folders" />
+          <Chip
+            icon={<StarIcon sx={{ color: '#fffd00 !important' }} />}
+            label="Key Folders"
+          />
         </Divider>
       </Grid>
+      {
+        keyFolders.length === 0 ? <Grid item xs={12}>
+          <Typography>No key folders.</Typography>
+        </Grid> :
+          null
+      }
       {
         keyFolders.map(folder =>
           <Folder
@@ -88,6 +98,12 @@ export default function FoldersPage() {
           <Chip label="Other Folders" />
         </Divider>
       </Grid>
+      {
+        otherFolders.length === 0 ? <Grid item xs={12}>
+          <Typography>No other folders.</Typography>
+        </Grid> :
+          null
+      }
       {
         otherFolders.map(folder =>
           <Folder
