@@ -12,7 +12,6 @@ const updateClient = require('./routes/clients/updateClient');
 const register = require('./routes/users/register');
 const verify = require('./routes/users/verify');
 const inviteClientUser = require('./routes/users/inviteClientUser');
-const completeRegistration = require('./routes/users/completeRegistration');
 const removeClientUser = require('./routes/users/removeClientUser');
 const updateProfile = require('./routes/users/updateProfile');
 const updateFolder = require('./routes/folders/updateFolder');
@@ -34,6 +33,8 @@ const importTasks = require('./routes/tasks/importTasks');
 const createWidget = require('./routes/widgets/createWidget');
 const updatedWidget = require('./routes/widgets/updateWidget');
 const deleteWidget = require('./routes/widgets/deleteWidget');
+const getInvitationData = require('./routes/users/getInvitationData');
+const updatePassword = require('./routes/users/updatePassword');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -69,12 +70,13 @@ const boot = async () => {
   app.get('/api/users/verify', verify);
   app.post('/api/users/register', register);
   app.post('/api/users/invite', checkPermissionsMW, inviteClientUser);
-  app.post('/api/users/completeRegistration', completeRegistration);
   app.delete('/api/users/uninvite', checkPermissionsMW, removeClientUser);
   app.delete('/api/users', checkPermissionsMW, removeUser);
   app.patch('/api/users', checkAuth, updateProfile);
   app.patch('/api/users/permissions', checkPermissionsMW, updatePermission);
   app.patch('/api/users/access', checkPermissionsMW, updateAccess);
+  app.patch('/api/users/password', updatePassword);
+  app.get('/api/users/invitation', getInvitationData);
 
   app.post('/api/clients', checkPermissionsMW, createClient);
   app.get('/api/clients', checkAuth, getClient);

@@ -4,6 +4,7 @@ const path = require('path');
 const emailService = require('../../../email');
 const validator = require("email-validator");
 const pool = require('../../../database');
+const { v4: uuidv4 } = require('uuid');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -48,33 +49,26 @@ module.exports = async (req, res) => {
     const user = userResult[0];
     const role = isAdmin ? 'admin' : 'member';
 
+    const invitationCode = uuidv4().substring(0, 16);
+
     if (user) {
       await pool.query(
-        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?,?) ON DUPLICATE KEY UPDATE role = ?',
-        [clientId, user.id, role, role]
+        'INSERT INTO client_users (client_id, user_id, role, invitation_code) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE role = ?, invitation_code = ?',
+        [clientId, user.id, role, invitationCode, role, invitationCode]
       );
 
       await sendInvitationEmail({
         email: email.toLowerCase(),
         clientId,
-        orgId,
+        userId: user.id,
         orgName,
         clientName,
-        orgBrand
+        orgBrand,
+        invitationCode
       });
 
       return res.json({ success: true, userId: user.id });
     } else {
-      await sendInvitationEmail({
-        email: email.toLowerCase(),
-        clientId,
-        orgId,
-        orgName,
-        clientName,
-        isNewUser: true,
-        orgBrand
-      });
-
       const newUserResult = await pool.query(
         'INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)',
         [firstName, lastName, email.toLowerCase()]
@@ -83,9 +77,19 @@ module.exports = async (req, res) => {
       const newUserId = newUserResult[0].insertId;
 
       await pool.query(
-        'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?,?)',
-        [clientId, newUserId, role]
+        'INSERT INTO client_users (client_id, user_id, role, invitation_code) VALUES (?,?,?,?)',
+        [clientId, newUserId, role, invitationCode]
       );
+
+      await sendInvitationEmail({
+        email: email.toLowerCase(),
+        clientId,
+        userId: newUserId,
+        orgName,
+        clientName,
+        orgBrand,
+        invitationCode
+      });
 
       return res.json({ success: true, userId: newUserId });
     }
@@ -97,29 +101,24 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail({ email, clientId, orgName, clientName, orgId, isNewUser, orgBrand }) {
-  let qs = `email=${email}&clientId=${clientId}&orgId=${orgId}`;
+async function sendInvitationEmail({ email, clientId, orgName, clientName, userId, orgBrand, invitationCode }) {
+  let qs = `clientId=${clientId}&userId=${userId}&invitationCode=${invitationCode}`;
 
-  let verificationUrl = process.env.APP_DOMAIN;
-
-  if (isNewUser) {
-    verificationUrl += `/complete-registration?${qs}`;
-  } else {
-    verificationUrl += `/home/dashboard?${qs}`;
-  }
+  let verificationUrl = `${process.env.APP_DOMAIN}/accept-invitation?${qs}`;
 
   const ejsData = {
     verificationUrl,
     orgName,
     clientName,
-    orgBrand
+    orgBrand,
+    invitationCode
   };
 
   const templatePath = path.resolve(__dirname, '../../../email/templates/inviteUser.ejs');
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({
-    from: `${orgName} Client  - Zeforis`,
+    from: `${orgName} Client Portal - Zeforis`,
     to: email,
     subject: `${orgName} has invited you to collaborate`,
     text: template,

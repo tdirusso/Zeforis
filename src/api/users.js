@@ -6,12 +6,6 @@ const register = async (payload) => {
   return data;
 };
 
-const completeRegistration = async (payload) => {
-  const { data } = await request.post('users/completeRegistration', payload);
-
-  return data;
-};
-
 const updateProfile = async (payload) => {
   const { data } = await request.patch(`users`, payload);
   return data;
@@ -27,10 +21,21 @@ const updateAccess = async (payload) => {
   return data;
 };
 
+const getInvitationData = async ({ userId, clientId, invitationCode }) => {
+  const { data } = await request.get(`users/invitation?userId=${userId}&clientId=${clientId}&invitationCode=${invitationCode}`);
+  return data;
+};
+
+const updatePassword = async (payload) => {
+  const { data } = await request.patch(`users/password`, payload);
+  return data;
+};
+
 export {
   updateProfile,
   updatePermission,
   updateAccess,
   register,
-  completeRegistration
+  getInvitationData,
+  updatePassword
 };

@@ -11,7 +11,7 @@ import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
-import CompleteRegistrationPage from './pages/CompleteRegistration';
+import AcceptInvitationPage from './pages/AcceptInvitation';
 import Dashboard from './pages/Home/Dashboard';
 import Settings from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders';
@@ -33,7 +33,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="register-success" element={<RegisterSuccessPage />} />
-          <Route path="complete-registration" element={<CompleteRegistrationPage />} />
+          <Route path="accept-invitation" element={<AcceptInvitationPage />} />
 
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
             <Route path="dashboard" element={<Dashboard />} />

@@ -66,9 +66,7 @@ export default function InviteClientUserModal({ open, setOpen }) {
       });
 
       if (success) {
-        setTimeout(() => {
-          openSnackBar('Invitation successfully sent.', 'success');
-        }, 250);
+        openSnackBar('Invitation successfully sent.', 'success');
 
         const addedUser = {
           id: userId,
@@ -183,7 +181,7 @@ export default function InviteClientUserModal({ open, setOpen }) {
               required
               fullWidth
               loading={isLoading}>
-              Send Invite
+              Send Invitation
             </LoadingButton>
           </DialogActions>
         </DialogContent>
