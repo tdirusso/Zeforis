@@ -68,7 +68,6 @@ export default function CustomWidgets({ widgets }) {
                       </Paper>
                     </Grow>
                   </Grid>
-
                 );
               })
             }

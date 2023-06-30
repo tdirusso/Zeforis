@@ -65,6 +65,7 @@ const defaultTask = {
 export default function TaskDrawer(props) {
   const {
     isOpen,
+    isAdmin,
     close,
     folders,
     clientMembers,
@@ -382,7 +383,7 @@ export default function TaskDrawer(props) {
               <CloseIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Delete task'>
+          <Tooltip title='Delete task' hidden={!isAdmin}>
             <IconButton
               size='large'
               onClick={e => setDeleteMenuAnchor(e.currentTarget)}
@@ -425,19 +426,24 @@ export default function TaskDrawer(props) {
               multiline
               onBlur={handleNameChange}
               onChange={e => setName(e.target.value)}
-              sx={{}}
               inputProps={{
                 sx: { fontSize: '1.25rem' }
               }}
+              InputProps={{ readOnly: !isAdmin }}
+              sx={!isAdmin ? {
+                '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
+                '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
+              } : {}}
             />
           </Box>
         </Box>
         <Box display="flex" alignItems="center" mt={2.5}>
           <Chip
+            disabled={!isAdmin}
             label={status}
             deleteIcon={<MoreVertIcon />}
             onClick={e => setStatusMenuAnchor(e.currentTarget)}
-            sx={{ mr: 4 }}
+            sx={{ mr: 4, opacity: '1 !important' }}
             onDelete={e => setStatusMenuAnchor(e.currentTarget)}
             className={status}>
           </Chip>
@@ -464,6 +470,7 @@ export default function TaskDrawer(props) {
           <FormControlLabel
             componentsProps={{ typography: { fontWeight: '300' } }}
             control={<Checkbox
+              disabled={!isAdmin}
               icon={<StarBorderIcon />}
               checkedIcon={<StarIcon htmlColor='gold' />}
               checked={isKeyTask}
@@ -484,6 +491,11 @@ export default function TaskDrawer(props) {
             inputProps={{ sx: { resize: 'vertical' } }}
             onBlur={handleDescriptionChange}
             onChange={e => setDescription(e.target.value)}
+            InputProps={{ readOnly: !isAdmin }}
+            sx={!isAdmin ? {
+              '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
+              '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
+            } : {}}
           />
         </Box>
         <Divider />
@@ -497,11 +509,16 @@ export default function TaskDrawer(props) {
               multiline
               onBlur={handleLinkChange}
               onChange={e => setLinkUrl(e.target.value)}
+              sx={!isAdmin ? {
+                '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
+                '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
+              } : {}}
               InputProps={{
                 startAdornment:
                   <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
                     <LinkIcon />
-                  </InputAdornment>
+                  </InputAdornment>,
+                readOnly: !isAdmin
               }}
             />
           </Box>
@@ -527,6 +544,7 @@ export default function TaskDrawer(props) {
           <Box my={2}>
             <FormControl fullWidth>
               <Autocomplete
+                readOnly={!isAdmin}
                 options={folders}
                 getOptionLabel={(option) => option.name || ''}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -543,7 +561,8 @@ export default function TaskDrawer(props) {
                       startAdornment:
                         <InputAdornment position='start'>
                           <FolderIcon />
-                        </InputAdornment>
+                        </InputAdornment>,
+                      endAdornment: isAdmin ? params.InputProps.endAdornment : null
                     }}
                   />
                 )}
@@ -554,6 +573,7 @@ export default function TaskDrawer(props) {
           <Box my={2}>
             <FormControl fullWidth>
               <Autocomplete
+                readOnly={!isAdmin}
                 options={membersAndAdmins}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
@@ -571,7 +591,8 @@ export default function TaskDrawer(props) {
                       startAdornment:
                         <InputAdornment position='start'>
                           <AccountCircleIcon />
-                        </InputAdornment>
+                        </InputAdornment>,
+                      endAdornment: isAdmin ? params.InputProps.endAdornment : null
                     }}
                   />
                 )}
@@ -582,6 +603,7 @@ export default function TaskDrawer(props) {
           <Box my={2}>
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DatePicker
+                readOnly={!isAdmin}
                 format="MM/DD/YYYY"
                 value={dateDue}
                 InputProps={{
@@ -607,6 +629,7 @@ export default function TaskDrawer(props) {
           <Box>
             <FormControl fullWidth>
               <Autocomplete
+                readOnly={!isAdmin}
                 multiple
                 value={selectedTags}
                 options={tags}
@@ -617,6 +640,10 @@ export default function TaskDrawer(props) {
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
                 onChange={handleTagsChange}
+                sx={!isAdmin ? {
+                  '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
+                  '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
+                } : {}}
                 componentsProps={{
                   popper: {
                     placement: 'top'
@@ -627,6 +654,10 @@ export default function TaskDrawer(props) {
                     {...params}
                     variant='standard'
                     placeholder={selectedTags.length === 0 ? 'Add tags' : ''}
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: isAdmin ? params.InputProps.endAdornment : null
+                    }}
                   />
                 )}
               />
