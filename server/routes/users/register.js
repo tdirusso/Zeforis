@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const emailService = require('../../../email');
 const validator = require("email-validator");
+const { v4: uuidv4 } = require('uuid');
 
 const pool = require('../../../database');
 
@@ -18,8 +19,7 @@ module.exports = async (req, res) => {
     email,
     firstName,
     lastName,
-    password,
-    orgName
+    password
   } = req.body;
 
   if (!email || !password || !firstName || !lastName) {
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    const verificationCode = Math.floor(1000 + Math.random() * 9000);
+    const verificationCode = uuidv4().substring(0, 16);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -51,12 +51,7 @@ module.exports = async (req, res) => {
 
     const userId = createUserResult[0].insertId;
 
-    await pool.query(
-      'INSERT INTO orgs (name, owner_id, brand_color) VALUES (?,?, "#3365f6")',
-      [orgName, userId]
-    );
-
-    await sendVerifyEmail(email, verificationCode);
+    await sendVerifyEmail(userId, verificationCode, email);
 
     return res.json({
       success: true
@@ -69,16 +64,16 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendVerifyEmail(email, verificationCode) {
-  const qs = `email=${email}&verificationCode=${verificationCode}`;
+async function sendVerifyEmail(userId, verificationCode, email) {
+  const qs = `userId=${userId}&verificationCode=${verificationCode}`;
 
-  const verificationUrl = `${process.env.API_DOMAIN}/verify?${qs}`;
+  const verificationUrl = `${process.env.API_DOMAIN}/api/users/verify?${qs}`;
 
   const ejsData = {
     verificationUrl
   };
 
-  const templatePath = path.resolve(__dirname, '../../email/templates/verifyEmail.ejs');
+  const templatePath = path.resolve(__dirname, '../../../email/templates/verifyEmail.ejs');
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({

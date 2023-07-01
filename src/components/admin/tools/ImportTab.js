@@ -189,7 +189,7 @@ export default function ImportTab() {
           <br></br><br></br>
           Experience the efficiency and convenience of our import tool by simply uploading a spreadsheet (.csv format) with the relevant column headers, or download and fill out the template.
           <br></br><br></br>
-          Note &ndash; setting the due date, assignee, status and folder can be done in bulk form the tasks page.
+          Note &ndash; setting the due date, assignee, status and folder can be done in bulk from the tasks page after importing.
         </Typography>
         <Box mt={1}>
           <Button sx={{ p: 0 }}>

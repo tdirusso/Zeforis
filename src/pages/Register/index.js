@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const password = useRef();
   const firstName = useRef();
   const lastName = useRef();
-  const orgName = useRef();
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -35,9 +34,8 @@ export default function RegisterPage() {
     const passwordVal = password.current.value;
     const firstNameVal = firstName.current.value;
     const lastNameVal = lastName.current.value;
-    const orgNameVal = orgName.current.value;
 
-    if (!emailVal || !passwordVal || !firstNameVal || !lastNameVal || !orgNameVal) {
+    if (!emailVal || !passwordVal || !firstNameVal || !lastNameVal) {
       openSnackBar('Please enter all required fields above.', 'error');
       return;
     }
@@ -48,7 +46,6 @@ export default function RegisterPage() {
       const { success, message } = await register({
         email: emailVal,
         password: passwordVal,
-        orgName: orgNameVal,
         firstName: firstNameVal,
         lastName: lastNameVal
       });
@@ -88,15 +85,6 @@ export default function RegisterPage() {
             />
           </Box>
           <TextField
-            label="Org / Company name"
-            variant="outlined"
-            sx={{ mb: 4 }}
-            required
-            inputRef={orgName}
-            disabled={isLoading}
-            autoComplete="off"
-          />
-          <TextField
             label="Email"
             variant="outlined"
             sx={{ mb: 4 }}
@@ -120,6 +108,7 @@ export default function RegisterPage() {
             fullWidth
             variant="contained"
             type="submit"
+            size="large"
             sx={{ mb: 4 }}>
             Create Account
           </LoadingButton>
