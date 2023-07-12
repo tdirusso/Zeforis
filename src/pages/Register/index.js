@@ -32,6 +32,47 @@ export default function RegisterPage() {
 
   const navigate = useNavigate();
 
+  const handleGoogleRegistration = authResponse => {
+    if (authResponse.credential) {
+      setLoading(true);
+
+      setTimeout(async () => {
+        const { success, message } = await register({
+          googleCredential: authResponse.credential
+        });
+
+        if (success) {
+          openSnackBar('Registration successful.', 'success');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          setLoading(false);
+          openSnackBar(message, 'error');
+        }
+      }, 1000);
+    } else {
+      openSnackBar('Error signing in with Google (missing credential).');
+    }
+  };
+
+  const initializeGoogleButton = () => {
+    window.google.accounts.id.initialize({
+      client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+      callback: handleGoogleRegistration
+    });
+
+    window.google.accounts.id.renderButton(
+      document.getElementById('google-signin'),
+      {
+        theme: "outline",
+        size: "large",
+        width: '325',
+        text: 'signup_with'
+      }
+    );
+  };
+
   const handleRegistration = e => {
     e.preventDefault();
 
@@ -65,26 +106,11 @@ export default function RegisterPage() {
   };
 
   useEffect(() => {
-    function handleCredentialResponse(response) {
-      console.log("Encoded JWT ID token: " + response.credential);
+    if (document.readyState === 'complete') {
+      initializeGoogleButton();
+    } else {
+      window.onload = initializeGoogleButton;
     }
-
-    window.onload = function () {
-      window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
-        callback: handleCredentialResponse
-      });
-
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-signin'),
-        {
-          theme: "outline",
-          size: "large",
-          width: '325',
-          text: 'signup_with'
-        }
-      );
-    };
   }, []);
 
   return (
@@ -105,7 +131,7 @@ export default function RegisterPage() {
         </Box>
       </Box>
       <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 5 }}>Sign Up</Typography>
+        <Typography variant="h5" sx={{ mb: 3.5 }}>Sign Up</Typography>
         <form onSubmit={handleRegistration} >
           <TextField
             placeholder="First name"
@@ -190,75 +216,5 @@ export default function RegisterPage() {
         message={message}
       />
     </Box>
-
-
-    // <div className="Register flex-centered">
-    //   <Paper sx={{ p: 8, pt: 5 }} className="container">
-    //     <Typography variant="h5" sx={{ mb: 5 }}>Create an Account</Typography>
-    //     <form onSubmit={handleRegistration} >
-    //       <Box sx={{ display: 'flex', mb: 4 }}>
-    //         <TextField
-    //           label="First name"
-    //           variant="outlined"
-    //           sx={{ mr: 1 }}
-    //           required
-    //           inputRef={firstName}
-    //           disabled={isLoading}
-    //           autoComplete="off"
-    //         />
-    //         <TextField
-    //           label="Last name"
-    //           variant="outlined"
-    //           sx={{ ml: 1 }}
-    //           required
-    //           inputRef={lastName}
-    //           disabled={isLoading}
-    //           autoComplete="off"
-    //         />
-    //       </Box>
-    //       <TextField
-    //         label="Email"
-    //         variant="outlined"
-    //         sx={{ mb: 4 }}
-    //         type="email"
-    //         required
-    //         inputRef={email}
-    //         disabled={isLoading}
-    //       />
-    //       <TextField
-    //         label="Password"
-    //         variant="outlined"
-    //         type="password"
-    //         sx={{ mb: 5 }}
-    //         required
-    //         inputRef={password}
-    //         disabled={isLoading}
-    //       />
-    //       <LoadingButton
-    //         loading={isLoading}
-    //         disabled={isLoading}
-    //         fullWidth
-    //         variant="contained"
-    //         type="submit"
-    //         size="large"
-    //         sx={{ mb: 4 }}>
-    //         Create Account
-    //       </LoadingButton>
-    //     </form>
-    //     <Box component="span" sx={{ textAlign: 'right' }}>
-    //       <Typography
-    //         variant="p"
-    //         component={Link}
-    //         to="/login">
-    //         Have an account?  Sign in here.
-    //       </Typography>
-    //     </Box>
-    //   </Paper>
-    //   <Snackbar
-    //     isOpen={isOpen}
-    //     type={type}
-    //     message={message}
-    //   />
-    // </div>
   );
 };

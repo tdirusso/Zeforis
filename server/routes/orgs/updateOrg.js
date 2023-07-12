@@ -9,7 +9,7 @@ const isDev = process.env.NODE_ENV === 'development';
 if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
-console.log(process.env.AWS_S3_ORG_LOGO_FOLDER);
+
 module.exports = async (req, res) => {
   const {
     name,

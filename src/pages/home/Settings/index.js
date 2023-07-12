@@ -11,7 +11,7 @@ import Account from "../../../components/core/settings/Account";
 import Clients from "../../../components/core/settings/Clients";
 import Organizations from "../../../components/core/settings/Organizations";
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useLocation } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 
 const settings = [
   { name: 'Clients', icon: <SwitchAccountIcon fontSize="small" /> },
@@ -27,6 +27,10 @@ export default function Settings() {
   const defaultTab = queryParams.get('tab');
 
   const [tab, setTab] = useState(defaultTab || 'Clients');
+
+  const {
+    user
+  } = useOutletContext();
 
   let componentToShow = <></>;
 
@@ -72,7 +76,7 @@ export default function Settings() {
             <Button
               size="small"
               fullWidth
-              onClick={logout}
+              onClick={() => logout(user.email)}
               startIcon={<LogoutIcon fontSize="small" />}
               sx={{ px: 3, py: 1.5 }}>Log Out</Button>
           </Box>

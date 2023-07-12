@@ -32,33 +32,56 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
+  const handleGoogleLogin = async (authResponse) => {
+    if (authResponse.credential) {
+      setLoading(true);
+
+      try {
+        const result = await login({
+          googleCredential: authResponse.credential
+        });
+
+        if (result.token) {
+          navigate('/home/dashboard');
+        } else {
+          setLoading(false);
+          openSnackBar(result.message, 'error');
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+      }
+    } else {
+      openSnackBar('Error signing in with Google (missing credential).');
+    }
+  };
+
+  const initializeGoogleButton = () => {
+    window.google.accounts.id.initialize({
+      client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+      callback: handleGoogleLogin
+    });
+
+    window.google.accounts.id.renderButton(
+      document.getElementById('google-signin'),
+      {
+        theme: "outline",
+        size: "large",
+        width: '325'
+      }
+    );
+  };
+
   useEffect(() => {
     if (new URLSearchParams(search).get('postVerify')) {
       openSnackBar('Email successfuly verified.', 'success');
     }
 
-    function handleCredentialResponse(response) {
-      console.log("Encoded JWT ID token: " + response.credential);
+    if (document.readyState === 'complete') {
+      initializeGoogleButton();
+    } else {
+      window.onload = initializeGoogleButton;
     }
-
-    window.onload = function () {
-      window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
-        callback: handleCredentialResponse
-      });
-
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-signin'),
-        {
-          theme: "outline",
-          size: "large",
-          width: '325'
-        }
-      );
-    };
-
   }, []);
-
 
   const handleLogin = async e => {
     e.preventDefault();

@@ -7,7 +7,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import { updatePassword, getInvitationData } from '../../api/users';
+import { updatePassword, getInvitationData, register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, CircularProgress, Divider } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -37,34 +37,11 @@ export default function AcceptInvitationPage() {
   useEffect(() => {
     setTimeout(() => {
       if (clientId && userId && invitationCode) {
-        //fetchInvitationData();
-        setUserNeedsPassword(true);
-        setFetchingInvitation(false);
-
-        setTimeout(() => {
-          window.google.accounts.id.initialize({
-            client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
-            callback: handleCredentialResponse
-          });
-  
-          window.google.accounts.id.renderButton(
-            document.getElementById('google-signin'),
-            {
-              theme: "outline",
-              size: "large",
-              width: '372',
-              text: 'continue_with'
-            }
-          );
-        }, 0);
+        fetchInvitationData();
       } else {
         setFetchingInvitation(false);
       }
     }, 1000);
-
-    function handleCredentialResponse(response) {
-      console.log("Encoded JWT ID token: " + response.credential);
-    }
 
     async function fetchInvitationData() {
       try {
@@ -83,6 +60,23 @@ export default function AcceptInvitationPage() {
           } else {
             setUserNeedsPassword(true);
             setFetchingInvitation(false);
+
+            setTimeout(() => {
+              window.google.accounts.id.initialize({
+                client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+                callback: handleGoogleRegistration
+              });
+
+              window.google.accounts.id.renderButton(
+                document.getElementById('google-signin'),
+                {
+                  theme: "outline",
+                  size: "large",
+                  width: '372',
+                  text: 'continue_with'
+                }
+              );
+            }, 0);
           }
         } else {
           setFetchingInvitation(false);
@@ -127,6 +121,30 @@ export default function AcceptInvitationPage() {
     } catch (error) {
       setLoading(false);
       openSnackBar(error.message, 'error');
+    }
+  };
+
+  const handleGoogleRegistration = authResponse => {
+    if (authResponse.credential) {
+      setLoading(true);
+
+      setTimeout(async () => {
+        const { success, message } = await register({
+          googleCredential: authResponse.credential
+        });
+
+        if (success) {
+          openSnackBar('Registration successful.', 'success');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          setLoading(false);
+          openSnackBar(message, 'error');
+        }
+      }, 1000);
+    } else {
+      openSnackBar('Error signing in with Google (missing credential).');
     }
   };
 
@@ -187,13 +205,13 @@ export default function AcceptInvitationPage() {
                 variant="outlined"
                 sx={{ mb: 4 }}
                 type="password"
-                InputProps={{ 
+                InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
                       <VpnKeyIcon htmlColor="#cbcbcb" />
                     </InputAdornment>
                   )
-                 }}
+                }}
                 inputRef={password}
                 disabled={isLoading}
                 autoFocus
@@ -208,7 +226,7 @@ export default function AcceptInvitationPage() {
                 type="submit">
                 Create Password
               </LoadingButton>
-              <Divider sx={{ mt: 4, mb:4 }}>Or</Divider>
+              <Divider sx={{ mt: 4, mb: 4 }}>Or</Divider>
               <Box id="google-signin"></Box>
             </form>
           </Paper>

@@ -250,7 +250,7 @@ export default function Header(props) {
                 </ListItemText>
               </MenuItem>
               <Divider />
-              <MenuItem onClick={() => logout()}>
+              <MenuItem onClick={() => logout(user.email)}>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>
