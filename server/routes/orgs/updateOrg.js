@@ -4,6 +4,12 @@ const pool = require('../../../database');
 
 const acceptMimes = ['image/png', 'image/jpeg'];
 
+const isDev = process.env.NODE_ENV === 'development';
+
+if (isDev) {
+  require('dotenv').config({ path: __dirname + '/../.env.local' });
+}
+console.log(process.env.AWS_S3_ORG_LOGO_FOLDER);
 module.exports = async (req, res) => {
   const {
     name,
@@ -80,7 +86,7 @@ async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl,
       const resizedLogoSize = Buffer.byteLength(resizedLogoBuffer);
       if (resizedLogoSize <= 250000) { //250,000 bytes -> 250 kb -> 0.25 mb
         const now = Date.now();
-        const uploadFileName = `org-logos/${orgId}-${now}.png`;
+        const uploadFileName = `${process.env.AWS_S3_ORG_LOGO_FOLDER}/${orgId}-${now}.png`;
 
         const s3ObjectParams = {
           Key: uploadFileName,

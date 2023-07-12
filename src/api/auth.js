@@ -12,7 +12,7 @@ const login = async (payload) => {
 
 const logout = () => {
   deleteToken();
-  window.location = '/login';
+  window.location.href = '/login';
 };
 
 const authenticate = async () => {

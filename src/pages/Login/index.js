@@ -12,7 +12,10 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import './Login.css';
-import { Button } from "@mui/material";
+import { Button, Divider } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 export default function LoginPage() {
   const email = useRef();
@@ -33,6 +36,27 @@ export default function LoginPage() {
     if (new URLSearchParams(search).get('postVerify')) {
       openSnackBar('Email successfuly verified.', 'success');
     }
+
+    function handleCredentialResponse(response) {
+      console.log("Encoded JWT ID token: " + response.credential);
+    }
+
+    window.onload = function () {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+        callback: handleCredentialResponse
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin'),
+        {
+          theme: "outline",
+          size: "large",
+          width: '325'
+        }
+      );
+    };
+
   }, []);
 
 
@@ -67,13 +91,13 @@ export default function LoginPage() {
         openSnackBar(result.message, 'error');
       }
     } catch (error) {
-      openSnackBar(error.message, 'error')
+      openSnackBar(error.message, 'error');
     }
   };
 
   return (
-    <div className="Login flex-centered">
-      <header>
+    <Box className="Login flex-centered">
+      <Box component="header">
         <Box component="a" href="https://www.zeforis.com" target="_blank">
           <img src={zeforisLogo} alt="Zeforis" height={30} />
         </Box>
@@ -81,13 +105,13 @@ export default function LoginPage() {
           <Box mr={1.5}>Don't have an account?</Box>
           <Button
             variant="contained"
-            component={Link}
-            to="/register"
+            component={'a'}
+            href="/register"
             size="large">
             Sign Up
           </Button>
         </Box>
-      </header>
+      </Box>
       <Paper sx={{ p: 8, pt: 5 }} className="container">
         <Typography variant="h5" sx={{ mb: 5 }}>Sign in</Typography>
         <form onSubmit={handleLogin}>
@@ -96,7 +120,13 @@ export default function LoginPage() {
             variant="outlined"
             sx={{ mb: 4 }}
             type="email"
-            InputProps={{ required: true }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutlineIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
             inputRef={email}
             disabled={isLoading}
             autoFocus
@@ -105,8 +135,14 @@ export default function LoginPage() {
             placeholder="Password"
             variant="outlined"
             type="password"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <VpnKeyIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
             sx={{ mb: 0.5 }}
-            InputProps={{ required: true }}
             inputRef={password}
             disabled={isLoading}
           />
@@ -119,6 +155,7 @@ export default function LoginPage() {
               Forgot password?
             </Typography>
           </Box>
+
           <LoadingButton
             loading={isLoading}
             disabled={isLoading}
@@ -129,14 +166,16 @@ export default function LoginPage() {
             type="submit">
             Sign in
           </LoadingButton>
+          <Divider sx={{ mt: 4, mb: 4 }} />
+          <Box id="google-signin"></Box>
         </form>
       </Paper>
-      <div className="circle"></div>
+      <Box className="circle"></Box>
       <Snackbar
         isOpen={isOpen}
         type={type}
         message={message}
       />
-    </div>
+    </Box>
   );
 };

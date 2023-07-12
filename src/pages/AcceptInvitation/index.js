@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import { updatePassword, getInvitationData } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Divider } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
@@ -33,16 +34,37 @@ export default function AcceptInvitationPage() {
     message
   } = useSnackbar();
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     setTimeout(() => {
       if (clientId && userId && invitationCode) {
-        fetchInvitationData();
+        //fetchInvitationData();
+        setUserNeedsPassword(true);
+        setFetchingInvitation(false);
+
+        setTimeout(() => {
+          window.google.accounts.id.initialize({
+            client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+            callback: handleCredentialResponse
+          });
+  
+          window.google.accounts.id.renderButton(
+            document.getElementById('google-signin'),
+            {
+              theme: "outline",
+              size: "large",
+              width: '372',
+              text: 'continue_with'
+            }
+          );
+        }, 0);
       } else {
         setFetchingInvitation(false);
       }
     }, 1000);
+
+    function handleCredentialResponse(response) {
+      console.log("Encoded JWT ID token: " + response.credential);
+    }
 
     async function fetchInvitationData() {
       try {
@@ -96,7 +118,7 @@ export default function AcceptInvitationPage() {
       if (success) {
         openSnackBar('Registration successful.', 'success');
         setTimeout(() => {
-          navigate('/login');
+          window.location.href = ('/login');
         }, 2000);
       } else {
         setLoading(false);
@@ -114,16 +136,6 @@ export default function AcceptInvitationPage() {
         <header>
           <Box component="a" href="https://www.zeforis.com" target="_blank">
             <img src={zeforisLogo} alt="Zeforis" height={30} />
-          </Box>
-          <Box display="flex" alignItems="center">
-            <Box mr={1.5}>Already have an account?</Box>
-            <Button
-              variant="contained"
-              component={Link}
-              to="/login"
-              size="large">
-              Sign In
-            </Button>
           </Box>
         </header>
 
@@ -153,8 +165,8 @@ export default function AcceptInvitationPage() {
           <Button
             variant="contained"
             disabled={isLoading}
-            component={Link}
-            to="/login"
+            component={'a'}
+            href="/login"
             size="large">
             Sign In
           </Button>
@@ -168,15 +180,20 @@ export default function AcceptInvitationPage() {
         </Box>
           :
           <Paper sx={{ p: 8, pt: 5, minWidth: '500px' }} className="container">
-            <Typography variant="h5" sx={{ mb: 2 }}>Complete Account Registration</Typography>
-            <Typography sx={{ mb: 4 }}>Please create a password that will be used to sign in.</Typography>
+            <Typography variant="h6" sx={{ mb: 3 }}>Complete Account Registration</Typography>
             <form onSubmit={handleUpdatePassword}>
               <TextField
                 placeholder="Password"
                 variant="outlined"
                 sx={{ mb: 4 }}
                 type="password"
-                InputProps={{ required: true }}
+                InputProps={{ 
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <VpnKeyIcon htmlColor="#cbcbcb" />
+                    </InputAdornment>
+                  )
+                 }}
                 inputRef={password}
                 disabled={isLoading}
                 autoFocus
@@ -191,6 +208,8 @@ export default function AcceptInvitationPage() {
                 type="submit">
                 Create Password
               </LoadingButton>
+              <Divider sx={{ mt: 4, mb:4 }}>Or</Divider>
+              <Box id="google-signin"></Box>
             </form>
           </Paper>
       }
