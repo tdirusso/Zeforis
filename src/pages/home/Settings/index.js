@@ -3,7 +3,6 @@ import { Box, Button, Grid, Paper } from "@mui/material";
 import React, { useState } from "react";
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import ApartmentIcon from '@mui/icons-material/Apartment';
-//import PaidIcon from '@mui/icons-material/Paid';
 import Account from "../../../components/core/settings/Account";
 import Organizations from "../../../components/core/settings/Organizations";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';

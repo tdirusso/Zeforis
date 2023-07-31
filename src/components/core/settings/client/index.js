@@ -23,6 +23,7 @@ import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import GeneralTab from "./GeneralTab";
+import MembersTab from "./MembersTab";
 
 export default function ClientsTab() {
   const {
@@ -155,6 +156,8 @@ export default function ClientsTab() {
     switch (tabVal) {
       case 0:
         return <GeneralTab />;
+      case 1:
+        return <MembersTab />;
       default:
         break;
     }
@@ -174,112 +177,8 @@ export default function ClientsTab() {
         }
       </Paper>
 
-      {/* <Paper sx={{ my: 3 }}>
-        <Box component="h6">{client.name} Team</Box>
-        <Divider sx={{ my: 4 }} />
-        <Button
-          hidden={!isAdmin}
-          variant="outlined"
-          size="small"
-          sx={{ mb: 2 }}
-          onClick={() => setInviteClientUserModalOpen(true)}
-          startIcon={<PersonAddIcon />}>
-          Invite someone to {client.name}
-        </Button>
-        <Box>
-          <Divider textAlign="left">
-            <Chip label="Members" size="small" />
-          </Divider>
-          <List dense>
-            {
-              clientMembers.length === 0 ?
-                <ListItem>
-                  <ListItemText>
-                    No client members.
-                  </ListItemText>
-                </ListItem> : ''
-            }
-            {
-              clientMembers.map((member, index) => {
-                return (
-                  <React.Fragment key={member.id}>
-                    <ListItem
-                      secondaryAction={
-                        isAdmin ?
-                          <Tooltip title="Remove Member">
-                            <IconButton
-                              edge="end"
-                              onClick={() => handleRemoveClientUser(member)}>
-                              <CloseIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip> : null
-                      }>
-                      <ListItemText
-                        primary={`${member.firstName} ${member.lastName}`}
-                        secondary={member.email}
-                      />
-                    </ListItem>
-                    {index !== clientMembers.length - 1 ? <Divider /> : null}
-                  </React.Fragment>
-                );
-              })
-            }
-          </List>
-        </Box>
 
-        <Box>
-          <Divider textAlign="left">
-            <Chip label="Administrators" size="small" />
-          </Divider>
-          <List dense>
-            {
-              clientAdmins.length === 0 ?
-                <ListItem>
-                  <ListItemText>
-                    No client administators.
-                  </ListItemText>
-                </ListItem> : ''
-            }
-            {
-              clientAdmins.map((member, index) => {
-                const isYou = member.id === user.id;
-
-                let primaryText = <span>{member.firstName} {member.lastName}</span>;
-
-                if (isYou) {
-                  primaryText = <span>
-                    {member.firstName} {member.lastName}
-                    <span style={{ color: '#bababa' }}>{` (you)`}</span>
-                  </span>;
-                }
-
-                return (
-                  <React.Fragment key={member.id}>
-                    <ListItem
-                      secondaryAction={!isYou && isAdmin ?
-                        <Tooltip title="Remove Administrator">
-                          <IconButton
-                            edge="end"
-                            onClick={() => handleRemoveClientUser(member)}>
-                            <CloseIcon
-                              fontSize="small"
-                            />
-                          </IconButton>
-                        </Tooltip> : null
-                      }>
-                      <ListItemText
-                        primary={primaryText}
-                        secondary={member.email}
-                      />
-                    </ListItem>
-                    {index !== clientAdmins.length - 1 ? <Divider /> : null}
-                  </React.Fragment>
-                );
-              })
-            }
-          </List>
-        </Box>
-      </Paper>
+{/* 
 
       <Paper sx={{ my: 3 }}>
         <Box component="h6" display="flex" alignItems="center">

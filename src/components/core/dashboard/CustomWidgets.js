@@ -35,10 +35,13 @@ export default function CustomWidgets({ widgets }) {
         <Collapse in={expanded}>
           <Grid container spacing={3}>
             {
-              widgets.filter(({ isEnabled }) => isEnabled).map(widget => {
+              widgets.filter(({ isEnabled }) => isEnabled).map((widget, index) => {
                 return (
                   <Grid item xs={12} md={4} key={widget.id}>
-                    <Grow in={expanded} appear={false}>
+                    <Grow
+                      in={expanded}
+                      appear={false}
+                      style={{ transitionDelay: `${index * 100}ms` }}>
                       <Paper sx={{
                         minHeight: '250px',
                         background: widget.backgroundColor
@@ -46,7 +49,8 @@ export default function CustomWidgets({ widgets }) {
                         <Box
                           color={widget.textColor}
                           component="h5"
-                          mb={1}>{widget.title}</Box>
+                          mb={1}>{widget.title}
+                        </Box>
                         <TextField
                           fullWidth
                           sx={{

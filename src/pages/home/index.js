@@ -157,7 +157,7 @@ export default function Home({ setTheme }) {
   let isAdmin = false;
   const clientMembers = [];
   const clientAdmins = [];
-
+  
   orgUsers.forEach(orgUser => {
     if (orgUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
       clientAdmins.push({ ...orgUser, role: 'Administrator' });
