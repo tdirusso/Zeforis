@@ -154,11 +154,10 @@ export default function ImportTab() {
 
       if (success) {
         openSnackBar('Tasks successfully imported.', 'success');
-        setTimeout(() => {
-          window.location.href = '/home/tasks';
-        }, 1000);
+        setLoading(false);
       } else {
         openSnackBar(message, 'error');
+        setLoading(false);
       }
     } catch (error) {
       openSnackBar(error.message, 'error');

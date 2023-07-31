@@ -29,14 +29,8 @@ module.exports = async (req, res) => {
     if (client) {
       await updateClient(name, clientId);
 
-      const clientObject = {
-        id: clientId,
-        name,
-        orgId: client.org_id
-      };
-
       return res.json({
-        client: clientObject
+        success: true
       });
     }
 

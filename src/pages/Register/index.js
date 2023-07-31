@@ -67,7 +67,7 @@ export default function RegisterPage() {
       {
         theme: "outline",
         size: "large",
-        width: '325',
+        width: 325,
         text: 'signup_with'
       }
     );

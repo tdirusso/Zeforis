@@ -13,10 +13,10 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import './styles/Header.css';
 import LogoutIcon from '@mui/icons-material/Logout';
-import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { logout } from "../../api/auth";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import { SwapHorizOutlined } from "@mui/icons-material";
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -63,11 +63,6 @@ export default function Header(props) {
   const openCreateFolderDrawer = () => {
     setAnchorEl(null);
     openDrawer('create-folder');
-  };
-
-  const openMyAccount = () => {
-    setAnchorEl(null);
-    navigate('/home/settings?tab=Account');
   };
 
   const openSearch = () => {
@@ -221,6 +216,7 @@ export default function Header(props) {
                   </Box>
                 </Box>
                 <Button
+                  startIcon={<SwapHorizOutlined />}
                   sx={{ mt: '10px', mb: '5px' }}
                   size="small"
                   onClick={openChangeOrgOrClient}
@@ -229,16 +225,6 @@ export default function Header(props) {
                 </Button>
               </Box>
               <Divider sx={{ my: '8px' }} />
-              <MenuItem onClick={openMyAccount}>
-                <ListItemIcon>
-                  <PersonIcon />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography>
-                    My account
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
               <MenuItem onClick={openSettings}>
                 <ListItemIcon>
                   <SettingsIcon />

@@ -57,6 +57,7 @@ export default function Home({ setTheme }) {
 
   const {
     modalToOpen,
+    modalProps,
     openModal,
     closeModal
   } = useModal();
@@ -241,6 +242,7 @@ export default function Home({ setTheme }) {
     isAdmin,
     widgets: sortedWidgets,
     setTags,
+    setClient,
     setTasks,
     setFolders,
     setOrgUsers,
@@ -283,9 +285,9 @@ export default function Home({ setTheme }) {
 
             <Modals
               {...context}
+              {...modalProps}
               modalToOpen={modalToOpen}
               closeModal={closeModal}
-              openDrawer={openDrawer}
             />
 
             <Drawers

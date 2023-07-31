@@ -6,13 +6,15 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteClient } from '../../api/clients';
-import { useOutletContext } from 'react-router-dom';
 
-export default function DeleteClientModal({ open, setOpen }) {
+export default function DeleteClientModal(props) {
+
   const {
+    close,
+    isOpen, 
     client,
     openSnackBar
-  } = useOutletContext();
+  } = props;
 
   const clientId = client.id;
 
@@ -41,16 +43,9 @@ export default function DeleteClientModal({ open, setOpen }) {
     }
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
-  };
-
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={close}>
         <DialogContent>
           <DialogContentText sx={{ mb: 5 }}>
             Are you sure you want to <strong>permanently delete "{client.name}"?</strong>
@@ -63,7 +58,7 @@ export default function DeleteClientModal({ open, setOpen }) {
               disabled={isLoading}
               fullWidth
               variant='outlined'
-              onClick={handleClose}>
+              onClick={close}>
               Cancel
             </Button>
             <LoadingButton

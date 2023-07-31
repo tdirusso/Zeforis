@@ -66,7 +66,7 @@ export default function LoginPage() {
       {
         theme: "outline",
         size: "large",
-        width: '325'
+        width: 325
       }
     );
   };

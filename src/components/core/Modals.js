@@ -1,3 +1,4 @@
+import DeleteClientModal from "../admin/DeleteClientModal";
 import SearchModal from "./SearchModal";
 
 export default function Modals(props) {
@@ -10,6 +11,12 @@ export default function Modals(props) {
     <>
       <SearchModal
         isOpen={modalToOpen === 'search'}
+        close={closeModal}
+        {...props}
+      />
+
+      <DeleteClientModal
+        isOpen={modalToOpen === 'delete-client'}
         close={closeModal}
         {...props}
       />

@@ -72,7 +72,7 @@ export default function AcceptInvitationPage() {
                 {
                   theme: "outline",
                   size: "large",
-                  width: '372',
+                  width: 372,
                   text: 'continue_with'
                 }
               );

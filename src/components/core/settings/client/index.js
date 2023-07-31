@@ -1,43 +1,30 @@
-import { Paper, Box, Divider, Button, Chip, Tooltip, Menu, TextField } from "@mui/material";
-import ClientMenu from "../../core/ClientMenu";
-import { setActiveClientId } from "../../../api/clients";
+import { Grid, Paper, Box, Divider, Button, Chip, Tooltip, Menu, TextField, Tabs, Tab, InputAdornment } from "@mui/material";
+import ClientMenu from "../../ClientMenu";
+import { setActiveClientId } from "../../../../api/clients";
 import { useOutletContext } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CreateClientModal from "../../admin/CreateClientModal";
-import EditClientModal from "../../admin/EditClientModal";
+import CreateClientModal from "../../../admin/CreateClientModal";
+import EditClientModal from "../../../admin/EditClientModal";
 import React, { useState } from "react";
-import InviteClientUserModal from "../../admin/InviteClientUserModal";
+import InviteClientUserModal from "../../../admin/InviteClientUserModal";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import RemoveClientUserModal from "../../admin/RemoveClientUserModal";
+import RemoveClientUserModal from "../../../admin/RemoveClientUserModal";
 import IconButton from '@mui/material/IconButton';
-import RemoveClientModal from "../../admin/RemoveClientModal";
+import RemoveClientModal from "../../../admin/DeleteClientModal";
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { deleteTag, updateTag } from "../../../api/tags";
+import { deleteTag, updateTag } from "../../../../api/tags";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
+import GeneralTab from "./GeneralTab";
 
-export default function Clients() {
-  const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
-  const [editClientModalOpen, setEditClientModalOpen] = useState(false);
-  const [inviteClientUserModalOpen, setInviteClientUserModalOpen] = useState(false);
-  const [removeClientUserModalOpen, setRemoveClientUserModalOpen] = useState(false);
-  const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
-  const [editTagMenuAnchor, setEditTagMenuAnchor] = useState(null);
-  const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState(null);
-  const [updatingTag, setUpdatingTag] = useState(false);
-  const [deletingTag, setDeletingTag] = useState(false);
-
-  const [userToModify, setUserToModify] = useState(null);
-  const [tagToDelete, setTagToDelete] = useState(null);
-  const [tagToEdit, setTagToEdit] = useState(null);
-  const [editingTagName, setEditingTagName] = useState('');
-
-  const editTagMenuOpen = Boolean(editTagMenuAnchor);
-  const deleteTagMenuOpen = Boolean(deleteTagMenuAnchor);
-
+export default function ClientsTab() {
   const {
     client,
     clientMembers,
@@ -51,8 +38,29 @@ export default function Clients() {
     tagsMap,
     setTags,
     tasks,
-    setTasks
+    setTasks,
+    openDrawer
   } = useOutletContext();
+
+  const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
+  const [editClientModalOpen, setEditClientModalOpen] = useState(false);
+  const [inviteClientUserModalOpen, setInviteClientUserModalOpen] = useState(false);
+  const [removeClientUserModalOpen, setRemoveClientUserModalOpen] = useState(false);
+  const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
+  const [editTagMenuAnchor, setEditTagMenuAnchor] = useState(null);
+  const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState(null);
+  const [updatingTag, setUpdatingTag] = useState(false);
+  const [deletingTag, setDeletingTag] = useState(false);
+  const [clientName, setClientName] = useState(client.name);
+  const [tabVal, setTabVal] = useState(0);
+
+  const [userToModify, setUserToModify] = useState(null);
+  const [tagToDelete, setTagToDelete] = useState(null);
+  const [tagToEdit, setTagToEdit] = useState(null);
+  const [editingTagName, setEditingTagName] = useState('');
+
+  const editTagMenuOpen = Boolean(editTagMenuAnchor);
+  const deleteTagMenuOpen = Boolean(deleteTagMenuAnchor);
 
   const handleChangeClient = (clientObject) => {
     setActiveClientId(clientObject.id);
@@ -143,50 +151,30 @@ export default function Clients() {
     setDeleteTagMenuAnchor(e.currentTarget);
   };
 
+  const getTabContent = () => {
+    switch (tabVal) {
+      case 0:
+        return <GeneralTab />;
+      default:
+        break;
+    }
+  };
+
   return (
-    <>
+    <Grid item xs={12}>
       <Paper>
-        <Box component="h6">{org.name} Clients</Box>
-        <Divider sx={{ my: 4 }} />
+        <Tabs value={tabVal} onChange={(_, newVal) => setTabVal(newVal)}>
+          <Tab label="General" icon={<InfoOutlinedIcon />} iconPosition="start" />
+          <Tab label="Members" icon={<PeopleOutlineOutlinedIcon />} iconPosition="start" />
+          <Tab label="Tags" icon={<LocalOfferOutlinedIcon />} iconPosition="start" />
+        </Tabs>
 
-        <Button
-          hidden={!isAdmin}
-          size="large"
-          onClick={() => setCreateClientModalOpen(true)}
-          variant="contained">
-          Create Client
-        </Button>
-
-        <Box
-          maxWidth={360}
-          mt={5}
-          mb={2}>
-          <ClientMenu
-            changeHandler={handleChangeClient}
-            curClientId={client.id}
-            clients={clients}
-          />
-        </Box>
-
-        <Box hidden={!isAdmin}>
-          <Button
-            startIcon={<EditIcon />}
-            sx={{ mr: 2 }}
-            onClick={() => setEditClientModalOpen(true)}
-            variant="outlined">
-            Edit {client.name}
-          </Button>
-          <Button
-            startIcon={<DeleteIcon />}
-            color="error"
-            onClick={() => setRemoveClientModalOpen(true)}
-            variant="outlined">
-            Delete {client.name}
-          </Button>
-        </Box>
+        {
+          getTabContent()
+        }
       </Paper>
 
-      <Paper sx={{ my: 3 }}>
+      {/* <Paper sx={{ my: 3 }}>
         <Box component="h6">{client.name} Team</Box>
         <Divider sx={{ my: 4 }} />
         <Button
@@ -391,7 +379,7 @@ export default function Clients() {
             </Box>
           </Box>
         </Menu>
-      </Paper>
+      </Paper> */}
 
       <CreateClientModal
         open={createClientModalOpen}
@@ -415,11 +403,6 @@ export default function Clients() {
         setOpen={setRemoveClientUserModalOpen}
         user={userToModify}
       />
-
-      <RemoveClientModal
-        open={removeClientModalOpen}
-        setOpen={setRemoveClientModalOpen}
-      />
-    </>
+    </Grid>
   );
 };
