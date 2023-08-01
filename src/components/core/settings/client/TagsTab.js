@@ -1,15 +1,15 @@
 import { Box, Button, Chip, InputAdornment, Menu, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { deleteTag, updateTag } from "../../../../api/tags";
+import { createTag, deleteTag, updateTag } from "../../../../api/tags";
 import { LoadingButton } from "@mui/lab";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 export default function TagsTab() {
 
   const {
     client,
     tags,
-    isAdmin,
     openSnackBar,
     tagsMap,
     setTags,
@@ -30,8 +30,11 @@ export default function TagsTab() {
 
   const [editTagMenuAnchor, setEditTagMenuAnchor] = useState(null);
   const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState(null);
+  const [newTagMenuAnchor, setNewTagMenuAnchor] = useState(null);
+  const [newTagName, setNewTagName] = useState('');
   const [updatingTag, setUpdatingTag] = useState(false);
   const [deletingTag, setDeletingTag] = useState(false);
+  const [creatingTag, setCreatingTag] = useState(false);
 
   const [tagToDelete, setTagToDelete] = useState(null);
   const [tagToEdit, setTagToEdit] = useState(null);
@@ -39,6 +42,7 @@ export default function TagsTab() {
 
   const editTagMenuOpen = Boolean(editTagMenuAnchor);
   const deleteTagMenuOpen = Boolean(deleteTagMenuAnchor);
+  const newTagMenuOpen = Boolean(newTagMenuAnchor);
 
   const handleEditTag = (e, tag) => {
     setTagToEdit(tag);
@@ -115,23 +119,62 @@ export default function TagsTab() {
     }
   };
 
+  const handleCreateTag = async () => {
+    if (!newTagName) {
+      openSnackBar('Please enter a name for the new tag.');
+      return;
+    }
+
+    setCreatingTag(true);
+
+    try {
+      const { tag, message } = await createTag({
+        name: newTagName,
+        clientId: client.id
+      });
+
+      if (tag) {
+        const newTag = tag;
+        setTags(tags => [...tags, newTag]);
+        setCreatingTag(false);
+        handleCloseNewTagMenu();
+        openSnackBar('Successfully created.', 'success');
+      } else {
+        setCreatingTag(false);
+        openSnackBar(message, 'error');
+      }
+    } catch (error) {
+      setCreatingTag(false);
+      openSnackBar(error.message, 'error');
+    }
+  };
+
 
   const openDeleteTagConfirmation = (e, tag) => {
     setTagToDelete(tag);
     setDeleteTagMenuAnchor(e.currentTarget);
   };
 
+  const handleCloseNewTagMenu = () => {
+    setNewTagName('');
+    setNewTagMenuAnchor(null);
+  };
+
   return (
     <>
       <Box mt={3}>
-        <Box>
-          <Button
-            hidden={!isAdmin}
+        <Box mb={3}>
+          <Chip
+            color="primary"
+            label="New Tag"
             variant="outlined"
-            sx={{ mb: 4 }}
-            onClick={e => { }}>
-            New tag
-          </Button>
+            sx={{
+              mr: 2
+            }}
+            deleteIcon={<AddCircleIcon />}
+            onClick={e => setNewTagMenuAnchor(e.currentTarget)}
+            onDelete={e => setNewTagMenuAnchor(e.currentTarget)}>
+          </Chip>
         </Box>
         <Box display="flex">
           {
@@ -187,6 +230,36 @@ export default function TagsTab() {
                   loading={updatingTag}
                   onClick={handleUpdateTag}>
                   Save
+                </LoadingButton>
+              </InputAdornment>
+            }}>
+          </TextField>
+        </Box>
+      </Menu>
+
+      <Menu
+        anchorEl={newTagMenuAnchor}
+        open={newTagMenuOpen}
+        onClose={handleCloseNewTagMenu}>
+        <Box px={2} py={1} width={225}>
+          <TextField
+            autoFocus
+            variant="standard"
+            value={newTagName}
+            onChange={e => setNewTagName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' ? handleCreateTag() : null}
+            size="small"
+            disabled={creatingTag}
+            placeholder="Tag name"
+            fullWidth
+            sx={{ mb: 1 }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">
+                <LoadingButton
+                  size="small"
+                  loading={creatingTag}
+                  onClick={handleCreateTag}>
+                  Create
                 </LoadingButton>
               </InputAdornment>
             }}>

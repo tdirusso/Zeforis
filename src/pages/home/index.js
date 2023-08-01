@@ -111,6 +111,12 @@ export default function Home({ setTheme }) {
   useEffect(() => {
     if (triedOrgAndClient) {
       if (client && tasks.length === 0) {
+        document.addEventListener('keyup', e => {
+          if (e.key === 'Escape') {
+            closeDrawer();
+          }
+        });
+
         fetchClientData();
       } else if (!client) {
         setLoading(false);
@@ -157,7 +163,7 @@ export default function Home({ setTheme }) {
   let isAdmin = false;
   const clientMembers = [];
   const clientAdmins = [];
-  
+
   orgUsers.forEach(orgUser => {
     if (orgUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
       clientAdmins.push({ ...orgUser, role: 'Administrator' });

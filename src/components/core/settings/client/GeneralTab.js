@@ -1,4 +1,4 @@
-import { Box, Button, TextField, InputAdornment } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Divider } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
@@ -78,6 +78,9 @@ export default function GeneralTab() {
           startIcon={<SwapHorizOutlinedIcon />}>
           Change client
         </Button>
+      </Box>
+      <Divider sx={{ my: 4 }} />
+      <Box>
         <Button
           disabled={loading}
           startIcon={<DeleteIcon />}

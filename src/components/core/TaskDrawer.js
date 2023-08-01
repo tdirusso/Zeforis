@@ -106,10 +106,8 @@ export default function TaskDrawer(props) {
   const deleteMenuOpen = Boolean(deleteMenuAnchor);
 
   useEffect(() => {
-    setTask(taskProp || defaultTask);
     if (taskProp) {
       const tagIds = taskProp.tags?.split(',').filter(Boolean) || [];
-
       setTask(taskProp);
       setName(taskProp.task_name);
       setDescription(taskProp.description);
@@ -124,6 +122,17 @@ export default function TaskDrawer(props) {
         name: tagIdNameMap[tagId],
         client_id: clientId
       })).sort((a, b) => a.name.localeCompare(b.name)));
+    } else {
+      setTask(defaultTask);
+      setName('');
+      setDescription('');
+      setLinkUrl('');
+      setDateDue(null);
+      setIsKeyTask(false);
+      setFolder(null);
+      setStatus(null);
+      setAssignedTo(null);
+      setSelectedTags([]);
     }
   }, [taskProp]);
 
