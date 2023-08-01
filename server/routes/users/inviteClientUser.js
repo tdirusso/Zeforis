@@ -15,13 +15,12 @@ if (isDev) {
 module.exports = async (req, res) => {
   const {
     email,
-    firstName,
-    lastName,
     clientId,
     clientName,
     orgId,
     orgName,
-    orgBrand,
+    orgColor,
+    orgLogo = 'https://zeforis.s3.us-west-1.amazonaws.com/assets/zeforis-logo.png',
     isAdmin = false
   } = req.body;
 
@@ -31,7 +30,7 @@ module.exports = async (req, res) => {
     });
   }
 
-  if (!firstName || !lastName || !email) {
+  if (!email) {
     return res.json({
       message: 'Missing name or email.'
     });
@@ -63,15 +62,21 @@ module.exports = async (req, res) => {
         userId: user.id,
         orgName,
         clientName,
-        orgBrand,
+        orgColor,
+        orgLogo,
         invitationCode
       });
 
-      return res.json({ success: true, userId: user.id });
+      return res.json({
+        success: true,
+        userId: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name
+      });
     } else {
       const newUserResult = await pool.query(
-        'INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)',
-        [firstName, lastName, email.toLowerCase()]
+        'INSERT INTO users (email) VALUES (?)',
+        [email.toLowerCase()]
       );
 
       const newUserId = newUserResult[0].insertId;
@@ -87,7 +92,8 @@ module.exports = async (req, res) => {
         userId: newUserId,
         orgName,
         clientName,
-        orgBrand,
+        orgColor,
+        orgLogo,
         invitationCode
       });
 
@@ -101,7 +107,7 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail({ email, clientId, orgName, clientName, userId, orgBrand, invitationCode }) {
+async function sendInvitationEmail({ email, clientId, orgName, clientName, userId, orgColor, orgLogo, invitationCode }) {
   let qs = `clientId=${clientId}&userId=${userId}&invitationCode=${invitationCode}`;
 
   let verificationUrl = `${process.env.APP_DOMAIN}/accept-invitation?${qs}`;
@@ -110,7 +116,8 @@ async function sendInvitationEmail({ email, clientId, orgName, clientName, userI
     verificationUrl,
     orgName,
     clientName,
-    orgBrand,
+    orgColor,
+    orgLogo,
     invitationCode
   };
 

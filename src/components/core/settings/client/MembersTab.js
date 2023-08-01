@@ -9,7 +9,15 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { removeClientUser } from "../../../../api/clients";
+import { inviteClientUser, removeClientUser } from "../../../../api/clients";
+import HelpIcon from '@mui/icons-material/Help';
+
+const inviteUserAdminTooltip = <>
+  Administrators can edit tasks, folders and client settings (best for contributors).
+  <br></br>
+  <br></br>
+  Non-admins will have view-only access (best for members that belong to the client).
+</>;
 
 export default function MembersTab() {
 
@@ -21,10 +29,16 @@ export default function MembersTab() {
     isAdmin,
     openSnackBar,
     setOrgUsers,
-    orgUsersMap
+    orgUsersMap,
+    org
   } = useOutletContext();
 
   const clientId = client.id;
+  const orgId = org.id;
+  const clientName = client.name;
+  const orgName = org.name;
+  const orgColor = org.brandColor;
+  const orgLogo = org.logo;
 
   const [userToRemove, setUserToRemove] = useState(null);
   const [isRemovingUser, setRemovingUser] = useState(false);
@@ -81,7 +95,79 @@ export default function MembersTab() {
   };
 
   const handleInviteClientUser = async () => {
+    if (!inviteeEmail) {
+      openSnackBar("Please enter the user's email address to invite.");
+      return;
+    }
 
+    setIsInviting(true);
+
+    try {
+      const { success, message, userId, firstName = '', lastName = '' } = await inviteClientUser({
+        email: inviteeEmail,
+        clientId,
+        orgId,
+        clientName,
+        orgName,
+        isAdmin,
+        orgColor,
+        orgLogo
+      });
+
+      if (success) {
+        const addedUser = {
+          id: userId,
+          email: inviteeEmail,
+          firstName,
+          lastName
+        };
+
+        if (!orgUsersMap[userId]) { // User is new to the org
+          addedUser.memberOfClients = [{ id: clientId, name: clientName }];
+          addedUser.adminOfClients = [];
+          setOrgUsers(members => [...members, addedUser]);
+        } else { // User already exists in the org
+          const existingUser = orgUsersMap[userId];
+          const userIsMember = existingUser.memberOfClients.find(({ id }) => id === clientId);
+          const userIsAdmin = existingUser.adminOfClients.find(({ id }) => id === clientId);
+
+          if (isAdmin) {
+            if (userIsMember) {
+              existingUser.memberOfClients.filter(({ id }) => id !== clientId);
+            }
+
+            if (!userIsAdmin) {
+              existingUser.adminOfClients.push({ id: clientId, name: clientName });
+            }
+          } else {
+            if (userIsAdmin) {
+              existingUser.adminOfClients.filter(({ id }) => id !== clientId);
+            }
+
+            if (!userIsMember) {
+              existingUser.memberOfClients.push({ id: clientId, name: clientName });
+            }
+          }
+
+          setOrgUsers(Object.values(orgUsersMap));
+        }
+
+        setIsInviting(false);
+        handleInviteUserMenuClose();
+        openSnackBar('Invitation successfully sent.', 'success');
+      } else {
+        openSnackBar(message, 'error');
+        setIsInviting(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setIsInviting(false);
+    }
+  };
+
+  const handleInviteUserMenuClose = () => {
+    setInviteUserMenuAnchor(null);
+    setInviteeEmail('');
   };
 
   return (
@@ -112,7 +198,18 @@ export default function MembersTab() {
             }
             {
               clientMembers.map((member, index) => {
+                const isYou = member.id === user.id;
+
+                let primaryText = <span>{member.firstName} {member.lastName}</span>;
+
+                if (isYou) {
+                  primaryText = <span>
+                    {member.firstName} {member.lastName}
+                    <span style={{ color: '#bababa' }}>{` (you)`}</span>
+                  </span>;
+                }
                 return (
+
                   <React.Fragment key={member.id}>
                     <ListItem
                       secondaryAction={
@@ -126,7 +223,7 @@ export default function MembersTab() {
                           </Tooltip> : null
                       }>
                       <ListItemText
-                        primary={`${member.firstName} ${member.lastName}`}
+                        primary={primaryText}
                         secondary={member.email}
                       />
                     </ListItem>
@@ -218,7 +315,7 @@ export default function MembersTab() {
       <Menu
         anchorEl={inviteUserMenuAnchor}
         open={inviteUserMenuOpen}
-        onClose={() => setInviteUserMenuAnchor(null)}>
+        onClose={handleInviteUserMenuClose}>
         <Box sx={{ py: 2, px: 2, minWidth: '300px' }}>
           <Box>
             <TextField
@@ -234,31 +331,34 @@ export default function MembersTab() {
               type="email">
             </TextField>
           </Box>
-          <Box mb={2}>
+          <Box mb={2} mt={1.5}>
             <FormGroup>
               <FormControlLabel
                 control={<Switch
-                size="small"
+                  size="small"
                   disabled={isInvitingUser}
                   value={inviteeIsAdmin}
                   onChange={(_, val) => setInviteeIsAdmin(val)}
                 />}
-                label={<Typography variant='body2'>Admin?</Typography>}
+                label={<Typography variant='body2' display="flex" alignItems="center">
+                  Administrator
+                  <Tooltip title={inviteUserAdminTooltip} placement="top">
+                    <HelpIcon
+                      fontSize="small"
+                      sx={{ ml: 0.5, cursor: 'default' }}
+                      htmlColor="#c7c7c7"
+                    />
+                  </Tooltip>
+                </Typography>}
               />
             </FormGroup>
           </Box>
-          <Box px={2} py={1}>
-            <Button
-              sx={{ mr: 0.5 }}
-              disabled={isInvitingUser}
-              size="small"
-              onClick={() => setInviteUserMenuAnchor(null)}>
-              Cancel
-            </Button>
+          <Box py={1} display="flex">
             <LoadingButton
               disabled={isInvitingUser}
               variant='contained'
               size="small"
+              fullWidth
               loading={isInvitingUser}
               onClick={() => handleInviteClientUser()}>
               Send Invitation
