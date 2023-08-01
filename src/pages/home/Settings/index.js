@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Button, Grid, Paper } from "@mui/material";
 import React, { useState } from "react";
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import Account from "../../../components/core/settings/Account";
-import Organizations from "../../../components/core/settings/Organizations";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ClientTab from "../../../components/core/settings/client";
+import OrgTab from "../../../components/core/settings/org";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const buttonStyles = {
   p: '10px 15px',
@@ -28,7 +28,7 @@ export default function Settings() {
       case 0:
         return <ClientTab />;
       case 1:
-        return <Organizations />;
+        return <OrgTab />;
       case 2:
         return <Account />;
       default:
@@ -51,7 +51,7 @@ export default function Settings() {
                 ...buttonStyles,
                 color: tabVal === 0 ? 'white' : 'var(--colors-primary)'
               }}
-              startIcon={<SwitchAccountIcon />}>
+              startIcon={<AccountBoxIcon />}>
               Client
             </Button>
           </Paper>
@@ -81,7 +81,7 @@ export default function Settings() {
                 ...buttonStyles,
                 color: tabVal === 2 ? 'white' : 'var(--colors-primary)'
               }}
-              startIcon={<AccountCircleIcon />}>
+              startIcon={<ManageAccountsIcon />}>
               Account
             </Button>
           </Paper>
