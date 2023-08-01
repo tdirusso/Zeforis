@@ -55,7 +55,7 @@ export default function GeneralTab() {
           value={clientName}
           disabled={loading}
           onChange={e => setClientName(e.target.value)}
-          variant="outlined"
+          variant="standard"
           helperText={`Current client name`}
           InputProps={{
             endAdornment: <InputAdornment position="end">
@@ -72,7 +72,6 @@ export default function GeneralTab() {
       <Box mt={3.5}>
         <Button
           sx={{ mr: 2 }}
-          disabled={loading}
           variant="outlined"
           onClick={() => openDrawer('change-org-or-client')}
           startIcon={<SwapHorizOutlinedIcon />}>
@@ -82,7 +81,6 @@ export default function GeneralTab() {
       <Divider sx={{ my: 4 }} />
       <Box>
         <Button
-          disabled={loading}
           startIcon={<DeleteIcon />}
           color="error"
           onClick={() => openModal('delete-client')}

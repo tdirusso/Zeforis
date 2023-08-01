@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     name,
     brandColor = '#3365f6',
     orgId,
-    isLogoChanged
+    isLogoChanged = false
   } = req.body;
 
   const logoFile = req.files?.logoFile;
@@ -40,15 +40,23 @@ module.exports = async (req, res) => {
 
     const org = orgResult[0];
 
+    let updatedLogoUrl = org.logo_url;
+
     if (org) {
       if (isLogoChanged === 'true') {
-        await updateOrgWithLogoChange(name, brandColor, orgId, org.logo_url, logoFile);
+        updatedLogoUrl = await updateOrgWithLogoChange(name, brandColor, orgId, org.logo_url, logoFile);
       } else {
         await updateOrg(name, brandColor, orgId);
       }
 
       return res.json({
-        success: true
+        success: true,
+        org: {
+          id: org.id,
+          name,
+          brandColor,
+          logo: updatedLogoUrl
+        }
       });
     }
 
@@ -105,4 +113,6 @@ async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl,
     'UPDATE orgs SET name = ?, brand_color = ?, logo_url = ? WHERE id = ?',
     [name, brandColor, updatedLogoUrl, orgId]
   );
+
+  return updatedLogoUrl;
 }

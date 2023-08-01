@@ -20,6 +20,7 @@ import useModal from "../../hooks/useModal";
 import Drawers from "../../components/core/Drawers";
 import useDrawer from "../../hooks/useDrawer";
 import useSideNav from "../../hooks/useSideNav";
+import { hexToRgb } from "../../lib/utils";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -247,8 +248,10 @@ export default function Home({ setTheme }) {
     tasksMap,
     isAdmin,
     widgets: sortedWidgets,
+    setTheme,
     setTags,
     setClient,
+    setOrg,
     setTasks,
     setFolders,
     setOrgUsers,
@@ -315,17 +318,3 @@ export default function Home({ setTheme }) {
     </Box >
   );
 };
-
-function hexToRgb(hex) {
-  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, function (m, r, g, b) {
-    return r + r + g + g + b + b;
-  });
-
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
-}
