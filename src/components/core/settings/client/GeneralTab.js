@@ -49,7 +49,7 @@ export default function GeneralTab() {
 
   return (
     <>
-      <Box mt={5}>
+      <Box mt={4}>
         <TextField
           sx={{ minWidth: '400px' }}
           value={clientName}

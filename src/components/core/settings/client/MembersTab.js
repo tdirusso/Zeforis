@@ -1,4 +1,4 @@
-import { Box, FormControlLabel, FormGroup, Switch, TextField, Typography } from "@mui/material";
+import { Box, FormControlLabel, FormGroup, InputAdornment, Switch, TextField, Typography } from "@mui/material";
 import { Divider, Button, Chip, Tooltip, Menu } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
@@ -11,6 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
 import { inviteClientUser, removeClientUser } from "../../../../api/clients";
 import HelpIcon from '@mui/icons-material/Help';
+import { MailOutline } from "@mui/icons-material";
 
 const inviteUserAdminTooltip = <>
   Administrators can edit tasks, folders and client settings (best for contributors).
@@ -172,7 +173,7 @@ export default function MembersTab() {
 
   return (
     <>
-      <Box mt={5}>
+      <Box mt={3}>
         <Box>
           <Button
             hidden={!isAdmin}
@@ -328,7 +329,14 @@ export default function MembersTab() {
               disabled={isInvitingUser}
               value={inviteeEmail}
               onChange={e => setInviteeEmail(e.target.value)}
-              type="email">
+              type="email"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MailOutline htmlColor="#cbcbcb" fontSize="small" />
+                  </InputAdornment>
+                )
+              }}>
             </TextField>
           </Box>
           <Box mb={2} mt={1.5}>

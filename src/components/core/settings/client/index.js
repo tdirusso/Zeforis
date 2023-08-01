@@ -12,7 +12,6 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import RemoveClientUserModal from "../../../admin/RemoveClientUserModal";
 import IconButton from '@mui/material/IconButton';
 import RemoveClientModal from "../../../admin/DeleteClientModal";
 import CloseIcon from '@mui/icons-material/Close';
@@ -24,6 +23,7 @@ import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import GeneralTab from "./GeneralTab";
 import MembersTab from "./MembersTab";
+import TagsTab from "./TagsTab";
 
 export default function ClientsTab() {
   const {
@@ -46,7 +46,6 @@ export default function ClientsTab() {
   const [createClientModalOpen, setCreateClientModalOpen] = useState(false);
   const [editClientModalOpen, setEditClientModalOpen] = useState(false);
   const [inviteClientUserModalOpen, setInviteClientUserModalOpen] = useState(false);
-  const [removeClientUserModalOpen, setRemoveClientUserModalOpen] = useState(false);
   const [removeClientModalOpen, setRemoveClientModalOpen] = useState(false);
   const [editTagMenuAnchor, setEditTagMenuAnchor] = useState(null);
   const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState(null);
@@ -68,10 +67,6 @@ export default function ClientsTab() {
     window.location.reload();
   };
 
-  const handleRemoveClientUser = (userObject) => {
-    setUserToModify(userObject);
-    setRemoveClientUserModalOpen(true);
-  };
 
   const handleDeleteTag = async () => {
     setDeletingTag(true);
@@ -158,6 +153,8 @@ export default function ClientsTab() {
         return <GeneralTab />;
       case 1:
         return <MembersTab />;
+      case 2:
+        return <TagsTab />;
       default:
         break;
     }
@@ -178,7 +175,7 @@ export default function ClientsTab() {
       </Paper>
 
 
-{/* 
+      {/* 
 
       <Paper sx={{ my: 3 }}>
         <Box component="h6" display="flex" alignItems="center">
@@ -297,11 +294,6 @@ export default function ClientsTab() {
         setOpen={setInviteClientUserModalOpen}
       />
 
-      <RemoveClientUserModal
-        open={removeClientUserModalOpen}
-        setOpen={setRemoveClientUserModalOpen}
-        user={userToModify}
-      />
     </Grid>
   );
 };
