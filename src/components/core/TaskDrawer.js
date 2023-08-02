@@ -149,7 +149,7 @@ export default function TaskDrawer(props) {
 
   const handleCopyLink = () => {
     window.navigator.clipboard.writeText(task.link_url);
-    setCopyButtonText('Copied!');
+    setCopyButtonText('Copied');
     setTimeout(() => {
       setCopyButtonText('Copy Link');
     }, 500);

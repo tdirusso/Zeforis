@@ -1,4 +1,4 @@
-import { Box, Button, TextField, InputAdornment, Divider, Chip, Typography, Skeleton, createTheme } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Divider, Skeleton, createTheme, Typography, IconButton, Tooltip } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
@@ -8,6 +8,9 @@ import { updateOrg } from "../../../../api/orgs";
 import { TwitterPicker } from "react-color";
 import { hexToRgb } from "../../../../lib/utils";
 import themeConfig from "../../../../theme";
+import LinkIcon from '@mui/icons-material/Link';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 export default function GeneralTab() {
   const {
@@ -19,6 +22,8 @@ export default function GeneralTab() {
     setTheme
   } = useOutletContext();
 
+  const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
+
   const [orgName, setOrgName] = useState(org.name);
   const [isUpdatingBranding, setUpdatingBranding] = useState(false);
   const [isUpdatingName, setUpdatingName] = useState(false);
@@ -27,6 +32,7 @@ export default function GeneralTab() {
   const [logoFile, setLogoFile] = useState(null);
   const [isLogoChanged, setLogoChanged] = useState(false);
   const [isLogoLoading, setLogoLoading] = useState(org.logo !== '');
+  const [copyButtonText, setCopyButtonText] = useState('Copy link');
 
   const handleUpdateOrgName = async () => {
     if (!orgName) {
@@ -116,6 +122,14 @@ export default function GeneralTab() {
     setTheme(createTheme(themeConfig));
   };
 
+  const handleCopyLoginLink = () => {
+    window.navigator.clipboard.writeText(customLoginPageUrl);
+    setCopyButtonText('Copied');
+    setTimeout(() => {
+      setCopyButtonText('Copy link');
+    }, 750);
+  };
+
   return (
     <>
       <Box mt={4}>
@@ -149,7 +163,7 @@ export default function GeneralTab() {
       </Box>
       <Divider sx={{ my: 4 }} />
       <Box>
-        <Box component="h4">
+        <Box component="h4" mb={3}>
           Branding
         </Box>
         <Box my={2} display='flex' alignItems='center'>
@@ -172,7 +186,7 @@ export default function GeneralTab() {
           </Box>
         </Box>
 
-        <Box sx={{ mt: 5, mb: 5, display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ mt: 3, mb: 3, display: 'flex', alignItems: 'center' }}>
           <Button
             variant='outlined'
             component='label'
@@ -194,7 +208,7 @@ export default function GeneralTab() {
             }}
             disabled={isUpdatingBranding}
             onClick={handleLogoClear}>
-            Clear
+            Clear Logo
           </Button>
 
           <Skeleton
@@ -221,8 +235,58 @@ export default function GeneralTab() {
           </LoadingButton>
         </Box>
       </Box>
-
       <Divider sx={{ my: 4 }} />
+      <Box>
+        <Box component="h4" mb={2}>
+          Custom Login Page
+        </Box>
+        <Typography variant="body2">
+          The "Custom Login Page" feature provides your clients with a custom login experience
+          by incorporating your branding colors and logo into the login page, delivering a professional touch.
+          <br></br><br></br>
+          This seamless white labeling capability enhances your brand, customer retention, marketing opportunities,
+          and overall user experience.
+        </Typography>
+        <Box my={3}>
+          <TextField
+            helperText="Share this link with your clients to provide a custom login experience with your brand."
+            value={customLoginPageUrl}
+            fullWidth
+            InputProps={{
+              startAdornment:
+                <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
+                  <LinkIcon />
+                </InputAdornment>,
+              readOnly: true,
+              endAdornment:
+                <>
+                  <InputAdornment position="end">
+                    <Tooltip title={copyButtonText}>
+                      <IconButton
+                        onClick={handleCopyLoginLink}
+                        color="primary"
+                        size="large">
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                  <InputAdornment position="end">
+                    <Tooltip title="Open preview" >
+                      <IconButton
+                        onClick={() => window.open(customLoginPageUrl, '_blank')}
+                        color="primary"
+                        size="large">
+                        <OpenInNewIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                </>
+            }}>
+          </TextField>
+        </Box>
+      </Box>
+      <Divider sx={{ my: 4 }} />
+
       <Box>
         <Button
           startIcon={<DeleteIcon />}
