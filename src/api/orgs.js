@@ -24,10 +24,17 @@ const createOrg = async (payload) => {
   return data;
 };
 
+const getOrg = async orgId => {
+  const { data } = await request.get(`orgs?orgId=${orgId}`);
+
+  return data;
+};
+
 export {
   getActiveOrgId,
   setActiveOrgId,
   deleteActiveOrgId,
   updateOrg,
-  createOrg
+  createOrg,
+  getOrg
 };

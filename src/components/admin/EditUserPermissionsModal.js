@@ -58,7 +58,7 @@ export default function EditUserPermissionsModal(props) {
 
         setOrgUsers(Object.values(orgUsersMap));
         setLoading(false);
-        openSnackBar('Permission successfully updated.', 'success');
+        openSnackBar('Permission updated.', 'success');
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -95,7 +95,7 @@ export default function EditUserPermissionsModal(props) {
 
         setOrgUsers(Object.values(orgUsersMap));
         setLoading(false);
-        openSnackBar('Successfully updated.', 'success');
+        openSnackBar('Access updated.', 'success');
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -115,10 +115,10 @@ export default function EditUserPermissionsModal(props) {
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogContent sx={{ minWidth: 550 }}>
+      <Dialog open={open} onClose={handleClose} PaperProps={{ sx: { minWidth: 900 } }}>
+        <DialogContent>
           <DialogContentText display="flex" alignItems="center" sx={{ mb: 1 }}>
-            Viewing permissions for {user?.firstName} {user?.lastName}
+            Viewing permissions for&nbsp; <strong>{user?.firstName} {user?.lastName}</strong>
             <CircularProgress
               size={20}
               sx={{
@@ -127,8 +127,8 @@ export default function EditUserPermissionsModal(props) {
               }}
             />
           </DialogContentText>
-          <Typography variant='caption' mt={2}>
-            Removing access entirely will automatically unassign all tasks to this user for the selected client.
+          <Typography variant='body2' mt={2}>
+            Removing access entirely will automatically unassign all tasks to this user for the associated client.
           </Typography>
           <Box
             mt={3}
@@ -138,10 +138,10 @@ export default function EditUserPermissionsModal(props) {
               Client
             </Box>
             <Box component="h5" flexBasis="33%" textAlign='center'>
-              Can Access
+              Access
             </Box>
             <Box component="h5" flexBasis="33%" textAlign='center'>
-              Is Administrator
+              Administrator
             </Box>
           </Box>
           <Divider sx={{ my: 1 }} />
@@ -150,13 +150,18 @@ export default function EditUserPermissionsModal(props) {
               const isMember = memberOfClientIds.includes(client.id);
               const isAdmin = adminOfClientIds.includes(client.id);
 
+              let clientName = client.name;
+              if (clientName.length > 30) {
+                clientName = clientName.substring(0, 40) + '...';
+              }
+
               return (
                 <Box
                   display="flex"
                   alignItems="center"
                   key={client.id}>
                   <Typography flexBasis="33%">
-                    {client.name}
+                    {clientName}
                   </Typography>
                   <Box flexBasis='33%' textAlign='center'>
                     <Checkbox

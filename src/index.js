@@ -30,7 +30,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path="login" element={<LoginPage />} />
+          <Route path="login" element={<LoginPage setTheme={setTheme} />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="register-success" element={<RegisterSuccessPage />} />
           <Route path="accept-invitation" element={<AcceptInvitationPage />} />

@@ -1,4 +1,4 @@
-import { Box, LinearProgress, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';

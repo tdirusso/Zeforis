@@ -12,16 +12,25 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import './Login.css';
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, createTheme } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import Loader from "../../components/core/Loader";
+import { getOrg } from "../../api/orgs";
+import { hexToRgb } from "../../lib/utils";
+import themeConfig from "../../theme";
 
-export default function LoginPage() {
+export default function LoginPage({ setTheme }) {
+  const { search } = useLocation();
+  const searchParams = new URLSearchParams(search);
+
+  const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
+  const [customPageData, setCustomPageData] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+
   const email = useRef();
   const password = useRef();
-  const [isLoading, setLoading] = useState(false);
-  const { search } = useLocation();
 
   const {
     isOpen,
@@ -29,6 +38,20 @@ export default function LoginPage() {
     type,
     message
   } = useSnackbar();
+
+  const customPageParam = searchParams.get('cp');
+  let needsCustomPage = false;
+  let orgId;
+
+  if (customPageParam) {
+    try {
+      const cpParamVal = window.atob(customPageParam);
+      orgId = new URLSearchParams(cpParamVal).get('orgId');
+      if (orgId) {
+        needsCustomPage = true;
+      }
+    } catch (error) { }
+  }
 
   const navigate = useNavigate();
 
@@ -72,16 +95,46 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (new URLSearchParams(search).get('postVerify')) {
-      openSnackBar('Email successfuly verified.', 'success');
+    if (!needsCustomPage) {
+      if (document.readyState === 'complete') {
+        initializeGoogleButton();
+      } else {
+        window.onload = initializeGoogleButton;
+      }
+    } else {
+      fetchCustomPageData();
     }
 
-    if (document.readyState === 'complete') {
-      initializeGoogleButton();
-    } else {
-      window.onload = initializeGoogleButton;
+    if (searchParams.get('postVerify')) {
+      openSnackBar('Email verified.', 'success');
+    }
+
+    async function fetchCustomPageData() {
+      try {
+        const { org, message } = await getOrg(orgId);
+
+        if (org) {
+          const brandRGB = hexToRgb(org.brand_color);
+          document.documentElement.style.setProperty('--colors-primary', org.brand_color);
+          document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
+          themeConfig.palette.primary.main = org.brand_color;
+          setTheme(createTheme(themeConfig));
+          setCustomPageData(org);
+          setDoneFetchingCustomPage(true);
+        } else {
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (doneFetchingCustomPage) {
+      initializeGoogleButton();
+    }
+  }, [doneFetchingCustomPage]);
 
   const handleLogin = async e => {
     e.preventDefault();
@@ -90,12 +143,12 @@ export default function LoginPage() {
     const passwordVal = password.current.value;
 
     if (!emailVal) {
-      openSnackBar('Please enter a valid email address', 'error');
+      openSnackBar('Please enter a valid email address');
       return;
     }
 
     if (!passwordVal) {
-      openSnackBar('Please enter your password', 'error');
+      openSnackBar('Please enter your password');
       return;
     }
 
@@ -118,12 +171,30 @@ export default function LoginPage() {
     }
   };
 
+  if (needsCustomPage && !doneFetchingCustomPage) {
+    return (
+      <Loader />
+    );
+  }
+
+  let pageIcon = <Box component="a" href="https://www.zeforis.com" target="_blank">
+    <img src={zeforisLogo} alt="Zeforis" height={30} />
+  </Box>;
+
+  if (needsCustomPage) {
+    if (customPageData.logo_url) {
+      pageIcon = <Box>
+        <img src={customPageData.logo_url} alt={customPageData.name} height={50} />
+      </Box>;
+    } else {
+      pageIcon = <Box component="h1" color={customPageData.brand_color}>{customPageData.name}</Box>;
+    }
+  }
+
   return (
     <Box className="Login flex-centered">
       <Box component="header">
-        <Box component="a" href="https://www.zeforis.com" target="_blank">
-          <img src={zeforisLogo} alt="Zeforis" height={30} />
-        </Box>
+        {pageIcon}
         <Box display="flex" alignItems="center">
           <Box mr={1.5}>Don't have an account?</Box>
           <Button
@@ -194,6 +265,24 @@ export default function LoginPage() {
         </form>
       </Paper>
       <Box className="circle"></Box>
+      {
+        needsCustomPage ?
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 10,
+              right: 10,
+              color: '#5f5f5f',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            component="a"
+            href="https://www.zeforis.com"
+            target="_blank">
+            Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
+          </Box>
+          : null
+      }
       <Snackbar
         isOpen={isOpen}
         type={type}

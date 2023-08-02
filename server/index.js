@@ -35,6 +35,7 @@ const updatedWidget = require('./routes/widgets/updateWidget');
 const deleteWidget = require('./routes/widgets/deleteWidget');
 const getInvitationData = require('./routes/users/getInvitationData');
 const updatePassword = require('./routes/users/updatePassword');
+const getOrg = require('./routes/orgs/getOrg');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -93,6 +94,7 @@ const boot = async () => {
 
   app.post('/api/orgs', createOrg);
   app.patch('/api/orgs', checkPermissionsMW, updateOrg);
+  app.get('/api/orgs', getOrg);
 
   app.post('/api/widgets', checkPermissionsMW, createWidget);
   app.patch('/api/widgets', checkPermissionsMW, updatedWidget);

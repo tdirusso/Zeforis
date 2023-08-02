@@ -1,5 +1,4 @@
 import { Box, Button, TextField, InputAdornment, Divider, Skeleton, createTheme, Typography, IconButton, Tooltip } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
@@ -15,7 +14,6 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 export default function GeneralTab() {
   const {
     openDrawer,
-    openModal,
     openSnackBar,
     setOrg,
     org,
@@ -284,17 +282,6 @@ export default function GeneralTab() {
             }}>
           </TextField>
         </Box>
-      </Box>
-      <Divider sx={{ my: 4 }} />
-
-      <Box>
-        <Button
-          startIcon={<DeleteIcon />}
-          color="error"
-          onClick={() => openModal('delete-client')}
-          variant="outlined">
-          Delete organization
-        </Button>
       </Box>
     </>
   );
