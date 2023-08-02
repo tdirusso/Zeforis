@@ -31,11 +31,17 @@ const updatePassword = async (payload) => {
   return data;
 };
 
+const sendPasswordResetLink = async (payload) => {
+  const { data } = await request.post(`users/sendPasswordResetLink`, payload);
+  return data;
+};
+
 export {
   updateProfile,
   updatePermission,
   updateAccess,
   register,
   getInvitationData,
-  updatePassword
+  updatePassword,
+  sendPasswordResetLink
 };

@@ -173,6 +173,7 @@ export default function MembersTab() {
 
   return (
     <>
+      <Box mt={3} component="h4">Members of {client.name}</Box>
       <Box mt={3}>
         <Box>
           <Button

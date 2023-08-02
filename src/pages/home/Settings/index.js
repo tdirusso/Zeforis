@@ -2,11 +2,11 @@
 import { Box, Button, Grid, Paper } from "@mui/material";
 import React, { useState } from "react";
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import Account from "../../../components/core/settings/Account";
 import ClientTab from "../../../components/core/settings/client";
 import OrgTab from "../../../components/core/settings/org";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import AccountTab from "../../../components/core/settings/account/";
 
 const buttonStyles = {
   p: '10px 15px',
@@ -30,7 +30,7 @@ export default function Settings() {
       case 1:
         return <OrgTab />;
       case 2:
-        return <Account />;
+        return <AccountTab />;
       default:
         break;
     }
@@ -55,6 +55,12 @@ export default function Settings() {
               Client
             </Button>
           </Paper>
+          <Box sx={{
+            width: '1px',
+            mx: 1,
+            background: 'var(--colors-primary)'
+          }}></Box>
+
           <Paper sx={{
             ...paperStyles,
             background:

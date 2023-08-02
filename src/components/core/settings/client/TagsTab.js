@@ -162,6 +162,7 @@ export default function TagsTab() {
 
   return (
     <>
+      <Box mt={3} component="h4">{client.name} Tags</Box>
       <Box mt={3}>
         <Box mb={3}>
           <Chip

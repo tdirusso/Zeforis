@@ -229,7 +229,7 @@ export default function GeneralTab() {
             onClick={handleUpdateOrgBranding}
             loading={isUpdatingBranding}
             variant="contained">
-            Save Changes
+            Save changes
           </LoadingButton>
         </Box>
       </Box>

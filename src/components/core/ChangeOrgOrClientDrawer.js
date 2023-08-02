@@ -130,7 +130,7 @@ export default function ChangeOrgOrClientDrawer(props) {
             fullWidth
             size='large'
             loading={isLoading}>
-            Save Changes
+            Save changes
           </LoadingButton>
         </DialogContent>
       </Drawer>
