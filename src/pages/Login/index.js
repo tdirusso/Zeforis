@@ -247,13 +247,16 @@ export default function LoginPage({ setTheme }) {
             disabled={isLoading}
           />
           <Box component="span" sx={{ textAlign: 'right', mb: 3.5 }}>
-            <Typography
+            <Box component="a" href="/password-reset" fontSize="small">
+              Forgot password?
+            </Box>
+            {/* <Typography
               variant="body2"
               component={Link}
               to=""
               sx={{ mb: 3, }}>
               Forgot password?
-            </Typography>
+            </Typography> */}
           </Box>
 
           <LoadingButton

@@ -34,26 +34,33 @@ module.exports = async (req, res) => {
       const user = userResult[0];
 
       if (user.date_password_reset_code_expiration) {
-        console.log(moment(user.date_password_reset_code_expiration).toDate());
-        return res.json({
-          success: true
-        });
-      } else {
-        const passwordResetCode = uuidv4().substring(0, 16);
-        const _1hourFromNow = moment().add('1', 'hours');
-        console.log(passwordResetCode, _1hourFromNow.toDate(), user);
+        const passwordLinkExpirationTime = moment(user.date_password_reset_code_expiration);
+        const now = moment();
 
-        await connection.query(
-          'UPDATE users SET password_reset_code = ?, date_password_reset_code_expiration = ? WHERE id = ?',
-          [passwordResetCode, _1hourFromNow.toDate(), user.id]
-        );
-
-        connection.release();
-
-        return res.json({
-          success: true
-        });
+        if (passwordLinkExpirationTime.isAfter(now)) {
+          connection.release();
+          return res.json({
+            success: true,
+            isLinkPending: true
+          });
+        }
       }
+
+      const passwordResetCode = uuidv4().substring(0, 16);
+      const _1hourFromNow = moment().add('1', 'hours');
+
+      await connection.query(
+        'UPDATE users SET password_reset_code = ?, date_password_reset_code_expiration = ? WHERE id = ?',
+        [passwordResetCode, _1hourFromNow.toDate(), user.id]
+      );
+
+      await sendPasswordResetLink(passwordResetCode, email.toLowerCase());
+
+      connection.release();
+
+      return res.json({
+        success: true
+      });
     } else {
       connection.release();
 
@@ -71,22 +78,22 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendVerifyEmail(userId, verificationCode, email) {
-  const qs = `userId=${userId}&verificationCode=${verificationCode}`;
+async function sendPasswordResetLink(resetCode, email) {
+  const qs = `resetCode=${resetCode}&email=${email}`;
 
-  const verificationUrl = `${process.env.API_DOMAIN}/api/users/verify?${qs}`;
+  const resetLinkUrl = `${process.env.APP_DOMAIN}/password-reset?${qs}`;
 
   const ejsData = {
-    verificationUrl
+    resetLinkUrl
   };
 
-  const templatePath = path.resolve(__dirname, '../../../email/templates/verifyEmail.ejs');
+  const templatePath = path.resolve(__dirname, '../../../email/templates/passwordReset.ejs');
   const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
 
   await emailService.sendMail({
     from: 'Zeforis',
     to: email,
-    subject: `Zeforis - Verify your Email`,
+    subject: `Zeforis - Password Reset`,
     text: template,
     html: template
   });

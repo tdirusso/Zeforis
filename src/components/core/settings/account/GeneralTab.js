@@ -67,14 +67,22 @@ export default function GeneralTab() {
 
     setTimeout(async () => {
       try {
-        const { success, message } = await sendPasswordResetLink({
+        const { success, message, isLinkPending } = await sendPasswordResetLink({
           email: user.email
         });
 
         if (success) {
-          setSendingResetLink(false);
-          setChangePasswordMenuAnchor(null);
-          openSnackBar('Password reset link sent.', 'success');
+          if (isLinkPending) {
+            setChangePasswordMenuAnchor(null);
+            openSnackBar('Reset link already sent - once expired, you can try again.');
+          } else {
+            setChangePasswordMenuAnchor(null);
+            openSnackBar('Password reset link sent.', 'success');
+          }
+
+          setTimeout(() => {
+            setSendingResetLink(false);
+          }, 250);
         } else {
           openSnackBar(message, 'error');
           setSendingResetLink(false);
@@ -167,7 +175,7 @@ export default function GeneralTab() {
         onClose={() => setChangePasswordMenuAnchor(null)}>
         <Box px={2} py={1}>
           <Typography variant="body2">
-            To change your password, click on the button below to send a special password reset link to your email listed above (valid for 1 hour).
+            To change your password, click on the button below to send a special password reset link to your email listed above (expires after 1 hour).
           </Typography>
           <Box mt={2}>
             <LoadingButton

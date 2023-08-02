@@ -18,6 +18,7 @@ import FoldersPage from './pages/Home/Folders';
 import TasksPage from './pages/Home/Tasks';
 import ToolsPage from './pages/Home/Tools';
 import AnalyticsPage from './pages/Home/Analytics';
+import PasswordResetPage from './pages/PasswordReset';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="register-success" element={<RegisterSuccessPage />} />
           <Route path="accept-invitation" element={<AcceptInvitationPage />} />
+          <Route path="password-reset" element={<PasswordResetPage />} />
 
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
             <Route path="dashboard" element={<Dashboard />} />
