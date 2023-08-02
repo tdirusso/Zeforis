@@ -10,15 +10,15 @@ const login = async (payload) => {
   return data;
 };
 
-const logout = email => {
+const logout = (email, logoutPageUrl) => {
   deleteToken();
-  
+
   window.google.accounts.id.revoke(email, () => {
-    window.location.href = '/login';
+    window.location.href = logoutPageUrl;
   });
 
   setTimeout(() => {
-    window.location.href = '/login';
+    window.location.href = logoutPageUrl;
   }, 1000);
 };
 

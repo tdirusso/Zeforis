@@ -17,7 +17,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import Loader from "../../components/core/Loader";
-import { getOrg } from "../../api/orgs";
+import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
 import themeConfig from "../../theme";
 
@@ -65,6 +65,9 @@ export default function LoginPage({ setTheme }) {
         });
 
         if (result.token) {
+          if (needsCustomPage && customPageData) {
+            setActiveOrgId(orgId);
+          }
           navigate('/home/dashboard');
         } else {
           setLoading(false);
@@ -111,7 +114,7 @@ export default function LoginPage({ setTheme }) {
 
     async function fetchCustomPageData() {
       try {
-        const { org, message } = await getOrg(orgId);
+        const { org } = await getOrg(orgId);
 
         if (org) {
           const brandRGB = hexToRgb(org.brand_color);
@@ -119,10 +122,11 @@ export default function LoginPage({ setTheme }) {
           document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
           themeConfig.palette.primary.main = org.brand_color;
           setTheme(createTheme(themeConfig));
+          document.title = `${org.name} Portal - Login`;
           setCustomPageData(org);
           setDoneFetchingCustomPage(true);
         } else {
-          openSnackBar(message, 'error');
+          window.location.href = '/login';
         }
       } catch (error) {
         openSnackBar(error.message, 'error');
@@ -207,7 +211,9 @@ export default function LoginPage({ setTheme }) {
         </Box>
       </Box>
       <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 5 }}>Sign in</Typography>
+        <Typography variant="h5" sx={{ mb: 5 }}>
+          Sign in
+        </Typography>
         <form onSubmit={handleLogin}>
           <TextField
             placeholder="Email"
@@ -264,6 +270,14 @@ export default function LoginPage({ setTheme }) {
           <Box id="google-signin"></Box>
         </form>
       </Paper>
+      <Box
+        hidden={!needsCustomPage}
+        component="a"
+        href="/login"
+        sx={{ fontSize: '13px' }}
+        mt={1}>
+        Go to universal login
+      </Box>
       <Box className="circle"></Box>
       {
         needsCustomPage ?

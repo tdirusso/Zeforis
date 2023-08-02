@@ -37,6 +37,8 @@ export default function Header(props) {
   const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
   const orgMenuOpen = Boolean(anchorEl?.className.includes('org-menu'));
 
+  const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
+
   const handleMenuClick = (e) => {
     setAnchorEl(e.currentTarget);
   };
@@ -236,7 +238,7 @@ export default function Header(props) {
                 </ListItemText>
               </MenuItem>
               <Divider />
-              <MenuItem onClick={() => logout(user.email)}>
+              <MenuItem onClick={() => logout(user.email, customLoginPageUrl)}>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>
