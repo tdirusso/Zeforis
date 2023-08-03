@@ -60,7 +60,9 @@ export default function LoginPage({ setTheme }) {
 
       try {
         const result = await login({
-          googleCredential: authResponse.credential
+          googleCredential: authResponse.credential,
+          isFromCustomLoginPage: needsCustomPage,
+          orgId
         });
 
         if (result.token) {
@@ -76,6 +78,7 @@ export default function LoginPage({ setTheme }) {
         openSnackBar(error.message, 'error');
       }
     } else {
+      setLoading(false);
       openSnackBar('Error signing in with Google (missing credential).');
     }
   };
@@ -160,10 +163,15 @@ export default function LoginPage({ setTheme }) {
     try {
       const result = await login({
         email: emailVal,
-        password: passwordVal
+        password: passwordVal,
+        isFromCustomLoginPage: needsCustomPage,
+        orgId
       });
 
       if (result.token) {
+        if (needsCustomPage && customPageData) {
+          setActiveOrgId(orgId);
+        }
         navigate('/home/dashboard');
       } else {
         setLoading(false);
@@ -288,7 +296,7 @@ export default function LoginPage({ setTheme }) {
               position: 'absolute',
               bottom: 10,
               right: 10,
-              color: '#5f5f5f',
+              color: '#5f5f5f !important',
               display: 'flex',
               alignItems: 'center'
             }}
