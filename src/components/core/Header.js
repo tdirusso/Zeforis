@@ -27,11 +27,12 @@ export default function Header(props) {
     isAdmin,
     user,
     org,
-    client,
+    engagement,
     openModal,
     openDrawer,
     toggleSideNav,
-    isSideNavOpen
+    isSideNavOpen,
+    openDialog
   } = props;
 
   const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
@@ -57,9 +58,10 @@ export default function Header(props) {
     navigate('/home/settings');
   };
 
-  const openChangeOrgOrClient = () => {
+  const openChangeOrgOrEngagement = () => {
     setAnchorEl(null);
-    openDrawer('change-org-or-client');
+    openDialog('change-engagement');
+    //openDrawer('change-org-or-engagement');
   };
 
   const openCreateFolderDrawer = () => {
@@ -202,10 +204,10 @@ export default function Header(props) {
                 <Box>
                   <Box display="flex">
                     <Typography color="#a5a5a5" mr={1}>
-                      Client:
+                      Engagement:
                     </Typography>
                     <Typography >
-                      {client.name}
+                      {engagement.name}
                     </Typography>
                   </Box>
                   <Box display="flex">
@@ -221,7 +223,7 @@ export default function Header(props) {
                   startIcon={<SwapHorizOutlined />}
                   sx={{ mt: '10px', mb: '5px' }}
                   size="small"
-                  onClick={openChangeOrgOrClient}
+                  onClick={openChangeOrgOrEngagement}
                   variant="outlined">
                   Change
                 </Button>

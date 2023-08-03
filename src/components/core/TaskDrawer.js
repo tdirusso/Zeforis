@@ -68,9 +68,9 @@ export default function TaskDrawer(props) {
     isAdmin,
     close,
     folders,
-    clientMembers,
-    clientAdmins,
-    client,
+    engagementMembers,
+    engagementAdmins,
+    engagement,
     tags,
     setTags,
     openSnackBar,
@@ -81,7 +81,7 @@ export default function TaskDrawer(props) {
     tasksMap
   } = props;
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const [selectedTags, setSelectedTags] = useState([]);
   const [assignedTo, setAssignedTo] = useState(null);
@@ -91,7 +91,7 @@ export default function TaskDrawer(props) {
   const [linkUrl, setLinkUrl] = useState('');
   const [copyButtonText, setCopyButtonText] = useState('Copy Link');
   const [task, setTask] = useState(defaultTask);
-  const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
+  const [membersAndAdmins] = useState([...engagementAdmins, ...engagementMembers]);
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
   const [dateDue, setDateDue] = useState(null);
@@ -120,7 +120,7 @@ export default function TaskDrawer(props) {
       setSelectedTags(tagIds.map(tagId => ({
         id: Number(tagId),
         name: tagIdNameMap[tagId],
-        client_id: clientId
+        engagement_id: engagementId
       })).sort((a, b) => a.name.localeCompare(b.name)));
     } else {
       setTask(defaultTask);
@@ -144,7 +144,7 @@ export default function TaskDrawer(props) {
   const curTags = curTagsIds.map(tagId => ({
     id: Number(tagId),
     name: tagIdNameMap[tagId],
-    client_id: clientId
+    engagement_id: engagementId
   }));
 
   const handleCopyLink = () => {
@@ -169,7 +169,7 @@ export default function TaskDrawer(props) {
     if (key === 'Enter' && newTagValue) {
       const result = await createTag({
         name: newTagValue,
-        clientId
+        engagementId
       });
 
       if (result.success) {
@@ -284,7 +284,7 @@ export default function TaskDrawer(props) {
         status,
         assignedToId,
         folderId,
-        clientId,
+        engagementId,
         tags: selectedTags,
         isKeyTask,
         dateDue,
@@ -335,7 +335,7 @@ export default function TaskDrawer(props) {
 
     try {
       const result = await deleteTasks({
-        clientId,
+        engagementId,
         taskIds: [task.task_id]
       });
 

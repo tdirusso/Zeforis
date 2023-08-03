@@ -4,25 +4,25 @@ module.exports = async (req, res) => {
   const {
     name,
     isKeyFolder,
-    clientId
+    engagementId
   } = req.body;
 
-  if (!name || !clientId) {
+  if (!name || !engagementId) {
     return res.json({
-      message: 'Missing folder name or clientId.'
+      message: 'Missing folder name or engagementId.'
     });
   }
 
   try {
     const newFolder = await pool.query(
-      'INSERT INTO folders (name, client_id, is_key_folder) VALUES (?,?,?)',
-      [name, clientId, isKeyFolder]
+      'INSERT INTO folders (name, engagement_id, is_key_folder) VALUES (?,?,?)',
+      [name, engagementId, isKeyFolder]
     );
 
     const folderObject = {
       id: newFolder[0].insertId,
       name,
-      client_id: clientId,
+      engagement_id: engagementId,
       is_key_folder: isKeyFolder
     };
 

@@ -2,12 +2,12 @@ const pool = require('../../../database');
 
 module.exports = async (req, res) => {
   const {
-    clientId,
+    engagementId,
     userId,
     hasAccess = false
   } = req.body;
 
-  if (!userId || !clientId) {
+  if (!userId || !engagementId) {
     return res.json({
       message: 'Missing permissions parameters.'
     });
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   try {
 
     if (hasAccess) {
-      await pool.query('INSERT INTO client_users (client_id, user_id, role) VALUES (?,?,?)', [clientId, userId, 'member']);
+      await pool.query('INSERT INTO engagement_users (engagement_id, user_id, role) VALUES (?,?,?)', [engagementId, userId, 'member']);
     } else {
       await pool.query(
         `
@@ -24,13 +24,13 @@ module.exports = async (req, res) => {
           SET assigned_to_id = NULL
           WHERE assigned_to_id = ? AND folder_id IN 
             (
-              SELECT id FROM folders WHERE client_id = ?
+              SELECT id FROM folders WHERE engagement_id = ?
             )
         `,
-        [userId, clientId]
+        [userId, engagementId]
       );
 
-      await pool.query('DELETE FROM client_users WHERE client_id = ? AND user_id = ?', [clientId, userId]);
+      await pool.query('DELETE FROM engagement_users WHERE engagement_id = ? AND user_id = ?', [engagementId, userId]);
     }
 
     return res.json({ success: true });

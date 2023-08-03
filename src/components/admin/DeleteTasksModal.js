@@ -21,12 +21,12 @@ export default function DeleteTasksModal(props) {
 
   const {
     setTasks,
-    client,
+    engagement,
     tasksMap,
     openSnackBar
   } = useOutletContext();
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const navigate = useNavigate();
 
@@ -37,7 +37,7 @@ export default function DeleteTasksModal(props) {
 
     try {
       const result = await deleteTasks({
-        clientId,
+        engagementId,
         taskIds
       });
 

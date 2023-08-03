@@ -10,7 +10,7 @@ import { createWidget, deleteWidget, updateWidget } from "../../../api/widgets";
 export default function WidgetsTab() {
 
   const {
-    client,
+    engagement,
     openSnackBar,
     widgets,
     setWidgets
@@ -63,7 +63,7 @@ export default function WidgetsTab() {
 
     try {
       const { widget, message } = await createWidget({
-        clientId: client.id,
+        engagementId: engagement.id,
         name: widgetName,
         title: widgetTitle,
         body: widgetBody,
@@ -97,7 +97,7 @@ export default function WidgetsTab() {
     try {
       const widgetParams = {
         widgetId: selectedWidget.id,
-        clientId: client.id,
+        engagementId: engagement.id,
         name: widgetName,
         title: widgetTitle,
         body: widgetBody,
@@ -136,7 +136,7 @@ export default function WidgetsTab() {
     try {
       const { success, message } = await deleteWidget({
         widgetId: selectedWidget.id,
-        clientId: client.id
+        engagementId: engagement.id
       });
 
       if (success) {

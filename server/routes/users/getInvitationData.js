@@ -3,11 +3,11 @@ const pool = require('../../../database');
 module.exports = async (req, res) => {
   const {
     userId,
-    clientId,
+    engagementId,
     invitationCode
   } = req.query;
 
-  if (!clientId || !userId || !invitationCode) {
+  if (!engagementId || !userId || !invitationCode) {
     return res.json({
       message: 'Missing invitation params.'
     });
@@ -17,8 +17,8 @@ module.exports = async (req, res) => {
 
   try {
     const [invitationResult] = await connection.query(
-      'SELECT user_id FROM client_users WHERE client_id = ? AND user_id = ? AND invitation_code = ?',
-      [clientId, userId, invitationCode]
+      'SELECT user_id FROM engagement_users WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
+      [engagementId, userId, invitationCode]
     );
 
     const invitation = invitationResult[0];

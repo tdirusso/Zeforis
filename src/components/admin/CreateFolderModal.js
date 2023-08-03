@@ -22,12 +22,12 @@ export default function CreateFolderModal(props) {
   const [isKeyFolder, setIsKeyFolder] = useState(Boolean(willBeKey));
 
   const {
-    client, 
+    engagement, 
     setFolders,
     openSnackBar
   } = useOutletContext();
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const handleCreateFolder = async () => {
     const nameVal = name.current.value;
@@ -41,7 +41,7 @@ export default function CreateFolderModal(props) {
     try {
       const { folder, message } = await createFolder({
         name: nameVal,
-        clientId,
+        engagementId,
         isKeyFolder
       });
 

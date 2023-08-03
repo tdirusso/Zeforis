@@ -27,20 +27,20 @@ module.exports = async (req, res) => {
     const user = userResult[0];
 
     if (user) {
-      const [clientMemberData] = await pool.query(
+      const [engagementMemberData] = await pool.query(
         `
           SELECT 
-            client_users.client_id, 
-            client_users.user_id,
-            client_users.role,
+            engagement_users.engagement_id, 
+            engagement_users.user_id,
+            engagement_users.role,
             orgs.name AS org_name,
             orgs.brand_color AS org_brand,
             orgs.logo_url AS org_logo,
             orgs.id AS org_id,
-            clients.name AS client_name
-          FROM client_users
-          LEFT JOIN clients ON clients.id = client_users.client_id
-          LEFT JOIN orgs ON orgs.id = clients.org_id
+            engagements.name AS engagement_name
+          FROM engagement_users
+          LEFT JOIN engagements ON engagements.id = engagement_users.engagement_id
+          LEFT JOIN orgs ON orgs.id = engagements.org_id
           WHERE user_id = ?
         `,
         [userId]
@@ -52,8 +52,8 @@ module.exports = async (req, res) => {
       );
 
       const memberOfOrgs = {};
-      const memberOfClients = [];
-      const adminOfClients = [];
+      const memberOfEngagements = [];
+      const adminOfEngagements = [];
 
       ownedOrgsData.forEach(row => {
         memberOfOrgs[row.id] = {
@@ -64,15 +64,15 @@ module.exports = async (req, res) => {
         };
       });
 
-      clientMemberData.forEach(row => {
+      engagementMemberData.forEach(row => {
         const {
           org_id,
           org_name,
           org_brand,
           org_logo,
-          client_id,
-          client_name,
-          client_logo,
+          engagement_id,
+          engagement_name,
+          engagement_logo,
           role
         } = row;
 
@@ -83,17 +83,17 @@ module.exports = async (req, res) => {
           logo: org_logo
         };
 
-        const clientObject = {
-          id: client_id,
-          name: client_name,
-          logo: client_logo,
+        const engagementObject = {
+          id: engagement_id,
+          name: engagement_name,
+          logo: engagement_logo,
           orgId: org_id
         };
 
         if (role === 'admin') {
-          adminOfClients.push(clientObject);
+          adminOfEngagements.push(engagementObject);
         } else {
-          memberOfClients.push(clientObject);
+          memberOfEngagements.push(engagementObject);
         }
       });
 
@@ -105,8 +105,8 @@ module.exports = async (req, res) => {
           email: user.email,
           dateCreated: user.date_created,
           memberOfOrgs: Object.values(memberOfOrgs),
-          adminOfClients,
-          memberOfClients
+          adminOfEngagements,
+          memberOfEngagements
         }
       });
     }

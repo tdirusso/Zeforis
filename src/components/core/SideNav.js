@@ -12,7 +12,7 @@ import BuildIcon from '@mui/icons-material/Build';
 export default function SideNav(props) {
 
   const {
-    client,
+    engagement,
     org,
     isSideNavOpen,
     isAdmin
@@ -48,7 +48,7 @@ export default function SideNav(props) {
         <Typography
           variant="body1"
           mt={1}>
-          {client.name}
+          {engagement.name}
         </Typography>
         <Divider
           sx={{

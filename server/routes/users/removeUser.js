@@ -19,15 +19,15 @@ module.exports = async (req, res) => {
         SET assigned_to_id = NULL
         WHERE assigned_to_id = ? AND folder_id IN 
           (
-            SELECT id FROM folders WHERE client_id IN 
-            (SELECT id FROM clients WHERE org_id = ?)
+            SELECT id FROM folders WHERE engagement_id IN 
+            (SELECT id FROM engagements WHERE org_id = ?)
           )
       `,
       [userId, orgId]
     );
 
     await pool.query(
-      `DELETE FROM client_users WHERE user_id = ? AND client_id IN (SELECT id FROM clients WHERE org_id = ?)`,
+      `DELETE FROM engagement_users WHERE user_id = ? AND engagement_id IN (SELECT id FROM engagements WHERE org_id = ?)`,
       [userId, orgId]
     );
 

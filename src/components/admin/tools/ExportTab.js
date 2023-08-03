@@ -15,7 +15,7 @@ export default function ExportTab() {
 
   const {
     tasks,
-    client,
+    engagement,
     foldersMap,
     tagsMap
   } = useOutletContext();
@@ -91,7 +91,7 @@ export default function ExportTab() {
     <Grid item xs={12}>
       <Paper>
         <Typography variant="body2">
-          Click the export button below to download a CSV export of all tasks for the current client ({client.name}).
+          Click the export button below to download a CSV export of all tasks for the current engagement ({engagement.name}).
         </Typography>
         <Box mt={5} width={'100%'}>
           <LoadingButton
@@ -107,7 +107,7 @@ export default function ExportTab() {
       <CSVLink
         hidden
         ref={downloadRef}
-        filename={`${client.name} Tasks Export`}
+        filename={`${engagement.name} Tasks Export`}
         data={csvData}
         target="_blank">
       </CSVLink>

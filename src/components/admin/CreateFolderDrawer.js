@@ -12,12 +12,12 @@ export default function CreateFolderDrawer(props) {
   const {
     isOpen,
     close,
-    client,
+    engagement,
     openSnackBar,
     setFolders
   } = props;
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const name = useRef();
 
@@ -42,7 +42,7 @@ export default function CreateFolderDrawer(props) {
     try {
       const { folder, message } = await createFolder({
         name: nameVal,
-        clientId,
+        engagementId,
         isKeyFolder
       });
 

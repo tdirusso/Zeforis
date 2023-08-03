@@ -18,14 +18,14 @@ export default function DeleteFolderModal(props) {
   } = props;
 
   const {
-    client,
+    engagement,
     foldersMap,
     setFolders,
     setTasks,
     openSnackBar
   } = useOutletContext();
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const [isLoading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ export default function DeleteFolderModal(props) {
     setLoading(true);
     try {
       const { success, message } = await deleteFolder({
-        clientId,
+        engagementId,
         folderId: folder.id
       });
 

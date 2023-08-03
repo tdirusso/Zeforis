@@ -24,16 +24,16 @@ export default function EditSelectedTasksModal(props) {
   } = props;
 
   const {
-    clientAdmins,
-    clientMembers,
+    engagementAdmins,
+    engagementMembers,
     folders,
     setTasks,
-    client,
+    engagement,
     tasksMap,
     openSnackBar
   } = useOutletContext();
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const [isLoading, setLoading] = useState(false);
   const [action, setAction] = useState('');
@@ -48,7 +48,7 @@ export default function EditSelectedTasksModal(props) {
 
     try {
       const { updatedTasks, message } = await batchUpdateTasks({
-        clientId,
+        engagementId,
         taskIds,
         action,
         status,
@@ -119,7 +119,7 @@ export default function EditSelectedTasksModal(props) {
           <Autocomplete
             value={assignee}
             renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
-            options={[...clientAdmins, ...clientMembers]}
+            options={[...engagementAdmins, ...engagementMembers]}
             getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             groupBy={(option) => option.role}

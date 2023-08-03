@@ -21,8 +21,8 @@ const updateAccess = async (payload) => {
   return data;
 };
 
-const getInvitationData = async ({ userId, clientId, invitationCode }) => {
-  const { data } = await request.get(`users/invitation?userId=${userId}&clientId=${clientId}&invitationCode=${invitationCode}`);
+const getInvitationData = async ({ userId, engagementId, invitationCode }) => {
+  const { data } = await request.get(`users/invitation?userId=${userId}&engagementId=${engagementId}&invitationCode=${invitationCode}`);
   return data;
 };
 

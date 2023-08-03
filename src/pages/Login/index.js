@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
@@ -83,7 +82,7 @@ export default function LoginPage({ setTheme }) {
 
   const initializeGoogleButton = () => {
     window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+      client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
       callback: handleGoogleLogin
     });
 

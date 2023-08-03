@@ -47,8 +47,8 @@ export default function TasksFilter(props) {
 
   const {
     tags,
-    clientAdmins,
-    clientMembers,
+    engagementAdmins,
+    engagementMembers,
     folders
   } = useOutletContext();
 
@@ -102,7 +102,7 @@ export default function TasksFilter(props) {
                   <Autocomplete
                     size="small"
                     renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
-                    options={[...clientAdmins, ...clientMembers]}
+                    options={[...engagementAdmins, ...engagementMembers]}
                     getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     groupBy={(option) => option.role}

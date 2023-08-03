@@ -5,14 +5,14 @@ const fileUpload = require('express-fileupload');
 
 const login = require('./routes/users/login');
 const authenticate = require('./routes/users/authenticate');
-const createClient = require('./routes/clients/createClient');
-const getClient = require('./routes/clients/getClientData');
+const createEngagement = require('./routes/engagements/createEngagement');
+const getEngagement = require('./routes/engagements/getEngagementData');
 const createFolder = require('./routes/folders/createFolder');
-const updateClient = require('./routes/clients/updateClient');
+const updateEngagement = require('./routes/engagements/updateEngagement');
 const register = require('./routes/users/register');
 const verify = require('./routes/users/verify');
-const inviteClientUser = require('./routes/users/inviteClientUser');
-const removeClientUser = require('./routes/users/removeClientUser');
+const inviteEngagementUser = require('./routes/users/inviteEngagementUser');
+const removeEngagementUser = require('./routes/users/removeEngagementUser');
 const updateProfile = require('./routes/users/updateProfile');
 const updateFolder = require('./routes/folders/updateFolder');
 const createTask = require('./routes/tasks/createTask');
@@ -21,7 +21,7 @@ const createOrg = require('./routes/orgs/createOrg');
 const deleteTag = require('./routes/tags/deleteTag');
 const deleteTasks = require('./routes/tasks/deleteTasks');
 const deleteFolder = require('./routes/folders/deleteFolder');
-const deleteClient = require('./routes/clients/deleteClient');
+const deleteEngagement = require('./routes/engagements/deleteEngagement');
 const removeUser = require('./routes/users/removeUser');
 const updateTask = require('./routes/tasks/updateTask');
 const updatePermission = require('./routes/users/updatePermission');
@@ -65,8 +65,8 @@ const boot = async () => {
   app.post('/api/users/authenticate', authenticate);
   app.get('/api/users/verify', verify);
   app.post('/api/users/register', register);
-  app.post('/api/users/invite', checkPermissionsMW, inviteClientUser);
-  app.delete('/api/users/uninvite', checkPermissionsMW, removeClientUser);
+  app.post('/api/users/invite', checkPermissionsMW, inviteEngagementUser);
+  app.delete('/api/users/uninvite', checkPermissionsMW, removeEngagementUser);
   app.delete('/api/users', checkPermissionsMW, removeUser);
   app.patch('/api/users', checkAuth, updateProfile);
   app.patch('/api/users/permissions', checkPermissionsMW, updatePermission);
@@ -75,10 +75,10 @@ const boot = async () => {
   app.get('/api/users/invitation', getInvitationData);
   app.post('/api/users/sendPasswordResetLink', sendPasswordResetLink);
 
-  app.post('/api/clients', checkPermissionsMW, createClient);
-  app.get('/api/clients', checkAuth, getClient);
-  app.patch('/api/clients', checkPermissionsMW, updateClient);
-  app.delete('/api/clients', checkPermissionsMW, deleteClient);
+  app.post('/api/engagements', checkPermissionsMW, createEngagement);
+  app.get('/api/engagements', checkAuth, getEngagement);
+  app.patch('/api/engagements', checkPermissionsMW, updateEngagement);
+  app.delete('/api/engagements', checkPermissionsMW, deleteEngagement);
 
   app.post('/api/folders', checkPermissionsMW, createFolder);
   app.delete('/api/folders', checkPermissionsMW, deleteFolder);

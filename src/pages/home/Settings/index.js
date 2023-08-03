@@ -2,7 +2,7 @@
 import { Box, Button, Grid, Paper } from "@mui/material";
 import React, { useState } from "react";
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import ClientTab from "../../../components/core/settings/client";
+import EngagementTab from "../../../components/core/settings/engagement";
 import OrgTab from "../../../components/core/settings/org";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -26,7 +26,7 @@ export default function Settings() {
   const getTabContent = () => {
     switch (tabVal) {
       case 0:
-        return <ClientTab />;
+        return <EngagementTab />;
       case 1:
         return <OrgTab />;
       case 2:
@@ -52,7 +52,7 @@ export default function Settings() {
                 color: tabVal === 0 ? 'white' : 'var(--colors-primary)'
               }}
               startIcon={<AccountBoxIcon />}>
-              Client
+              Engagement
             </Button>
           </Paper>
           <Box sx={{

@@ -18,7 +18,7 @@ export default function AcceptInvitationPage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
-  const clientId = queryParams.get('clientId');
+  const engagementId = queryParams.get('engagementId');
   const invitationCode = queryParams.get('invitationCode');
   const userId = queryParams.get('userId');
 
@@ -37,7 +37,7 @@ export default function AcceptInvitationPage() {
 
   useEffect(() => {
     setTimeout(() => {
-      if (clientId && userId && invitationCode) {
+      if (engagementId && userId && invitationCode) {
         fetchInvitationData();
       } else {
         setFetchingInvitation(false);
@@ -48,7 +48,7 @@ export default function AcceptInvitationPage() {
       try {
         const { invitation } = await getInvitationData({
           userId,
-          clientId,
+          engagementId,
           invitationCode
         });
 
@@ -64,7 +64,7 @@ export default function AcceptInvitationPage() {
 
             setTimeout(() => {
               window.google.accounts.id.initialize({
-                client_id: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+                client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
                 callback: handleGoogleRegistration
               });
 
@@ -104,7 +104,7 @@ export default function AcceptInvitationPage() {
     try {
       const { success, message } = await updatePassword({
         password: passwordVal,
-        clientId,
+        engagementId,
         userId,
         invitationCode,
         type: 'complete-registration'

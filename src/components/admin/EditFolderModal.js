@@ -21,7 +21,7 @@ export default function EditFolderModal(props) {
   const [isKeyFolder, setIsKeyFolder] = useState(Boolean(folder?.is_key_folder));
 
   const {
-    client,
+    engagement,
     setFolders,
     foldersMap,
     openSnackBar
@@ -31,7 +31,7 @@ export default function EditFolderModal(props) {
     setIsKeyFolder(Boolean(folder?.is_key_folder));
   }, [folder]);
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
 
   const handleUpdateFolder = async () => {
@@ -47,7 +47,7 @@ export default function EditFolderModal(props) {
     try {
       const { updatedFolder, message } = await updateFolder({
         name: nameVal,
-        clientId,
+        engagementId,
         isKeyFolder,
         folderId: folder.id
       });

@@ -14,13 +14,13 @@ export default function EditUserPermissionsModal(props) {
     user
   } = props;
 
-  const memberOfClientIds = user?.memberOfClients.map(({ id }) => id) || [];
-  const adminOfClientIds = user?.adminOfClients.map(({ id }) => id) || [];
+  const memberOfEngagementIds = user?.memberOfEngagements.map(({ id }) => id) || [];
+  const adminOfEngagementIds = user?.adminOfEngagements.map(({ id }) => id) || [];
 
   const [isLoading, setLoading] = useState(false);
 
   const {
-    clients,
+    engagements,
     setOrgUsers,
     orgUsersMap,
     openSnackBar
@@ -28,31 +28,31 @@ export default function EditUserPermissionsModal(props) {
 
   const theUser = orgUsersMap[user?.id];
 
-  const handleUpdatePermission = async (isAdmin, clientObject) => {
+  const handleUpdatePermission = async (isAdmin, engagementObject) => {
     setLoading(true);
 
-    const clientId = clientObject.id;
-    const clientName = clientObject.name;
+    const engagementId = engagementObject.id;
+    const engagementName = engagementObject.name;
 
     try {
       const { success, message } = await updatePermission({
         isAdmin,
-        clientId,
+        engagementId,
         userId: user.id
       });
 
       if (success) {
         if (isAdmin) {
-          theUser.memberOfClients = theUser.memberOfClients.filter(c => c.id !== clientId);
-          theUser.adminOfClients.push({
-            id: clientId,
-            name: clientName
+          theUser.memberOfEngagements = theUser.memberOfEngagements.filter(c => c.id !== engagementId);
+          theUser.adminOfEngagements.push({
+            id: engagementId,
+            name: engagementName
           });
         } else {
-          theUser.adminOfClients = theUser.adminOfClients.filter(c => c.id !== clientId);
-          theUser.memberOfClients.push({
-            id: clientId,
-            name: clientName
+          theUser.adminOfEngagements = theUser.adminOfEngagements.filter(c => c.id !== engagementId);
+          theUser.memberOfEngagements.push({
+            id: engagementId,
+            name: engagementName
           });
         }
 
@@ -69,28 +69,28 @@ export default function EditUserPermissionsModal(props) {
     }
   };
 
-  const handleUpdateAccess = async (hasAccess, clientObject) => {
+  const handleUpdateAccess = async (hasAccess, engagementObject) => {
     setLoading(true);
 
-    const clientId = clientObject.id;
-    const clientName = clientObject.name;
+    const engagementId = engagementObject.id;
+    const engagementName = engagementObject.name;
 
     try {
       const { success, message } = await updateAccess({
         hasAccess,
-        clientId,
+        engagementId,
         userId: user.id
       });
 
       if (success) {
         if (hasAccess) {
-          theUser.memberOfClients.push({
-            id: clientId,
-            name: clientName
+          theUser.memberOfEngagements.push({
+            id: engagementId,
+            name: engagementName
           });
         } else {
-          theUser.adminOfClients = theUser.adminOfClients.filter(c => c.id !== clientId);
-          theUser.memberOfClients = theUser.memberOfClients.filter(c => c.id !== clientId);
+          theUser.adminOfEngagements = theUser.adminOfEngagements.filter(c => c.id !== engagementId);
+          theUser.memberOfEngagements = theUser.memberOfEngagements.filter(c => c.id !== engagementId);
         }
 
         setOrgUsers(Object.values(orgUsersMap));
@@ -128,14 +128,14 @@ export default function EditUserPermissionsModal(props) {
             />
           </DialogContentText>
           <Typography variant='body2' mt={2}>
-            Removing access entirely will automatically unassign all tasks to this user for the associated client.
+            Removing access entirely will automatically unassign all tasks to this user for the associated engagement.
           </Typography>
           <Box
             mt={3}
             display="flex"
             alignItems="center">
             <Box component="h5" flexBasis="33%" >
-              Client
+              Engagement
             </Box>
             <Box component="h5" flexBasis="33%" textAlign='center'>
               Access
@@ -146,33 +146,33 @@ export default function EditUserPermissionsModal(props) {
           </Box>
           <Divider sx={{ my: 1 }} />
           {
-            clients.map(client => {
-              const isMember = memberOfClientIds.includes(client.id);
-              const isAdmin = adminOfClientIds.includes(client.id);
+            engagements.map(engagement => {
+              const isMember = memberOfEngagementIds.includes(engagement.id);
+              const isAdmin = adminOfEngagementIds.includes(engagement.id);
 
-              let clientName = client.name;
-              if (clientName.length > 30) {
-                clientName = clientName.substring(0, 40) + '...';
+              let engagementName = engagement.name;
+              if (engagementName.length > 30) {
+                engagementName = engagementName.substring(0, 40) + '...';
               }
 
               return (
                 <Box
                   display="flex"
                   alignItems="center"
-                  key={client.id}>
+                  key={engagement.id}>
                   <Typography flexBasis="33%">
-                    {clientName}
+                    {engagementName}
                   </Typography>
                   <Box flexBasis='33%' textAlign='center'>
                     <Checkbox
                       checked={isMember || isAdmin}
-                      onChange={(_, isChecked) => handleUpdateAccess(isChecked, client)}
+                      onChange={(_, isChecked) => handleUpdateAccess(isChecked, engagement)}
                     />
                   </Box>
                   <Box flexBasis='33%' textAlign='center'>
                     <Switch
                       disabled={!isMember && !isAdmin}
-                      onChange={(_, isChecked) => handleUpdatePermission(isChecked, client)}
+                      onChange={(_, isChecked) => handleUpdatePermission(isChecked, engagement)}
                       checked={isAdmin}
                     />
                   </Box>

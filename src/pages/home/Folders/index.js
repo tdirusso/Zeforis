@@ -36,7 +36,7 @@ export default function FoldersPage() {
   };
 
   const {
-    client,
+    engagement,
     folders,
     isAdmin,
     openDrawer
@@ -149,7 +149,7 @@ export default function FoldersPage() {
       <CreateFolderModal
         open={createFolderModalOpen}
         setOpen={setCreateFolderModalOpen}
-        clientId={client.id}
+        engagementId={engagement.id}
       />
 
       <EditFolderModal

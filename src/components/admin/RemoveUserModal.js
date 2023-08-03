@@ -5,7 +5,7 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeUser } from '../../api/clients';
+import { removeUser } from '../../api/engagements';
 import { useOutletContext } from 'react-router-dom';
 
 export default function RemoveUserModal({ open, setOpen, user }) {
@@ -64,7 +64,7 @@ export default function RemoveUserModal({ open, setOpen, user }) {
             Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>
             <br></br>
             <br></br>
-            Proceeding will remove them from all clients within {orgName} and unassign all tasks that are currently assigned to them.
+            Proceeding will remove them from all engagements within {orgName} and unassign all tasks that are currently assigned to them.
           </DialogContentText>
           <DialogActions sx={{ p: 0 }}>
             <Button

@@ -15,7 +15,7 @@ if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
-const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID);
+const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
 module.exports = async (req, res) => {
   const {
@@ -39,9 +39,9 @@ module.exports = async (req, res) => {
   try {
 
     if (googleCredential) {
-      const ticket = await client.verifyIdToken({
+      const ticket = await authClient.verifyIdToken({
         idToken: googleCredential,
-        audience: process.env.REACT_APP_GOOGLE_OATH_CLIENT_ID,
+        audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
       });
 
       const payload = ticket.getPayload();

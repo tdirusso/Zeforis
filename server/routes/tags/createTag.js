@@ -3,10 +3,10 @@ const pool = require('../../../database');
 module.exports = async (req, res) => {
   const {
     name,
-    clientId
+    engagementId
   } = req.body;
 
-  if (!clientId || !name) {
+  if (!engagementId || !name) {
     return res.json({
       message: 'Missing tag parameters.'
     });
@@ -15,8 +15,8 @@ module.exports = async (req, res) => {
   try {
 
     const newTag = await pool.query(
-      'INSERT INTO tags (name, client_id) VALUES (?,?)',
-      [name, clientId]
+      'INSERT INTO tags (name, engagement_id) VALUES (?,?)',
+      [name, engagementId]
     );
 
     const newTagId = newTag[0].insertId;
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     const tagObject = {
       name,
       id: newTagId,
-      client_id: clientId
+      engagement_id: engagementId
     };
 
     return res.json({

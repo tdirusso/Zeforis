@@ -30,12 +30,12 @@ module.exports = async (req, res) => {
 async function handleUpdatePassword(req, res) {
   const {
     userId,
-    clientId,
+    engagementId,
     invitationCode,
     password
   } = req.body;
 
-  if (!userId || !password || !invitationCode || !clientId) {
+  if (!userId || !password || !invitationCode || !engagementId) {
     return res.json({ message: 'Missing password update parameters.' });
   }
 
@@ -51,8 +51,8 @@ async function handleUpdatePassword(req, res) {
     }
 
     const [invitationResult] = await pool.query(
-      'SELECT user_id FROM client_users WHERE client_id = ? AND user_id = ? AND invitation_code = ?',
-      [clientId, userId, invitationCode]
+      'SELECT user_id FROM engagement_users WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
+      [engagementId, userId, invitationCode]
     );
 
     const invitation = invitationResult[0];

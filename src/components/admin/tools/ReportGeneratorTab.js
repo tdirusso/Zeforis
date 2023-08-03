@@ -127,11 +127,11 @@ export default function ReportGeneratorTab() {
       <Grid item xs={12}>
         <Paper>
           <Typography variant="body2">
-            The Report Generator is a powerful tool allows you to effortlessly customize and generate reports for efficient client communications.
-            You can define date ranges and select relevant fields to curate a report that provides valuable task insights to your client.
+            The Report Generator is a powerful tool allows you to effortlessly customize and generate reports for efficient engagement communications.
+            You can define date ranges and select relevant fields to curate a report that provides valuable task insights to your engagement.
             <br></br><br></br>
             Our generator includes seamless integration with
-            your organization's brand, ensuring consistent and professional representation to your clients.
+            your organization's brand, ensuring consistent and professional representation to your engagements.
             <br></br><br></br>
             After generating the report, it will be displayed below in-line where it can then be copied into emails and other documents.
           </Typography>
@@ -295,7 +295,7 @@ function ReportDataPage(props) {
 
   const {
     org,
-    client
+    engagement
   } = useOutletContext();
 
   const copyReport = async () => {
@@ -332,7 +332,7 @@ function ReportDataPage(props) {
         <Divider sx={{ my: 4 }} />
         <Box ref={reportContainer}>
           <img src={org.logo} alt="" width={200} />
-          <Box component="h2">{client.name} Update</Box>
+          <Box component="h2">{engagement.name} Update</Box>
           <Box component="h4" mt={1}>
             {start.format('MM/DD/YYYY')} &ndash; {end.format('MM/DD/YYYY')}
           </Box>

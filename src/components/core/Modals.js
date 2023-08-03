@@ -1,4 +1,4 @@
-import DeleteClientModal from "../admin/DeleteClientModal";
+import DeleteEngagementModal from "../admin/DeleteEngagementModal";
 import SearchModal from "./SearchModal";
 
 export default function Modals(props) {
@@ -15,8 +15,8 @@ export default function Modals(props) {
         {...props}
       />
 
-      <DeleteClientModal
-        isOpen={modalToOpen === 'delete-client'}
+      <DeleteEngagementModal
+        isOpen={modalToOpen === 'delete-engagement'}
         close={closeModal}
         {...props}
       />

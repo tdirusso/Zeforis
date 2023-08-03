@@ -4,11 +4,11 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid, createTheme } from "@mui/material";
-import SelectClientScreen from "../../components/core/SelectClientScreen";
+import SelectEngagementScreen from "../../components/core/SelectEngagementScreen";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { getActiveClientId, getClientData, getUserClientListForOrg, setActiveClientId } from "../../api/clients";
-import CreateClientScreen from "../../components/admin/CreateClientScreen";
+import { getActiveEngagementId, getEngagementData, getUserEngagementListForOrg, setActiveEngagementId } from "../../api/engagements";
+import CreateEngagementScreen from "../../components/admin/CreateEngagementScreen";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import SelectOrgModal from "../../components/core/SelectOrgModal";
 import Loader from "../../components/core/Loader";
@@ -21,33 +21,35 @@ import Drawers from "../../components/core/Drawers";
 import useDrawer from "../../hooks/useDrawer";
 import useSideNav from "../../hooks/useSideNav";
 import { hexToRgb } from "../../lib/utils";
+import useDialog from "../../hooks/useDialog";
+import Dialogs from "../../components/core/Dialogs";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
   const orgIdPassed = queryParams.get('orgId');
-  const clientIdPassed = queryParams.get('clientId');
+  const engagementIdPassed = queryParams.get('engagementId');
 
-  if (orgIdPassed && clientIdPassed) {
+  if (orgIdPassed && engagementIdPassed) {
     setActiveOrgId(orgIdPassed);
-    setActiveClientId(clientIdPassed);
+    setActiveEngagementId(engagementIdPassed);
     window.location = window.location.href.split('?')[0];
   }
 
   let activeOrgId = getActiveOrgId();
-  let activeClientId = getActiveClientId();
+  let activeEngagementId = getActiveEngagementId();
 
   const { user, authError, setUser } = useAuth();
   const [isLoading, setLoading] = useState(true);
-  const [client, setClient] = useState(null);
+  const [engagement, setEngagement] = useState(null);
   const [org, setOrg] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [tags, setTags] = useState([]);
   const [widgets, setWidgets] = useState([]);
   const [orgUsers, setOrgUsers] = useState([]);
-  const [triedOrgAndClient, setTriedOrgAndClient] = useState(false);
+  const [triedOrgAndEngagement, setTriedOrgAndEngagement] = useState(false);
 
   const {
     isOpen,
@@ -75,6 +77,13 @@ export default function Home({ setTheme }) {
     closeDrawer
   } = useDrawer();
 
+  const {
+    dialogToOpen,
+    dialogProps,
+    openDialog,
+    closeDialog
+  } = useDialog();
+
   useEffect(() => {
     if (user) {
       if (activeOrgId) {
@@ -93,39 +102,39 @@ export default function Home({ setTheme }) {
         }
       }
 
-      if (activeClientId) {
-        const activeClient = user.adminOfClients.concat(user.memberOfClients).find(client => {
-          return client.id === activeClientId;
+      if (activeEngagementId) {
+        const activeEngagement = user.adminOfEngagements.concat(user.memberOfEngagements).find(engagement => {
+          return engagement.id === activeEngagementId;
         });
 
-        if (activeClient) {
-          setClient(activeClient);
+        if (activeEngagement) {
+          setEngagement(activeEngagement);
         }
       }
 
-      setTriedOrgAndClient(true);
+      setTriedOrgAndEngagement(true);
     } else if (authError) {
       openSnackBar(authError, 'error');
     }
   }, [user, authError]);
 
   useEffect(() => {
-    if (triedOrgAndClient) {
-      if (client && tasks.length === 0) {
+    if (triedOrgAndEngagement) {
+      if (engagement && tasks.length === 0) {
         document.addEventListener('keyup', e => {
           if (e.key === 'Escape') {
             closeDrawer();
           }
         });
 
-        fetchClientData();
-      } else if (!client) {
+        fetchEngagementData();
+      } else if (!engagement) {
         setLoading(false);
       }
     }
 
-    async function fetchClientData() {
-      const result = await getClientData(client.id, org.id);
+    async function fetchEngagementData() {
+      const result = await getEngagementData(engagement.id, org.id);
       setTasks(result.tasks);
       setFolders(result.folders);
       setTags(result.tags);
@@ -133,7 +142,7 @@ export default function Home({ setTheme }) {
       setWidgets(result.widgets);
       setLoading(false);
     }
-  }, [triedOrgAndClient]);
+  }, [triedOrgAndEngagement]);
 
   const foldersMap = {};
   const tasksMap = {};
@@ -162,17 +171,17 @@ export default function Home({ setTheme }) {
   const sortedWidgets = widgets.sort((a, b) => a.name.localeCompare(b.name));
 
   let isAdmin = false;
-  const clientMembers = [];
-  const clientAdmins = [];
+  const engagementMembers = [];
+  const engagementAdmins = [];
 
   orgUsers.forEach(orgUser => {
-    if (orgUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientAdmins.push({ ...orgUser, role: 'Administrator' });
+    if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
+      engagementAdmins.push({ ...orgUser, role: 'Administrator' });
       if (orgUser.id === user.id) isAdmin = true;
     }
 
-    if (orgUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientMembers.push({ ...orgUser, role: 'Member' });
+    if (orgUser.memberOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
+      engagementMembers.push({ ...orgUser, role: 'Member' });
     }
   });
 
@@ -205,26 +214,26 @@ export default function Home({ setTheme }) {
     }
   }
 
-  const clients = getUserClientListForOrg(user, activeOrgId);
+  const engagements = getUserEngagementListForOrg(user, activeOrgId);
 
-  if (clients.length === 0) {
+  if (engagements.length === 0) {
     return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
-        <CreateClientScreen org={org} />
+        <CreateEngagementScreen org={org} />
       </Box>
     );
   }
 
-  if (!client) {
-    if (clients.length === 1) {
-      setActiveClientId(clients[0].id);
-      setClient(clients[0]);
+  if (!engagement) {
+    if (engagements.length === 1) {
+      setActiveEngagementId(engagements[0].id);
+      setEngagement(engagements[0]);
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectClientScreen
-            client={client}
-            clients={clients}
+          <SelectEngagementScreen
+            engagement={engagement}
+            engagements={engagements}
           />
         </Box>
       );
@@ -232,15 +241,15 @@ export default function Home({ setTheme }) {
   }
 
   const context = {
-    client,
-    clients,
+    engagement,
+    engagements,
     org,
     user,
     folders: sortedFolders,
     tasks: sortedTasks,
     tags: sortedTags,
-    clientMembers,
-    clientAdmins,
+    engagementMembers,
+    engagementAdmins,
     orgUsers,
     orgUsersMap,
     tagsMap,
@@ -250,7 +259,7 @@ export default function Home({ setTheme }) {
     widgets: sortedWidgets,
     setTheme,
     setTags,
-    setClient,
+    setEngagement,
     setOrg,
     setTasks,
     setFolders,
@@ -266,7 +275,7 @@ export default function Home({ setTheme }) {
     <Box>
       <SideNav
         org={org}
-        client={client}
+        engagement={engagement}
         isSideNavOpen={isSideNavOpen}
         isAdmin={isAdmin}
       />
@@ -285,9 +294,10 @@ export default function Home({ setTheme }) {
               isAdmin={isAdmin}
               user={user}
               org={org}
-              client={client}
+              engagement={engagement}
               openModal={openModal}
               openDrawer={openDrawer}
+              openDialog={openDialog}
               toggleSideNav={toggleSideNav}
               isSideNavOpen={isSideNavOpen}
             />
@@ -305,6 +315,14 @@ export default function Home({ setTheme }) {
               drawerToOpen={drawerToOpen}
               closeDrawer={closeDrawer}
             />
+
+            <Dialogs
+              {...context}
+              {...dialogProps}
+              dialogToOpen={dialogToOpen}
+              closeDialog={closeDialog}
+            />
+
             <Outlet context={context} />
           </Grid>
         </Box>

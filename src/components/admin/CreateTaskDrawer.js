@@ -19,9 +19,9 @@ export default function CreateTaskDrawer(props) {
     close,
     defaultFolder,
     folders,
-    clientMembers,
-    clientAdmins,
-    client,
+    engagementMembers,
+    engagementAdmins,
+    engagement,
     tags,
     setTags,
     setTasks,
@@ -29,7 +29,7 @@ export default function CreateTaskDrawer(props) {
     openSnackBar
   } = props;
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const name = useRef();
   const linkUrl = useRef();
@@ -38,7 +38,7 @@ export default function CreateTaskDrawer(props) {
   const [selectedTags, setSelectedTags] = useState([]);
   const [assignedTo, setAssignedTo] = useState(null);
   const [folder, setFolder] = useState(defaultFolder || null);
-  const [membersAndAdmins] = useState([...clientAdmins, ...clientMembers]);
+  const [membersAndAdmins] = useState([...engagementAdmins, ...engagementMembers]);
 
   useEffect(() => {
     setFolder(defaultFolder || null);
@@ -75,7 +75,7 @@ export default function CreateTaskDrawer(props) {
         linkUrl: linkVal,
         assignedToId,
         folderId,
-        clientId,
+        engagementId,
         tags: selectedTags
       });
 
@@ -136,7 +136,7 @@ export default function CreateTaskDrawer(props) {
     if (key === 'Enter' && newTagValue) {
       const result = await createTag({
         name: newTagValue,
-        clientId
+        engagementId
       });
 
       if (result.success) {

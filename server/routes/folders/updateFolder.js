@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
     name,
     isKeyFolder,
     folderId,
-    clientId
+    engagementId
   } = req.body;
 
   if (!name || !folderId) {
@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
     const folderObject = {
       id: folderId,
       name,
-      client_id: clientId,
+      engagement_id: engagementId,
       is_key_folder: isKeyFolder
     };
 

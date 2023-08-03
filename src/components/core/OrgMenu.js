@@ -15,7 +15,7 @@ export default function OrgMenu(props) {
 
 
   useEffect(() => {
-    //need this update since the org ID is programatically reset when drawer to change org/client is cloesd
+    //need this update since the org ID is programatically reset when drawer to change org/engagement is cloesd
     if (curOrgId) {
       setOrgId(curOrgId);
     } else {

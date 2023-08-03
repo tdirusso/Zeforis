@@ -29,10 +29,10 @@ export default function ImportTab() {
     tags,
     folders,
     openSnackBar,
-    client
+    engagement
   } = useOutletContext();
 
-  const clientId = client.id;
+  const engagementId = engagement.id;
 
   const [importData, setImportData] = useState(null);
   const [createNewFolders, setCreateNewFolders] = useState(true);
@@ -148,7 +148,7 @@ export default function ImportTab() {
 
     try {
       const { success, message } = await importTasks({
-        clientId,
+        engagementId,
         importRows: importData.importRows
       });
 
@@ -184,7 +184,7 @@ export default function ImportTab() {
     <Grid item xs={12}>
       <Paper>
         <Typography variant="body2">
-          The import tool is designed to simplify and expedite the process of adding tasks for your clients. With just a few clicks, you can seamlessly import a CSV spreadsheet containing a list of tasks specific to a particular client, saving you valuable time and effort.
+          The import tool is designed to simplify and expedite the process of adding tasks for your engagements. With just a few clicks, you can seamlessly import a CSV spreadsheet containing a list of tasks specific to a particular engagement, saving you valuable time and effort.
           <br></br><br></br>
           Experience the efficiency and convenience of our import tool by simply uploading a spreadsheet (.csv format) with the relevant column headers, or download and fill out the template.
           <br></br><br></br>

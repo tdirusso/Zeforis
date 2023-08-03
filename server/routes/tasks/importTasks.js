@@ -3,13 +3,13 @@ const moment = require('moment');
 
 module.exports = async (req, res) => {
   const {
-    clientId,
+    engagementId,
     importRows = []
   } = req.body;
 
   const creatorUserId = req.userId;
 
-  if (!clientId || !importRows.length === 0) {
+  if (!engagementId || !importRows.length === 0) {
     return res.json({
       message: 'Missing import parameters.'
     });
@@ -19,13 +19,13 @@ module.exports = async (req, res) => {
 
   try {
     const [existingFolders] = await connection.query(
-      `SELECT id, name FROM folders WHERE client_id = ?`,
-      [clientId]
+      `SELECT id, name FROM folders WHERE engagement_id = ?`,
+      [engagementId]
     );
 
     const [existingTags] = await connection.query(
-      `SELECT id, name FROM tags WHERE client_id = ?`,
-      [clientId]
+      `SELECT id, name FROM tags WHERE engagement_id = ?`,
+      [engagementId]
     );
 
     const folderNameToIdMap = {};
@@ -60,12 +60,12 @@ module.exports = async (req, res) => {
     const foldersArray = [...newFoldersSet];
     const tagsArray = [...newTagsSet];
 
-    const folderInsertVals = foldersArray.map(folder => [folder, clientId]);
-    const tagsInsertVals = tagsArray.map(tag => [tag, clientId]);
+    const folderInsertVals = foldersArray.map(folder => [folder, engagementId]);
+    const tagsInsertVals = tagsArray.map(tag => [tag, engagementId]);
 
     if (folderInsertVals.length > 0) {
       const insertResult = await connection.query(
-        `INSERT INTO folders (name, client_id) VALUES ?`,
+        `INSERT INTO folders (name, engagement_id) VALUES ?`,
         [folderInsertVals]
       );
 
@@ -75,7 +75,7 @@ module.exports = async (req, res) => {
 
     if (tagsInsertVals.length > 0) {
       const insertResult = await connection.query(
-        `INSERT INTO tags (name, client_id) VALUES ?`,
+        `INSERT INTO tags (name, engagement_id) VALUES ?`,
         [tagsInsertVals]
       );
 

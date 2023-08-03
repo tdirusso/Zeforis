@@ -2,7 +2,7 @@ const pool = require('../../../database');
 
 module.exports = async (req, res) => {
   const {
-    clientId,
+    engagementId,
     name,
     title = '',
     body = '',
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
     const newWidget = await pool.query(
       `INSERT INTO widgets 
         (
-          client_id,
+          engagement_id,
           name,
           title,
           body, 
@@ -31,14 +31,14 @@ module.exports = async (req, res) => {
         ) 
         VALUES
         (?,?,?,?,?,?,?)`,
-      [clientId, name, title, body, isEnabled, backgroundColor, textColor]
+      [engagementId, name, title, body, isEnabled, backgroundColor, textColor]
     );
 
     const newWidgetId = newWidget[0].insertId;
 
     const widgetObject = {
       id: newWidgetId,
-      clientId,
+      engagementId,
       name,
       title,
       body,
