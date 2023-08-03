@@ -107,7 +107,7 @@ export default function AcceptInvitationPage() {
         clientId,
         userId,
         invitationCode,
-        resetType: 'invitation'
+        type: 'complete-registration'
       });
 
       if (success) {

@@ -14,7 +14,7 @@ import { Button, Divider } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { sendPasswordResetLink } from "../../api/users";
+import { sendPasswordResetLink, updatePassword } from "../../api/users";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
@@ -23,14 +23,8 @@ export default function PasswordResetPage() {
   const { search } = useLocation();
   const searchParams = new URLSearchParams(search);
 
-  const emailParam = searchParams.get('email');
-  const resetCodeParam = searchParams.get('resetCode');
-
-  const [email, setEmail] = useState(emailParam);
-  const [resetCode, setResetCode] = useState(resetCodeParam);
-  const [password, setPassword] = useState('');
-  const [passwordMatch, setPasswordMatch] = useState('');
-  const [isLoading, setLoading] = useState(false);
+  const email = searchParams.get('email');
+  const resetCode = searchParams.get('resetCode');
 
   const {
     isOpen,
@@ -38,43 +32,6 @@ export default function PasswordResetPage() {
     type,
     message
   } = useSnackbar();
-
-  const navigate = useNavigate();
-
-  const handleLogin = async e => {
-    e.preventDefault();
-
-    const emailVal = email.current.value;
-    const passwordVal = password.current.value;
-
-    if (!emailVal) {
-      openSnackBar('Please enter a valid email address');
-      return;
-    }
-
-    if (!passwordVal) {
-      openSnackBar('Please enter your password');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const result = await login({
-        email: emailVal,
-        password: passwordVal
-      });
-
-      if (result.token) {
-        navigate('/home/dashboard');
-      } else {
-        setLoading(false);
-        openSnackBar(result.message, 'error');
-      }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-    }
-  };
 
   return (
     <Box className="Login flex-centered">
@@ -98,54 +55,10 @@ export default function PasswordResetPage() {
           Password Reset
         </Typography>
         {
-          !emailParam || !resetCodeParam ?
+          !email || !resetCode ?
             <PasswordResetStep1 openSnackBar={openSnackBar} /> :
-            <PasswordResetStep2 />
+            <PasswordResetStep2 openSnackBar={openSnackBar} email={email} resetCode={resetCode} />
         }
-        {/* <form onSubmit={handleLogin}>
-          <TextField
-            placeholder="Email"
-            variant="outlined"
-            sx={{ mb: 4 }}
-            type="email"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MailOutlineIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
-            inputRef={email}
-            disabled={isLoading}
-            autoFocus
-          />
-          <TextField
-            placeholder="Password"
-            variant="outlined"
-            type="password"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <VpnKeyIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
-            sx={{ mb: 4 }}
-            inputRef={password}
-            disabled={isLoading}
-          />
-
-          <LoadingButton
-            loading={isLoading}
-            disabled={isLoading}
-            fullWidth
-            size="large"
-            sx={{ py: 1.3 }}
-            variant="contained"
-            type="submit">
-            Sign in
-          </LoadingButton>
-        </form> */}
       </Paper>
       <Box className="circle"></Box>
       <Snackbar
@@ -185,6 +98,7 @@ function PasswordResetStep1({ openSnackBar }) {
             setSentResetLink(true);
           }
         } else {
+          setSendingResetLink(true);
           openSnackBar(message, 'error');
         }
       } catch (error) {
@@ -233,6 +147,84 @@ function PasswordResetStep1({ openSnackBar }) {
   );
 }
 
-function PasswordResetStep2() {
+function PasswordResetStep2({ openSnackBar, email, resetCode }) {
+  const [password, setPassword] = useState('');
+  const [isResettingPassword, setResettingPassword] = useState(false);
+  const [passwordReset, setPasswordReset] = useState(false);
 
+  const handleResetPassword = e => {
+    e.preventDefault();
+
+    if (!email || !resetCode) {
+      openSnackBar('Error processing request.');
+      return;
+    }
+
+    if (!password) {
+      openSnackBar('Please enter your password.');
+      return;
+    }
+
+    setResettingPassword(true);
+
+    setTimeout(async () => {
+      try {
+        const { success, message } = await updatePassword({
+          email,
+          password,
+          resetCode,
+          type: 'reset'
+        });
+
+        if (success) {
+          setPasswordReset(true);
+        } else {
+          setResettingPassword(false);
+          openSnackBar(message);
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+        setResettingPassword(false);
+      }
+    }, 1000);
+  };
+
+  return (
+    <>
+      <form onSubmit={handleResetPassword} hidden={passwordReset}>
+        <TextField
+          placeholder="New password"
+          variant="outlined"
+          type="password"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <VpnKeyIcon htmlColor="#cbcbcb" />
+              </InputAdornment>
+            )
+          }}
+          sx={{ mb: 4 }}
+          disabled={isResettingPassword}
+          autoFocus
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+
+        <LoadingButton
+          loading={isResettingPassword}
+          fullWidth
+          size="large"
+          sx={{ py: 1.3 }}
+          variant="contained"
+          startIcon={<SendRoundedIcon />}
+          type="submit">
+          Reset password
+        </LoadingButton>
+      </form>
+      <Typography sx={{ display: 'flex', alignItems: 'center' }} hidden={!passwordReset}>
+        <CheckCircleRoundedIcon htmlColor="#4caf50" />
+        &nbsp;Password successfully reset.
+      </Typography>
+    </>
+  );
 }
