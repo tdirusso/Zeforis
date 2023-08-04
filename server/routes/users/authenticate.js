@@ -42,12 +42,13 @@ module.exports = async (req, res) => {
           LEFT JOIN engagements ON engagements.id = engagement_users.engagement_id
           LEFT JOIN orgs ON orgs.id = engagements.org_id
           WHERE user_id = ?
+          ORDER BY engagement_name
         `,
         [userId]
       );
 
       const [ownedOrgsData] = await pool.query(
-        'SELECT id, name, brand_color, logo_url, owner_id FROM orgs WHERE owner_id = ?',
+        'SELECT id, name, brand_color, logo_url, owner_id FROM orgs WHERE owner_id = ? ORDER BY name',
         [userId]
       );
 

@@ -61,7 +61,6 @@ export default function Header(props) {
   const openChangeOrgOrEngagement = () => {
     setAnchorEl(null);
     openDialog('change-engagement');
-    //openDrawer('change-org-or-engagement');
   };
 
   const openCreateFolderDrawer = () => {

@@ -42,7 +42,7 @@ export default function UsersTab() {
         </Box>
         <List dense>
           {
-            orgUsers.sort((a, b) => (a.firstName || '').localeCompare(b.firstName || '')).map((orgUser, index) => {
+            orgUsers.map((orgUser, index) => {
               const isYou = orgUser.id === user.id;
 
               let primaryText = <span>{orgUser.firstName} {orgUser.lastName}</span>;

@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
   try {
 
     const [folders] = await connection.query(
-      'SELECT * FROM folders WHERE engagement_id = ?',
+      'SELECT * FROM folders WHERE engagement_id = ? ORDER BY folders.name',
       [engagementId]
     );
 
@@ -37,6 +37,7 @@ module.exports = async (req, res) => {
         LEFT JOIN users ON engagement_users.user_id = users.id
         LEFT JOIN orgs ON orgs.id = engagements.org_id
         WHERE engagements.org_id = ?
+        ORDER BY users.first_name
       `,
       [orgId]
     );
@@ -78,8 +79,6 @@ module.exports = async (req, res) => {
       }
     });
 
-    const sortedOrgUsers = Object.values(orgUsersMap).sort((a, b) => a.firstName.localeCompare(b.firstName));
-
     const foldersIds = folders.length > 0 ? folders.map(folder => folder.id) : null;
 
     const [tasks] = await connection.query(
@@ -113,6 +112,7 @@ module.exports = async (req, res) => {
         LEFT JOIN users as updated_by_user ON tasks.last_updated_by_id = updated_by_user.id
         WHERE tasks.folder_id IN (?)
         GROUP BY tasks.id
+        ORDER BY task_name
       `,
       [foldersIds]
     );
@@ -130,6 +130,7 @@ module.exports = async (req, res) => {
         is_enabled AS isEnabled
         FROM widgets
         WHERE engagement_id = ?
+        ORDER BY widgets.name
       `,
       [engagementId]
     );
@@ -141,7 +142,7 @@ module.exports = async (req, res) => {
       tasks,
       tags,
       widgets,
-      orgUsers: sortedOrgUsers
+      orgUsers: Object.values(orgUsersMap)
     });
 
   } catch (error) {

@@ -9,7 +9,7 @@ import { updateEngagement } from "../../../../api/engagements";
 export default function GeneralTab() {
   const {
     engagement,
-    openDrawer,
+    openDialog,
     openModal,
     openSnackBar,
     setEngagement
@@ -73,7 +73,7 @@ export default function GeneralTab() {
         <Button
           sx={{ mr: 2 }}
           variant="outlined"
-          onClick={() => openDrawer('change-org-or-engagement')}
+          onClick={() => openDialog('change-engagement')}
           startIcon={<SwapHorizOutlinedIcon />}>
           Change engagement
         </Button>

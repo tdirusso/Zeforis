@@ -121,7 +121,7 @@ export default function TaskDrawer(props) {
         id: Number(tagId),
         name: tagIdNameMap[tagId],
         engagement_id: engagementId
-      })).sort((a, b) => a.name.localeCompare(b.name)));
+      })));
     } else {
       setTask(defaultTask);
       setName('');

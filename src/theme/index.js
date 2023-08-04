@@ -53,7 +53,9 @@ const theme = {
       }
     },
     MuiButton: {
-      defaultProps: {},
+      defaultProps: {
+        disableFocusRipple: true
+      },
       styleOverrides: {
         root: {
           textTransform: 'none',
@@ -69,6 +71,7 @@ const theme = {
       }
     },
     MuiLoadingButton: {
+      defaultProps: { disableFocusRipple: true },
       styleOverrides: {
         root: {
           textTransform: 'none',
@@ -125,6 +128,9 @@ const theme = {
           }
         }
       }
+    },
+    MuiIconButton: {
+      defaultProps: { disableFocusRipple: true },
     }
   }
 };

@@ -35,9 +35,7 @@ const getUserEngagementListForOrg = (user, activeOrgId) => {
     }
   });
 
-  const sortedResult = result.sort((a, b) => a.name.localeCompare(b.name));
-
-  return sortedResult;
+  return result;
 };
 
 const deleteActiveEngagementId = () => {

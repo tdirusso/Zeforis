@@ -239,7 +239,7 @@ export default function GeneralTab() {
           Custom Login Page
         </Box>
         <Typography variant="body2">
-          The "Custom Login Page" feature provides your engagements with a custom login experience
+          The "Custom Login Page" feature provides your customers with a custom login experience
           by incorporating your branding colors and logo into the login page, delivering a professional touch.
           <br></br><br></br>
           This seamless white labeling capability enhances your brand, customer retention, marketing opportunities,
@@ -247,7 +247,7 @@ export default function GeneralTab() {
         </Typography>
         <Box my={3}>
           <TextField
-            helperText="Share this link with your engagements to provide a custom login experience with your brand."
+            helperText="Share this link with your customers to provide a custom login experience with your brand."
             value={customLoginPageUrl}
             fullWidth
             InputProps={{

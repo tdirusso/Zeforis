@@ -41,7 +41,8 @@ export default function Home({ setTheme }) {
   let activeEngagementId = getActiveEngagementId();
 
   const { user, authError, setUser } = useAuth();
-  const [isLoading, setLoading] = useState(true);
+  const [isDataFetched, setDataFetched] = useState(false);
+  const [isReadyToRender, setReadyToRender] = useState(false);
   const [engagement, setEngagement] = useState(null);
   const [org, setOrg] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -49,6 +50,13 @@ export default function Home({ setTheme }) {
   const [tags, setTags] = useState([]);
   const [widgets, setWidgets] = useState([]);
   const [orgUsers, setOrgUsers] = useState([]);
+  const [tasksMap, setTasksMap] = useState({});
+  const [tagsMap, setTagsMap] = useState({});
+  const [foldersMap, setFoldersMap] = useState({});
+  const [orgUsersMap, setOrgUsersMap] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [engagementMembers, setEngagementMembers] = useState([]);
+  const [engagementAdmins, setEngagementAdmins] = useState([]);
   const [triedOrgAndEngagement, setTriedOrgAndEngagement] = useState(false);
 
   const {
@@ -129,7 +137,7 @@ export default function Home({ setTheme }) {
 
         fetchEngagementData();
       } else if (!engagement) {
-        setLoading(false);
+        setDataFetched(true);
       }
     }
 
@@ -140,52 +148,59 @@ export default function Home({ setTheme }) {
       setTags(result.tags);
       setOrgUsers(result.orgUsers);
       setWidgets(result.widgets);
-      setLoading(false);
+      setDataFetched(true);
     }
   }, [triedOrgAndEngagement]);
 
-  const foldersMap = {};
-  const tasksMap = {};
-  const tagsMap = {};
-  const orgUsersMap = {};
+  useEffect(() => {
+    if (isDataFetched) {
+      const foldersMapResult = {};
+      folders.forEach(folder => {
+        foldersMapResult[String(folder.id)] = { ...folder, tasks: [] };
+      });
 
-  orgUsers.forEach(user => orgUsersMap[user.id] = user);
+      const tasksMapResult = {};
 
-  const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
+      tasks.forEach(task => {
+        foldersMapResult[task.folder_id].tasks.push(task);
+        tasksMapResult[task.task_id] = task;
+      });
 
-  folders.forEach(folder => {
-    foldersMap[String(folder.id)] = { ...folder, tasks: [] };
-  });
+      const tagsMapResult = {};
 
-  sortedTasks.forEach(task => {
-    foldersMap[task.folder_id].tasks.push(task);
-    tasksMap[task.task_id] = task;
-  });
+      tags.forEach(tag => {
+        tagsMapResult[tag.id] = tag;
+      });
 
-  tags.forEach(tag => {
-    tagsMap[tag.id] = tag;
-  });
+      const orgUsersMapResult = {};
+      const engagementMembersResult = [];
+      const engagementAdminsResult = [];
+      let isAdminResult = false;
 
-  const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
-  const sortedTags = Object.values(tagsMap).sort((a, b) => a.name.localeCompare(b.name));
-  const sortedWidgets = widgets.sort((a, b) => a.name.localeCompare(b.name));
+      orgUsers.forEach(orgUser => {
+        orgUsersMapResult[user.id] = orgUser;
+        if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
+          engagementAdminsResult.push({ ...orgUser, role: 'Administrator' });
+          if (orgUser.id === user.id) isAdminResult = true;
+        }
 
-  let isAdmin = false;
-  const engagementMembers = [];
-  const engagementAdmins = [];
+        if (orgUser.memberOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
+          engagementMembersResult.push({ ...orgUser, role: 'Member' });
+        }
+      });
 
-  orgUsers.forEach(orgUser => {
-    if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
-      engagementAdmins.push({ ...orgUser, role: 'Administrator' });
-      if (orgUser.id === user.id) isAdmin = true;
+      setFoldersMap(foldersMapResult);
+      setTasksMap(tasksMapResult);
+      setTagsMap(tagsMapResult);
+      setOrgUsersMap(orgUsersMapResult);
+      setEngagementMembers(engagementMembersResult);
+      setEngagementAdmins(engagementAdminsResult);
+      setIsAdmin(isAdminResult);
+      setReadyToRender(true);
     }
+  }, [tasks, folders, tags, orgUsers, isDataFetched]);
 
-    if (orgUser.memberOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
-      engagementMembers.push({ ...orgUser, role: 'Member' });
-    }
-  });
-
-  if (isLoading) {
+  if (!isReadyToRender) {
     return <Loader />;
   }
 
@@ -245,9 +260,9 @@ export default function Home({ setTheme }) {
     engagements,
     org,
     user,
-    folders: sortedFolders,
-    tasks: sortedTasks,
-    tags: sortedTags,
+    folders: Object.values(foldersMap),
+    tasks,
+    tags,
     engagementMembers,
     engagementAdmins,
     orgUsers,
@@ -256,7 +271,7 @@ export default function Home({ setTheme }) {
     foldersMap,
     tasksMap,
     isAdmin,
-    widgets: sortedWidgets,
+    widgets,
     setTheme,
     setTags,
     setEngagement,
@@ -268,7 +283,8 @@ export default function Home({ setTheme }) {
     setUser,
     openSnackBar,
     openModal,
-    openDrawer
+    openDrawer,
+    openDialog
   };
 
   return (
