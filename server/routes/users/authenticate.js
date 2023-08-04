@@ -52,17 +52,17 @@ module.exports = async (req, res) => {
         [userId]
       );
 
-      const memberOfOrgs = {};
+      const memberOfOrgs = new Map();
       const memberOfEngagements = [];
       const adminOfEngagements = [];
 
       ownedOrgsData.forEach(row => {
-        memberOfOrgs[row.id] = {
+        memberOfOrgs.set(row.id, {
           id: row.id,
           name: row.name,
           brandColor: row.brand_color,
           logo: row.logo_url
-        };
+        });
       });
 
       engagementMemberData.forEach(row => {
@@ -77,12 +77,12 @@ module.exports = async (req, res) => {
           role
         } = row;
 
-        memberOfOrgs[org_id] = {
+        memberOfOrgs.set(org_id, {
           id: org_id,
           name: org_name,
           brandColor: org_brand,
           logo: org_logo
-        };
+        });
 
         const engagementObject = {
           id: engagement_id,
@@ -105,7 +105,7 @@ module.exports = async (req, res) => {
           lastName: user.last_name,
           email: user.email,
           dateCreated: user.date_created,
-          memberOfOrgs: Object.values(memberOfOrgs),
+          memberOfOrgs: [...memberOfOrgs.values()],
           adminOfEngagements,
           memberOfEngagements
         }

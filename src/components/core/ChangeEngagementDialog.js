@@ -7,7 +7,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import './styles/ChangeEngagementDialog.css';
 import { SwapHorizOutlined } from "@mui/icons-material";
-import { setActiveEngagementId } from '../../api/engagements';
+import { deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
+import { setActiveOrgId } from '../../api/orgs';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={300} />;
@@ -19,14 +20,15 @@ export default function ChangeEngagementDialog(props) {
     close,
     engagements,
     org,
-    engagement,
     user
   } = props;
 
   const [query, setQuery] = useState('');
-  const [engagementId, setEngagementId] = useState(engagement.id);
+  const [engagementId, setEngagementId] = useState();
+  const [orgId, setOrgId] = useState();
   const [shouldAnimate, setShouldAnimate] = useState(true);
   const [isLoadingEngagement, setLoadingEngagement] = useState(false);
+  const [isLoadingOrg, setLoadingOrg] = useState(false);
   const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
 
   const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
@@ -58,19 +60,30 @@ export default function ChangeEngagementDialog(props) {
     }
   };
 
-  const handleLoadEngagement = engagementId => {
+  const handleLoadEngagement = eId => {
     setLoadingEngagement(true);
-    setEngagementId(engagementId);
+    setEngagementId(eId);
+  };
+
+  const handleLoadOrg = orgId => {
+    setLoadingOrg(true);
+    setOrgId(orgId);
   };
 
   useEffect(() => {
-    if (engagementId !== engagement.id) {
+    if (isLoadingEngagement) {
       setTimeout(() => {
         setActiveEngagementId(engagementId);
         window.location.reload();
       }, 500);
+    } else if (isLoadingOrg) {
+      setTimeout(() => {
+        setActiveOrgId(orgId);
+        deleteActiveEngagementId();
+        window.location.reload();
+      }, 500);
     }
-  }, [engagementId]);
+  }, [engagementId, orgId]);
 
   const lcQuery = query.toLowerCase();
   const filteredEngagements = query ? engagements.filter(e => e.name.toLowerCase().includes(lcQuery)) : engagements;
@@ -130,7 +143,12 @@ export default function ChangeEngagementDialog(props) {
                 autoFocus>
               </TextField>
             </Box>
-            <Box display="flex" flexWrap="wrap" justifyContent="center" mt={3} maxWidth={1200}>
+            <Box
+              display="flex"
+              flexWrap="wrap"
+              justifyContent="center"
+              mt={3}
+              maxWidth={1200}>
               {
                 filteredEngagements.map((e, index) => {
                   return (
@@ -158,12 +176,16 @@ export default function ChangeEngagementDialog(props) {
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>
         {
-          user.memberOfOrgs.map(o => {
+          user.memberOfOrgs.map(({ id, name }) => {
             return (
               <MenuItem
-                key={o.id}
-                onClick={() => { }}>
-                {o.name}
+                disabled={id === org.id}
+                selected={id === org.id}
+                key={id}
+                onClick={() => handleLoadOrg(id)}>
+                {
+                  isLoadingOrg && orgId === id ? <CircularProgress size={20} /> : name
+                }
               </MenuItem>
             );
           })
