@@ -36,6 +36,12 @@ const sendPasswordResetLink = async (payload) => {
   return data;
 };
 
+
+const resendVerificationLink = async (payload) => {
+  const { data } = await request.post(`users/resendVerificationLink`, payload);
+  return data;
+};
+
 export {
   updateProfile,
   updatePermission,
@@ -43,5 +49,6 @@ export {
   register,
   getInvitationData,
   updatePassword,
-  sendPasswordResetLink
+  sendPasswordResetLink,
+  resendVerificationLink
 };

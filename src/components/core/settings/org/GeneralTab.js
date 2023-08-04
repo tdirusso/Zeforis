@@ -13,7 +13,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 export default function GeneralTab() {
   const {
-    openDrawer,
+    openDialog,
     openSnackBar,
     setOrg,
     org,
@@ -154,9 +154,9 @@ export default function GeneralTab() {
         <Button
           sx={{ mr: 2 }}
           variant="outlined"
-          onClick={() => openDrawer('change-org-or-engagement')}
+          onClick={() => openDialog('change-engagement')}
           startIcon={<SwapHorizOutlinedIcon />}>
-          Change organization
+          Change
         </Button>
       </Box>
       <Divider sx={{ my: 4 }} />

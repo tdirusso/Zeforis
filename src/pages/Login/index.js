@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
 import { login } from "../../api/auth";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -11,7 +11,7 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import './Login.css';
-import { Button, Divider, createTheme } from "@mui/material";
+import { Button, CircularProgress, Divider, createTheme } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
@@ -19,6 +19,7 @@ import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
 import themeConfig from "../../theme";
+import { resendVerificationLink } from "../../api/users";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
@@ -27,6 +28,7 @@ export default function LoginPage({ setTheme }) {
   const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
   const [customPageData, setCustomPageData] = useState(null);
   const [isLoading, setLoading] = useState(false);
+  const [verificationContent, setVerificationContent] = useState('');
 
   const email = useRef();
   const password = useRef();
@@ -52,7 +54,6 @@ export default function LoginPage({ setTheme }) {
     } catch (error) { }
   }
 
-  const navigate = useNavigate();
 
   const handleGoogleLogin = async (authResponse) => {
     if (authResponse.credential) {
@@ -69,7 +70,7 @@ export default function LoginPage({ setTheme }) {
           if (needsCustomPage && customPageData) {
             setActiveOrgId(orgId);
           }
-          navigate('/home/dashboard');
+          window.location.href = '/home/dashboard';
         } else {
           setLoading(false);
           openSnackBar(result.message, 'error');
@@ -168,11 +169,14 @@ export default function LoginPage({ setTheme }) {
         orgId
       });
 
-      if (result.token) {
+      if (result.unverified) {
+        setLoading(false);
+        setVerificationContent(unverifiedText);
+      } else if (result.token) {
         if (needsCustomPage && customPageData) {
           setActiveOrgId(orgId);
         }
-        navigate('/home/dashboard');
+        window.location.href = '/home/dashboard';
       } else {
         setLoading(false);
         openSnackBar(result.message, 'error');
@@ -181,6 +185,44 @@ export default function LoginPage({ setTheme }) {
       openSnackBar(error.message, 'error');
     }
   };
+
+  const handleResendVerificationLink = () => {
+    const emailVal = email.current.value;
+
+    if (!emailVal) {
+      openSnackBar('Please enter a valid email address');
+      return;
+    }
+
+    setVerificationContent(<CircularProgress size={20} sx={{ mt: 1 }} />);
+
+    setTimeout(async () => {
+      try {
+        const { success, message } = await resendVerificationLink({
+          email: emailVal
+        });
+
+        setVerificationContent('');
+
+        if (success) {
+          openSnackBar('New verification link sent.', 'success');
+        } else {
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
+      }
+    }, 1000);
+  };
+
+  const unverifiedText =
+    <Typography variant="body2">
+      Your email address has not been verified.
+      <br></br>
+      Click the verification link in your email address or
+      <Button sx={{ mx: 0.2 }} size="small" onClick={handleResendVerificationLink}>click here</Button>
+      to resend a verification link.
+    </Typography>;
 
   if (needsCustomPage && !doneFetchingCustomPage) {
     return (
@@ -257,13 +299,6 @@ export default function LoginPage({ setTheme }) {
             <Box component="a" href="/password-reset" fontSize="small">
               Forgot password?
             </Box>
-            {/* <Typography
-              variant="body2"
-              component={Link}
-              to=""
-              sx={{ mb: 3, }}>
-              Forgot password?
-            </Typography> */}
           </Box>
 
           <LoadingButton
@@ -276,6 +311,9 @@ export default function LoginPage({ setTheme }) {
             type="submit">
             Sign in
           </LoadingButton>
+          <Box mt={1} hidden={!Boolean(verificationContent)}>
+            {verificationContent}
+          </Box>
           <Divider sx={{ mt: 4, mb: 4 }} />
           <Box id="google-signin"></Box>
         </form>

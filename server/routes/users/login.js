@@ -102,13 +102,15 @@ async function handleCustomPageLogin(req, res) {
       const user = userResult[0];
 
       if (user) {
-        if (!user.is_verified) {
-          return res.json({ message: 'Please verify your email address.' });
-        }
-
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
+          if (!user.is_verified) {
+            return res.json({
+              unverified: true,
+              message: 'Please verify your email address.'
+            });
+          }
           const token = createToken(user.id);
           return res.json({ token });
         }
@@ -190,13 +192,15 @@ async function handleUniversalLogin(req, res) {
       const user = userResult[0];
 
       if (user) {
-        if (!user.is_verified) {
-          return res.json({ message: 'Please verify your email address.' });
-        }
-
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
+          if (!user.is_verified) {
+            return res.json({
+              unverified: true,
+              message: 'Please verify your email address.'
+            });
+          }
           const token = createToken(user.id);
           return res.json({ token });
         }

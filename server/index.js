@@ -37,6 +37,7 @@ const getInvitationData = require('./routes/users/getInvitationData');
 const updatePassword = require('./routes/users/updatePassword');
 const getOrg = require('./routes/orgs/getOrg');
 const sendPasswordResetLink = require('./routes/users/sendPasswordResetLink');
+const resendVerificationLink = require('./routes/users/resendVerificationLink');
 
 const checkPermissionsMW = require('./middlewares/checkPermissions');
 const checkAuth = require('./middlewares/checkAuth');
@@ -74,6 +75,7 @@ const boot = async () => {
   app.patch('/api/users/password', updatePassword);
   app.get('/api/users/invitation', getInvitationData);
   app.post('/api/users/sendPasswordResetLink', sendPasswordResetLink);
+  app.post('/api/users/resendVerificationLink', resendVerificationLink);
 
   app.post('/api/engagements', checkPermissionsMW, createEngagement);
   app.get('/api/engagements', checkAuth, getEngagement);
