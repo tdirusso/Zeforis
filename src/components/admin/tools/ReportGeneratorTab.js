@@ -58,7 +58,7 @@ export default function ReportGeneratorTab() {
     }
 
     if (includeStatuses.length === 0) {
-      openSnackBar('Select at least 1 status to include in the report.');
+      openSnackBar('Choose at least 1 status to include in the report.');
       return;
     }
 
@@ -128,7 +128,7 @@ export default function ReportGeneratorTab() {
         <Paper>
           <Typography variant="body2">
             The Report Generator is a powerful tool allows you to effortlessly customize and generate reports for efficient customer communications.
-            You can define date ranges and select relevant fields to curate a report that provides valuable task insights to your engagement.
+            You can define date ranges and choose relevant fields to curate a report that provides valuable task insights to your engagement.
             <br></br><br></br>
             Our generator includes seamless integration with
             your organization's brand, ensuring consistent and professional representation to your engagements.
@@ -216,7 +216,7 @@ export default function ReportGeneratorTab() {
           <Box component='h4' mt={4}>Status Criteria</Box>
           <Box my={2} mt={3}>
             <FormControl sx={{ width: 550 }}>
-              <InputLabel id="to-label">Select statuses</InputLabel>
+              <InputLabel id="to-label">Choose statuses</InputLabel>
               <Select
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -230,7 +230,7 @@ export default function ReportGeneratorTab() {
                   </Box>
                 )}
                 value={includeStatuses}
-                label="Select statuses"
+                label="Choose statuses"
                 labelId="to-label"
                 multiple
                 onChange={e => setIncludeStatuses(e.target.value)}

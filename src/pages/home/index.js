@@ -10,7 +10,6 @@ import Snackbar from "../../components/core/Snackbar";
 import { getActiveEngagementId, getEngagementData, getUserEngagementListForOrg, setActiveEngagementId } from "../../api/engagements";
 import CreateEngagementScreen from "../../components/admin/CreateEngagementScreen";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
-import SelectOrgModal from "../../components/core/SelectOrgModal";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
 import CreateOrgScreen from "../../components/admin/CreateOrgScreen";
@@ -23,6 +22,7 @@ import useSideNav from "../../hooks/useSideNav";
 import { hexToRgb } from "../../lib/utils";
 import useDialog from "../../hooks/useDialog";
 import Dialogs from "../../components/core/Dialogs";
+import SelectOrgScreen from "../../components/core/SelectOrgScreen";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -217,7 +217,7 @@ export default function Home({ setTheme }) {
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectOrgModal
+          <SelectOrgScreen
             open={true}
             setOpen={() => { }}
             hideCancel={true}
@@ -247,8 +247,9 @@ export default function Home({ setTheme }) {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
           <SelectEngagementScreen
-            engagement={engagement}
             engagements={engagements}
+            org={org}
+            user={user}
           />
         </Box>
       );

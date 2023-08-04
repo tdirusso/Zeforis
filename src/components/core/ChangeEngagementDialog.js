@@ -11,7 +11,7 @@ import { deleteActiveEngagementId, setActiveEngagementId } from '../../api/engag
 import { setActiveOrgId } from '../../api/orgs';
 
 const Transition = forwardRef(function Transition(props, ref) {
-  return <Grow ref={ref} {...props} timeout={300} />;
+  return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 600 }} />;
 });
 
 export default function ChangeEngagementDialog(props) {
@@ -91,6 +91,7 @@ export default function ChangeEngagementDialog(props) {
   return (
     <Box>
       <Dialog
+        PaperProps={{ sx: { background: '#f3f4f9' } }}
         open={isOpen}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -152,7 +153,7 @@ export default function ChangeEngagementDialog(props) {
               {
                 filteredEngagements.map((e, index) => {
                   return (
-                    <Zoom key={e.id} appear={shouldAnimate} in style={{ transitionDelay: `${index * 17}ms` }}>
+                    <Zoom key={e.id} appear={shouldAnimate} in style={{ transitionDelay: `${(index * 15) + 100}ms` }}>
                       <Paper
                         onClick={() => handleLoadEngagement(e.id)}
                         sx={{ m: 2 }}

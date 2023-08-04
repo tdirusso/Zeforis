@@ -243,7 +243,7 @@ export default function TaskDrawer(props) {
 
   const handleFolderChange = () => {
     if (!folder) {
-      openSnackBar('Please select a folder for the task.');
+      openSnackBar('Please choose a folder for the task.');
       return;
     } else if (folder.id !== task.folder_id) {
       setNeedsUpdating(true);
@@ -272,7 +272,7 @@ export default function TaskDrawer(props) {
     }
 
     if (!folderId) {
-      openSnackBar('Please select a folder for the task.');
+      openSnackBar('Please choose a folder for the task.');
       return;
     }
 

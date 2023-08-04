@@ -220,7 +220,7 @@ export default function EditSelectedTasksModal(props) {
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Please select the action and corresponding value to apply to <strong>{taskIds.length}</strong> selected tasks.
+            Please choose the action and corresponding value to apply to <strong>{taskIds.length}</strong> selected tasks.
           </DialogContentText>
 
           <Grid container rowSpacing={2} columnSpacing={2}>

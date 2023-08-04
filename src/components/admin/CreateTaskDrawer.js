@@ -63,7 +63,7 @@ export default function CreateTaskDrawer(props) {
     }
 
     if (!folderId) {
-      openSnackBar('Please select a folder for the task');
+      openSnackBar('Please choose a folder for the task');
       return;
     }
 
