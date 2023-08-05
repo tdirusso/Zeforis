@@ -10,6 +10,7 @@ import themeConfig from "../../../../theme";
 import LinkIcon from '@mui/icons-material/Link';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 
 export default function GeneralTab() {
   const {
@@ -189,6 +190,7 @@ export default function GeneralTab() {
 
         <Box sx={{ mt: 3, mb: 3, display: 'flex', alignItems: 'center' }}>
           <Button
+          startIcon={<ImageOutlinedIcon/>}
             variant='outlined'
             component='label'
             sx={{ mr: 1 }}

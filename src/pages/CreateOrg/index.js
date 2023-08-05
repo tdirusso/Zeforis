@@ -9,11 +9,30 @@ import zeforisLogo from '../../assets/zeforis-logo.png';
 import { hexToRgb } from '../../lib/utils';
 import themeConfig from '../../theme';
 import { TwitterPicker } from 'react-color';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
+
+const poweredByZeforisWatermark =
+  <Grow appear in>
+    <Box
+      sx={{
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        color: '#5f5f5f !important',
+        display: 'flex',
+        alignItems: 'center'
+      }}
+      component="a"
+      href="https://www.zeforis.com"
+      target="_blank">
+      Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
+    </Box>
+  </Grow>;
 
 export default function CreateOrgPage({ setTheme }) {
-  const [step, setStep] = useState(2);
-  const [orgName, setOrgName] = useState('Test');
-  const [orgId, setOrgId] = useState(1);
+  const [step, setStep] = useState(1);
+  const [orgName, setOrgName] = useState('');
+  const [orgId, setOrgId] = useState(null);
 
   const {
     isOpen,
@@ -88,7 +107,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
         openSnackBar(error.message, 'error');
         setLoading(false);
       }
-    }, 1000);
+    }, 2000);
   };
 
   return (
@@ -98,21 +117,21 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
           <img src={createOrgIcon} alt="" width={150} />
         </Box>
       </Grow>
-      <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '125ms' }}>
+      <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '150ms' }}>
         <Box>
           <Box component="h2" mb={1}>
             Create an Organization
           </Box>
           <Divider sx={{ my: 3 }} />
           <Typography>
-            Let's start by creating your own organization, since you are not currently a member of one.
+            Let's start by creating your own organization.
           </Typography>
           <Typography mt={1}>
             This should be your organization/company name.  When you create and manage engagements, they will be a part of your organization.
           </Typography>
         </Box>
       </Fade>
-      <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '200ms' }}>
+      <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '220ms' }}>
         <form onSubmit={handleCreateOrg}>
           <Box sx={{ mt: 3, mb: 3 }}>
             <TextField
@@ -134,6 +153,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
           </LoadingButton>
         </form>
       </Fade>
+      {poweredByZeforisWatermark}
     </Box>
   );
 }
@@ -144,11 +164,9 @@ const colorTransitionStyle = {
 
 function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   const [isUpdatingBranding, setUpdatingBranding] = useState(false);
-  const [isUpdatingName, setUpdatingName] = useState(false);
   const [brandColor, setBrandColor] = useState('#3365f6');
   const [logoSrc, setLogoSrc] = useState('');
   const [logoFile, setLogoFile] = useState(null);
-  const [isLogoChanged, setLogoChanged] = useState(false);
 
   const fileInput = useRef();
 
@@ -156,32 +174,32 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
     return;
   }
 
-  const handleUpdateOrgBranding = async () => {
+  const handleUpdateOrgBranding = () => {
     setUpdatingBranding(true);
 
-    try {
-      const fd = new FormData();
-      fd.append('logoFile', logoFile);
-      fd.append('name', orgName);
-      fd.append('brandColor', brandColor);
-      fd.append('isLogoChanged', isLogoChanged);
-      fd.append('orgId', orgId);
+    setTimeout(async () => {
+      try {
+        const fd = new FormData();
+        fd.append('logoFile', logoFile);
+        fd.append('name', orgName);
+        fd.append('brandColor', brandColor);
+        fd.append('isLogoChanged', true);
+        fd.append('orgId', orgId);
 
+        const result = await updateOrg(fd);
+        const { success, message } = result;
 
-      const result = await updateOrg(fd);
-      const { success, message } = result;
-
-      if (success) {
-        window.location.href = '/home/dashboard';
-        openSnackBar('Organization updated.', 'success');
-      } else {
-        openSnackBar(message, 'error');
+        if (success) {
+          window.location.href = '/home/dashboard';
+        } else {
+          openSnackBar(message, 'error');
+          setUpdatingBranding(false);
+        }
+      } catch (error) {
+        openSnackBar(error.message, 'error');
         setUpdatingBranding(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setUpdatingBranding(false);
-    }
+    }, 1500);
   };
 
   const handleLogoChange = e => {
@@ -193,13 +211,11 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
 
     setLogoSrc(URL.createObjectURL(imageFile));
     setLogoFile(imageFile);
-    setLogoChanged(true);
   };
 
   const handleLogoClear = () => {
     setLogoSrc('');
     setLogoFile(null);
-    setLogoChanged(true);
     fileInput.current.value = null;
   };
 
@@ -247,6 +263,7 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
 
         <Box sx={{ my: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
           <Button
+            startIcon={<ImageOutlinedIcon />}
             variant='outlined'
             component='label'
             sx={{ mr: 1 }}
@@ -284,22 +301,17 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
             Apply brand
           </LoadingButton>
         </Box>
-
       </Paper>
-      <Box style={colorTransitionStyle} className="circle"></Box>
       <Box
-        sx={{
-          position: 'absolute',
-          bottom: 10,
-          right: 10,
-          color: '#5f5f5f !important',
-          display: 'flex',
-          alignItems: 'center'
-        }}
         component="a"
-        target="_blank">
-        Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
+        style={colorTransitionStyle}
+        href='/home/dashboard'
+        fontSize={14}
+        mt={1}>
+        Skip
       </Box>
+      <Box style={colorTransitionStyle} className="circle"></Box>
+      {poweredByZeforisWatermark}
     </Box>
   );
 }
