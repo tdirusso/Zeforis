@@ -2,9 +2,16 @@ const pool = require('../../../database');
 
 module.exports = async (req, res) => {
   const {
-    name,
-    userId
+    name
   } = req.body;
+
+  const creatorUserId = req.userId;
+
+  if (!creatorUserId) {
+    return res.json({
+      message: 'Missing userId.'
+    });
+  }
 
   if (!name) {
     return res.json({
@@ -15,7 +22,7 @@ module.exports = async (req, res) => {
   try {
     const newOrg = await pool.query(
       'INSERT INTO orgs (name, owner_id, brand_color) VALUES (?,?, "#3365f6")',
-      [name, userId]
+      [name, creatorUserId]
     );
 
     return res.json({ orgId: newOrg[0].insertId });

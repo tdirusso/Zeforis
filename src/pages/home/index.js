@@ -12,7 +12,6 @@ import CreateEngagementScreen from "../../components/admin/CreateEngagementScree
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
-import CreateOrgScreen from "../../components/admin/CreateOrgScreen";
 import Header from "../../components/core/Header";
 import Modals from "../../components/core/Modals";
 import useModal from "../../hooks/useModal";
@@ -209,11 +208,8 @@ export default function Home({ setTheme }) {
       setActiveOrgId(user.memberOfOrgs[0].id);
       setOrg(user.memberOfOrgs[0]);
     } else if (user.memberOfOrgs.length === 0) {
-      return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
-          <CreateOrgScreen user={user} />
-        </Box>
-      );
+      window.location.href = '/create-org';
+      return;
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>

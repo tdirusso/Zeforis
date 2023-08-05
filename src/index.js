@@ -21,6 +21,7 @@ import AnalyticsPage from './pages/Home/Analytics';
 import PasswordResetPage from './pages/PasswordReset';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
+import CreateOrgPage from './pages/CreateOrg';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -36,6 +37,7 @@ function App() {
           <Route path="register-success" element={<RegisterSuccessPage />} />
           <Route path="accept-invitation" element={<AcceptInvitationPage />} />
           <Route path="password-reset" element={<PasswordResetPage />} />
+          <Route path="create-org" element={<CreateOrgPage setTheme={setTheme} />} />
 
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
             <Route path="dashboard" element={<Dashboard />} />

@@ -96,7 +96,7 @@ const boot = async () => {
   app.delete('/api/tags', checkPermissionsMW, deleteTag);
   app.patch('/api/tags', checkPermissionsMW, updateTag);
 
-  app.post('/api/orgs', createOrg);
+  app.post('/api/orgs', checkAuth, createOrg);
   app.patch('/api/orgs', checkPermissionsMW, updateOrg);
   app.get('/api/orgs', getOrg);
 
