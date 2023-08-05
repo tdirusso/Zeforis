@@ -5,7 +5,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
 import SpeedIcon from '@mui/icons-material/Speed';
-import zeforisIcon from '../../assets/zeforis-logo.png';
+import zeforisLogo from '../../assets/zeforis-logo.png';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BuildIcon from '@mui/icons-material/Build';
 
@@ -147,14 +147,18 @@ export default function SideNav(props) {
         </Box>
       </Box>
       <Box className="buttons">
-        <Button
-          onClick={() => window.location.href = 'mailto:timgdirusso@gmail.com?subject=Zeforis Support Inquiry'}
-          variant="contained"
-          fullWidth>
-          Contact Support
-        </Button>
-        <Box mt={1.5} textAlign="center">
-          <img src={zeforisIcon} alt="Zeforis" height={15}></img>
+        <Box
+          sx={{
+            color: '#5f5f5f !important',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 'small'
+          }}
+          component="a"
+          href="https://www.zeforis.com"
+          target="_blank">
+          Powered by  <img src={zeforisLogo} alt="Zeforis" height={13} style={{ marginLeft: '4px' }} />
         </Box>
       </Box>
     </Box>

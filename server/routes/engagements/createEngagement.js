@@ -10,34 +10,34 @@ module.exports = async (req, res) => {
 
   if (!name) {
     return res.json({
-      message: 'Missing client name.'
+      message: 'Missing engagement name.'
     });
   }
 
   const connection = await pool.getConnection();
 
   try {
-    const newClient = await connection.query(
-      'INSERT INTO clients (name, org_id) VALUES (?,?)',
+    const newEngagement = await connection.query(
+      'INSERT INTO engagements (name, org_id) VALUES (?,?)',
       [name, orgId]
     );
 
-    const newClientId = newClient[0].insertId;
+    const newEngagementId = newEngagement[0].insertId;
 
     await connection.query(
-      'INSERT INTO client_users (client_id, user_id, role) VALUES (?,?, "admin")',
-      [newClientId, userId]
+      'INSERT INTO engagement_users (engagement_id, user_id, role) VALUES (?,?, "admin")',
+      [newEngagementId, userId]
     );
 
-    const clientObject = {
-      id: newClientId,
+    const engagementObject = {
+      id: newEngagementId,
       name,
       orgId
     };
 
     connection.release();
 
-    return res.json({ client: clientObject });
+    return res.json({ engagement: engagementObject });
   } catch (error) {
     console.log(error);
     connection.release();

@@ -41,7 +41,7 @@ export default function CreateEngagementScreen({ org }) {
           setActiveEngagementId(engagement.id);
           openSnackBar('Engagement created.', 'success');
           setTimeout(() => {
-            window.location.href = '/home/dashboard';
+            window.location.href = '/home/folders';
           }, 500);
         } else {
           openSnackBar(message, 'error');

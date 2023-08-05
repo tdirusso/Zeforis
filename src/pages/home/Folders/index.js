@@ -1,7 +1,6 @@
 import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
 import './styles.css';
 import FolderIcon from '@mui/icons-material/Folder';
-import CreateFolderModal from "../../../components/admin/CreateFolderModal";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import Divider from '@mui/material/Divider';
@@ -14,9 +13,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import HelpIcon from '@mui/icons-material/Help';
 
 export default function FoldersPage() {
-  const [createFolderModalOpen, setCreateFolderModalOpen] = useState(false);
   const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
   const [deleteFolderModalOpen, setDeleteFolderModalOpen] = useState(false);
   const [folderToEdit, setFolderToEdit] = useState(null);
@@ -65,11 +64,22 @@ export default function FoldersPage() {
       <Grid item>
         <Button
           hidden={!isAdmin}
-          onClick={() => openDrawer('create-folder')}
+          onClick={() => openDrawer('create-folder', { engagementId: engagement.id })}
           size="large"
           variant="contained">
           New Folder
         </Button>
+        <Tooltip title='Folders are used to organize tasks.  Every task must reside in a folder.' placement="top">
+          <HelpIcon
+            fontSize="small"
+            sx={{
+              position: 'relative',
+              top: '5px',
+              left: '7px'
+            }}
+            htmlColor="#c7c7c7"
+          />
+        </Tooltip>
       </Grid>
       <Grid item xs={12}>
         <Divider textAlign="left">
@@ -145,12 +155,6 @@ export default function FoldersPage() {
           </ListItemText>
         </MenuItem>
       </Menu>
-
-      <CreateFolderModal
-        open={createFolderModalOpen}
-        setOpen={setCreateFolderModalOpen}
-        engagementId={engagement.id}
-      />
 
       <EditFolderModal
         open={editFolderModalOpen}
