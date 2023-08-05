@@ -7,7 +7,8 @@ import {
   MenuItem,
   Select,
   InputLabel,
-  Button
+  Button,
+  InputAdornment
 } from "@mui/material";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -25,6 +26,8 @@ import Switch from '@mui/material/Switch';
 import StarIcon from '@mui/icons-material/Star';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { statuses } from "../../../lib/constants";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Folder, LocalOffer } from "@mui/icons-material";
 
 export default function TasksFilter(props) {
 
@@ -64,7 +67,7 @@ export default function TasksFilter(props) {
 
   return (
     <Grid item xs={12}>
-      <Paper>
+      <Paper sx={{ p: 1 }}>
         <Accordion
           disableGutters
           sx={{
@@ -88,7 +91,7 @@ export default function TasksFilter(props) {
           </AccordionSummary>
           <AccordionDetails>
             <Grid container rowSpacing={2} columnSpacing={2}>
-              <Grid item xs={12} md={4} >
+              <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
                   size="small"
@@ -97,6 +100,7 @@ export default function TasksFilter(props) {
                   onChange={e => setFilterName(e.target.value)}
                 />
               </Grid>
+              <Grid item xs={12} md={8}></Grid>
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <Autocomplete
@@ -112,6 +116,13 @@ export default function TasksFilter(props) {
                       <TextField
                         {...params}
                         label="Assigned To"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment:
+                            <InputAdornment position='start'>
+                              <AccountCircleIcon />
+                            </InputAdornment>
+                        }}
                       />
                     )}
                   />
@@ -134,6 +145,13 @@ export default function TasksFilter(props) {
                       <TextField
                         {...params}
                         label="Tags"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment:
+                            <InputAdornment position='start'>
+                              <LocalOffer />
+                            </InputAdornment>
+                        }}
                       />
                     )}
                   />
@@ -153,6 +171,13 @@ export default function TasksFilter(props) {
                       <TextField
                         {...params}
                         label="Folder"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment:
+                            <InputAdornment position='start'>
+                              <Folder />
+                            </InputAdornment>
+                        }}
                       />
                     )}
                   />

@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
           last_updated_by_id
         ) 
         VALUES
-        (?,?,?,?,?,?,?,?,?,?,?)`,
+        (?,?,?,?,?,?,?,?,?,?)`,
       [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
     );
 

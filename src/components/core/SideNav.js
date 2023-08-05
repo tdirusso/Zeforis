@@ -1,4 +1,4 @@
-import { Box, Button, ButtonBase, Divider, Typography } from "@mui/material";
+import { Box, ButtonBase, Divider, Typography } from "@mui/material";
 import './styles/SideNav.css';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';

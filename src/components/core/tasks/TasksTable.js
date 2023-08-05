@@ -21,9 +21,7 @@ import TableRow from '@mui/material/TableRow';
 import { useLocation, useOutletContext } from "react-router-dom";
 import './styles.css';
 import { useEffect, useState } from "react";
-import { LoadingButton } from "@mui/lab";
 import EditIcon from '@mui/icons-material/Edit';
-import AddTaskIcon from '@mui/icons-material/AddTask';
 import TasksFilter from "./TasksFilter";
 import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
 import DeleteTasksModal from "../../admin/DeleteTasksModal";
@@ -190,37 +188,41 @@ export default function TasksTable({ tasks }) {
         filterTags={filterTags}
       />
 
-      <Grid item xs={12} hidden={!isAdmin}>
-        <Box
-          display="flex">
-          <Box display="flex" alignItems="center">
+      <Grid item xs={12}>
+        <Paper sx={{ px: 0, overflowX: 'auto' }}>
+          <Box px={3} mb={2}>
             <Button
-              variant="outlined"
+              variant="contained"
               sx={{ mr: 5 }}
-              onClick={() => openDrawer('create-task')}
-              startIcon={<AddTaskIcon />}>
+              onClick={() => openDrawer('create-task')}>
               New Task
             </Button>
-            <LoadingButton
-              variant="contained"
+          </Box>
+          <Box display='flex' alignItems='center' px={3} mb={2} height={40}>
+            <FormGroup>
+              <FormControlLabel
+                fontSize="small"
+                control={<Switch
+                  size="small"
+                  onChange={handleEditModeChange}
+                />}
+                label={
+                  <Typography
+                    variant="body2">
+                    Edit
+                  </Typography>
+                }
+              />
+            </FormGroup>
+            <Button
+              hidden={!isEditMode}
+              variant="outlined"
               sx={{ mr: 1.5 }}
               onClick={() => setEditSelectedTasksModalOpen(true)}
               disabled={selectedTasks.length === 0}
               startIcon={<EditIcon />}>
-              Edit Selected
-            </LoadingButton>
-            {
-              selectedTasks.length > 0 ?
-                <Button
-                  variant="outlined"
-                  sx={{ mr: 1.5 }}
-                  onClick={() => setDeleteTasksModalOpen(true)}
-                  startIcon={<DeleteIcon />}
-                  color="error">
-                  Delete Selected
-                </Button> :
-                ''
-            }
+              Edit tasks
+            </Button>
             {
               selectedTasks.length > 0 ?
                 <Box component="h6">
@@ -228,32 +230,18 @@ export default function TasksTable({ tasks }) {
                 </Box> :
                 ''
             }
+            {
+              selectedTasks.length > 0 ?
+                <Button
+                  sx={{ ml: 'auto' }}
+                  onClick={() => setDeleteTasksModalOpen(true)}
+                  startIcon={<DeleteIcon />}
+                  color="error">
+                  Delete tasks
+                </Button> :
+                ''
+            }
           </Box>
-        </Box>
-      </Grid>
-
-      <Grid item xs={2} hidden={!isAdmin}>
-        <Box>
-          <FormGroup>
-            <FormControlLabel
-              fontSize="small"
-              control={<Switch
-                size="small"
-                onChange={handleEditModeChange}
-              />}
-              label={
-                <Typography
-                  variant="body2">
-                  Editing mode
-                </Typography>
-              }
-            />
-          </FormGroup>
-        </Box>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Paper sx={{ px: 0, overflowX: 'auto' }}>
           <Table
             sx={{ minWidth: 650 }}
             className="tasks-table"
