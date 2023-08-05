@@ -1,5 +1,5 @@
 import { Box, Button, TextField, InputAdornment, Divider, Skeleton, createTheme, Typography, IconButton, Tooltip } from "@mui/material";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { useOutletContext } from "react-router";
@@ -31,6 +31,8 @@ export default function GeneralTab() {
   const [isLogoChanged, setLogoChanged] = useState(false);
   const [isLogoLoading, setLogoLoading] = useState(org.logo !== '');
   const [copyButtonText, setCopyButtonText] = useState('Copy link');
+
+  const fileInput = useRef();
 
   const handleUpdateOrgName = async () => {
     if (!orgName) {
@@ -110,6 +112,7 @@ export default function GeneralTab() {
     setLogoSrc('');
     setLogoFile(null);
     setLogoChanged(true);
+    fileInput.current.value = null;
   };
 
   const updateUI = () => {
@@ -197,6 +200,7 @@ export default function GeneralTab() {
               type="file"
               onChange={handleLogoChange}
               disabled={isUpdatingBranding}
+              ref={fileInput}
             />
           </Button>
           <Button

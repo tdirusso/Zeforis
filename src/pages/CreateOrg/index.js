@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Box, Button, Divider, Fade, Grow, Paper, TextField, Typography, createTheme } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../../components/core/Snackbar';
@@ -90,6 +90,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
       }
     }, 1000);
   };
+
   return (
     <Box textAlign="center" mb={'100px'} maxWidth={600}>
       <Grow appear in timeout={{ enter: 500 }}>
@@ -137,7 +138,9 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
   );
 }
 
-
+const colorTransitionStyle = {
+  transition: 'color 1s, background 1s'
+};
 
 function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   const [isUpdatingBranding, setUpdatingBranding] = useState(false);
@@ -146,6 +149,8 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   const [logoSrc, setLogoSrc] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [isLogoChanged, setLogoChanged] = useState(false);
+
+  const fileInput = useRef();
 
   if (!orgName || !orgId) {
     return;
@@ -195,17 +200,24 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
     setLogoSrc('');
     setLogoFile(null);
     setLogoChanged(true);
+    fileInput.current.value = null;
   };
 
-  const updateUI = () => {
+  const handleColorChange = color => {
     const brandRGB = hexToRgb(brandColor);
-    document.documentElement.style.setProperty('--colors-primary', brandColor);
+    document.documentElement.style.setProperty('--colors-primary', color.hex);
     document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
-    themeConfig.palette.primary.main = brandColor;
+    themeConfig.palette.primary.main = color.hex;
     setTheme(createTheme(themeConfig));
+    setBrandColor(color.hex);
   };
 
-  let pageIcon = <Box component="h1" color={brandColor}>{orgName}</Box>;
+  let pageIcon = <Box
+    style={colorTransitionStyle}
+    component="h1"
+    sx={{ color: brandColor }}>
+    {orgName}
+  </Box>;
 
   if (logoSrc) {
     pageIcon = <Box>
@@ -217,46 +229,28 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
     <Box className="Login flex-centered">
       <Box component="header">
         {pageIcon}
-        <Box display="flex" alignItems="center">
-          <Button
-            variant="contained"
-            component={'a'}
-            href="/register"
-            size="large">
-            Sign Up
-          </Button>
-        </Box>
       </Box>
       <Paper sx={{ p: 8, pt: 5 }} className="container">
         <Typography variant="h5" sx={{ mb: 5 }}>
-          Sign in
+          Apply your Brand
         </Typography>
-
         <Box my={2} display='flex' alignItems='center'>
           <Box>
             <TwitterPicker
+              width='100%'
               triangle="hide"
               color={brandColor}
-              onChange={color => setBrandColor(color.hex)}
+              onChange={handleColorChange}
             />
-          </Box>
-          <Box
-            sx={{
-              background: brandColor,
-              borderRadius: '6px',
-              height: '75px',
-              width: '75px',
-              transition: 'background 500ms',
-              ml: 4
-            }}>
           </Box>
         </Box>
 
-        <Box sx={{ mt: 3, mb: 3, display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ my: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
           <Button
             variant='outlined'
             component='label'
             sx={{ mr: 1 }}
+            style={colorTransitionStyle}
             disabled={isUpdatingBranding}>
             Upload Logo
             <input
@@ -265,9 +259,11 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
               type="file"
               onChange={handleLogoChange}
               disabled={isUpdatingBranding}
+              ref={fileInput}
             />
           </Button>
           <Button
+            style={colorTransitionStyle}
             sx={{
               display: logoSrc ? 'block' : 'none',
               mr: 2
@@ -276,24 +272,21 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
             onClick={handleLogoClear}>
             Clear Logo
           </Button>
-          <img
-            src={logoSrc}
-            alt=""
-            width={100}
-          />
         </Box>
-
-        <Box my={2}>
+        <Divider sx={{ my: 4 }} />
+        <Box>
           <LoadingButton
+            style={colorTransitionStyle}
             onClick={handleUpdateOrgBranding}
             loading={isUpdatingBranding}
+            fullWidth
             variant="contained">
-            Save changes
+            Apply brand
           </LoadingButton>
         </Box>
 
       </Paper>
-      <Box className="circle"></Box>
+      <Box style={colorTransitionStyle} className="circle"></Box>
       <Box
         sx={{
           position: 'absolute',
@@ -304,7 +297,6 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
           alignItems: 'center'
         }}
         component="a"
-        href="https://www.zeforis.com"
         target="_blank">
         Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
       </Box>
