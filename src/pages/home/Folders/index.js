@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
 import './styles.css';
 import FolderIcon from '@mui/icons-material/Folder';
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { useState } from "react";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Divider from '@mui/material/Divider';
 import React from 'react';
 import StarIcon from '@mui/icons-material/Star';
@@ -22,6 +23,23 @@ export default function FoldersPage() {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
+  const { search } = useLocation();
+
+  const {
+    engagement,
+    folders,
+    isAdmin,
+    openDrawer
+  } = useOutletContext();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(search);
+    const isGettingStarted = queryParams.get('gettingStarted');
+
+    if (isGettingStarted) {
+      openDrawer('getting-started');
+    }
+  }, []);
 
   const handleMenuClick = (e, folder) => {
     e.stopPropagation();
@@ -33,13 +51,6 @@ export default function FoldersPage() {
     setAnchorEl(null);
     setFolderToEdit(null);
   };
-
-  const {
-    engagement,
-    folders,
-    isAdmin,
-    openDrawer
-  } = useOutletContext();
 
   const keyFolders = [];
   const otherFolders = [];

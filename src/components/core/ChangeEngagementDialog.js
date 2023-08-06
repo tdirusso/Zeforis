@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import { forwardRef, useEffect, useState } from 'react';
-import { Box, Button, CircularProgress, Dialog, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import './styles/ChangeEngagementDialog.css';
@@ -88,6 +87,18 @@ export default function ChangeEngagementDialog(props) {
   const lcQuery = query.toLowerCase();
   const filteredEngagements = query ? engagements.filter(e => e.name.toLowerCase().includes(lcQuery)) : engagements;
 
+  let pageIcon = <Box
+    component="h1"
+    sx={{ color: org.brandColor }}>
+    {org.name}
+  </Box>;
+
+  if (org.logo) {
+    pageIcon = <Box>
+      <img src={org.logo} alt="" height={40} />
+    </Box>;
+  }
+
   return (
     <Box>
       <Dialog
@@ -97,12 +108,12 @@ export default function ChangeEngagementDialog(props) {
         TransitionComponent={Transition}
         fullScreen>
         <DialogContent sx={{ width: 1200, margin: '0 auto' }}>
-          <Box sx={{ mb: 3 }}>
+          <Box sx={{ my: 3 }}>
             <Box
               display="flex"
               position="relative"
-              alignItems="center"
-              justifyContent="center">
+              justifyContent="center"
+              alignItems="flex-start">
               <IconButton
                 size='large'
                 onClick={handleClose}
@@ -112,12 +123,12 @@ export default function ChangeEngagementDialog(props) {
                 }}>
                 <CloseIcon />
               </IconButton>
-              <DialogTitle
-                sx={{
-                  textAlign: 'center',
-                }}>
-                Engagements in {org.name}
-              </DialogTitle>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                {pageIcon}
+                <Box mt={2.5}>
+                  <Box component="h2">Change Engagement</Box>
+                </Box>
+              </Box>
               <Button
                 startIcon={<SwapHorizOutlined />}
                 onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
@@ -126,8 +137,10 @@ export default function ChangeEngagementDialog(props) {
                 Change org
               </Button>
             </Box>
+            <Divider sx={{ my: 3, width: '85%', mx: 'auto' }} />
             <Box m='0 auto' width={300}>
               <TextField
+                variant='standard'
                 size='small'
                 placeholder='Search'
                 value={query}

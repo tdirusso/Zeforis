@@ -1,5 +1,6 @@
 import CreateFolderDrawer from "../admin/CreateFolderDrawer";
 import CreateTaskDrawer from "../admin/CreateTaskDrawer";
+import GettingStartedDrawer from "./GettingStartedDrawer";
 import TaskDrawer from "./TaskDrawer";
 
 export default function Drawers(props) {
@@ -25,6 +26,11 @@ export default function Drawers(props) {
       <TaskDrawer
         {...props}
         isOpen={drawerToOpen === 'task'}
+        close={closeDrawer}
+      />
+
+      <GettingStartedDrawer
+        isOpen={drawerToOpen === 'getting-started'}
         close={closeDrawer}
       />
     </>

@@ -49,7 +49,7 @@ export default function CreateEngagementDialog(props) {
           setActiveEngagementId(engagement.id);
           openSnackBar('Engagement created.', 'success');
           setTimeout(() => {
-            window.location.href = '/home/folders';
+            window.location.href = close ? '/home/folders' : '/home/folders?gettingStarted=true';
           }, 500);
         } else {
           openSnackBar(message, 'error');
