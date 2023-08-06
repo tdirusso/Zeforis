@@ -8,7 +8,7 @@ import SelectEngagementScreen from "../../components/core/SelectEngagementScreen
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import { getActiveEngagementId, getEngagementData, getUserEngagementListForOrg, setActiveEngagementId } from "../../api/engagements";
-import CreateEngagementScreen from "../../components/admin/CreateEngagementScreen";
+import CreateEngagementDialog from "../../components/admin/CreateEngagementDialog";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
@@ -230,7 +230,11 @@ export default function Home({ setTheme }) {
   if (engagements.length === 0) {
     return (
       <Box className="flex-centered" sx={{ height: '100%' }}>
-        <CreateEngagementScreen org={org} />
+        <CreateEngagementDialog
+          org={org}
+          openSnackBar={openSnackBar}
+          isOpen={true}
+        />
       </Box>
     );
   }

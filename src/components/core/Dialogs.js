@@ -1,3 +1,4 @@
+import CreateEngagementDialog from "../admin/CreateEngagementDialog";
 import ChangeEngagementDialog from "./ChangeEngagementDialog";
 
 export default function Dialogs(props) {
@@ -14,6 +15,11 @@ export default function Dialogs(props) {
         close={closeDialog}
       />
 
+      <CreateEngagementDialog
+        {...props}
+        isOpen={dialogToOpen === 'create-engagement'}
+        close={closeDialog}
+      />
     </>
   );
 };

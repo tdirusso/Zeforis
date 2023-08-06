@@ -17,6 +17,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { logout } from "../../api/auth";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { SwapHorizOutlined } from "@mui/icons-material";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -71,6 +72,11 @@ export default function Header(props) {
   const openSearch = () => {
     setAnchorEl(null);
     openModal('search');
+  };
+
+  const openCreateEngagementDialog = () => {
+    setAnchorEl(null);
+    openDialog('create-engagement');
   };
 
   return (
@@ -152,6 +158,17 @@ export default function Header(props) {
                 <ListItemText>
                   <Typography>
                     New Folder
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={openCreateEngagementDialog}>
+                <ListItemIcon>
+                  <AccountBoxIcon />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography>
+                    New Engagement
                   </Typography>
                 </ListItemText>
               </MenuItem>
