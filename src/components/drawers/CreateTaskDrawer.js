@@ -162,10 +162,12 @@ export default function CreateTaskDrawer(props) {
           <Grid container rowSpacing={2} columnSpacing={1.5}>
             <Grid item xs={12} mb={2}>
               <Box
-                display="flex"
-                position="relative"
-                alignItems="center"
-                justifyContent="center">
+                style={{
+                  display: 'flex',
+                  position: 'relative',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
                 <IconButton
                   size='large'
                   onClick={handleClose}

@@ -22,6 +22,7 @@ import { hexToRgb } from "../../lib/utils";
 import useDialog from "../../hooks/useDialog";
 import Dialogs from "../../components/dialogs";
 import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
+import './styles.scss';
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -251,19 +252,20 @@ export default function Home({ setTheme }) {
             org={org}
             user={user}
             isOpen={true}
-
           />
         </Box>
       );
     }
   }
 
+  const foldersWithTasks = Object.values(foldersMap);
+
   const context = {
     engagement,
     engagements,
     org,
     user,
-    folders: Object.values(foldersMap),
+    folders: foldersWithTasks,
     tasks,
     tags,
     engagementMembers,
@@ -301,15 +303,13 @@ export default function Home({ setTheme }) {
       <Box
         component="main"
         style={{
-          transition: 'margin 200ms',
-          padding: '0 2.5rem',
           marginLeft: isSideNavOpen ? '280px' : '0px'
         }}>
         <Box
-          maxWidth={isSideNavOpen ? '1200px' : '1450px'}
-          m='auto'
-          pt={2}
-          pb={5}>
+          className="content"
+          style={{
+            maxWidth: isSideNavOpen ? '1200px' : '1450px'
+          }}>
           <Grid container spacing={3}>
             <Header
               isAdmin={isAdmin}
@@ -324,10 +324,14 @@ export default function Home({ setTheme }) {
             />
 
             <Modals
-              {...context}
-              {...modalProps}
+              folders={context.folders}
+              tasks={tasks}
+              openDrawer
               modalToOpen={modalToOpen}
               closeModal={closeModal}
+              engagement={engagement}
+              openSnackBar={openSnackBar}
+              {...modalProps}
             />
 
             <Drawers
@@ -338,10 +342,13 @@ export default function Home({ setTheme }) {
             />
 
             <Dialogs
-              {...context}
-              {...dialogProps}
               dialogToOpen={dialogToOpen}
               closeDialog={closeDialog}
+              engagements={engagements}
+              org={org}
+              user={user}
+              openSnackBar={openSnackBar}
+              {...dialogProps}
             />
 
             <Outlet context={context} />
