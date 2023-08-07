@@ -131,8 +131,8 @@ export default function RegisterPage() {
           </Button>
         </Box>
       </Box>
-      <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 3.5 }}>Sign Up</Typography>
+      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+        <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>Sign Up</Typography>
         <form onSubmit={handleRegistration} >
           <TextField
             placeholder="First name"
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             inputRef={firstName}
             disabled={isLoading}
             autoComplete="off"
-            sx={{ mb: 2 }}
+            style={{ marginBottom: '1rem' }}
             autoFocus
             InputProps={{
               startAdornment: (
@@ -156,7 +156,7 @@ export default function RegisterPage() {
             inputRef={lastName}
             disabled={isLoading}
             autoComplete="off"
-            sx={{ mb: 5 }}
+            style={{ marginBottom: '2.5rem' }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -169,7 +169,7 @@ export default function RegisterPage() {
           <TextField
             placeholder="Email"
             variant="outlined"
-            sx={{ mb: 2 }}
+            style={{ marginBottom: '1rem' }}
             type="email"
             inputRef={email}
             disabled={isLoading}
@@ -185,7 +185,7 @@ export default function RegisterPage() {
             placeholder="Password"
             variant="outlined"
             type="password"
-            sx={{ mb: 5 }}
+            style={{ marginBottom: '2.5rem' }}
             inputRef={password}
             disabled={isLoading}
             InputProps={{
@@ -203,11 +203,11 @@ export default function RegisterPage() {
             variant="contained"
             type="submit"
             size="large"
-            sx={{ mb: 4 }}>
+            style={{ marginBottom: '2rem' }}>
             Create Account
           </LoadingButton>
         </form>
-        <Divider sx={{ mb: 4 }} />
+        <Divider style={{ marginBottom: '2rem' }} />
         <Box id="google-signin"></Box>
       </Paper>
       <Box className="circle"></Box>

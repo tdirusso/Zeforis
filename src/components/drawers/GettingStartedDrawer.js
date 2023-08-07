@@ -14,11 +14,6 @@ import { Folder } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import './styles.scss';
 
-const flexCenterStyle = {
-  display: 'flex',
-  alignItems: 'center'
-};
-
 export default function GettingStartedDrawer(props) {
   const {
     isOpen,
@@ -34,9 +29,8 @@ export default function GettingStartedDrawer(props) {
       className='getting-started-drawer'
       variant='persistent'
       PaperProps={{
-        sx: {
+        style: {
           width: '450px',
-          py: 0,
         }
       }}>
       <DialogContent>
@@ -49,20 +43,20 @@ export default function GettingStartedDrawer(props) {
           <IconButton
             size='large'
             onClick={close}
-            sx={{
+            style={{
               position: 'absolute',
               left: '-8px',
             }}>
             <CloseIcon />
           </IconButton>
           <DialogTitle
-            sx={{
+            style={{
               textAlign: 'center',
             }}>
             Getting Started
           </DialogTitle>
         </Box>
-        <Divider sx={{ mt: 0, mb: 4 }} />
+        <Divider style={{ marginBottom: '2rem' }} />
         <Box>
           <Box component="h3">
             Welcome to Zeforis.
@@ -70,7 +64,7 @@ export default function GettingStartedDrawer(props) {
           <Box component="h4" mt={0.5}>
             Your engagements, your brand, one place.
           </Box>
-          <Divider sx={{ mt: 4, mb: 2 }} />
+          <Divider style={{ marginTop: '2rem', marginBottom: '1rem' }} />
           <Typography mt={2}>
             We'll guide you through getting started with your first engagement, customization, and collaboration.
             Embrace efficiency and conquer your consulting world with ease.
@@ -87,9 +81,9 @@ export default function GettingStartedDrawer(props) {
               height={45}
             />
           </Box>
-          <Divider sx={{ my: 2 }} />
-          <Box component="h3" mt={0.5} sx={flexCenterStyle}>
-            <Folder htmlColor='grey' sx={{ mr: 0.5 }} />
+          <Divider className='my2' />
+          <Box component="h3" mt={0.5} className='flex-ac'>
+            <Folder htmlColor='grey' style={{ marginRight: '5px' }} />
             Folders
           </Box>
           <Typography mt={2}>

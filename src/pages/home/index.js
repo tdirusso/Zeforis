@@ -212,7 +212,7 @@ export default function Home({ setTheme }) {
       return;
     } else {
       return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
+        <Box className="flex-centered" style={{ height: '100%' }}>
           <ChooseOrgScreen
             open={true}
             setOpen={() => { }}
@@ -229,7 +229,7 @@ export default function Home({ setTheme }) {
 
   if (engagements.length === 0) {
     return (
-      <Box className="flex-centered" sx={{ height: '100%' }}>
+      <Box className="flex-centered" style={{ height: '100%' }}>
         <CreateEngagementDialog
           org={org}
           openSnackBar={openSnackBar}
@@ -245,7 +245,7 @@ export default function Home({ setTheme }) {
       setEngagement(engagements[0]);
     } else {
       return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
+        <Box className="flex-centered" style={{ height: '100%' }}>
           <ChooseEngagementDialog
             engagements={engagements}
             org={org}
@@ -300,9 +300,11 @@ export default function Home({ setTheme }) {
       />
       <Box
         component="main"
-        ml={isSideNavOpen ? '280px' : '0px'}
-        sx={{ transition: 'margin 200ms' }}
-        px={5}>
+        style={{
+          transition: 'margin 200ms',
+          padding: '0 2.5rem',
+          marginLeft: isSideNavOpen ? '280px' : '0px'
+        }}>
         <Box
           maxWidth={isSideNavOpen ? '1200px' : '1450px'}
           m='auto'

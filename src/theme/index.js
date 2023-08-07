@@ -88,12 +88,12 @@ const theme = {
     MuiTextField: {
       defaultProps: {
         InputLabelProps: {
-          sx: {
+          style: {
             fontWeight: 300
           }
         },
         inputProps: {
-          sx: {
+          style: {
             fontWeight: 400
           }
         },
@@ -108,14 +108,14 @@ const theme = {
     },
     MuiAlertTitle: {
       defaultProps: {
-        sx: {
+        style: {
           fontWeight: 300
         }
       }
     },
     MuiTab: {
       defaultProps: {
-        sx: {
+        style: {
           textTransform: 'none'
         }
       }

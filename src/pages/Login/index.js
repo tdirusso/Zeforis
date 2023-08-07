@@ -195,7 +195,7 @@ export default function LoginPage({ setTheme }) {
       return;
     }
 
-    setVerificationContent(<CircularProgress size={20} sx={{ mt: 1 }} />);
+    setVerificationContent(<CircularProgress size={20} style={{ marginTop: '0.5rem' }} />);
 
     setTimeout(async () => {
       try {
@@ -221,7 +221,7 @@ export default function LoginPage({ setTheme }) {
       Your email address has not been verified.
       <br></br>
       Click the verification link in your email address or
-      <Button sx={{ mx: 0.2 }} size="small" onClick={handleResendVerificationLink}>click here</Button>
+      <Button style={{ margin: '0 2px' }} size="small" onClick={handleResendVerificationLink}>click here</Button>
       to resend a verification link.
     </Typography>;
 
@@ -260,15 +260,15 @@ export default function LoginPage({ setTheme }) {
           </Button>
         </Box>
       </Box>
-      <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 5 }}>
+      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+        <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Sign in
         </Typography>
         <form onSubmit={handleLogin}>
           <TextField
             placeholder="Email"
             variant="outlined"
-            sx={{ mb: 4 }}
+            style={{ marginBottom: '2rem' }}
             type="email"
             InputProps={{
               startAdornment: (
@@ -292,11 +292,10 @@ export default function LoginPage({ setTheme }) {
                 </InputAdornment>
               )
             }}
-            sx={{ mb: 0.5 }}
             inputRef={password}
             disabled={isLoading}
           />
-          <Box component="span" sx={{ textAlign: 'right', mb: 3.5 }}>
+          <Box component="span" style={{ textAlign: 'right', marginBottom: '1.75rem' }}>
             <Box component="a" href="/password-reset" fontSize="small">
               Forgot password?
             </Box>
@@ -307,7 +306,7 @@ export default function LoginPage({ setTheme }) {
             disabled={isLoading}
             fullWidth
             size="large"
-            sx={{ py: 1.3 }}
+            style={{padding: '0.75rem 0.5rem'}}
             variant="contained"
             type="submit">
             Sign in
@@ -315,7 +314,7 @@ export default function LoginPage({ setTheme }) {
           <Box mt={1} hidden={!Boolean(verificationContent)}>
             {verificationContent}
           </Box>
-          <Divider sx={{ mt: 4, mb: 4 }} />
+          <Divider className="my4" />
           <Box id="google-signin"></Box>
         </form>
       </Paper>
@@ -323,7 +322,7 @@ export default function LoginPage({ setTheme }) {
         hidden={!needsCustomPage}
         component="a"
         href="/login"
-        sx={{ fontSize: '13px' }}
+        style={{ fontSize: '13px' }}
         mt={1}>
         Go to universal login
       </Box>

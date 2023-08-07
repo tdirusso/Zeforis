@@ -48,8 +48,8 @@ export default function PasswordResetPage() {
           </Box>
         </Box>
       </Box>
-      <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 5 }}>
+      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+        <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Password Reset
         </Typography>
         {
@@ -112,7 +112,7 @@ function PasswordResetStep1({ openSnackBar }) {
         <TextField
           placeholder="Email"
           variant="outlined"
-          sx={{ mb: 4 }}
+          style={{ marginBottom: '2rem' }}
           type="email"
           onChange={e => setEmail(e.target.value)}
           InputProps={{
@@ -130,14 +130,14 @@ function PasswordResetStep1({ openSnackBar }) {
           loading={isSendingResetLink}
           fullWidth
           size="large"
-          sx={{ py: 1.3 }}
+          style={{ padding: '0.75rem 0.5rem' }}
           variant="contained"
           startIcon={<SendRoundedIcon />}
           type="submit">
           Send reset link
         </LoadingButton>
       </form>
-      <Typography sx={{ display: 'flex', alignItems: 'center' }} hidden={!sentResetLink}>
+      <Typography className="flex-ac" hidden={!sentResetLink}>
         <CheckCircleRoundedIcon htmlColor="#4caf50" />
         &nbsp;Password reset link successfully sent.
       </Typography>
@@ -201,7 +201,7 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
               </InputAdornment>
             )
           }}
-          sx={{ mb: 4 }}
+          style={{ marginBottom: '2rem' }}
           disabled={isResettingPassword}
           autoFocus
           value={password}
@@ -212,14 +212,14 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
           loading={isResettingPassword}
           fullWidth
           size="large"
-          sx={{ py: 1.3 }}
+          style={{ padding: '0.75rem 0.5rem' }}
           variant="contained"
           startIcon={<SendRoundedIcon />}
           type="submit">
           Reset password
         </LoadingButton>
       </form>
-      <Typography sx={{ display: 'flex', alignItems: 'center' }} hidden={!passwordReset}>
+      <Typography className="flex-ac" hidden={!passwordReset}>
         <CheckCircleRoundedIcon htmlColor="#4caf50" />
         &nbsp;Password successfully reset.
       </Typography>

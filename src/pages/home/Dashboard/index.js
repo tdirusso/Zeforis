@@ -78,7 +78,7 @@ function NoFoldersMessage({ openDrawer, isAdmin }) {
         </Typography>
         <Button
           hidden={!isAdmin}
-          sx={{ mt: 1.5 }}
+          style={{ marginTop: '0.75rem' }}
           variant="outlined"
           onClick={() => openDrawer('create-folder')}
           startIcon={<CreateNewFolderIcon />}>

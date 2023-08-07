@@ -29,7 +29,7 @@ export default function CreateOrgPage({ setTheme }) {
   }
 
   return (
-    <Box className="flex-centered" sx={{ height: '100%' }}>
+    <Box className="flex-centered" style={{ height: '100%' }}>
       <Box textAlign="center" mb={'100px'} maxWidth={600}>
         {
           step === 1 ?
@@ -104,7 +104,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
           <Box component="h2" mb={1}>
             Create an Organization
           </Box>
-          <Divider sx={{ my: 3 }} />
+          <Divider className='my3' />
           <Typography>
             Let's start by creating your own organization.
           </Typography>
@@ -115,7 +115,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
       </Fade>
       <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '220ms' }}>
         <form onSubmit={handleCreateOrg}>
-          <Box sx={{ mt: 3, mb: 3 }}>
+          <Box className='my3'>
             <TextField
               placeholder="Organization Name"
               fullWidth
@@ -215,9 +215,8 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   };
 
   let pageIcon = <Box
-    style={colorTransitionStyle}
     component="h1"
-    sx={{ color: brandColor }}>
+    style={{ ...colorTransitionStyle, color: brandColor }}>
     {orgName}
   </Box>;
 
@@ -232,8 +231,8 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
       <Box component="header">
         {pageIcon}
       </Box>
-      <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 5 }}>
+      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+        <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Apply your Brand
         </Typography>
         <Box my={2} display='flex' alignItems='center'>
@@ -247,13 +246,12 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
           </Box>
         </Box>
 
-        <Box sx={{ my: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
+        <Box className='flex-ac my4' style={{ justifyContent: 'space-evenly' }}>
           <Button
             startIcon={<ImageOutlinedIcon />}
             variant='outlined'
             component='label'
-            sx={{ mr: 1 }}
-            style={colorTransitionStyle}
+            style={{ ...colorTransitionStyle, marginRight: '0.5rem' }}
             disabled={isUpdatingBranding}>
             Upload Logo
             <input
@@ -266,17 +264,16 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
             />
           </Button>
           <Button
-            style={colorTransitionStyle}
-            sx={{
-              display: logoSrc ? 'block' : 'none',
-              mr: 2
+            style={{
+              ...colorTransitionStyle,
+              display: logoSrc ? 'block' : 'none'
             }}
             disabled={isUpdatingBranding}
             onClick={handleLogoClear}>
             Clear Logo
           </Button>
         </Box>
-        <Divider sx={{ my: 4 }} />
+        <Divider className='my4' />
         <Box>
           <LoadingButton
             style={colorTransitionStyle}

@@ -83,7 +83,7 @@ export default function FoldersPage() {
         <Tooltip title='Folders are used to organize tasks.  Every task must reside in a folder.' placement="top">
           <HelpIcon
             fontSize="small"
-            sx={{
+            style={{
               position: 'relative',
               top: '5px',
               left: '7px'
@@ -95,7 +95,7 @@ export default function FoldersPage() {
       <Grid item xs={12}>
         <Divider textAlign="left">
           <Chip
-            icon={<StarIcon sx={{ color: '#fffd00 !important' }} />}
+            icon={<StarIcon style={{ color: '#fffd00' }} />}
             label="Key Folders"
           />
         </Divider>
@@ -156,7 +156,7 @@ export default function FoldersPage() {
               <DeleteOutlineIcon
                 fontSize="small"
                 color="error"
-                sx={{ mr: 0.5 }}
+                style={{ marginRight: '5px' }}
               />
               <Typography variant="body2" color="error">
                 Delete Folder
@@ -198,7 +198,7 @@ function Folder({ folder, handleMenuClick }) {
       <Paper
         className="folder-item"
         onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}
-        sx={{
+        style={{
           position: 'relative',
           width: 180
         }}>

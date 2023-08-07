@@ -172,7 +172,7 @@ function AnalyticsCharts(props) {
       </Grid>
 
       <Grid item xs={12}>
-        <Paper sx={{ maxHeight: '700px', minHeight: '450px' }}>
+        <Paper style={{ maxHeight: '700px', minHeight: '450px' }}>
           <Box
             component="h4"
             mb={2}>

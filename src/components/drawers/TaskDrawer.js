@@ -368,10 +368,9 @@ export default function TaskDrawer(props) {
       hideBackdrop
       variant='persistent'
       PaperProps={{
-        sx: {
+        style: {
           width: '550px',
-          py: 0,
-          pt: 7
+          paddingTop: '3.5rem'
         }
       }}>
       <DialogContent>
@@ -385,7 +384,7 @@ export default function TaskDrawer(props) {
             <IconButton
               size='large'
               onClick={handleClose}
-              sx={{
+              style={{
                 position: 'absolute',
                 left: '-15px',
               }}>
@@ -396,7 +395,7 @@ export default function TaskDrawer(props) {
             <IconButton
               size='large'
               onClick={e => setDeleteMenuAnchor(e.currentTarget)}
-              sx={{
+              style={{
                 position: 'absolute',
                 right: '0',
               }}>
@@ -408,12 +407,6 @@ export default function TaskDrawer(props) {
             open={deleteMenuOpen}
             onClose={() => setDeleteMenuAnchor(null)}>
             <Box px={2} py={1}>
-              <Button
-                sx={{ mr: 0.5 }}
-                disabled={isDeleting}
-                onClick={() => setDeleteMenuAnchor(null)}>
-                Cancel
-              </Button>
               <LoadingButton
                 disabled={isDeleting}
                 color='error'
@@ -436,23 +429,22 @@ export default function TaskDrawer(props) {
               onBlur={handleNameChange}
               onChange={e => setName(e.target.value)}
               inputProps={{
-                sx: { fontSize: '1.25rem' }
+                style: { fontSize: '1.25rem' }
               }}
               InputProps={{ readOnly: !isAdmin }}
-              sx={!isAdmin ? {
-                '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
-                '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
-              } : {}}
+              className={!isAdmin ? 'readonly-textfield' : ''}
             />
           </Box>
         </Box>
         <Box display="flex" alignItems="center" mt={2.5}>
           <Chip
-            disabled={!isAdmin}
             label={status}
             deleteIcon={<MoreVertIcon />}
-            onClick={e => setStatusMenuAnchor(e.currentTarget)}
-            sx={{ mr: 4, opacity: '1 !important' }}
+            onClick={isAdmin ? e => setStatusMenuAnchor(e.currentTarget) : () => { }}
+            style={{
+              marginRight: '2rem',
+              cursor: isAdmin ? 'pointer' : 'unset'
+            }}
             onDelete={e => setStatusMenuAnchor(e.currentTarget)}
             className={status}>
           </Chip>
@@ -469,7 +461,7 @@ export default function TaskDrawer(props) {
                     <Chip
                       label={name}
                       className={name}
-                      sx={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer' }}
                     />
                   </MenuItem>
                 );
@@ -488,7 +480,7 @@ export default function TaskDrawer(props) {
             label="Key task"
           />
         </Box>
-        <Divider sx={{ mt: 4 }} />
+        <Divider style={{ marginTop: '2rem' }} />
         <Box my={3}>
           <TextField
             fullWidth
@@ -497,14 +489,11 @@ export default function TaskDrawer(props) {
             value={description}
             multiline
             inputRef={descriptionTextarea}
-            inputProps={{ sx: { resize: 'vertical' } }}
+            inputProps={{ style: { resize: 'vertical' } }}
             onBlur={handleDescriptionChange}
             onChange={e => setDescription(e.target.value)}
             InputProps={{ readOnly: !isAdmin }}
-            sx={!isAdmin ? {
-              '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
-              '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
-            } : {}}
+            className={!isAdmin ? 'readonly-textfield' : ''}
           />
         </Box>
         <Divider />
@@ -518,13 +507,10 @@ export default function TaskDrawer(props) {
               multiline
               onBlur={handleLinkChange}
               onChange={e => setLinkUrl(e.target.value)}
-              sx={!isAdmin ? {
-                '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
-                '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
-              } : {}}
+              className={!isAdmin ? 'readonly-textfield' : ''}
               InputProps={{
                 startAdornment:
-                  <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
+                  <InputAdornment position='start' style={{ transform: 'rotate(-45deg)' }}>
                     <LinkIcon />
                   </InputAdornment>,
                 readOnly: !isAdmin
@@ -534,7 +520,7 @@ export default function TaskDrawer(props) {
           <Box>
             <Button
               disabled={!Boolean(task.link_url)}
-              sx={{ mr: 1.5 }}
+              style={{ marginRight: '0.75rem' }}
               onClick={() => window.open(task.link_url, '_blank')}
               endIcon={<OpenInNewIcon />}
               variant="outlined">
@@ -616,7 +602,7 @@ export default function TaskDrawer(props) {
                 format="MM/DD/YYYY"
                 value={dateDue}
                 InputProps={{
-                  sx: {
+                  style: {
                     flexDirection: 'row-reverse'
                   }
                 }}
@@ -649,10 +635,7 @@ export default function TaskDrawer(props) {
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
                 onChange={handleTagsChange}
-                sx={!isAdmin ? {
-                  '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
-                  '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
-                } : {}}
+                className={!isAdmin ? 'readonly-textfield' : ''}
                 componentsProps={{
                   popper: {
                     placement: 'top'

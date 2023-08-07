@@ -164,7 +164,7 @@ export default function AcceptInvitationPage() {
             <CircularProgress />
           </Box>
             :
-            <Paper sx={{ p: 5, minWidth: '500px' }} className="container">
+            <Paper style={{ padding: '2.5rem', minWidth: '500px' }} className="container">
               <Typography>No invitation was found.</Typography>
             </Paper>
         }
@@ -198,13 +198,13 @@ export default function AcceptInvitationPage() {
           <CircularProgress />
         </Box>
           :
-          <Paper sx={{ p: 8, pt: 5, minWidth: '500px' }} className="container">
-            <Typography variant="h6" sx={{ mb: 3 }}>Complete Account Registration</Typography>
+          <Paper style={{ padding: '4rem', paddingTop: '2.5rem', minWidth: '500px' }} className="container">
+            <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
             <form onSubmit={handleUpdatePassword}>
               <TextField
                 placeholder="Password"
                 variant="outlined"
-                sx={{ mb: 4 }}
+                style={{ marginBottom: '2rem' }}
                 type="password"
                 InputProps={{
                   startAdornment: (
@@ -222,12 +222,12 @@ export default function AcceptInvitationPage() {
                 disabled={isLoading}
                 fullWidth
                 size="large"
-                sx={{ py: 1.3 }}
+                style={{ padding: '0.75rem 0' }}
                 variant="contained"
                 type="submit">
                 Create Password
               </LoadingButton>
-              <Divider sx={{ mt: 4, mb: 4 }}>Or</Divider>
+              <Divider className="my4">Or</Divider>
               <Box id="google-signin"></Box>
             </form>
           </Paper>
