@@ -103,7 +103,7 @@ export default function EditFolderModal(props) {
             <Grid item xs={12} mt="-20px">
               <FormControlLabel
                 componentsProps={{ typography: { fontWeight: '300' } }}
-                sx={{ mt: 2, fontSize: '12px' }}
+                style={{ marginTop: '2rem', fontSize: '12px' }}
                 control={<Checkbox
                   onChange={(_, val) => setIsKeyFolder(val)}
                   value={isKeyFolder}
@@ -114,7 +114,7 @@ export default function EditFolderModal(props) {
               />
             </Grid>
           </Grid>
-          <DialogActions sx={{ p: 0, mt: 2 }}>
+          <DialogActions>
             <Button
               disabled={isLoading}
               fullWidth

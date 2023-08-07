@@ -4,24 +4,24 @@ import useAuth from "../../hooks/useAuth";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid, createTheme } from "@mui/material";
-import SelectEngagementScreen from "../../components/core/SelectEngagementScreen";
+import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
 import { getActiveEngagementId, getEngagementData, getUserEngagementListForOrg, setActiveEngagementId } from "../../api/engagements";
-import CreateEngagementDialog from "../../components/admin/CreateEngagementDialog";
+import CreateEngagementDialog from "../../components/dialogs/CreateEngagementDialog";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
 import Header from "../../components/core/Header";
 import Modals from "../../components/core/Modals";
 import useModal from "../../hooks/useModal";
-import Drawers from "../../components/core/Drawers";
+import Drawers from "../../components/drawers";
 import useDrawer from "../../hooks/useDrawer";
 import useSideNav from "../../hooks/useSideNav";
 import { hexToRgb } from "../../lib/utils";
 import useDialog from "../../hooks/useDialog";
-import Dialogs from "../../components/core/Dialogs";
-import SelectOrgScreen from "../../components/core/SelectOrgScreen";
+import Dialogs from "../../components/dialogs";
+import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -213,7 +213,7 @@ export default function Home({ setTheme }) {
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectOrgScreen
+          <ChooseOrgScreen
             open={true}
             setOpen={() => { }}
             hideCancel={true}
@@ -246,7 +246,7 @@ export default function Home({ setTheme }) {
     } else {
       return (
         <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectEngagementScreen
+          <ChooseEngagementDialog
             engagements={engagements}
             org={org}
             user={user}

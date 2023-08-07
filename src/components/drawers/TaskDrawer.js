@@ -27,7 +27,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import './styles/TaskDrawer.css';
+import './styles.scss';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { statuses } from '../../lib/constants';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';

@@ -96,10 +96,10 @@ export default function DeleteTasksModal(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
+          <DialogContentText style={{ marginBottom: '2rem' }}>
             Are you sure you want to <strong>permanently delete</strong> {taskIds.length} tasks?
           </DialogContentText>
-          <DialogActions sx={{ p: 0 }}>
+          <DialogActions style={{ padding: 0 }}>
             <Button
               disabled={isLoading}
               fullWidth

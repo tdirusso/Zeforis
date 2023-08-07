@@ -1,0 +1,11 @@
+.getting-started-drawer {
+  a {
+    text-decoration: underline;
+  }
+}
+
+.task-drawer {
+  .MuiInput-underline:before {
+    border-bottom: none !important;
+  }
+}

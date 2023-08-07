@@ -115,7 +115,7 @@ export default function EditUserPermissionsModal(props) {
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose} PaperProps={{ sx: { minWidth: 900 } }}>
+      <Dialog open={open} onClose={handleClose} PaperProps={{ style: { minWidth: 900 } }}>
         <DialogContent>
           <DialogContentText display="flex" alignItems="center" sx={{ mb: 1 }}>
             Viewing permissions for&nbsp; <strong>{user?.firstName} {user?.lastName}</strong>

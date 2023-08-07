@@ -12,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import userMenuIcon from '../../assets/user-menu-icon.png';
 import { Folder } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import './styles/GettingStartedDrawer.css';
+import './styles.scss';
 
 const flexCenterStyle = {
   display: 'flex',
@@ -31,7 +31,7 @@ export default function GettingStartedDrawer(props) {
       open={isOpen}
       onClose={close}
       hideBackdrop
-      className='gs-drawer'
+      className='getting-started-drawer'
       variant='persistent'
       PaperProps={{
         sx: {
@@ -99,7 +99,7 @@ export default function GettingStartedDrawer(props) {
             Folders are your way of organizing and dividing tasks.  Each and every task must reside in a folder.
           </Typography>
           <Typography mt={2}>
-          <Link to="/home/folders" component="a">Go to folders</Link>
+            <Link to="/home/folders" component="a">Go to folders</Link>
 
           </Typography>
         </Box>

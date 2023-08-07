@@ -1,5 +1,5 @@
-import CreateFolderDrawer from "../admin/CreateFolderDrawer";
-import CreateTaskDrawer from "../admin/CreateTaskDrawer";
+import CreateFolderDrawer from "./CreateFolderDrawer";
+import CreateTaskDrawer from "./CreateTaskDrawer";
 import GettingStartedDrawer from "./GettingStartedDrawer";
 import TaskDrawer from "./TaskDrawer";
 

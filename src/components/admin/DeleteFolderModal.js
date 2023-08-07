@@ -68,11 +68,11 @@ export default function DeleteFolderModal(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
+          <DialogContentText style={{ marginBottom: '2rem' }}>
             Are you sure you want to <strong>permanently delete {folder?.name}</strong>?
             All tasks in this folder will be deleted.
           </DialogContentText>
-          <DialogActions sx={{ p: 0 }}>
+          <DialogActions style={{ padding: 0 }}>
             <Button
               disabled={isLoading}
               fullWidth

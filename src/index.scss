@@ -1,9 +1,12 @@
 :root {
   --colors-primary: #3365f6;
   --colors-primary-rgb: 35, 153, 239;
+  --colors-body-background: #f3f4f9;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   box-sizing: border-box;
 }
@@ -11,7 +14,7 @@ html, body, #root {
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background-color: #f3f4f9;
+  background-color: var(--colors-body-background);
   color: #121f43;
   overflow-x: hidden;
 }
@@ -35,7 +38,8 @@ a {
   text-decoration: none;
 }
 
-a, a:visited {
+a,
+a:visited {
   color: var(--colors-primary);
 }
 
@@ -48,11 +52,14 @@ a.MuiListItem-root {
   color: initial;
 }
 
-h2, h4, h6 {
+h2,
+h4,
+h6 {
   font-weight: 600;
 }
 
-h5, h6 {
+h5,
+h6 {
   font-size: 0.9rem;
 }
 
@@ -126,4 +133,13 @@ h5, h6 {
 .MuiDrawer-paperAnchorRight {
   border-top-right-radius: 0px !important;
   border-bottom-right-radius: 0px !important;
+}
+
+.choose-engagement-btn,
+.choose-org-btn {
+  cursor: pointer;
+
+  &:hover {
+    background: #f6f6f6;
+  }
 }

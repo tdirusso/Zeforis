@@ -4,7 +4,7 @@
 }
 
 .task-row:hover {
-  background: #f3f4f9;
+  background: var(--colors-body-background);
 }
 
 .in-progress-icon {

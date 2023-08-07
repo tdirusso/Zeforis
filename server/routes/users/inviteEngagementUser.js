@@ -51,6 +51,17 @@ module.exports = async (req, res) => {
     const invitationCode = uuidv4().substring(0, 16);
 
     if (user) {
+      const [memberExistsResult] = await pool.query(
+        'SELECT 1 FROM engagement_users WHERE engagement_id = ? AND user_id = ?',
+        [engagementId, user.id]
+      );
+
+      if (memberExistsResult.length) {
+        return res.json({
+          message: 'User is already part of this engagement.'
+        });
+      }
+
       await pool.query(
         'INSERT INTO engagement_users (engagement_id, user_id, role, invitation_code) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE role = ?, invitation_code = ?',
         [engagementId, user.id, role, invitationCode, role, invitationCode]

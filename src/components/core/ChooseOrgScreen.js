@@ -3,10 +3,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useEffect, useState } from 'react';
 import { Box, CircularProgress, Paper, Zoom } from '@mui/material';
-import './styles/ChangeEngagementDialog.css';
 import { setActiveOrgId } from '../../api/orgs';
 
-export default function SelectOrgScreen(props) {
+export default function ChooseOrgScreen(props) {
   const {
     user
   } = props;
@@ -57,7 +56,7 @@ export default function SelectOrgScreen(props) {
                     <Paper
                       onClick={() => handleLoadOrg(org.id)}
                       sx={{ m: 2 }}
-                      className='choose-engagement-btn'>
+                      className='choose-org-btn'>
                       {
                         isLoadingOrg && orgId === org.id ? <CircularProgress size={20} /> : org.name
                       }

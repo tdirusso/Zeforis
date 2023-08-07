@@ -95,9 +95,22 @@ export default function MembersTab() {
     }
   };
 
-  const handleInviteEngagementUser = async () => {
+  const handleInviteEngagementUser = async e => {
+    e.preventDefault();
+    
     if (!inviteeEmail) {
       openSnackBar("Please enter the user's email address to invite.");
+      return;
+    }
+
+    const lcInviteeEmail = inviteeEmail.toLowerCase();
+
+    const engagementUserExists = [...engagementAdmins, ...engagementMembers].some(
+      eUser => eUser.email.toLowerCase() === lcInviteeEmail
+    );
+
+    if (engagementUserExists) {
+      openSnackBar('User is already part of this engagement.');
       return;
     }
 
@@ -105,12 +118,12 @@ export default function MembersTab() {
 
     try {
       const { success, message, userId, firstName = '', lastName = '' } = await inviteEngagementUser({
-        email: inviteeEmail,
+        email: lcInviteeEmail,
         engagementId,
         orgId,
         engagementName,
         orgName,
-        isAdmin,
+        isAdmin: inviteeIsAdmin,
         orgColor,
         orgLogo
       });
@@ -118,21 +131,22 @@ export default function MembersTab() {
       if (success) {
         const addedUser = {
           id: userId,
-          email: inviteeEmail,
+          email: lcInviteeEmail,
           firstName,
           lastName
         };
 
         if (!orgUsersMap[userId]) { // User is new to the org
-          addedUser.memberOfEngagements = [{ id: engagementId, name: engagementName }];
-          addedUser.adminOfEngagements = [];
+          const engagementData = { id: engagementId, name: engagementName };
+          addedUser.memberOfEngagements = inviteeIsAdmin ? [] : [engagementData];
+          addedUser.adminOfEngagements = inviteeIsAdmin ? [engagementData] : [];
           setOrgUsers(members => [...members, addedUser]);
         } else { // User already exists in the org
           const existingUser = orgUsersMap[userId];
           const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
           const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
 
-          if (isAdmin) {
+          if (inviteeIsAdmin) {
             if (userIsMember) {
               existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
             }
@@ -318,7 +332,7 @@ export default function MembersTab() {
         anchorEl={inviteUserMenuAnchor}
         open={inviteUserMenuOpen}
         onClose={handleInviteUserMenuClose}>
-        <Box sx={{ py: 2, px: 2, minWidth: '300px' }}>
+        <Box sx={{ py: 2, px: 2, minWidth: '300px' }} component="form" onSubmit={handleInviteEngagementUser}>
           <Box>
             <TextField
               variant="standard"
@@ -368,8 +382,8 @@ export default function MembersTab() {
               variant='contained'
               size="small"
               fullWidth
-              loading={isInvitingUser}
-              onClick={() => handleInviteEngagementUser()}>
+              type="submit"
+              loading={isInvitingUser}>
               Send Invitation
             </LoadingButton>
           </Box>

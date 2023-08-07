@@ -11,7 +11,7 @@ export default function DeleteEngagementModal(props) {
 
   const {
     close,
-    isOpen, 
+    isOpen,
     engagement,
     openSnackBar
   } = props;
@@ -47,13 +47,13 @@ export default function DeleteEngagementModal(props) {
     <div>
       <Dialog open={isOpen} onClose={close}>
         <DialogContent>
-          <DialogContentText sx={{ mb: 5 }}>
+          <DialogContentText>
             Are you sure you want to <strong>permanently delete "{engagement.name}"?</strong>
             <br></br>
             <br></br>
             If you proceed, ALL folders, tasks and tags will be deleted.
           </DialogContentText>
-          <DialogActions sx={{ p: 0 }}>
+          <DialogActions style={{ marginTop: '2rem', padding: 0 }}>
             <Button
               disabled={isLoading}
               fullWidth

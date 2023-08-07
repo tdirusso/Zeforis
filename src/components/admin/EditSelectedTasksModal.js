@@ -107,7 +107,7 @@ export default function EditSelectedTasksModal(props) {
                     <Chip
                       label={name}
                       className={name}
-                      sx={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer' }}
                     />
                   </MenuItem>
                 )}
@@ -183,18 +183,16 @@ export default function EditSelectedTasksModal(props) {
               disabled={isLoading}>
               <MenuItem
                 value='yes'
-                onClick={() => setIsKey('yes')}
-              >
-                <ListItemIcon sx={{ alignSelf: 'center' }}>
+                onClick={() => setIsKey('yes')}>
+                <ListItemIcon style={{ alignSelf: 'center' }}>
                   <StarIcon fontSize="small" htmlColor='gold' />
                 </ListItemIcon>
                 <ListItemText>Yes</ListItemText>
               </MenuItem>
               <MenuItem
                 value='no'
-                onClick={() => setIsKey('no')}
-              >
-                <ListItemIcon sx={{ alignSelf: 'center' }}>
+                onClick={() => setIsKey('no')}>
+                <ListItemIcon style={{ alignSelf: 'center' }}>
                   <StarBorderIcon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>No</ListItemText>
@@ -219,7 +217,7 @@ export default function EditSelectedTasksModal(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
+          <DialogContentText style={{ marginBottom: '1.5rem' }}>
             Please choose the action and corresponding value to apply to <strong>{taskIds.length}</strong> selected tasks.
           </DialogContentText>
 
@@ -249,7 +247,7 @@ export default function EditSelectedTasksModal(props) {
             </Grid>
           </Grid>
 
-          <DialogActions sx={{ p: 0, mt: 3 }}>
+          <DialogActions style={{ padding: 0, marginTop: '2rem' }}>
             <Button
               fullWidth
               variant="outlined"

@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import './styles/ChangeEngagementDialog.css';
+import './styles.scss';
 import { SwapHorizOutlined } from "@mui/icons-material";
 import { deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import { setActiveOrgId } from '../../api/orgs';
@@ -102,7 +102,7 @@ export default function ChangeEngagementDialog(props) {
   return (
     <Box>
       <Dialog
-        PaperProps={{ sx: { background: '#f3f4f9' } }}
+        className='change-engagement-dialog'
         open={isOpen}
         onClose={handleClose}
         TransitionComponent={Transition}

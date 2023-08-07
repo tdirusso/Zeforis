@@ -68,7 +68,7 @@ export default function CreateEngagementDialog(props) {
 
   let pageIcon = <Box
     component="h1"
-    sx={{ color: org.brandColor }}>
+    style={{ color: org.brandColor }}>
     {org.name}
   </Box>;
 
@@ -80,12 +80,10 @@ export default function CreateEngagementDialog(props) {
 
   return (
     <Dialog
-      PaperProps={{ sx: { background: '#f3f4f9' } }}
       open={isOpen}
       onClose={handleClose}
       TransitionComponent={close ? toggleableTransition : fixedTransition}
-      fullScreen
-    >
+      fullScreen>
       <Box className="flex-centered" sx={{ height: '100%' }}>
         <Box textAlign="center" mb={'100px'} maxWidth={600}>
           <IconButton

@@ -4,7 +4,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { forwardRef, useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Grow, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import './styles/ChangeEngagementDialog.css';
 import { SwapHorizOutlined } from "@mui/icons-material";
 import { deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import { setActiveOrgId } from '../../api/orgs';
@@ -13,7 +12,7 @@ const Transition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 600 }} appear={false} />;
 });
 
-export default function SelectEngagementScreen(props) {
+export default function ChooseEngagementDialog(props) {
   const {
     engagements,
     org,
@@ -70,7 +69,6 @@ export default function SelectEngagementScreen(props) {
   return (
     <Box>
       <Dialog
-        PaperProps={{ sx: { background: '#f3f4f9' } }}
         open
         TransitionComponent={Transition}
         fullScreen>
