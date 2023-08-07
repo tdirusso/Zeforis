@@ -20,7 +20,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useLocation, useOutletContext } from "react-router-dom";
 import './styles.scss';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import TasksFilter from "./TasksFilter";
 import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
@@ -89,9 +89,7 @@ export default function TasksTable({ tasks }) {
     setIsEditMode(val);
   };
 
-  let filteredTasks = [...tasks];
-
-  filteredTasks = filteredTasks.filter(task => {
+  const filteredTasks = tasks.filter(task => {
     let shouldReturnTask = true;
 
     if (filterName) {

@@ -258,14 +258,12 @@ export default function Home({ setTheme }) {
     }
   }
 
-  const foldersWithTasks = Object.values(foldersMap);
-
   const context = {
     engagement,
     engagements,
     org,
     user,
-    folders: foldersWithTasks,
+    folders: Object.values(foldersMap),
     tasks,
     tags,
     engagementMembers,
@@ -324,14 +322,10 @@ export default function Home({ setTheme }) {
             />
 
             <Modals
-              folders={context.folders}
-              tasks={tasks}
-              openDrawer
+              {...context}
+              {...modalProps}
               modalToOpen={modalToOpen}
               closeModal={closeModal}
-              engagement={engagement}
-              openSnackBar={openSnackBar}
-              {...modalProps}
             />
 
             <Drawers
@@ -342,13 +336,10 @@ export default function Home({ setTheme }) {
             />
 
             <Dialogs
+              {...context}
+              {...dialogProps}
               dialogToOpen={dialogToOpen}
               closeDialog={closeDialog}
-              engagements={engagements}
-              org={org}
-              user={user}
-              openSnackBar={openSnackBar}
-              {...dialogProps}
             />
 
             <Outlet context={context} />
@@ -361,6 +352,6 @@ export default function Home({ setTheme }) {
         type={type}
         message={message}
       />
-    </Box >
+    </Box>
   );
 };
