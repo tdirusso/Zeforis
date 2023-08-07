@@ -78,9 +78,9 @@ export default function CreateFolderDrawer(props) {
       onClose={handleClose}
       hideBackdrop
       variant='persistent'
-      PaperProps={{ sx: { width: '450px', py: 0 } }}>
+      PaperProps={{ style: { width: '450px' } }}>
       <DialogContent>
-        <Box sx={{ mb: 3 }}>
+        <Box style={{ marginBottom: '1.5rem' }}>
           <Grid container rowSpacing={0} columnSpacing={1.5}>
             <Grid item xs={12} mb={2}>
               <Box
@@ -92,14 +92,14 @@ export default function CreateFolderDrawer(props) {
                 <IconButton
                   size='large'
                   onClick={handleClose}
-                  sx={{
+                  style={{
                     position: 'absolute',
                     left: '-8px',
                   }}>
                   <CloseIcon />
                 </IconButton>
                 <DialogTitle
-                  sx={{
+                  style={{
                     textAlign: 'center',
                   }}>
                   Create New Folder
@@ -125,7 +125,7 @@ export default function CreateFolderDrawer(props) {
               <Grid item xs={12}>
                 <FormControlLabel
                   componentsProps={{ typography: { fontWeight: '300' } }}
-                  sx={{ mt: 1.5 }}
+                  style={{ marginTop: '0.75rem' }}
                   control={<Checkbox
                     icon={<StarBorderIcon />}
                     checkedIcon={<StarIcon htmlColor='gold' />}
@@ -138,7 +138,7 @@ export default function CreateFolderDrawer(props) {
                 <Tooltip title='Key folders provide a method of organization and are automatically displayed on the Dashboard.' placement="top">
                   <HelpIcon
                     fontSize="small"
-                    sx={{
+                    style={{
                       position: 'relative',
                       top: '11px',
                       right: '10px'
@@ -148,7 +148,7 @@ export default function CreateFolderDrawer(props) {
                 </Tooltip>
               </Grid>
               <LoadingButton
-                sx={{ mt: '10px' }}
+                style={{ marginTop: '1rem' }}
                 variant='contained'
                 type='submit'
                 fullWidth

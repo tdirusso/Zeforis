@@ -1,3 +1,6 @@
+.tasks-table {
+}
+
 .tasks-table .MuiCheckbox-root {
   padding: 0;
 }
@@ -27,4 +30,19 @@
 
 .tasks-table thead th {
   padding-bottom: 1.5rem;
+}
+
+.tasks-filter-accordion {
+  &.MuiPaper-root {
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .accordion-summary {
+    justify-content: flex-start;
+
+    & .MuiAccordionSummary-content {
+      flex-grow: 0;
+    }
+  }
 }

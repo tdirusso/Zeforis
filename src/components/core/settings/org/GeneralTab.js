@@ -136,7 +136,7 @@ export default function GeneralTab() {
     <>
       <Box mt={4}>
         <TextField
-          sx={{ minWidth: '400px' }}
+          style={{ minWidth: '400px' }}
           value={orgName}
           disabled={isUpdatingName}
           onChange={e => setOrgName(e.target.value)}
@@ -156,14 +156,14 @@ export default function GeneralTab() {
 
       <Box mt={3.5}>
         <Button
-          sx={{ mr: 2 }}
+          style={{ marginRight: '1rem' }}
           variant="outlined"
           onClick={() => openDialog('choose-engagement')}
           startIcon={<SwapHorizOutlinedIcon />}>
           Change
         </Button>
       </Box>
-      <Divider sx={{ my: 4 }} />
+      <Divider className="my4" />
       <Box>
         <Box component="h4" mb={3}>
           Branding
@@ -177,23 +177,23 @@ export default function GeneralTab() {
             />
           </Box>
           <Box
-            sx={{
+            style={{
               background: brandColor,
               borderRadius: '6px',
               height: '75px',
               width: '75px',
               transition: 'background 500ms',
-              ml: 4
+              marginLeft: '2rem'
             }}>
           </Box>
         </Box>
 
-        <Box sx={{ mt: 3, mb: 3, display: 'flex', alignItems: 'center' }}>
+        <Box className="flex-ac" style={{ margin: '1.5rem 0' }}>
           <Button
-          startIcon={<ImageOutlinedIcon/>}
+            startIcon={<ImageOutlinedIcon />}
             variant='outlined'
             component='label'
-            sx={{ mr: 1 }}
+            style={{ marginRight: '0.5rem' }}
             disabled={isUpdatingBranding}>
             Upload Logo
             <input
@@ -206,9 +206,9 @@ export default function GeneralTab() {
             />
           </Button>
           <Button
-            sx={{
+            style={{
               display: logoSrc && !isLogoLoading ? 'block' : 'none',
-              mr: 2
+              marginRight: '1rem'
             }}
             disabled={isUpdatingBranding}
             onClick={handleLogoClear}>
@@ -220,7 +220,7 @@ export default function GeneralTab() {
             width={70}
             height={70}
             animation='wave'
-            sx={{ display: logoSrc && isLogoLoading ? 'block' : 'none' }}>
+            style={{ display: logoSrc && isLogoLoading ? 'block' : 'none' }}>
           </Skeleton>
           <img
             src={logoSrc}
@@ -239,7 +239,7 @@ export default function GeneralTab() {
           </LoadingButton>
         </Box>
       </Box>
-      <Divider sx={{ my: 4 }} />
+      <Divider className="my4" />
       <Box>
         <Box component="h4" mb={2}>
           Custom Login Page
@@ -258,7 +258,7 @@ export default function GeneralTab() {
             fullWidth
             InputProps={{
               startAdornment:
-                <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
+                <InputAdornment position='start' style={{ transform: 'rotate(-45deg)' }}>
                   <LinkIcon />
                 </InputAdornment>,
               readOnly: true,

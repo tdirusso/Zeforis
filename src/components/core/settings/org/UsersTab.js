@@ -65,7 +65,7 @@ export default function UsersTab() {
                               <Tooltip title="Edit Permissions">
                                 <IconButton
                                   edge="end"
-                                  sx={{ mr: 0.5 }}
+                                  style={{ marginRight: '5px' }}
                                   onClick={() => handleEditUser(orgUser)}>
                                   <LockOpenIcon fontSize="small" />
                                 </IconButton>

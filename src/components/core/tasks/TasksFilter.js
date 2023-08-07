@@ -16,7 +16,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import './styles.css';
+import './styles.scss';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -67,24 +67,13 @@ export default function TasksFilter(props) {
 
   return (
     <Grid item xs={12}>
-      <Paper sx={{ p: 1 }}>
+      <Paper style={{ padding: '8px' }}>
         <Accordion
-          disableGutters
-          sx={{
-            '&.MuiPaper-root': {
-              p: '0 !important',
-              boxShadow: 0
-            }
-          }}>
+          className="tasks-filter-accordion"
+          disableGutters>
           <AccordionSummary
-            sx={{
-              justifyContent: 'flex-start',
-              '& .MuiAccordionSummary-content': {
-                flexGrow: 0
-              }
-            }}
-            expandIcon={<ExpandMoreIcon />}>
-            <Typography sx={{ mr: 1, display: 'flex', alignItems: 'center' }} variant="body1">
+            className="accordion-summary" expandIcon={<ExpandMoreIcon />}>
+            <Typography className="flex-ac" style={{ marginRight: '0.5rem' }} variant="body1">
               <FilterAltIcon htmlColor="#cbced4" />
               Filters
             </Typography>

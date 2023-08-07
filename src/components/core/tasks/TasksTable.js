@@ -19,7 +19,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useLocation, useOutletContext } from "react-router-dom";
-import './styles.css';
+import './styles.scss';
 import { useEffect, useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import TasksFilter from "./TasksFilter";
@@ -63,11 +63,6 @@ export default function TasksTable({ tasks }) {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterKeyTasks, setFilterKeyTasks] = useState(Boolean(preFilterKeyTasks));
   const [sortBy, setSortBy] = useState(preSort);
-  const [theTasks, setTheTasks] = useState(tasks);
-
-  useEffect(() => {
-    setTheTasks(tasks);
-  }, [tasks]);
 
   const handleTaskSelection = task => {
     if (isEditMode) {
@@ -94,7 +89,7 @@ export default function TasksTable({ tasks }) {
     setIsEditMode(val);
   };
 
-  let filteredTasks = [...theTasks];
+  let filteredTasks = [...tasks];
 
   filteredTasks = filteredTasks.filter(task => {
     let shouldReturnTask = true;
@@ -189,11 +184,10 @@ export default function TasksTable({ tasks }) {
       />
 
       <Grid item xs={12}>
-        <Paper sx={{ px: 0, overflowX: 'auto' }}>
+        <Paper className="px0" style={{ overflowX: 'auto' }}>
           <Box px={3} mb={2}>
             <Button
               variant="contained"
-              sx={{ mr: 5 }}
               onClick={() => openDrawer('create-task')}>
               New Task
             </Button>
@@ -217,7 +211,7 @@ export default function TasksTable({ tasks }) {
             <Button
               hidden={!isEditMode}
               variant="outlined"
-              sx={{ mr: 1.5 }}
+              style={{ marginRight: '0.75rem' }}
               onClick={() => setEditSelectedTasksModalOpen(true)}
               disabled={selectedTasks.length === 0}
               startIcon={<EditIcon />}>
@@ -233,7 +227,7 @@ export default function TasksTable({ tasks }) {
             {
               selectedTasks.length > 0 ?
                 <Button
-                  sx={{ ml: 'auto' }}
+                  style={{ marginLeft: 'auto' }}
                   onClick={() => setDeleteTasksModalOpen(true)}
                   startIcon={<DeleteIcon />}
                   color="error">
@@ -243,23 +237,22 @@ export default function TasksTable({ tasks }) {
             }
           </Box>
           <Table
-            sx={{ minWidth: 650 }}
             className="tasks-table"
             size="small">
             <TableHead>
-              <TableRow sx={{ pb: 3 }}>
+              <TableRow style={{ paddingBottom: '1.5rem' }}>
                 <TableCell hidden={!isEditMode}>
                   <Checkbox
                     onChange={handleSelectAll}
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '350px' }}>Name</TableCell>
+                <TableCell style={{ width: '350px' }}>Name</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Folder</TableCell>
                 <TableCell>Due</TableCell>
-                <TableCell sx={{ width: '175px' }}>Tags</TableCell>
-                <TableCell sx={{ width: '30px' }}></TableCell>
+                <TableCell style={{ width: '175px' }}>Tags</TableCell>
+                <TableCell style={{ width: '30px' }}></TableCell>
               </TableRow>
             </TableHead>
 
@@ -284,7 +277,7 @@ export default function TasksTable({ tasks }) {
                       onClick={() => handleTaskSelection(task)}
                       key={task.task_id}
                       className={isSelectedRow ? 'selected' : ''}
-                      sx={{ position: 'relative', }}>
+                      style={{ position: 'relative', }}>
                       <TableCell hidden={!isEditMode}>
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
@@ -294,7 +287,7 @@ export default function TasksTable({ tasks }) {
                             task.is_key_task ?
                               <StarIcon
                                 htmlColor="gold"
-                                sx={{ mr: 0.3 }}
+                                style={{ marginRight: '5px' }}
                                 fontSize="small"
                               /> :
                               ''
@@ -323,7 +316,7 @@ export default function TasksTable({ tasks }) {
                             key={tagId}
                             label={tagsMap[tagId].name}
                             size="small"
-                            sx={{ m: 0.5 }}
+                            style={{ marginRight: '10px' }}
                           />)}
                       </TableCell>
                       <TableCell>

@@ -84,13 +84,13 @@ export default function CreateEngagementDialog(props) {
       onClose={handleClose}
       TransitionComponent={close ? toggleableTransition : fixedTransition}
       fullScreen>
-      <Box className="flex-centered" sx={{ height: '100%' }}>
+      <Box className="flex-centered" style={{ height: '100%' }}>
         <Box textAlign="center" mb={'100px'} maxWidth={600}>
           <IconButton
             hidden={!close}
             size='large'
             onClick={handleClose}
-            sx={{
+            style={{
               position: 'absolute',
               left: '100px',
               top: '30px'
@@ -105,7 +105,7 @@ export default function CreateEngagementDialog(props) {
               <Box component="h2" mb={1} mt={2}>
                 Create an Engagement
               </Box>
-              <Divider sx={{ my: 3 }} />
+              <Divider className='my3' />
               <Typography>
                 An engagement is a project with one of your customers/clients.
               </Typography>
@@ -116,7 +116,7 @@ export default function CreateEngagementDialog(props) {
           </Fade>
           <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '200ms' }}>
             <form onSubmit={handleCreateEngagement}>
-              <Box sx={{ mt: 3, mb: 3 }}>
+              <Box className='my3'>
                 <TextField
                   placeholder="Engagement Name"
                   fullWidth

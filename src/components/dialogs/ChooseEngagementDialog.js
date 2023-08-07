@@ -94,7 +94,7 @@ export default function ChooseEngagementDialog(props) {
 
   let pageIcon = <Box
     component="h1"
-    sx={{ color: org.brandColor }}>
+    style={{ color: org.brandColor }}>
     {org.name}
   </Box>;
 
@@ -111,8 +111,8 @@ export default function ChooseEngagementDialog(props) {
         onClose={handleClose}
         TransitionComponent={close ? toggleableTransition : fixedTransition}
         fullScreen>
-        <DialogContent sx={{ width: 1200, margin: '0 auto' }}>
-          <Box sx={{ my: 3 }}>
+        <DialogContent style={{ width: 1200, margin: '0 auto' }}>
+          <Box className='my3'>
             <Box
               display="flex"
               position="relative"
@@ -122,7 +122,7 @@ export default function ChooseEngagementDialog(props) {
                 hidden={!close}
                 size='large'
                 onClick={handleClose}
-                sx={{
+                style={{
                   position: 'absolute',
                   left: '-8px',
                 }}>
@@ -137,12 +137,14 @@ export default function ChooseEngagementDialog(props) {
               <Button
                 startIcon={<SwapHorizOutlined />}
                 onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
-                sx={{ position: 'absolute', right: '8px' }}
+                style={{ position: 'absolute', right: '8px' }}
                 variant='outlined'>
                 Change org
               </Button>
             </Box>
-            <Divider sx={{ my: 3, width: '85%', mx: 'auto' }} />
+            <Box className='m0a' style={{ width: '85%' }}>
+              <Divider className='my3' />
+            </Box>
             <Box m='0 auto' width={300}>
               <TextField
                 variant='standard'
@@ -174,7 +176,7 @@ export default function ChooseEngagementDialog(props) {
                     <Zoom key={e.id} appear={shouldAnimate} in style={{ transitionDelay: `${(index * 15) + 100}ms` }}>
                       <Paper
                         onClick={() => handleLoadEngagement(e.id)}
-                        sx={{ m: 2 }}
+                        style={{ margin: '1rem' }}
                         className='choose-engagement-btn'>
                         {
                           isLoadingEngagement && engagementId === e.id ? <CircularProgress size={20} /> : e.name
@@ -190,7 +192,7 @@ export default function ChooseEngagementDialog(props) {
       </Dialog>
 
       <Menu
-        PaperProps={{ sx: { minWidth: 200 } }}
+        PaperProps={{ style: { minWidth: 200 } }}
         anchorEl={changeOrgMenuAnchor}
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>

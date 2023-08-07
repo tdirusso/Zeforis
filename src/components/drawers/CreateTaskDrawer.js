@@ -156,9 +156,9 @@ export default function CreateTaskDrawer(props) {
       onClose={handleClose}
       hideBackdrop
       variant='persistent'
-      PaperProps={{ sx: { width: '450px', pb: 0 } }}>
+      PaperProps={{ style: { width: '450px' } }}>
       <DialogContent>
-        <Box sx={{ mb: 3 }}>
+        <Box style={{ marginBottom: '1.5rem' }}>
           <Grid container rowSpacing={2} columnSpacing={1.5}>
             <Grid item xs={12} mb={2}>
               <Box
@@ -169,14 +169,14 @@ export default function CreateTaskDrawer(props) {
                 <IconButton
                   size='large'
                   onClick={handleClose}
-                  sx={{
+                  style={{
                     position: 'absolute',
                     left: '-8px',
                   }}>
                   <CloseIcon />
                 </IconButton>
                 <DialogTitle
-                  sx={{
+                  style={{
                     textAlign: 'center',
                   }}>
                   Create New Task
@@ -199,7 +199,7 @@ export default function CreateTaskDrawer(props) {
                 placeholder='https://'
                 InputProps={{
                   startAdornment:
-                    <InputAdornment position='start' sx={{ transform: 'rotate(-45deg)' }}>
+                    <InputAdornment position='start' style={{ transform: 'rotate(-45deg)' }}>
                       <LinkIcon />
                     </InputAdornment>
                 }}
@@ -299,7 +299,7 @@ export default function CreateTaskDrawer(props) {
         </Box>
 
         <LoadingButton
-          sx={{ mt: '10px' }}
+          style={{ marginTop: '1rem' }}
           variant='contained'
           onClick={handleCreateTask}
           type='submit'
