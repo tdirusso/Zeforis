@@ -135,15 +135,14 @@ export default function ReportGeneratorTab() {
             <br></br><br></br>
             After generating the report, it will be displayed below in-line where it can then be copied into emails and other documents.
           </Typography>
-          <Divider sx={{ my: 4 }} />
+          <Divider className="my4" />
           <Box component='h4'>Date Range</Box>
           <Box my={2} mt={1} display='flex' alignItems='center'>
-            <FormControl sx={{ mr: 3 }}>
+            <FormControl style={{ marginRight: '25px' }}>
               <RadioGroup
                 defaultValue="this-week"
                 value={dateRange}
-                onChange={e => setDateRange(e.target.value)}
-              >
+                onChange={e => setDateRange(e.target.value)}>
                 <FormControlLabel disabled={isLoading} value="this-week" control={<Radio />} label="This week" />
                 <FormControlLabel disabled={isLoading} value="last-week" control={<Radio />} label="Last week" />
                 <FormControlLabel disabled={isLoading} value="custom" control={<Radio />} label="Custom" />
@@ -158,7 +157,7 @@ export default function ReportGeneratorTab() {
                   onChange={handleDateRangeStartChange}
                   renderInput={(params) => <TextField
                     {...params}
-                    sx={{ mr: 2 }}
+                    style={{ marginRight: '1rem' }}
                     label='From'
                   />}
                 ></DatePicker>
@@ -179,7 +178,7 @@ export default function ReportGeneratorTab() {
 
           <Box component='h4' mt={4}>Task Criteria</Box>
           <Box my={2} mt={1}>
-            <FormControl sx={{ mr: 3 }}>
+            <FormControl>
               <RadioGroup
                 value={taskCriteria}
                 onChange={e => setTaskCriteria(e.target.value)}>
@@ -189,7 +188,7 @@ export default function ReportGeneratorTab() {
                   control={<Radio />}
                   label="Date due"
                 />
-                <FormHelperText sx={{ m: 0 }}>
+                <FormHelperText className="m0">
                   The report will only include tasks that have a due date assigned within the selected time range.
                 </FormHelperText>
                 <FormControlLabel
@@ -198,7 +197,7 @@ export default function ReportGeneratorTab() {
                   control={<Radio />}
                   label="Date updated"
                 />
-                <FormHelperText sx={{ m: 0 }}>
+                <FormHelperText className="m0">
                   The report will only include tasks that have been updated within the selected time range, regardless of the due date.
                 </FormHelperText>
                 <FormControlLabel
@@ -207,7 +206,7 @@ export default function ReportGeneratorTab() {
                   control={<Radio />}
                   label="Both"
                 />
-                <FormHelperText sx={{ m: 0 }}>
+                <FormHelperText className="m0">
                   The report will include tasks that have been updated within the selected time range, regardless of the due date, as well as tasks that have a due date within the selected time range.
                 </FormHelperText>
               </RadioGroup>
@@ -215,11 +214,11 @@ export default function ReportGeneratorTab() {
           </Box>
           <Box component='h4' mt={4}>Status Criteria</Box>
           <Box my={2} mt={3}>
-            <FormControl sx={{ width: 550 }}>
+            <FormControl style={{ width: 550 }}>
               <InputLabel id="to-label">Choose statuses</InputLabel>
               <Select
                 renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box className="flex wrap" style={{ gap: 6 }}>
                     {selected.map((value) => (
                       <Chip
                         className={value}
@@ -244,7 +243,7 @@ export default function ReportGeneratorTab() {
                       <Chip
                         label={name}
                         className={name}
-                        sx={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer' }}
                       />
                     </MenuItem>
                   )}
@@ -266,7 +265,7 @@ export default function ReportGeneratorTab() {
 
           <Box mt={5} width={'100%'}>
             <LoadingButton
-              sx={{ width: '100%', height: '50px' }}
+              style={{ width: '100%', height: '50px' }}
               size="large"
               onClick={generateReport}
               loading={isLoading}
@@ -329,7 +328,7 @@ function ReportDataPage(props) {
           onClick={copyReport}>
           {copyButtonText}
         </Button>
-        <Divider sx={{ my: 4 }} />
+        <Divider className="my4" />
         <Box ref={reportContainer}>
           <img src={org.logo} alt="" width={200} />
           <Box component="h2">{engagement.name} Update</Box>

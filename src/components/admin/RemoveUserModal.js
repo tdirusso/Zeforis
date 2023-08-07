@@ -60,13 +60,13 @@ export default function RemoveUserModal({ open, setOpen, user }) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent >
-          <DialogContentText sx={{ mb: 5 }}>
+          <DialogContentText style={{ marginBottom: '2rem' }}>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>
             <br></br>
             <br></br>
             Proceeding will remove them from all engagements within {orgName} and unassign all tasks that are currently assigned to them.
           </DialogContentText>
-          <DialogActions sx={{ p: 0 }}>
+          <DialogActions style={{ padding: 0 }}>
             <Button
               fullWidth
               disabled={isLoading}

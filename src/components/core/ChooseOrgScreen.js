@@ -29,17 +29,14 @@ export default function ChooseOrgScreen(props) {
 
   return (
     <Box>
-      <DialogContent sx={{ width: 1200, margin: '0 auto' }}>
-        <Box sx={{ mb: 3 }}>
+      <DialogContent className='m0a' style={{ width: 1200 }}>
+        <Box style={{ marginBottom: '4rem' }}>
           <Box
             display="flex"
             position="relative"
             alignItems="center"
             justifyContent="center">
-            <DialogTitle
-              sx={{
-                textAlign: 'center',
-              }}>
+            <DialogTitle>
               Choose an Organization
             </DialogTitle>
           </Box>
@@ -55,8 +52,7 @@ export default function ChooseOrgScreen(props) {
                   <Zoom key={org.id} appear in style={{ transitionDelay: `${index * 50}ms` }}>
                     <Paper
                       onClick={() => handleLoadOrg(org.id)}
-                      sx={{ m: 2 }}
-                      className='choose-org-btn'>
+                      className='m2 choose-org-btn'>
                       {
                         isLoadingOrg && orgId === org.id ? <CircularProgress size={20} /> : org.name
                       }

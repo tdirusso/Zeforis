@@ -191,22 +191,21 @@ export default function ImportTab() {
           Note &ndash; setting the due date, assignee, status and folder can be done in bulk from the tasks page after importing.
         </Typography>
         <Box mt={1}>
-          <Button sx={{ p: 0 }}>
+          <Button style={{ padding: 0 }}>
             <Box
-              display='flex'
-              alignItems='center'
-              p={'6px 8px'}
+              className="flex-ac"
+              style={{ padding: '6px 8px' }}
               component="a"
               href={importTemplate}
               download='Import Tasks Template'>
-              <DownloadIcon fontSize="small" sx={{ mr: 0.25 }} />
+              <DownloadIcon fontSize="small" style={{ marginRight: '7px' }} />
               Download Import Template
             </Box>
           </Button>
         </Box>
         <Box mt={2} mb={3}>
           <Accordion
-            sx={{ p: 0, borderRadius: '16px !important' }}
+            sx={{ borderRadius: '16px !important', p: 0 }}
             disableGutters>
             <AccordionSummary
               sx={{
@@ -269,8 +268,8 @@ export default function ImportTab() {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell component="th" scope="row" sx={{ borderBottom: 'none' }}>tags</TableCell>
-                      <TableCell sx={{ borderBottom: 'none' }}>
+                      <TableCell component="th" scope="row" style={{ borderBottom: 'none' }}>tags</TableCell>
+                      <TableCell style={{ borderBottom: 'none' }}>
                         A comma separated list of tags to apply to the task.
                         <br></br><br></br>
                         Ex.  tag1,tag2,tag3...
@@ -337,7 +336,7 @@ export default function ImportTab() {
         </Box>
         <Box mt={5} width={'100%'}>
           <LoadingButton
-            sx={{ width: '100%', height: '50px' }}
+            style={{ width: '100%', height: '50px' }}
             size="large"
             onClick={handleImport}
             loading={isLoading}

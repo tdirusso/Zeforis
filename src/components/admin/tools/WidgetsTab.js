@@ -167,16 +167,16 @@ export default function WidgetsTab() {
         </Paper>
       </Grid>
       <Grid item xs={3}>
-        <Paper sx={{ px: 0 }}>
-          <Box component="h5" mx={2}>Your Widgets</Box>
-          <Divider sx={{ py: 1 }} />
-          <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+        <Paper className="px0">
+          <Box component="h5" mx={2} style={{ marginBottom: '20px' }}>Your Widgets</Box>
+          <Divider className="my1" />
+          <Box style={{ maxHeight: 300, overflow: 'auto' }}>
             <List dense>
-              <ListSubheader sx={{ px: 0 }}>
+              <ListSubheader className="px0">
                 <ListItemButton
                   disabled={loading}
                   onClick={() => setSelectedWidget({ id: 'new' })}>
-                  <ListItemText sx={{ color: '#bebebe' }}>
+                  <ListItemText style={{ color: '#bebebe' }}>
                     + New Widget
                   </ListItemText>
                 </ListItemButton>
@@ -184,7 +184,7 @@ export default function WidgetsTab() {
               {
                 widgets.map((widget) => {
                   return (
-                    <ListItem key={widget.id} sx={{ px: 0, py: 0 }}>
+                    <ListItem key={widget.id} className="p0">
                       <ListItemButton
                         disabled={loading}
                         selected={selectedWidget?.id === widget.id}
@@ -202,12 +202,13 @@ export default function WidgetsTab() {
         </Paper>
       </Grid>
       <Grid item xs={9}>
-        <Paper sx={{ display: selectedWidget ? 'flex' : 'none' }}>
+        <Paper style={{ display: selectedWidget ? 'flex' : 'none' }}>
           <Box flexBasis={'50%'} py={2} px={2}>
             <Box mb={2}>
               <FormGroup>
                 <FormControlLabel
-                  sx={{ justifyContent: 'flex-end', mx: 0 }}
+                  className="mx0"
+                  style={{ justifyContent: 'flex-end' }}
                   labelPlacement="start"
                   control={<Switch
                     disabled={loading}
@@ -222,7 +223,7 @@ export default function WidgetsTab() {
                 <Box display='flex'>
                   <Typography>Background color</Typography>
                   <Box
-                    sx={{
+                    style={{
                       cursor: 'pointer',
                       background: backgroundColor
                     }}
@@ -237,7 +238,7 @@ export default function WidgetsTab() {
                 <Box display='flex'>
                   <Typography>Text color</Typography>
                   <Box
-                    sx={{
+                    style={{
                       cursor: 'pointer',
                       background: textColor
                     }}
@@ -275,7 +276,7 @@ export default function WidgetsTab() {
               <TextField
                 disabled={loading}
                 value={widgetBody}
-                inputProps={{ sx: { resize: 'vertical' } }}
+                inputProps={{ style: { resize: 'vertical' } }}
                 fullWidth
                 variant="standard"
                 multiline
@@ -285,7 +286,6 @@ export default function WidgetsTab() {
             </Box>
             <Box display='flex' justifyContent='space-between'>
               <LoadingButton
-                sx={{ alignSelf: 'center' }}
                 size="large"
                 loading={loading}
                 onClick={selectedWidget?.id === 'new' ? handleCreateWidget : handleUpdateWidget}
@@ -297,8 +297,7 @@ export default function WidgetsTab() {
                   onClick={e => setDeleteMenuAnchor(e.currentTarget)}
                   disabled={loading}
                   size="large"
-                  edge="end"
-                  sx={{ mr: 0.5 }}>
+                  edge="end">
                   <DeleteOutlineIcon color="error" />
                 </IconButton>
               </Tooltip>
@@ -306,7 +305,7 @@ export default function WidgetsTab() {
           </Box>
 
           <Box flexBasis={'50%'} p={5}>
-            <Paper sx={{
+            <Paper style={{
               minHeight: '250px',
               background: backgroundColor
             }}>
@@ -321,7 +320,7 @@ export default function WidgetsTab() {
                   '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
                 }}
                 inputProps={{
-                  sx: {
+                  style: {
                     color: textColor,
                     fontWeight: 400,
                     fontSize: '0.875rem'
@@ -384,12 +383,6 @@ export default function WidgetsTab() {
         open={deleteMenuOpen}
         onClose={() => setDeleteMenuAnchor(null)}>
         <Box px={2} py={1}>
-          <Button
-            sx={{ mr: 0.5 }}
-            disabled={loading}
-            onClick={() => setDeleteMenuAnchor(null)}>
-            Cancel
-          </Button>
           <LoadingButton
             disabled={loading}
             color='error'
@@ -403,9 +396,3 @@ export default function WidgetsTab() {
     </>
   );
 };
-
-// function EditWidgetPanel(props) {
-//   return (
-
-//   );
-// }

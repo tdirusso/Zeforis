@@ -95,7 +95,7 @@ export default function ExportTab() {
         </Typography>
         <Box mt={5} width={'100%'}>
           <LoadingButton
-            sx={{ width: '100%', height: '50px' }}
+            style={{ width: '100%', height: 50 }}
             size="large"
             onClick={handleExport}
             loading={loading}

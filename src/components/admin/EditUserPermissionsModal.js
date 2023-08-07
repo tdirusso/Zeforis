@@ -117,12 +117,12 @@ export default function EditUserPermissionsModal(props) {
     <div>
       <Dialog open={open} onClose={handleClose} PaperProps={{ style: { minWidth: 900 } }}>
         <DialogContent>
-          <DialogContentText display="flex" alignItems="center" sx={{ mb: 1 }}>
+          <DialogContentText style={{ marginBottom: '1rem' }} className='flex-ac'>
             Viewing permissions for&nbsp; <strong>{user?.firstName} {user?.lastName}</strong>
             <CircularProgress
               size={20}
-              sx={{
-                ml: 1,
+              style={{
+                marginLeft: '0.5rem',
                 display: isLoading ? 'inline-block' : 'none'
               }}
             />
@@ -144,7 +144,7 @@ export default function EditUserPermissionsModal(props) {
               Administrator
             </Box>
           </Box>
-          <Divider sx={{ my: 1 }} />
+          <Divider style={{ margin: '0.5rem 0' }} />
           {
             engagements.map(engagement => {
               const isMember = memberOfEngagementIds.includes(engagement.id);
