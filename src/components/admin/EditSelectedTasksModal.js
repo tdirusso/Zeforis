@@ -175,8 +175,8 @@ export default function EditSelectedTasksModal(props) {
               labelId="to-label"
               value={isKey}
               label="To"
-              sx={{
-                '& .MuiSelect-select': {
+              SelectDisplayProps={{
+                style: {
                   display: 'flex'
                 }
               }}

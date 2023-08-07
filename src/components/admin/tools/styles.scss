@@ -1,0 +1,15 @@
+.import-tab {
+  .field-mappings-accordion {
+    padding: 0 !important;
+    border-radius: 16px !important;
+  }
+
+  .MuiAccordionSummary-content {
+    flex-grow: unset !important;
+    margin-right: 8px !important;
+  }
+}
+
+.widget-color-picker-menu .MuiList-root {
+  padding: 0 !important;
+}

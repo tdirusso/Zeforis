@@ -51,7 +51,7 @@ export default function GeneralTab() {
     <>
       <Box mt={4}>
         <TextField
-          sx={{ minWidth: '400px' }}
+          style={{ minWidth: '400px' }}
           value={engagementName}
           disabled={loading}
           onChange={e => setEngagementName(e.target.value)}
@@ -71,14 +71,13 @@ export default function GeneralTab() {
 
       <Box mt={3.5}>
         <Button
-          sx={{ mr: 2 }}
           variant="outlined"
           onClick={() => openDialog('choose-engagement')}
           startIcon={<SwapHorizOutlinedIcon />}>
           Change
         </Button>
       </Box>
-      <Divider sx={{ my: 4 }} />
+      <Divider className="my4" />
       <Box>
         <Button
           startIcon={<DeleteIcon />}

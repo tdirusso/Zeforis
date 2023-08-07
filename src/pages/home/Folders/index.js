@@ -199,7 +199,6 @@ function Folder({ folder, handleMenuClick }) {
         className="folder-item"
         onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}
         sx={{
-          height: '100%',
           position: 'relative',
           width: 180
         }}>

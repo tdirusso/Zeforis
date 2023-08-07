@@ -10,7 +10,7 @@ export default function KeyTasks({ tasks }) {
 
   return (
     <Grid item xs={12} md={7}>
-      <Paper sx={{ height: '100%' }}>
+      <Paper style={{ height: '100%' }}>
         <Box
           display="flex"
           alignItems="center"
@@ -23,13 +23,13 @@ export default function KeyTasks({ tasks }) {
             <StarIcon
               fontSize="small"
               htmlColor="gold"
-              sx={{ mr: 0.3 }}
+              style={{marginRight: '5px'}}
             />
             Key Tasks
           </Box>
           <Button
             onClick={() => navigate('/home/tasks?preFilterKeyTasks=true')}
-            sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
+            style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View All
           </Button>
         </Box>

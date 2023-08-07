@@ -169,9 +169,6 @@ export default function TagsTab() {
             color="primary"
             label="New Tag"
             variant="outlined"
-            sx={{
-              mr: 2
-            }}
             deleteIcon={<AddCircleIcon />}
             onClick={e => setNewTagMenuAnchor(e.currentTarget)}
             onDelete={e => setNewTagMenuAnchor(e.currentTarget)}>
@@ -188,8 +185,8 @@ export default function TagsTab() {
                 <Box>
                   <Chip
                     label={tag.name}
-                    sx={{
-                      mr: 2
+                    style={{
+                      marginRight: '1rem'
                     }}
                     onClick={e => handleEditTag(e, tag)}
                     onDelete={e => openDeleteTagConfirmation(e, tag)}>
@@ -223,7 +220,6 @@ export default function TagsTab() {
             disabled={updatingTag}
             placeholder="Tag name"
             fullWidth
-            sx={{ mb: 1 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">
                 <LoadingButton
@@ -253,7 +249,6 @@ export default function TagsTab() {
             disabled={creatingTag}
             placeholder="Tag name"
             fullWidth
-            sx={{ mb: 1 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">
                 <LoadingButton

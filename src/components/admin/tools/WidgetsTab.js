@@ -6,6 +6,7 @@ import { ChromePicker } from "react-color";
 import { useOutletContext } from "react-router-dom";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { createWidget, deleteWidget, updateWidget } from "../../../api/widgets";
+import './styles.scss';
 
 export default function WidgetsTab() {
 
@@ -159,7 +160,7 @@ export default function WidgetsTab() {
   return (
     <>
       <Grid item xs={12}>
-        <Paper>
+        <Paper className="widgets-tab">
           <Typography variant="body2">
             The Widget Creator allows you to create personalized widgets that will display on your customer's dashboard.
             Customize titles, content, and design to enhance communication that engages and informs your customer's.
@@ -201,6 +202,7 @@ export default function WidgetsTab() {
           </Box>
         </Paper>
       </Grid>
+
       <Grid item xs={9}>
         <Paper style={{ display: selectedWidget ? 'flex' : 'none' }}>
           <Box flexBasis={'50%'} py={2} px={2}>
@@ -304,21 +306,19 @@ export default function WidgetsTab() {
             </Box>
           </Box>
 
-          <Box flexBasis={'50%'} p={5}>
+          <Box style={{ flexBasis: '50%', padding: '40px' }}>
             <Paper style={{
               minHeight: '250px',
               background: backgroundColor
             }}>
               <Box
-                color={textColor}
-                component="h5"
-                mb={1}>{widgetTitle}</Box>
+                style={{ color: textColor, marginBottom: '8px' }}
+                component="h5">
+                {widgetTitle}
+              </Box>
               <TextField
+                className="readonly-textfield"
                 fullWidth
-                sx={{
-                  '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
-                  '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
-                }}
                 inputProps={{
                   style: {
                     color: textColor,
@@ -337,7 +337,7 @@ export default function WidgetsTab() {
       </Grid>
 
       <Menu
-        PaperProps={{ sx: { '& .MuiList-root': { p: 0 } } }}
+        PaperProps={{ className: 'widget-color-picker-menu' }}
         anchorEl={bgColorMenu}
         open={bgColorMenuOpen}
         transformOrigin={{
@@ -349,7 +349,6 @@ export default function WidgetsTab() {
           horizontal: 'left',
         }}
         onClose={() => setBgColorMenu(null)}>
-
         <ChromePicker
           color={backgroundColor}
           disableAlpha
@@ -358,7 +357,8 @@ export default function WidgetsTab() {
       </Menu>
 
       <Menu
-        PaperProps={{ sx: { '& .MuiList-root': { p: 0 } } }}
+        className="color-picker-menu"
+        PaperProps={{ className: 'widget-color-picker-menu' }}
         anchorEl={textColorMenu}
         open={textColorMenuOpen}
         transformOrigin={{

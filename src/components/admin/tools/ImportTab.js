@@ -19,6 +19,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useOutletContext } from "react-router-dom";
 import { importTasks } from "../../../api/tasks";
+import './styles.scss';
 
 const statusesString = statuses.map(({ name }) => name).join(', ');
 const statusesSet = new Set(statuses.map(({ name }) => name.toLowerCase()));
@@ -182,7 +183,7 @@ export default function ImportTab() {
 
   return (
     <Grid item xs={12}>
-      <Paper>
+      <Paper className="import-tab">
         <Typography variant="body2">
           The import tool is designed to simplify and expedite the process of adding tasks for your engagements. With just a few clicks, you can seamlessly import a CSV spreadsheet containing a list of tasks specific to a particular engagement, saving you valuable time and effort.
           <br></br><br></br>
@@ -205,17 +206,9 @@ export default function ImportTab() {
         </Box>
         <Box mt={2} mb={3}>
           <Accordion
-            sx={{ borderRadius: '16px !important', p: 0 }}
+            className="field-mappings-accordion"
             disableGutters>
-            <AccordionSummary
-              sx={{
-                '& .MuiAccordionSummary-content': {
-                  flexGrow: 'unset !important',
-                  mr: 1
-                }
-              }}
-              expandIcon={<ExpandMoreIcon />}
-            >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography>View Column Field Mappings</Typography>
             </AccordionSummary>
             <AccordionDetails>

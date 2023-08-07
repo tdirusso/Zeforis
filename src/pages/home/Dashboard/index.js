@@ -72,7 +72,7 @@ export default function Dashboard() {
 function NoFoldersMessage({ openDrawer, isAdmin }) {
   return (
     <Grid item xs={12} md={4}>
-      <Paper sx={{ height: '100%' }}>
+      <Paper>
         <Typography variant="body2">
           There are currently no key folders.
         </Typography>

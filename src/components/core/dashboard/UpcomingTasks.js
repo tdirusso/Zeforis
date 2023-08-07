@@ -13,7 +13,7 @@ export default function UpcomingTasks({ tasks }) {
 
   return (
     <Grid item xs={12} md={5}>
-      <Paper sx={{ height: '100%' }}>
+      <Paper style={{ height: '100%' }}>
         <Box
           display="flex"
           alignItems="center"
@@ -26,13 +26,13 @@ export default function UpcomingTasks({ tasks }) {
             <AccessAlarmIcon
               fontSize="small"
               color="primary"
-              sx={{ mr: 0.6 }}
+              style={{ marginRight: '5px' }}
             />
             Upcoming Tasks
           </Box>
           <Button
             onClick={() => navigate('/home/tasks?preSort=dateDue')}
-            sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
+            style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View All
           </Button>
         </Box>
@@ -98,7 +98,7 @@ function UpcomingTaskRow({ task }) {
       <Box flex={1} textAlign="center">
         <Chip
           label={task.status}
-          sx={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer' }}
           className={task.status} />
       </Box>
       <Box flexBasis={'10%'}>

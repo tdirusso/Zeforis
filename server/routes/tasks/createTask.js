@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
     }
 
     const taskObject = {
-      id: newTask,
+      id: newTaskId,
       name,
       description,
       status,

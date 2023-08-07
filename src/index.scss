@@ -191,6 +191,13 @@ h6 {
   font-weight: 300 !important;
 }
 
+.readonly-textfield {
+  & .MuiInputBase-root::before,
+  & .MuiInputBase-root::after {
+    border-bottom: none !important;
+  }
+}
+
 .choose-engagement-btn,
 .choose-org-btn {
   cursor: pointer;

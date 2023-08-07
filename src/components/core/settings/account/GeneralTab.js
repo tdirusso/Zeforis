@@ -97,7 +97,7 @@ export default function GeneralTab() {
   return (
     <>
       <Box component="h4" my={3} >Personal</Box>
-      <Box sx={{ display: 'flex', maxWidth: '600px' }}>
+      <Box style={{ display: 'flex', maxWidth: '600px' }}>
         <TextField
           fullWidth
           variant="standard"
@@ -105,7 +105,7 @@ export default function GeneralTab() {
           disabled={isUpdatingName}
           inputRef={firstName}
           defaultValue={user.firstName}
-          sx={{ mr: 4 }}
+          style={{ marginRight: '2rem' }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -138,7 +138,7 @@ export default function GeneralTab() {
           Save changes
         </LoadingButton>
       </Box>
-      <Divider sx={{ my: 4 }} />
+      <Divider className="my4" />
       <Box component="h4" my={3} >Email & Password</Box>
       <Box my={3}>
         <Box maxWidth={600}>
@@ -169,7 +169,7 @@ export default function GeneralTab() {
       </Box>
 
       <Menu
-        PaperProps={{ sx: { maxWidth: 350 } }}
+        PaperProps={{ style: { maxWidth: 350 } }}
         anchorEl={changePasswordMenuAnchor}
         open={changePasswordMenuOpen}
         onClose={() => setChangePasswordMenuAnchor(null)}>

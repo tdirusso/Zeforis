@@ -24,7 +24,7 @@ export default function KeyFolders({ folders }) {
 
           return (
             <Grid item xs={12} md={4} key={folder.id}>
-              <Paper sx={{ height: '100%' }}>
+              <Paper style={{ height: '100%' }}>
                 <Box
                   display="flex"
                   alignItems="center"
@@ -36,7 +36,7 @@ export default function KeyFolders({ folders }) {
                     alignItems="center">
                     <FolderIcon
                       htmlColor="#cbced4"
-                      sx={{ mr: 0.75 }}
+                      style={{ marginRight: '6px' }}
                     />
                     {folder.name}
                   </Box>
@@ -71,7 +71,7 @@ function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
         There are no tasks in this folder.
       </Typography>
       <Button
-        sx={{ mt: 1.5 }}
+        style={{ marginTop: '12px' }}
         variant="outlined"
         onClick={handleOpenCreateTaskDrawer}
         startIcon={<AddTaskIcon />}>

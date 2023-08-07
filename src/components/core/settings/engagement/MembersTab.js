@@ -97,7 +97,7 @@ export default function MembersTab() {
 
   const handleInviteEngagementUser = async e => {
     e.preventDefault();
-    
+
     if (!inviteeEmail) {
       openSnackBar("Please enter the user's email address to invite.");
       return;
@@ -193,7 +193,7 @@ export default function MembersTab() {
           <Button
             hidden={!isAdmin}
             variant="outlined"
-            sx={{ mb: 2 }}
+            style={{ marginBottom: '1rem' }}
             onClick={e => setInviteUserMenuAnchor(e.currentTarget)}
             startIcon={<PersonAddIcon />}>
             Invite someone to {engagement.name}
@@ -309,13 +309,6 @@ export default function MembersTab() {
         open={removeUserMenuOpen}
         onClose={() => setRemoveUserMenuAnchor(null)}>
         <Box px={2} py={1}>
-          <Button
-            sx={{ mr: 0.5 }}
-            disabled={isRemovingUser}
-            size="small"
-            onClick={() => setRemoveUserMenuAnchor(null)}>
-            Cancel
-          </Button>
           <LoadingButton
             disabled={isRemovingUser}
             color='error'
@@ -332,7 +325,10 @@ export default function MembersTab() {
         anchorEl={inviteUserMenuAnchor}
         open={inviteUserMenuOpen}
         onClose={handleInviteUserMenuClose}>
-        <Box sx={{ py: 2, px: 2, minWidth: '300px' }} component="form" onSubmit={handleInviteEngagementUser}>
+        <Box
+          style={{ padding: '1rem', minWidth: 300 }}
+          component="form"
+          onSubmit={handleInviteEngagementUser}>
           <Box>
             <TextField
               variant="standard"
@@ -368,7 +364,7 @@ export default function MembersTab() {
                   <Tooltip title={inviteUserAdminTooltip} placement="top">
                     <HelpIcon
                       fontSize="small"
-                      sx={{ ml: 0.5, cursor: 'default' }}
+                      style={{ marginLeft: '5px', cursor: 'default' }}
                       htmlColor="#c7c7c7"
                     />
                   </Tooltip>

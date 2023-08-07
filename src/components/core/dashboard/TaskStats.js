@@ -7,7 +7,7 @@ export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
   return (
     <>
       <Grid item xs={12} md={4}>
-        <Paper sx={{ height: '100%' }}>
+        <Paper style={{ height: '100%' }}>
           <Box display="flex" alignItems="center">
             <Box className="in-progress-icon" mr={3}>
               <EditIcon />
@@ -21,7 +21,7 @@ export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
       </Grid>
 
       <Grid item xs={12} md={4}>
-        <Paper sx={{ height: '100%' }}>
+        <Paper style={{ height: '100%' }}>
           <Box display="flex" alignItems="center">
             <Box className="completed-icon" mr={3}>
               <CheckIcon />
@@ -35,7 +35,7 @@ export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
       </Grid>
 
       <Grid item xs={12} md={4}>
-        <Paper sx={{ height: '100%' }}>
+        <Paper style={{ height: '100%' }}>
           <Box display="flex" alignItems="center">
             <Box className="past-due-icon" mr={3}>
               <EventBusyIcon />

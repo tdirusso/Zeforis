@@ -1,6 +1,7 @@
 import { Paper, Box, TextField, Grid, Divider, Tooltip, IconButton, Grow, Collapse } from "@mui/material";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import React, { useState } from "react";
+import './styles.scss';
 
 export default function CustomWidgets({ widgets }) {
   const showDashboardWidgetsValue = localStorage.getItem('showDashboardWidgets');
@@ -22,7 +23,7 @@ export default function CustomWidgets({ widgets }) {
               size="large"
               onClick={toggleWidgets}>
               <ArrowUpwardIcon
-                sx={{
+                style={{
                   transition: 'transform 200ms',
                   transform: expanded ? 'rotate(0deg)' : 'rotate(180deg)'
                 }}
@@ -31,7 +32,7 @@ export default function CustomWidgets({ widgets }) {
           </Tooltip>
         </Divider>
       </Grid>
-      <Grid item xs={12} sx={{ pt: '10px !important' }}>
+      <Grid item xs={12} className="widgets-container">
         <Collapse in={expanded}>
           <Grid container spacing={3}>
             {
@@ -42,7 +43,7 @@ export default function CustomWidgets({ widgets }) {
                       in={expanded}
                       appear={false}
                       style={{ transitionDelay: `${index * 100}ms` }}>
-                      <Paper sx={{
+                      <Paper style={{
                         minHeight: '250px',
                         background: widget.backgroundColor
                       }}>
@@ -52,13 +53,10 @@ export default function CustomWidgets({ widgets }) {
                           mb={1}>{widget.title}
                         </Box>
                         <TextField
+                          className="readonly-textfield"
                           fullWidth
-                          sx={{
-                            '& .MuiInputBase-root::before': { borderBottom: 'none !important' },
-                            '& .MuiInputBase-root::after': { borderBottom: 'none !important' }
-                          }}
                           inputProps={{
-                            sx: {
+                            style: {
                               color: widget.textColor,
                               fontWeight: 400,
                               fontSize: '0.875rem'
@@ -78,7 +76,10 @@ export default function CustomWidgets({ widgets }) {
           </Grid>
         </Collapse>
       </Grid>
-      <Grid item xs={12} sx={{ display: expanded && widgets.length > 0 ? 'block' : 'none' }}>
+      <Grid
+        item
+        xs={12}
+        display={expanded && widgets.length > 0 ? 'block' : 'none'}>
         <Divider />
       </Grid >
     </>
