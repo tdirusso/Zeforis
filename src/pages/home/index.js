@@ -250,6 +250,8 @@ export default function Home({ setTheme }) {
             engagements={engagements}
             org={org}
             user={user}
+            isOpen={true}
+
           />
         </Box>
       );

@@ -1,5 +1,5 @@
 import CreateEngagementDialog from "./CreateEngagementDialog";
-import ChangeEngagementDialog from "./ChangeEngagementDialog";
+import ChooseEngagementDialog from "./ChooseEngagementDialog";
 
 export default function Dialogs(props) {
   const {
@@ -9,9 +9,9 @@ export default function Dialogs(props) {
 
   return (
     <>
-      <ChangeEngagementDialog
+      <ChooseEngagementDialog
         {...props}
-        isOpen={dialogToOpen === 'change-engagement'}
+        isOpen={dialogToOpen === 'choose-engagement'}
         close={closeDialog}
       />
 

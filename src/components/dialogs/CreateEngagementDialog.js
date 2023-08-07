@@ -2,8 +2,8 @@ import { forwardRef, useRef, useState } from 'react';
 import { Box, Dialog, Divider, Fade, Grow, IconButton, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createEngagement, setActiveEngagementId } from '../../api/engagements';
-import zeforisLogo from '../../assets/zeforis-logo.png';
 import CloseIcon from '@mui/icons-material/Close';
+import Watermark from '../core/Watermark';
 
 const toggleableTransition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 300 }} />;
@@ -136,19 +136,8 @@ export default function CreateEngagementDialog(props) {
             </form>
           </Fade>
           <Grow appear in>
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: 10,
-                right: 10,
-                color: '#5f5f5f !important',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              component="a"
-              href="https://www.zeforis.com"
-              target="_blank">
-              Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
+            <Box>
+              <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
             </Box>
           </Grow>
         </Box>

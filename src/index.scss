@@ -47,6 +47,10 @@ body * {
   margin: 0.5rem 0 !important;
 }
 
+.my2 {
+  margin: 1.3rem 0 !important;
+}
+
 .my4 {
   margin: 2.25rem 0 !important;
 }
@@ -180,6 +184,11 @@ h6 {
 .MuiDrawer-paperAnchorRight {
   border-top-right-radius: 0px !important;
   border-bottom-right-radius: 0px !important;
+}
+
+.alert {
+  width: 100% !important;
+  font-weight: 300 !important;
 }
 
 .choose-engagement-btn,

@@ -20,6 +20,7 @@ import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
 import themeConfig from "../../theme";
 import { resendVerificationLink } from "../../api/users";
+import Watermark from "../../components/core/Watermark";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
@@ -329,20 +330,7 @@ export default function LoginPage({ setTheme }) {
       <Box className="circle"></Box>
       {
         needsCustomPage ?
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 10,
-              right: 10,
-              color: '#5f5f5f !important',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            component="a"
-            href="https://www.zeforis.com"
-            target="_blank">
-            Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
-          </Box>
+          <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
           : null
       }
       <Snackbar

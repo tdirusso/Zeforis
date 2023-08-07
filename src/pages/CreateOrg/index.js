@@ -5,29 +5,11 @@ import Snackbar from '../../components/core/Snackbar';
 import createOrgIcon from '../../assets/create-org-icon.png';
 import { createOrg, setActiveOrgId, updateOrg } from '../../api/orgs';
 import useSnackbar from '../../hooks/useSnackbar';
-import zeforisLogo from '../../assets/zeforis-logo.png';
 import { hexToRgb } from '../../lib/utils';
 import themeConfig from '../../theme';
 import { TwitterPicker } from 'react-color';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
-
-const poweredByZeforisWatermark =
-  <Grow appear in>
-    <Box
-      sx={{
-        position: 'absolute',
-        bottom: 10,
-        right: 10,
-        color: '#5f5f5f !important',
-        display: 'flex',
-        alignItems: 'center'
-      }}
-      component="a"
-      href="https://www.zeforis.com"
-      target="_blank">
-      Powered by  <img src={zeforisLogo} alt="Zeforis" height={15} style={{ marginLeft: '4px' }} />
-    </Box>
-  </Grow>;
+import Watermark from '../../components/core/Watermark';
 
 export default function CreateOrgPage({ setTheme }) {
   const [step, setStep] = useState(1);
@@ -153,7 +135,11 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
           </LoadingButton>
         </form>
       </Fade>
-      {poweredByZeforisWatermark}
+      <Grow appear in>
+        <Box>
+          <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+        </Box>
+      </Grow>
     </Box>
   );
 }
@@ -311,7 +297,11 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
         Skip
       </Box>
       <Box style={colorTransitionStyle} className="circle"></Box>
-      {poweredByZeforisWatermark}
+      <Grow appear in>
+        <Box>
+          <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+        </Box>
+      </Grow>
     </Box>
   );
 }

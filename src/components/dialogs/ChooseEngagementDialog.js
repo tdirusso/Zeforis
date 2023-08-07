@@ -1,19 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import { forwardRef, useEffect, useState } from 'react';
-import { Box, Button, CircularProgress, Dialog, Grow, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
+import './styles.scss';
 import { SwapHorizOutlined } from "@mui/icons-material";
 import { deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import { setActiveOrgId } from '../../api/orgs';
 
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 600 }} appear={false} />;
+const toggleableTransition = forwardRef(function Transition(props, ref) {
+  return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 600 }} />;
 });
+
+const fixedTransition = forwardRef(function Transition(props, ref) {
+  return <Grow ref={ref} {...props} timeout={{ enter: 0 }} />;
+});
+
 
 export default function ChooseEngagementDialog(props) {
   const {
+    isOpen,
+    close,
     engagements,
     org,
     user
@@ -22,11 +30,29 @@ export default function ChooseEngagementDialog(props) {
   const [query, setQuery] = useState('');
   const [engagementId, setEngagementId] = useState();
   const [orgId, setOrgId] = useState();
+  const [shouldAnimate, setShouldAnimate] = useState(true);
   const [isLoadingEngagement, setLoadingEngagement] = useState(false);
   const [isLoadingOrg, setLoadingOrg] = useState(false);
   const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
 
   const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
+
+  const handleClose = () => {
+    close();
+    setTimeout(() => {
+      setQuery('');
+      setShouldAnimate(true);
+    }, 500);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldAnimate(true);
+      setTimeout(() => {
+        setShouldAnimate(false);
+      }, 1000);
+    }
+  }, [isOpen]);
 
   const handleQueryChange = e => {
     setQuery(e.target.value);
@@ -66,25 +92,48 @@ export default function ChooseEngagementDialog(props) {
   const lcQuery = query.toLowerCase();
   const filteredEngagements = query ? engagements.filter(e => e.name.toLowerCase().includes(lcQuery)) : engagements;
 
+  let pageIcon = <Box
+    component="h1"
+    sx={{ color: org.brandColor }}>
+    {org.name}
+  </Box>;
+
+  if (org.logo) {
+    pageIcon = <Box>
+      <img src={org.logo} alt="" height={40} />
+    </Box>;
+  }
+
   return (
     <Box>
       <Dialog
-        open
-        TransitionComponent={Transition}
+        open={isOpen}
+        onClose={handleClose}
+        TransitionComponent={close ? toggleableTransition : fixedTransition}
         fullScreen>
         <DialogContent sx={{ width: 1200, margin: '0 auto' }}>
-          <Box sx={{ mb: 3 }}>
+          <Box sx={{ my: 3 }}>
             <Box
               display="flex"
               position="relative"
-              alignItems="center"
-              justifyContent="center">
-              <DialogTitle
+              justifyContent="center"
+              alignItems="flex-start">
+              <IconButton
+                hidden={!close}
+                size='large'
+                onClick={handleClose}
                 sx={{
-                  textAlign: 'center',
+                  position: 'absolute',
+                  left: '-8px',
                 }}>
-                Choose an Engagement in {org.name}
-              </DialogTitle>
+                <CloseIcon />
+              </IconButton>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                {pageIcon}
+                <Box mt={2.5}>
+                  <Box component="h2">Choose an Engagement</Box>
+                </Box>
+              </Box>
               <Button
                 startIcon={<SwapHorizOutlined />}
                 onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
@@ -93,8 +142,10 @@ export default function ChooseEngagementDialog(props) {
                 Change org
               </Button>
             </Box>
+            <Divider sx={{ my: 3, width: '85%', mx: 'auto' }} />
             <Box m='0 auto' width={300}>
               <TextField
+                variant='standard'
                 size='small'
                 placeholder='Search'
                 value={query}
@@ -120,7 +171,7 @@ export default function ChooseEngagementDialog(props) {
               {
                 filteredEngagements.map((e, index) => {
                   return (
-                    <Zoom key={e.id} appear in style={{ transitionDelay: `${(index * 15) + 100}ms` }}>
+                    <Zoom key={e.id} appear={shouldAnimate} in style={{ transitionDelay: `${(index * 15) + 100}ms` }}>
                       <Paper
                         onClick={() => handleLoadEngagement(e.id)}
                         sx={{ m: 2 }}

@@ -73,7 +73,7 @@ export default function GeneralTab() {
         <Button
           sx={{ mr: 2 }}
           variant="outlined"
-          onClick={() => openDialog('change-engagement')}
+          onClick={() => openDialog('choose-engagement')}
           startIcon={<SwapHorizOutlinedIcon />}>
           Change
         </Button>

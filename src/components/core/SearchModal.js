@@ -68,7 +68,7 @@ export default function SearchModal(props) {
     <div>
       <Dialog
         PaperProps={{
-          sx: {
+          style: {
             height: 400,
             overflow: 'hidden'
           }
@@ -85,7 +85,7 @@ export default function SearchModal(props) {
             placeholder="Search..."
           />
         </Box>
-        <Divider sx={{ my: 2 }} />
+        <Divider className='my2' />
         <Box overflow='auto'>
           <Typography variant='caption'>
             Folders
@@ -106,7 +106,7 @@ export default function SearchModal(props) {
               })
             }
           </List>
-          <Divider sx={{ my: 2 }} />
+          <Divider className='my2' />
           <Typography variant='caption'>
             Tasks
           </Typography>

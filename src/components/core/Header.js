@@ -11,7 +11,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import { useNavigate } from "react-router-dom";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
-import './styles/Header.css';
+import './styles/Header.scss';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { logout } from "../../api/auth";
@@ -61,7 +61,7 @@ export default function Header(props) {
 
   const openChangeOrgOrEngagement = () => {
     setAnchorEl(null);
-    openDialog('change-engagement');
+    openDialog('choose-engagement');
   };
 
   const openCreateFolderDrawer = () => {
@@ -83,24 +83,17 @@ export default function Header(props) {
     <Grid
       item
       xs={12}
-      className="Header"
+      className="header"
       component="header">
-      <Box
-        sx={{
-          height: 60,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%'
-        }}>
+      <Box className="header-box">
         <Box>
           <Tooltip title={isSideNavOpen ? 'Close Menu' : 'Open Menu'}>
-            <Paper sx={{ p: 0, borderRadius: '50%' }}>
+            <Paper className="header-button">
               <IconButton
                 size="large"
                 onClick={toggleSideNav}>
                 <MenuOpenIcon
-                  sx={{
+                  style={{
                     transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
                     transition: 'transform 200ms'
                   }}
@@ -112,7 +105,7 @@ export default function Header(props) {
         <Box display="flex">
           <Box mr={2}>
             <Tooltip title="Search">
-              <Paper sx={{ p: 0, borderRadius: '50%' }}>
+              <Paper className="header-button">
                 <IconButton
                   size="large"
                   onClick={openSearch}>
@@ -123,7 +116,7 @@ export default function Header(props) {
           </Box>
           <Box hidden={!isAdmin} mr={2}>
             <Tooltip title="Actions">
-              <Paper sx={{ p: 0, borderRadius: '50%' }}>
+              <Paper className="header-button">
                 <IconButton
                   className="actions-menu"
                   size="large"
@@ -177,10 +170,10 @@ export default function Header(props) {
 
           <Box>
             <Tooltip title="Settings">
-              <Paper sx={{ p: 0, borderRadius: '24px' }}>
+              <Paper style={{ padding: 0, borderRadius: '24px' }}>
                 <IconButton
                   className="org-menu"
-                  sx={{ borderRadius: '24px' }}
+                  style={{ borderRadius: '24px' }}
                   size="large"
                   onClick={handleMenuClick}>
                   <Box className="org-circle" display="flex">
@@ -190,14 +183,15 @@ export default function Header(props) {
                 </IconButton>
               </Paper>
             </Tooltip>
+
             <Menu
               anchorEl={anchorEl}
               open={orgMenuOpen}
               onClose={handleMenuClose}
               PaperProps={{
-                sx: {
+                style: {
                   minWidth: '300px',
-                  pb: '15px !important'
+                  paddingBottom: '15px !important'
                 }
               }}>
               <Box p="23px 28px 14px 25px">
@@ -209,7 +203,7 @@ export default function Header(props) {
                 </Typography>
               </Box>
 
-              <Divider sx={{ my: '8px' }} />
+              <Divider style={{ margin: '8px 0' }} />
 
               <Box
                 py={1}
@@ -237,14 +231,14 @@ export default function Header(props) {
                 </Box>
                 <Button
                   startIcon={<SwapHorizOutlined />}
-                  sx={{ mt: '10px', mb: '5px' }}
+                  style={{ margin: '10px 0 5px 0' }}
                   size="small"
                   onClick={openChangeOrgOrEngagement}
                   variant="outlined">
                   Change
                 </Button>
               </Box>
-              <Divider sx={{ my: '8px' }} />
+              <Divider style={{ margin: '8px 0' }} />
               <MenuItem onClick={openSettings}>
                 <ListItemIcon>
                   <SettingsIcon />
@@ -270,7 +264,7 @@ export default function Header(props) {
           </Box>
         </Box>
       </Box>
-      <Divider sx={{ mt: 2.5, mb: 2 }} />
+      <Divider style={{ marginTop: '1.25rem', marginBottom: '2rem' }} />
     </Grid>
   );
 };
