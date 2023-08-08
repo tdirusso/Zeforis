@@ -9,12 +9,12 @@ module.exports = async (req, res) => {
     status,
     taskIds,
     dateDue,
-    isKey
+    isKey,
+    tags = [],
+    tagAction = 'add'
   } = req.body;
 
   const updaterUserId = req.userId;
-
-  console.log(action, taskIds, isKey);
 
   if (!action) {
     return res.json({
@@ -69,6 +69,15 @@ module.exports = async (req, res) => {
           });
         } else {
           await updateKeyTask(taskIds, isKey, updaterUserId, connection);
+        }
+        break;
+      case 'tags':
+        if (tags.length === 0 || !tagAction) {
+          return res.json({
+            message: 'Missing tags or tag action.'
+          });
+        } else {
+          await updateTags(taskIds, tags, tagAction, connection);
         }
         break;
       default:
@@ -162,10 +171,29 @@ async function updateStatuses(taskIds, status, updaterUserId, connection) {
   }
 }
 
-
 async function updateKeyTask(taskIds, isKey, updaterUserId, connection) {
   await connection.query(
     'UPDATE tasks SET is_key_task = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [isKey === 'yes' ? 1 : 0, updaterUserId, taskIds]
   );
+}
+
+async function updateTags(taskIds, tags, tagAction, connection) {
+  const combinations = taskIds.flatMap(taskId =>
+    tags.map(tag => [tag.id, taskId])
+  );
+
+  if (tagAction === 'add') {
+    await connection.query(
+      'INSERT IGNORE INTO task_tags (tag_id, task_id) VALUES ?',
+      [combinations]
+    );
+  } else {
+    const placeholders = combinations.map(() => '(?, ?)').join(', ');
+
+    await connection.query(
+      `DELETE FROM task_tags WHERE (tag_id, task_id) IN (${placeholders})`,
+      combinations.flat()
+    );
+  }
 }

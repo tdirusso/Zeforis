@@ -314,7 +314,7 @@ export default function TasksTable({ tasks }) {
                             key={tagId}
                             label={tagsMap[tagId].name}
                             size="small"
-                            style={{ marginRight: '10px' }}
+                            style={{ marginRight: '10px', marginBottom: '5px' }}
                           />)}
                       </TableCell>
                       <TableCell>

@@ -29,8 +29,8 @@ body * {
 }
 
 .flex-ac {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .wrap {
