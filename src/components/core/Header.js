@@ -66,7 +66,7 @@ export default function Header(props) {
 
   const openCreateFolderDrawer = () => {
     setAnchorEl(null);
-    openDrawer('create-folder');
+    openDrawer('folder');
   };
 
   const openSearch = () => {

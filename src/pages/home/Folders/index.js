@@ -8,7 +8,6 @@ import Divider from '@mui/material/Divider';
 import React from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EditFolderModal from "../../../components/admin/EditFolderModal";
 import DeleteFolderModal from "../../../components/admin/DeleteFolderModal";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,7 +16,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HelpIcon from '@mui/icons-material/Help';
 
 export default function FoldersPage() {
-  const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
   const [deleteFolderModalOpen, setDeleteFolderModalOpen] = useState(false);
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -26,7 +24,6 @@ export default function FoldersPage() {
   const { search } = useLocation();
 
   const {
-    engagement,
     folders,
     isAdmin,
     openDrawer
@@ -61,7 +58,7 @@ export default function FoldersPage() {
   );
 
   const handleEditClick = () => {
-    setEditFolderModalOpen(true);
+    openDrawer('folder', { folderProp: folderToEdit });
     setAnchorEl(null);
   };
 
@@ -75,7 +72,7 @@ export default function FoldersPage() {
       <Grid item>
         <Button
           hidden={!isAdmin}
-          onClick={() => openDrawer('create-folder', { engagementId: engagement.id })}
+          onClick={() => openDrawer('folder')}
           size="large"
           variant="contained">
           New Folder
@@ -166,12 +163,6 @@ export default function FoldersPage() {
           </ListItemText>
         </MenuItem>
       </Menu>
-
-      <EditFolderModal
-        open={editFolderModalOpen}
-        setOpen={setEditFolderModalOpen}
-        folder={folderToEdit}
-      />
 
       <DeleteFolderModal
         open={deleteFolderModalOpen}

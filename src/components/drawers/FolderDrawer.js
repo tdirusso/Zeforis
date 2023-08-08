@@ -3,20 +3,22 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useEffect, useRef, useState } from 'react';
 import { Box, Checkbox, Drawer, FormControlLabel, Grid, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { createFolder } from '../../api/folders';
+import { createFolder, updateFolder } from '../../api/folders';
 import CloseIcon from '@mui/icons-material/Close';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import FolderIcon from '@mui/icons-material/Folder';
 import HelpIcon from '@mui/icons-material/Help';
 
-export default function CreateFolderDrawer(props) {
+export default function FolderDrawer(props) {
   const {
     isOpen,
     close,
-    engagementId,
+    engagement,
     openSnackBar,
-    setFolders
+    setFolders,
+    folderProp,
+    foldersMap
   } = props;
 
   const name = useRef();
@@ -27,8 +29,12 @@ export default function CreateFolderDrawer(props) {
   useEffect(() => {
     if (isOpen) {
       name.current.focus();
+      if (folderProp) {
+        name.current.value = folderProp.name;
+        setIsKeyFolder(Boolean(folderProp.is_key_folder));
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, folderProp]);
 
   const handleCreateFolder = async e => {
     e.preventDefault();
@@ -44,13 +50,50 @@ export default function CreateFolderDrawer(props) {
     try {
       const { folder, message } = await createFolder({
         name: nameVal,
-        engagementId,
+        engagementId: engagement.id,
         isKeyFolder
       });
 
       if (folder) {
         openSnackBar('Folder created.', 'success');
         setFolders(folders => [...folders, folder]);
+        handleClose();
+      } else {
+        openSnackBar(message, 'error');
+        setLoading(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateFolder = async e => {
+    e.preventDefault();
+
+    const nameVal = name.current.value;
+
+    if (!nameVal) {
+      openSnackBar('Enter a name for the folder.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { updatedFolder, message } = await updateFolder({
+        name: nameVal,
+        engagementId: engagement.id,
+        isKeyFolder,
+        folderId: folderProp.id
+      });
+
+      if (updatedFolder) {
+        setLoading(false);
+        const theFolder = foldersMap[folderProp.id];
+        foldersMap[folderProp.id] = { ...theFolder, ...updatedFolder };
+        setFolders(Object.values(foldersMap));
+        openSnackBar('Folder updated.', 'success');
         handleClose();
       } else {
         openSnackBar(message, 'error');
@@ -102,11 +145,11 @@ export default function CreateFolderDrawer(props) {
                   style={{
                     textAlign: 'center',
                   }}>
-                  Create New Folder
+                  {folderProp ? 'Edit Folder' : 'Create New Folder'}
                 </DialogTitle>
               </Box>
             </Grid>
-            <Box component='form' width="100%" onSubmit={handleCreateFolder}>
+            <Box component='form' width="100%" onSubmit={folderProp ? handleUpdateFolder : handleCreateFolder}>
               <Grid item xs={12}>
                 <TextField
                   InputProps={{
@@ -154,7 +197,7 @@ export default function CreateFolderDrawer(props) {
                 fullWidth
                 size='large'
                 loading={isLoading}>
-                Create Folder
+                {folderProp ? 'Update folder' : 'Create folder'}
               </LoadingButton>
             </Box>
           </Grid>

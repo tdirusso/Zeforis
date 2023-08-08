@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
     }
 
     const [userResult] = await connection.query(
-      'SELECT id, email, password FROM users WHERE id = ?',
+      'SELECT id, email, password, first_name FROM users WHERE id = ?',
       [userId]
     );
 
@@ -43,8 +43,9 @@ module.exports = async (req, res) => {
         message: 'No invitation found.'
       });
     }
-
-    const userNeedsPassword = !Boolean(user.password);
+    
+    //User used Google (passwordless) if first name exists and no password
+    const userNeedsPassword = Boolean(!user.password && !user.first_name);
 
     if (!userNeedsPassword) {
       await connection.query(

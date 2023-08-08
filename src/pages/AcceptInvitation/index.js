@@ -187,7 +187,7 @@ export default function AcceptInvitationPage() {
           </Box>
             :
             <Paper style={{ padding: '2.5rem', minWidth: '500px' }} className="container">
-              <Typography>No invitation was found.</Typography>
+              <Typography>Invitation does not exist or has expired.</Typography>
               <Snackbar
                 isOpen={isOpen}
                 type={type}
