@@ -90,50 +90,14 @@ export default function TasksTable({ tasks }) {
   };
 
   const filteredTasks = tasks.filter(task => {
-    let shouldReturnTask = true;
+    const tagIds = task.tags?.split(',').filter(Boolean).map(id => String(id)) || [];
 
-    if (filterName) {
-      shouldReturnTask = task.task_name.toLowerCase().includes(filterName.toLowerCase());
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterAssignedTo) {
-      shouldReturnTask = filterAssignedTo.id === task.assigned_to_id;
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterTags.length > 0) {
-      const tagIds = task.tags?.split(',').filter(Boolean) || [];
-
-      shouldReturnTask = filterTags.every(({ id }) => tagIds.includes(String(id)));
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterFolder) {
-      shouldReturnTask = filterFolder.id === task.folder_id;
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterStatus !== 'all') {
-      shouldReturnTask = filterStatus === task.status;
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterKeyTasks) {
-      shouldReturnTask = Boolean(task.is_key_task);
-    }
-
-    return shouldReturnTask;;
+    return (!filterName || task.task_name.toLowerCase().includes(filterName.toLowerCase())) &&
+      (!filterAssignedTo || filterAssignedTo.id === task.assigned_to_id) &&
+      (filterTags.length === 0 || filterTags.every(tag => tagIds.includes(tag.id.toString()))) &&
+      (!filterFolder || filterFolder.id === task.folder_id) &&
+      (filterStatus === 'all' || filterStatus === task.status) &&
+      (!filterKeyTasks || task.is_key_task);
   });
 
   switch (sortBy) {
@@ -239,7 +203,7 @@ export default function TasksTable({ tasks }) {
             size="small">
             <TableHead>
               <TableRow style={{ paddingBottom: '1.5rem' }}>
-                <TableCell hidden={!isEditMode}>
+                <TableCell hidden={!isEditMode} style={{ width: '60px' }}>
                   <Checkbox
                     onChange={handleSelectAll}
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
@@ -280,18 +244,16 @@ export default function TasksTable({ tasks }) {
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
                       <TableCell scope="row">
-                        <Box display="flex" alignItems="center">
-                          {
-                            task.is_key_task ?
-                              <StarIcon
-                                htmlColor="gold"
-                                style={{ marginRight: '5px' }}
-                                fontSize="small"
-                              /> :
-                              ''
-                          }
-                          {taskName}
-                        </Box>
+                        {
+                          task.is_key_task ?
+                            <StarIcon
+                              htmlColor="gold"
+                              style={{ position: 'relative', top: '4px', right: '2px' }}
+                              fontSize="small"
+                            /> :
+                            ''
+                        }
+                        {taskName}
                       </TableCell>
                       <TableCell>
                         <Chip

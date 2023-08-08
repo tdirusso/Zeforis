@@ -137,9 +137,12 @@ export default function TasksFilter(props) {
                         InputProps={{
                           ...params.InputProps,
                           startAdornment:
-                            <InputAdornment position='start'>
-                              <LocalOffer />
-                            </InputAdornment>
+                            <>
+                              <InputAdornment position='start'>
+                                <LocalOffer />
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
                         }}
                       />
                     )}
