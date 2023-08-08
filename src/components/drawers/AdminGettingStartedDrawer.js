@@ -14,7 +14,7 @@ import { Folder } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import './styles.scss';
 
-export default function GettingStartedDrawer(props) {
+export default function AdminGettingStartedDrawer(props) {
   const {
     isOpen,
     close,

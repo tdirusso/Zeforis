@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import { forwardRef, useEffect, useState } from 'react';
-import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Zoom } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import './styles.scss';
@@ -24,7 +24,8 @@ export default function ChooseEngagementDialog(props) {
     close,
     engagements,
     org,
-    user
+    user,
+    engagement
   } = props;
 
   const [query, setQuery] = useState('');
@@ -177,9 +178,11 @@ export default function ChooseEngagementDialog(props) {
                       <Paper
                         onClick={() => handleLoadEngagement(e.id)}
                         style={{ margin: '1rem' }}
-                        className='choose-engagement-btn'>
+                        className={`choose-engagement-btn ${engagement?.id === e.id ? 'active' : ''}`}>
                         {
-                          isLoadingEngagement && engagementId === e.id ? <CircularProgress size={20} /> : e.name
+                          isLoadingEngagement && engagementId === e.id ?
+                            <CircularProgress size={20} /> :
+                            <Typography>{e.name}</Typography>
                         }
                       </Paper>
                     </Zoom>

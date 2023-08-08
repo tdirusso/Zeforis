@@ -18,6 +18,7 @@ import { logout } from "../../api/auth";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { SwapHorizOutlined } from "@mui/icons-material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import HelpIcon from '@mui/icons-material/Help';
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -77,6 +78,11 @@ export default function Header(props) {
   const openCreateEngagementDialog = () => {
     setAnchorEl(null);
     openDialog('create-engagement');
+  };
+
+  const openGettingStartedDrawer = () => {
+    setAnchorEl(null);
+    openDrawer('getting-started-admin');
   };
 
   return (
@@ -246,6 +252,16 @@ export default function Header(props) {
                 <ListItemText>
                   <Typography>
                     Settings
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={openGettingStartedDrawer}>
+                <ListItemIcon>
+                  <HelpIcon />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography>
+                    Help
                   </Typography>
                 </ListItemText>
               </MenuItem>

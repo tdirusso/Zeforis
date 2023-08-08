@@ -2,8 +2,8 @@
 import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
 import './styles.css';
 import FolderIcon from '@mui/icons-material/Folder';
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { useState } from "react";
 import Divider from '@mui/material/Divider';
 import React from 'react';
 import StarIcon from '@mui/icons-material/Star';
@@ -21,22 +21,12 @@ export default function FoldersPage() {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
-  const { search } = useLocation();
 
   const {
     folders,
     isAdmin,
     openDrawer
   } = useOutletContext();
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(search);
-    const isGettingStarted = queryParams.get('gettingStarted');
-
-    if (isGettingStarted) {
-      openDrawer('getting-started');
-    }
-  }, []);
 
   const handleMenuClick = (e, folder) => {
     e.stopPropagation();

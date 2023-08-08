@@ -1,4 +1,4 @@
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import KeyFolders from "../../../components/core/dashboard/KeyFolders";
 import KeyTasks from "../../../components/core/dashboard/KeyTasks";
 import TaskStats from "../../../components/core/dashboard/TaskStats";
@@ -7,8 +7,12 @@ import './styles.css';
 import { Paper, Typography, Button, Grid } from "@mui/material";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import CustomWidgets from "../../../components/core/dashboard/CustomWidgets";
+import { useEffect } from "react";
 
 export default function Dashboard() {
+
+  const { search } = useLocation();
+
   const {
     tasks,
     folders,
@@ -16,6 +20,15 @@ export default function Dashboard() {
     widgets,
     isAdmin
   } = useOutletContext();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(search);
+    const isGettingStarted = queryParams.get('gettingStarted');
+
+    if (isGettingStarted) {
+      openDrawer('getting-started-admin');
+    }
+  }, []);
 
   const tasksSortedByDate = tasks.sort((a, b) => {
     return new Date(a.date_due) - new Date(b.date_due);

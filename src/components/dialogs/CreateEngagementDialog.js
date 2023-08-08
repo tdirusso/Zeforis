@@ -1,9 +1,12 @@
-import { forwardRef, useRef, useState } from 'react';
-import { Box, Dialog, Divider, Fade, Grow, IconButton, TextField, Typography } from '@mui/material';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { forwardRef, useEffect, useRef, useState } from 'react';
+import { Box, Button, CircularProgress, Dialog, Divider, Fade, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { createEngagement, setActiveEngagementId } from '../../api/engagements';
+import { createEngagement, deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import CloseIcon from '@mui/icons-material/Close';
 import Watermark from '../core/Watermark';
+import { SwapHorizOutlined } from '@mui/icons-material';
+import { setActiveOrgId } from '../../api/orgs';
 
 const toggleableTransition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 300 }} />;
@@ -14,16 +17,37 @@ const fixedTransition = forwardRef(function Transition(props, ref) {
 });
 
 export default function CreateEngagementDialog(props) {
-
   const {
     org,
     openSnackBar,
     isOpen,
-    close
+    close,
+    user
   } = props;
 
   const name = useRef();
+
+  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
+  const [isLoadingOrg, setLoadingOrg] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [orgId, setOrgId] = useState();
+
+  const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
+
+  const handleLoadOrg = orgId => {
+    setLoadingOrg(true);
+    setOrgId(orgId);
+  };
+
+  useEffect(() => {
+    if (isLoadingOrg) {
+      setTimeout(() => {
+        setActiveOrgId(orgId);
+        deleteActiveEngagementId();
+        window.location.reload();
+      }, 500);
+    }
+  }, [orgId]);
 
   const handleCreateEngagement = e => {
     e.preventDefault();
@@ -39,17 +63,16 @@ export default function CreateEngagementDialog(props) {
 
     setTimeout(async () => {
       try {
-        const fd = new FormData();
-        fd.append('name', nameVal);
-        fd.append('orgId', org.id);
-
-        const { engagement, message } = await createEngagement(fd);
+        const { engagement, message } = await createEngagement({
+          namme: nameVal,
+          orgId: org.id
+        });
 
         if (engagement) {
           setActiveEngagementId(engagement.id);
           openSnackBar('Engagement created.', 'success');
           setTimeout(() => {
-            window.location.href = close ? '/home/folders' : '/home/folders?gettingStarted=true';
+            window.location.href = close ? '/home/dashboard' : '/home/dashboard?gettingStarted=true';
           }, 500);
         } else {
           openSnackBar(message, 'error');
@@ -97,6 +120,13 @@ export default function CreateEngagementDialog(props) {
             }}>
             <CloseIcon />
           </IconButton>
+          <Button
+            startIcon={<SwapHorizOutlined />}
+            onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
+            style={{ position: 'absolute', right: '100px', top: '30px' }}
+            variant='outlined'>
+            Change org
+          </Button>
           <Grow appear in timeout={{ enter: 500 }}>
             {pageIcon}
           </Grow>
@@ -142,6 +172,28 @@ export default function CreateEngagementDialog(props) {
           </Grow>
         </Box>
       </Box>
+
+      <Menu
+        PaperProps={{ style: { minWidth: 200 } }}
+        anchorEl={changeOrgMenuAnchor}
+        open={changeOrgMenuOpen}
+        onClose={() => setChangeOrgMenuAnchor(null)}>
+        {
+          user.memberOfOrgs.map(({ id, name }) => {
+            return (
+              <MenuItem
+                disabled={id === org.id}
+                selected={id === org.id}
+                key={id}
+                onClick={() => handleLoadOrg(id)}>
+                {
+                  isLoadingOrg && orgId === id ? <CircularProgress size={20} /> : name
+                }
+              </MenuItem>
+            );
+          })
+        }
+      </Menu>
     </Dialog>
   );
 };
