@@ -178,7 +178,8 @@ export default function Home({ setTheme }) {
       let isAdminResult = false;
 
       orgUsers.forEach(orgUser => {
-        orgUsersMapResult[user.id] = orgUser;
+        orgUsersMapResult[orgUser.id] = orgUser;
+        
         if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
           engagementAdminsResult.push({ ...orgUser, role: 'Administrator' });
           if (orgUser.id === user.id) isAdminResult = true;

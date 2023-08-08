@@ -61,7 +61,7 @@ export default function MembersTab() {
     setRemovingUser(true);
 
     const willBeRemovedFromOrg =
-      userToRemove?.memberOfEngagements.length + user?.adminOfEngagements.length === 1;
+      userToRemove.memberOfEngagements.length + userToRemove.adminOfEngagements.length === 1;
 
     try {
       const result = await removeEngagementUser({

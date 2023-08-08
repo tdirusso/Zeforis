@@ -13,6 +13,8 @@ import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, CircularProgress, Divider } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { AccountCircle } from "@mui/icons-material";
+import { setActiveOrgId } from "../../api/orgs";
 
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
@@ -21,8 +23,13 @@ export default function AcceptInvitationPage() {
   const engagementId = queryParams.get('engagementId');
   const invitationCode = queryParams.get('invitationCode');
   const userId = queryParams.get('userId');
+  const orgId = queryParams.get('orgId');
 
   const password = useRef();
+  const firstName = useRef();
+  const lastName = useRef();
+
+  const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${orgId}`)}`;
 
   const [fetchingInvitation, setFetchingInvitation] = useState(true);
   const [userNeedsPassword, setUserNeedsPassword] = useState(null);
@@ -55,8 +62,9 @@ export default function AcceptInvitationPage() {
         if (invitation) {
           if (!Boolean(invitation.userNeedsPassword)) {
             openSnackBar('Invitation accepted.', 'success');
+            setActiveOrgId(orgId);
             setTimeout(() => {
-              window.location.href = '/login';
+              window.location.href = customLoginPageUrl;
             }, 1000);
           } else {
             setUserNeedsPassword(true);
@@ -73,7 +81,7 @@ export default function AcceptInvitationPage() {
                 {
                   theme: "outline",
                   size: "large",
-                  width: 372,
+                  width: 400,
                   text: 'continue_with'
                 }
               );
@@ -93,6 +101,13 @@ export default function AcceptInvitationPage() {
     e.preventDefault();
 
     const passwordVal = password.current.value;
+    const firstNameVal = firstName.current.value;
+    const lastNameVal = lastName.current.value;
+
+    if (!firstNameVal || !lastNameVal) {
+      openSnackBar('Please enter your first and last name.');
+      return;
+    }
 
     if (!passwordVal) {
       openSnackBar('Please enter a password.');
@@ -107,13 +122,15 @@ export default function AcceptInvitationPage() {
         engagementId,
         userId,
         invitationCode,
-        type: 'complete-registration'
+        type: 'complete-registration',
+        firstName: firstNameVal,
+        lastName: lastNameVal
       });
 
       if (success) {
         openSnackBar('Registration successful.', 'success');
         setTimeout(() => {
-          window.location.href = ('/login');
+          window.location.href = customLoginPageUrl;
         }, 2000);
       } else {
         setLoading(false);
@@ -137,7 +154,7 @@ export default function AcceptInvitationPage() {
         if (success) {
           openSnackBar('Registration successful.', 'success');
           setTimeout(() => {
-            window.location.href = '/login';
+            window.location.href = customLoginPageUrl;
           }, 2000);
         } else {
           setLoading(false);
@@ -162,10 +179,20 @@ export default function AcceptInvitationPage() {
           fetchingInvitation ? <Box>
             <Typography mb={2}>Fetching invitation...</Typography>
             <CircularProgress />
+            <Snackbar
+              isOpen={isOpen}
+              type={type}
+              message={message}
+            />
           </Box>
             :
             <Paper style={{ padding: '2.5rem', minWidth: '500px' }} className="container">
               <Typography>No invitation was found.</Typography>
+              <Snackbar
+                isOpen={isOpen}
+                type={type}
+                message={message}
+              />
             </Paper>
         }
         <div className="circle"></div>
@@ -198,9 +225,40 @@ export default function AcceptInvitationPage() {
           <CircularProgress />
         </Box>
           :
-          <Paper style={{ padding: '4rem', paddingTop: '2.5rem', minWidth: '500px' }} className="container">
+          <Paper style={{ padding: '4rem', paddingTop: '2.5rem', minWidth: '600px' }} className="container">
             <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
             <form onSubmit={handleUpdatePassword}>
+              <Box className="flex-centered" style={{ marginBottom: '1rem' }}>
+                <TextField
+                  placeholder="First name"
+                  variant="outlined"
+                  style={{ marginRight: '10px' }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle htmlColor="#cbcbcb" />
+                      </InputAdornment>
+                    )
+                  }}
+                  inputRef={firstName}
+                  disabled={isLoading}
+                  autoFocus
+                />
+                <TextField
+                  placeholder="Last name"
+                  variant="outlined"
+                  style={{ marginLeft: '10px' }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle htmlColor="#cbcbcb" />
+                      </InputAdornment>
+                    )
+                  }}
+                  inputRef={lastName}
+                  disabled={isLoading}
+                />
+              </Box>
               <TextField
                 placeholder="Password"
                 variant="outlined"
@@ -215,7 +273,6 @@ export default function AcceptInvitationPage() {
                 }}
                 inputRef={password}
                 disabled={isLoading}
-                autoFocus
               />
               <LoadingButton
                 loading={isLoading}
@@ -225,10 +282,12 @@ export default function AcceptInvitationPage() {
                 style={{ padding: '0.75rem 0' }}
                 variant="contained"
                 type="submit">
-                Create Password
+                Complete Registration
               </LoadingButton>
               <Divider className="my4">Or</Divider>
-              <Box id="google-signin"></Box>
+              <Box style={{ display: 'flex', justifyContent: 'center' }}>
+                <Box id="google-signin" style={{ width: 400 }}></Box>
+              </Box>
             </form>
           </Paper>
       }

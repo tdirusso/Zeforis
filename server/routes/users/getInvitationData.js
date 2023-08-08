@@ -46,6 +46,13 @@ module.exports = async (req, res) => {
 
     const userNeedsPassword = !Boolean(user.password);
 
+    if (!userNeedsPassword) {
+      await connection.query(
+        'UPDATE engagement_users SET invitation_code = NULL WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
+        [engagementId, userId, invitationCode]
+      );
+    }
+
     connection.release();
 
     return res.json({

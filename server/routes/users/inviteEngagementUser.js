@@ -75,7 +75,8 @@ module.exports = async (req, res) => {
         engagementName,
         orgColor,
         orgLogo,
-        invitationCode
+        invitationCode,
+        orgId
       });
 
       return res.json({
@@ -105,7 +106,8 @@ module.exports = async (req, res) => {
         engagementName,
         orgColor,
         orgLogo,
-        invitationCode
+        invitationCode,
+        orgId
       });
 
       return res.json({ success: true, userId: newUserId });
@@ -118,8 +120,8 @@ module.exports = async (req, res) => {
   }
 };
 
-async function sendInvitationEmail({ email, engagementId, orgName, engagementName, userId, orgColor, orgLogo, invitationCode }) {
-  let qs = `engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}`;
+async function sendInvitationEmail({ email, engagementId, orgName, engagementName, userId, orgColor, orgLogo, invitationCode, orgId }) {
+  let qs = `engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}`;
 
   let verificationUrl = `${process.env.APP_DOMAIN}/accept-invitation?${qs}`;
 

@@ -15,10 +15,12 @@ module.exports = async (req, res) => {
     });
   }
 
+  const connection = await pool.getConnection();
+
   if (type === 'complete-registration') {
-    handleUpdatePassword(req, res);
+    handleCompleteRegistration(req, res, connection);
   } else if (type === 'reset') {
-    handleResetPassword(req, res);
+    handleResetPassword(req, res, connection);
   } else {
     return res.json({
       error: true,
@@ -27,30 +29,34 @@ module.exports = async (req, res) => {
   }
 };
 
-async function handleUpdatePassword(req, res) {
+async function handleCompleteRegistration(req, res, connection) {
   const {
     userId,
     engagementId,
     invitationCode,
-    password
+    password,
+    firstName,
+    lastName
   } = req.body;
 
-  if (!userId || !password || !invitationCode || !engagementId) {
-    return res.json({ message: 'Missing password update parameters.' });
+  if (!userId || !password || !invitationCode || !engagementId || !firstName || !lastName) {
+    connection.release();
+    return res.json({ message: 'Missing registration parameters.' });
   }
 
   try {
-    const [userResult] = await pool.query('SELECT id, password FROM users WHERE id = ?', [userId]);
+    const [userResult] = await connection.query('SELECT id, password FROM users WHERE id = ?', [userId]);
 
     const user = userResult[0];
 
     if (!user) {
+      connection.release();
       return res.json({
         message: 'User does not exist.'
       });
     }
 
-    const [invitationResult] = await pool.query(
+    const [invitationResult] = await connection.query(
       'SELECT user_id FROM engagement_users WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
       [engagementId, userId, invitationCode]
     );
@@ -58,23 +64,32 @@ async function handleUpdatePassword(req, res) {
     const invitation = invitationResult[0];
 
     if (!invitation) {
+      connection.release();
       return res.json({
-        message: 'Invalid credential combination.'
+        message: 'Invalid credentials.'
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await pool.query(
-      'UPDATE users SET is_verified = 1, password = ? WHERE id = ?',
-      [hashedPassword, userId]
+    await connection.query(
+      'UPDATE users SET is_verified = 1, password = ?, first_name = ?, last_name = ? WHERE id = ?',
+      [hashedPassword, firstName, lastName, userId]
     );
+
+    await connection.query(
+      'UPDATE engagement_users SET invitation_code = NULL WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
+      [engagementId, userId, invitationCode]
+    );
+
+    connection.release();
 
     return res.json({
       success: true
     });
 
   } catch (error) {
+    connection.release();
     console.log(error);
     return res.json({
       message: error.message
@@ -82,7 +97,7 @@ async function handleUpdatePassword(req, res) {
   }
 }
 
-async function handleResetPassword(req, res) {
+async function handleResetPassword(req, res, connection) {
   const {
     email,
     password,
@@ -90,29 +105,33 @@ async function handleResetPassword(req, res) {
   } = req.body;
 
   if (!email || !password || !resetCode) {
+    connection.release();
     return res.json({ message: 'Missing password reset parameters.' });
   }
 
   if (!validator.validate(email)) {
+    connection.release();
     return res.json({
       message: 'Invalid email address'
     });
   }
 
   try {
-    const [userResult] = await pool.query(
+    const [userResult] = await connection.query(
       'SELECT id, password_reset_code, date_password_reset_code_expiration FROM users WHERE email = ?',
       [email.toLowerCase()]);
 
     const user = userResult[0];
 
     if (!user) {
+      connection.release();
       return res.json({
         message: 'User does not exist.'
       });
     }
 
     if (!user.password_reset_code) {
+      connection.release();
       return res.json({
         message: 'Password reset has not been requested.'
       });
@@ -122,6 +141,7 @@ async function handleResetPassword(req, res) {
     const resetCodeExpiration = moment(user.date_password_reset_code_expiration);
 
     if (resetCodeExpiration.isBefore(now)) {
+      connection.release();
       return res.json({
         message: 'Password reset code has expired - must request a new reset link.'
       });
@@ -129,15 +149,19 @@ async function handleResetPassword(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await pool.query(
+    await connection.query(
       'UPDATE users SET is_verified = 1, password = ?, password_reset_code = NULL, date_password_reset_code_expiration = NULL WHERE id = ?',
       [hashedPassword, user.id]
     );
+
+    connection.release();
 
     return res.json({
       success: true
     });
   } catch (error) {
+    connection.release();
+
     console.log(error);
     return res.json({
       message: error.message
