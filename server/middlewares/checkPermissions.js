@@ -12,14 +12,10 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Unauthorized.' });
   }
 
-  let { engagementId, orgId } = req.body;
+  const { engagementId, orgId } = req.body || req.query;
 
   if (!engagementId && !orgId) {
-    ({ engagementId, orgId } = req.query);
-
-    if (!engagementId && !orgId) {
-      return res.json({ message: 'Unauthorized.' });
-    }
+    return res.json({ message: 'Unauthorized.' });
   }
 
   try {

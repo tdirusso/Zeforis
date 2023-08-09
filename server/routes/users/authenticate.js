@@ -17,16 +17,11 @@ module.exports = async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-    const userId = decoded.user.id;
+    const authenticatedUser = decoded.user;
 
-    const [userResult] = await pool.query(
-      'SELECT id, first_name, last_name, email, date_created FROM users WHERE id = ?',
-      [userId]
-    );
+    if (authenticatedUser) {
+      const userId = authenticatedUser.id;
 
-    const user = userResult[0];
-
-    if (user) {
       const [engagementMemberData] = await pool.query(
         `
           SELECT 
@@ -73,7 +68,6 @@ module.exports = async (req, res) => {
           org_logo,
           engagement_id,
           engagement_name,
-          engagement_logo,
           role
         } = row;
 
@@ -87,7 +81,6 @@ module.exports = async (req, res) => {
         const engagementObject = {
           id: engagement_id,
           name: engagement_name,
-          logo: engagement_logo,
           orgId: org_id
         };
 
@@ -100,11 +93,7 @@ module.exports = async (req, res) => {
 
       return res.json({
         user: {
-          id: user.id,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          email: user.email,
-          dateCreated: user.date_created,
+          ...authenticatedUser,
           memberOfOrgs: [...memberOfOrgs.values()],
           adminOfEngagements,
           memberOfEngagements

@@ -94,6 +94,32 @@ export default function TasksFilter(props) {
                 <FormControl fullWidth>
                   <Autocomplete
                     size="small"
+                    options={folders}
+                    value={filterFolder}
+                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+                    getOptionLabel={(option) => option.name || ''}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onChange={(_, newVal) => setFilterFolder(newVal)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Folder"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment:
+                            <InputAdornment position='start'>
+                              <Folder />
+                            </InputAdornment>
+                        }}
+                      />
+                    )}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <Autocomplete
+                    size="small"
                     renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                     options={[...engagementAdmins, ...engagementMembers]}
                     getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
@@ -143,32 +169,6 @@ export default function TasksFilter(props) {
                               </InputAdornment>
                               {params.InputProps.startAdornment}
                             </>
-                        }}
-                      />
-                    )}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <Autocomplete
-                    size="small"
-                    options={folders}
-                    value={filterFolder}
-                    renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                    getOptionLabel={(option) => option.name || ''}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    onChange={(_, newVal) => setFilterFolder(newVal)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Folder"
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment:
-                            <InputAdornment position='start'>
-                              <Folder />
-                            </InputAdornment>
                         }}
                       />
                     )}

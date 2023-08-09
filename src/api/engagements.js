@@ -49,7 +49,7 @@ const inviteEngagementUser = async (payload) => {
 };
 
 const removeEngagementUser = async (payload) => {
-  const { data } = await request.delete(`users/uninvite`, { data: payload });
+  const { data } = await request.delete(`users/removeEngagementUser`, { data: payload });
 
   return data;
 };
