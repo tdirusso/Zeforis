@@ -147,14 +147,20 @@ export default function TasksTable({ tasks }) {
 
       <Grid item xs={12}>
         <Paper className="px0" style={{ overflowX: 'auto' }}>
-          <Box px={3} mb={2}>
+          <Box px={3} mb={2} hidden={!isAdmin}>
             <Button
               variant="contained"
               onClick={() => openDrawer('create-task')}>
               New Task
             </Button>
           </Box>
-          <Box display='flex' alignItems='center' px={3} mb={2} height={40}>
+          <Box 
+          hidden={!isAdmin}
+          display='flex' 
+          alignItems='center' 
+          px={3} 
+          mb={2} 
+          height={40}>
             <FormGroup>
               <FormControlLabel
                 fontSize="small"

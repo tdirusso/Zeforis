@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useLocation, useOutletContext } from "react-router-dom";
 import KeyFolders from "../../../components/core/dashboard/KeyFolders";
 import KeyTasks from "../../../components/core/dashboard/KeyTasks";

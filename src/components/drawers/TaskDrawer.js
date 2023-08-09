@@ -445,7 +445,7 @@ export default function TaskDrawer(props) {
               marginRight: '2rem',
               cursor: isAdmin ? 'pointer' : 'unset'
             }}
-            onDelete={e => setStatusMenuAnchor(e.currentTarget)}
+            onDelete={isAdmin ? e => setStatusMenuAnchor(e.currentTarget) : () => { }}
             className={status}>
           </Chip>
           <Menu

@@ -32,6 +32,7 @@ module.exports = async (req, res) => {
             orgs.brand_color AS org_brand,
             orgs.logo_url AS org_logo,
             orgs.id AS org_id,
+            orgs.owner_id AS org_owner,
             engagements.name AS engagement_name
           FROM engagement_users
           LEFT JOIN engagements ON engagements.id = engagement_users.engagement_id
@@ -56,7 +57,8 @@ module.exports = async (req, res) => {
           id: row.id,
           name: row.name,
           brandColor: row.brand_color,
-          logo: row.logo_url
+          logo: row.logo_url,
+          ownerId: row.owner_id
         });
       });
 
@@ -66,6 +68,7 @@ module.exports = async (req, res) => {
           org_name,
           org_brand,
           org_logo,
+          org_owner,
           engagement_id,
           engagement_name,
           role
@@ -75,7 +78,8 @@ module.exports = async (req, res) => {
           id: org_id,
           name: org_name,
           brandColor: org_brand,
-          logo: org_logo
+          logo: org_logo,
+          ownerId: org_owner
         });
 
         const engagementObject = {

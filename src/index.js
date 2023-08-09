@@ -12,8 +12,8 @@ import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
 import AcceptInvitationPage from './pages/AcceptInvitation';
-import Dashboard from './pages/Home/Dashboard';
-import Settings from './pages/Home/Settings';
+import DashboardPage from './pages/Home/Dashboard';
+import SettingsPage from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders';
 import TasksPage from './pages/Home/Tasks';
 import ToolsPage from './pages/Home/Tools';
@@ -40,12 +40,12 @@ function App() {
           <Route path="create-org" element={<CreateOrgPage setTheme={setTheme} />} />
 
           <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="tasks" element={<TasksPage />} />
             <Route path="folders" element={<FoldersPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="tools" element={<ToolsPage />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="login" />} />

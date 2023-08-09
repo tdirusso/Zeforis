@@ -55,6 +55,7 @@ export default function Home({ setTheme }) {
   const [foldersMap, setFoldersMap] = useState({});
   const [orgUsersMap, setOrgUsersMap] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isOrgOwner, setIsOrgOwner] = useState(false);
   const [engagementMembers, setEngagementMembers] = useState([]);
   const [engagementAdmins, setEngagementAdmins] = useState([]);
   const [triedOrgAndEngagement, setTriedOrgAndEngagement] = useState(false);
@@ -95,18 +96,20 @@ export default function Home({ setTheme }) {
   useEffect(() => {
     if (user) {
       if (activeOrgId) {
-        const activeOrg = user.memberOfOrgs.find(org => {
-          return org.id === activeOrgId;
-        });
+        const activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
 
         if (activeOrg) {
+          const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
+
           const brandRGB = hexToRgb(activeOrg.brandColor);
           document.documentElement.style.setProperty('--colors-primary', activeOrg.brandColor);
           document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
           themeConfig.palette.primary.main = activeOrg.brandColor;
           document.title = `${activeOrg.name} Portal`;
+
           setTheme(createTheme(themeConfig));
           setOrg(activeOrg);
+          setIsOrgOwner(isOwnerOfActiveOrg);
         }
       }
 
@@ -179,7 +182,7 @@ export default function Home({ setTheme }) {
 
       orgUsers.forEach(orgUser => {
         orgUsersMapResult[orgUser.id] = orgUser;
-        
+
         if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
           engagementAdminsResult.push({ ...orgUser, role: 'Administrator' });
           if (orgUser.id === user.id) isAdminResult = true;
@@ -218,7 +221,6 @@ export default function Home({ setTheme }) {
           <ChooseOrgScreen
             open={true}
             setOpen={() => { }}
-            hideCancel={true}
             orgs={user.memberOfOrgs}
             user={user}
           />

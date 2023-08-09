@@ -39,8 +39,8 @@ const getOrg = require('./routes/orgs/getOrg');
 const sendPasswordResetLink = require('./routes/users/sendPasswordResetLink');
 const resendVerificationLink = require('./routes/users/resendVerificationLink');
 
-const checkPermissionsMW = require('./middlewares/checkPermissions');
-const checkAuth = require('./middlewares/checkAuth');
+const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
+const checkAuthMW = require('./middlewares/checkAuth');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -66,43 +66,43 @@ const boot = async () => {
   app.post('/api/users/authenticate', authenticate);
   app.get('/api/users/verify', verify);
   app.post('/api/users/register', register);
-  app.post('/api/users/invite', checkPermissionsMW, inviteEngagementUser);
-  app.delete('/api/users/removeEngagementUser', checkPermissionsMW, removeEngagementUser);
-  app.delete('/api/removeOrgUser', checkPermissionsMW, removeOrgUser);
-  app.patch('/api/users', checkAuth, updateProfile);
-  app.patch('/api/users/permissions', checkPermissionsMW, updatePermission);
-  app.patch('/api/users/access', checkPermissionsMW, updateAccess);
+  app.post('/api/users/invite', checkEngagementAdminMW, inviteEngagementUser);
+  app.delete('/api/users/removeEngagementUser', checkEngagementAdminMW, removeEngagementUser);
+  app.delete('/api/removeOrgUser', checkEngagementAdminMW, removeOrgUser);
+  app.patch('/api/users', checkAuthMW, updateProfile);
+  app.patch('/api/users/permissions', checkEngagementAdminMW, updatePermission);
+  app.patch('/api/users/access', checkEngagementAdminMW, updateAccess);
   app.patch('/api/users/password', updatePassword);
   app.get('/api/users/invitation', getInvitationData);
   app.post('/api/users/sendPasswordResetLink', sendPasswordResetLink);
   app.post('/api/users/resendVerificationLink', resendVerificationLink);
 
-  app.post('/api/engagements', checkPermissionsMW, createEngagement);
-  app.get('/api/engagements', checkAuth, getEngagement);
-  app.patch('/api/engagements', checkPermissionsMW, updateEngagement);
-  app.delete('/api/engagements', checkPermissionsMW, deleteEngagement);
+  app.post('/api/engagements', checkEngagementAdminMW, createEngagement);
+  app.get('/api/engagements', checkAuthMW, getEngagement);
+  app.patch('/api/engagements', checkEngagementAdminMW, updateEngagement);
+  app.delete('/api/engagements', checkEngagementAdminMW, deleteEngagement);
 
-  app.post('/api/folders', checkPermissionsMW, createFolder);
-  app.delete('/api/folders', checkPermissionsMW, deleteFolder);
-  app.patch('/api/folders', checkPermissionsMW, updateFolder);
+  app.post('/api/folders', checkEngagementAdminMW, createFolder);
+  app.delete('/api/folders', checkEngagementAdminMW, deleteFolder);
+  app.patch('/api/folders', checkEngagementAdminMW, updateFolder);
 
-  app.post('/api/tasks', checkPermissionsMW, createTask);
-  app.delete('/api/tasks', checkPermissionsMW, deleteTasks);
-  app.patch('/api/tasks', checkPermissionsMW, updateTask);
-  app.patch('/api/tasks/batch', checkPermissionsMW, batchUpdateTasks);
-  app.post('/api/tasks/import', checkPermissionsMW, importTasks);
+  app.post('/api/tasks', checkEngagementAdminMW, createTask);
+  app.delete('/api/tasks', checkEngagementAdminMW, deleteTasks);
+  app.patch('/api/tasks', checkEngagementAdminMW, updateTask);
+  app.patch('/api/tasks/batch', checkEngagementAdminMW, batchUpdateTasks);
+  app.post('/api/tasks/import', checkEngagementAdminMW, importTasks);
 
-  app.post('/api/tags', checkPermissionsMW, createTag);
-  app.delete('/api/tags', checkPermissionsMW, deleteTag);
-  app.patch('/api/tags', checkPermissionsMW, updateTag);
+  app.post('/api/tags', checkEngagementAdminMW, createTag);
+  app.delete('/api/tags', checkEngagementAdminMW, deleteTag);
+  app.patch('/api/tags', checkEngagementAdminMW, updateTag);
 
-  app.post('/api/orgs', checkAuth, createOrg);
-  app.patch('/api/orgs', checkPermissionsMW, updateOrg);
+  app.post('/api/orgs', checkAuthMW, createOrg);
+  app.patch('/api/orgs', checkEngagementAdminMW, updateOrg);
   app.get('/api/orgs', getOrg);
 
-  app.post('/api/widgets', checkPermissionsMW, createWidget);
-  app.patch('/api/widgets', checkPermissionsMW, updatedWidget);
-  app.delete('/api/widgets', checkPermissionsMW, deleteWidget);
+  app.post('/api/widgets', checkEngagementAdminMW, createWidget);
+  app.patch('/api/widgets', checkEngagementAdminMW, updatedWidget);
+  app.delete('/api/widgets', checkEngagementAdminMW, deleteWidget);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
   app.listen(port, () => console.log('App is running'));

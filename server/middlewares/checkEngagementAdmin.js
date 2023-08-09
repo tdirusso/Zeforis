@@ -12,9 +12,9 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Unauthorized.' });
   }
 
-  const { engagementId, orgId } = req.body || req.query;
+  const { engagementId } = req.body || req.query;
 
-  if (!engagementId && !orgId) {
+  if (!engagementId) {
     return res.json({ message: 'Unauthorized.' });
   }
 
@@ -34,18 +34,6 @@ module.exports = async (req, res, next) => {
         return next();
       } else {
         return res.json({ message: 'Unauthorized.' });
-      }
-    } else {
-      const [isOwnerOfOrgResult] = await pool.query(
-        'SELECT 1 FROM orgs WHERE id = ? AND owner_id = ?',
-        [orgId, userId]
-      );
-
-      if (isOwnerOfOrgResult.length) {
-        req.userId = userId;
-        return next();
-      } else {
-        return res.json({ message: 'Unauthorized' });
       }
     }
   } catch (error) {
