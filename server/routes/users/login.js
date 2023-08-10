@@ -33,7 +33,7 @@ const createToken = user => {
       }
     },
     process.env.SECRET_KEY,
-    { expiresIn: 86400 }
+    { expiresIn: 3600 }
   );
 };
 

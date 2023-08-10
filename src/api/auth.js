@@ -3,10 +3,6 @@ import request from '../lib/request';
 const login = async (payload) => {
   const { data } = await request.post(`users/login`, payload);
 
-  if (data.token) {
-    setToken(data.token);
-  }
-
   return data;
 };
 

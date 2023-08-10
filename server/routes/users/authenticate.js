@@ -95,17 +95,28 @@ module.exports = async (req, res) => {
         }
       });
 
+      const newToken = jwt.sign(
+        {
+          user: {
+            ...authenticatedUser,
+          }
+        },
+        process.env.SECRET_KEY,
+        { expiresIn: 3600 }
+      );
+
       return res.json({
         user: {
           ...authenticatedUser,
           memberOfOrgs: [...memberOfOrgs.values()],
           adminOfEngagements,
           memberOfEngagements
-        }
+        },
+        token: newToken
       });
     }
 
-    return res.json({ message: 'User does not exist.' });
+    return res.json({ message: 'Unauthenticated.' });
 
   } catch (error) {
     console.log(error);

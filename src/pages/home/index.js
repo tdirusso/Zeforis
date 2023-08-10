@@ -146,6 +146,12 @@ export default function Home({ setTheme }) {
 
     async function fetchEngagementData() {
       const result = await getEngagementData(engagement.id, org.id);
+      
+      if (!result.tasks) {
+        openSnackBar(result.message || 'Something went wrong...');
+        return;
+      }
+
       setTasks(result.tasks);
       setFolders(result.folders);
       setTags(result.tags);
@@ -205,7 +211,16 @@ export default function Home({ setTheme }) {
   }, [tasks, folders, tags, orgUsers, isDataFetched]);
 
   if (!isReadyToRender) {
-    return <Loader />;
+    return (
+      <>
+        <Loader />
+        <Snackbar
+          isOpen={isOpen}
+          type={type}
+          message={message}
+        />
+      </>
+    );
   }
 
   if (!org) {

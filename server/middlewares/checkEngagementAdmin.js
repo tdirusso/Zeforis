@@ -12,7 +12,11 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Unauthorized.' });
   }
 
-  const { engagementId } = req.body || req.query;
+  let { engagementId } = req.body;
+
+  if (!engagementId) {
+    engagementId = req.query.engagementId;
+  }
 
   if (!engagementId) {
     return res.json({ message: 'Unauthorized.' });

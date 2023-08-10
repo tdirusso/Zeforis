@@ -40,6 +40,7 @@ const sendPasswordResetLink = require('./routes/users/sendPasswordResetLink');
 const resendVerificationLink = require('./routes/users/resendVerificationLink');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
+const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
 const checkAuthMW = require('./middlewares/checkAuth');
 
 const app = express();
@@ -78,7 +79,7 @@ const boot = async () => {
   app.post('/api/users/resendVerificationLink', resendVerificationLink);
 
   app.post('/api/engagements', checkEngagementAdminMW, createEngagement);
-  app.get('/api/engagements', checkAuthMW, getEngagement);
+  app.get('/api/engagements', checkEngagementMemberMW, getEngagement);
   app.patch('/api/engagements', checkEngagementAdminMW, updateEngagement);
   app.delete('/api/engagements', checkEngagementAdminMW, deleteEngagement);
 

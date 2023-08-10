@@ -20,8 +20,6 @@ export default function UsersTab() {
     org
   } = useOutletContext();
 
-  console.log('orgUsers', orgUsers);
-
   const [userToModify, setUserToModify] = useState(null);
   const [editUserPermissionsModalOpen, setEditUserPermissionsModalOpen] = useState(false);
   const [removeUserModalOpen, setRemoveUserModalOpen] = useState(false);

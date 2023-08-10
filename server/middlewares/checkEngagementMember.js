@@ -12,13 +12,13 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Unauthorized.' });
   }
 
-  let { orgId } = req.body;
+  let { engagementId } = req.body;
 
-  if (!orgId) {
-    orgId = req.query.orgId;
+  if (!engagementId) {
+    engagementId = req.query.engagementId;
   }
 
-  if (!orgId) {
+  if (!engagementId) {
     return res.json({ message: 'Unauthorized.' });
   }
 
@@ -27,16 +27,18 @@ module.exports = async (req, res, next) => {
 
     const userId = decoded.user.id;
 
-    const [isOwnerOfOrgResult] = await pool.query(
-      'SELECT 1 FROM orgs WHERE id = ? AND owner_id = ?',
-      [orgId, userId]
-    );
+    if (engagementId) {
+      const [doesEngagementUserExistResult] = await pool.query(
+        'SELECT 1 FROM engagement_users WHERE user_id = ? AND engagement_id = ? AND (role = "admin" OR role = "member")',
+        [userId, engagementId]
+      );
 
-    if (isOwnerOfOrgResult.length) {
-      req.userId = userId;
-      return next();
-    } else {
-      return res.json({ message: 'Unauthorized' });
+      if (doesEngagementUserExistResult.length) {
+        req.userId = userId;
+        return next();
+      } else {
+        return res.json({ message: 'Unauthorized.' });
+      }
     }
   } catch (error) {
     console.log(error);
