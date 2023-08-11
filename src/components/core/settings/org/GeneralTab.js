@@ -23,6 +23,7 @@ export default function GeneralTab() {
     setTheme,
     openModal,
     isOrgOwner,
+    isAdmin,
     engagement
   } = useOutletContext();
 
@@ -183,13 +184,16 @@ export default function GeneralTab() {
           variant="standard"
           helperText={`Current organization name`}
           InputProps={{
-            endAdornment: <InputAdornment position="end">
-              <LoadingButton
-                loading={isUpdatingName}
-                onClick={handleUpdateOrgName}>
-                Save
-              </LoadingButton>
-            </InputAdornment>
+            readOnly: !isOrgOwner,
+            endAdornment: isOrgOwner ?
+              <InputAdornment position="end">
+                <LoadingButton
+                  loading={isUpdatingName}
+                  onClick={handleUpdateOrgName}>
+                  Save
+                </LoadingButton>
+              </InputAdornment>
+              : null
           }}>
         </TextField>
       </Box>
@@ -203,8 +207,8 @@ export default function GeneralTab() {
           Change
         </Button>
       </Box>
-      <Divider className="my4" />
-      <Box>
+      <Divider className="my4" hidden={!isOrgOwner} />
+      <Box hidden={!isOrgOwner}>
         <Box component="h4" mb={3}>
           Branding
         </Box>
@@ -279,8 +283,10 @@ export default function GeneralTab() {
           </LoadingButton>
         </Box>
       </Box>
-      <Divider className="my4" />
-      <Box>
+
+      <Divider className="my4" hidden={!isAdmin} />
+
+      <Box hidden={!isAdmin}>
         <Box component="h4" mb={2}>
           Custom Login Page
         </Box>

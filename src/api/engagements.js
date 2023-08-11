@@ -60,8 +60,8 @@ const removeUser = async (payload) => {
   return data;
 };
 
-const getEngagementData = async (engagementId, orgId, isOrgOwner) => {
-  const { data } = await request.get(`engagements?engagementId=${engagementId}&orgId=${orgId}&isOrgOwner=${isOrgOwner}`);
+const getEngagementData = async (engagementId, orgId) => {
+  const { data } = await request.get(`engagements?engagementId=${engagementId}&orgId=${orgId}`);
 
   return data;
 };

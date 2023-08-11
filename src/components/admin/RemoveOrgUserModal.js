@@ -8,7 +8,7 @@ import { LoadingButton } from '@mui/lab';
 import { removeUser } from '../../api/engagements';
 import { useOutletContext } from 'react-router-dom';
 
-export default function RemoveUserModal({ open, setOpen, user }) {
+export default function RemoveOrgUserModal({ open, setOpen, user }) {
   const {
     org,
     setOrgUsers,
@@ -22,7 +22,7 @@ export default function RemoveUserModal({ open, setOpen, user }) {
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleRemoveUser = async () => {
+  const handleRemoveOrgUser = async () => {
     setLoading(true);
 
     try {
@@ -77,7 +77,7 @@ export default function RemoveUserModal({ open, setOpen, user }) {
             <LoadingButton
               fullWidth
               variant='contained'
-              onClick={handleRemoveUser}
+              onClick={handleRemoveOrgUser}
               required
               loading={isLoading}
               color="error">

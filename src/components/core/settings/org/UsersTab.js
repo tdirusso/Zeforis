@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import React, { useState } from "react";
 import EditUserPermissionsModal from "../../../admin/EditUserPermissionsModal";
-import RemoveUserModal from "../../../admin/RemoveUserModal";
+import RemoveOrgUserModal from "../../../admin/RemoveOrgUserModal";
 
 export default function UsersTab() {
 
@@ -102,7 +102,7 @@ export default function UsersTab() {
         setOpen={setEditUserPermissionsModalOpen}
       />
 
-      <RemoveUserModal
+      <RemoveOrgUserModal
         open={removeUserModalOpen}
         setOpen={setRemoveUserModalOpen}
         user={userToModify}

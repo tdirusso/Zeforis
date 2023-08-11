@@ -146,7 +146,7 @@ export default function Home({ setTheme }) {
     }
 
     async function fetchEngagementData() {
-      const result = await getEngagementData(engagement.id, org.id, isOrgOwner);
+      const result = await getEngagementData(engagement.id, org.id);
 
       if (!result.tasks) {
         openSnackBar(result.message || 'Something went wrong...');

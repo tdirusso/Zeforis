@@ -23,7 +23,8 @@ export default function EditUserPermissionsModal(props) {
     engagements,
     setOrgUsers,
     orgUsersMap,
-    openSnackBar
+    openSnackBar,
+    org
   } = useOutletContext();
 
   const theUser = orgUsersMap[user?.id];
@@ -38,7 +39,8 @@ export default function EditUserPermissionsModal(props) {
       const { success, message } = await updatePermission({
         isAdmin,
         engagementId,
-        userId: user.id
+        userId: user.id,
+        orgId: org.id
       });
 
       if (success) {
@@ -79,7 +81,8 @@ export default function EditUserPermissionsModal(props) {
       const { success, message } = await updateAccess({
         hasAccess,
         engagementId,
-        userId: user.id
+        userId: user.id,
+        orgId: org.id
       });
 
       if (success) {

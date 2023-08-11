@@ -4,8 +4,7 @@ module.exports = async (req, res) => {
 
   const {
     engagementId,
-    orgId,
-    isOrgOwner
+    orgId
   } = req.query;
 
   if (!engagementId) {
@@ -28,11 +27,8 @@ module.exports = async (req, res) => {
 
     const orgUsersMap = {};
 
-    const shouldIncludeOrgUsers = isOrgOwner === 'true';
-
-    if (shouldIncludeOrgUsers) {
-      const [orgUsers] = await connection.query(
-        `
+    const [orgUsers] = await connection.query(
+      `
           SELECT 
             users.id as user_id,
             users.first_name, 
@@ -48,44 +44,43 @@ module.exports = async (req, res) => {
           WHERE engagements.org_id = ?
           ORDER BY users.first_name
         `,
-        [orgId]
-      );
+      [orgId]
+    );
 
-      orgUsers.forEach(row => {
-        const {
-          engagement_id,
-          engagement_name,
-          user_id,
-          first_name,
-          last_name,
-          role,
-          email
-        } = row;
+    orgUsers.forEach(row => {
+      const {
+        engagement_id,
+        engagement_name,
+        user_id,
+        first_name,
+        last_name,
+        role,
+        email
+      } = row;
 
-        if (!orgUsersMap[user_id]) {
-          orgUsersMap[user_id] = {
-            firstName: first_name,
-            lastName: last_name,
-            email,
-            id: user_id,
-            memberOfEngagements: [],
-            adminOfEngagements: []
-          };
-        }
+      if (!orgUsersMap[user_id]) {
+        orgUsersMap[user_id] = {
+          firstName: first_name,
+          lastName: last_name,
+          email,
+          id: user_id,
+          memberOfEngagements: [],
+          adminOfEngagements: []
+        };
+      }
 
-        if (role === 'admin') {
-          orgUsersMap[user_id].adminOfEngagements.push({
-            id: engagement_id,
-            name: engagement_name
-          });
-        } else {
-          orgUsersMap[user_id].memberOfEngagements.push({
-            id: engagement_id,
-            name: engagement_name
-          });
-        }
-      });
-    }
+      if (role === 'admin') {
+        orgUsersMap[user_id].adminOfEngagements.push({
+          id: engagement_id,
+          name: engagement_name
+        });
+      } else {
+        orgUsersMap[user_id].memberOfEngagements.push({
+          id: engagement_id,
+          name: engagement_name
+        });
+      }
+    });
 
     const foldersIds = folders.length > 0 ? folders.map(folder => folder.id) : null;
 

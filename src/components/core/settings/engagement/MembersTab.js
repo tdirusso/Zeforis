@@ -31,7 +31,8 @@ export default function MembersTab() {
     openSnackBar,
     setOrgUsers,
     orgUsersMap,
-    org
+    org,
+    isOrgOwner
   } = useOutletContext();
 
   const engagementId = engagement.id;
@@ -66,7 +67,8 @@ export default function MembersTab() {
     try {
       const result = await removeEngagementUser({
         engagementId,
-        userId: userToRemove.id
+        userId: userToRemove.id,
+        orgId: org.id
       });
 
       const success = result.success;
@@ -191,7 +193,7 @@ export default function MembersTab() {
       <Box mt={3}>
         <Box>
           <Button
-            hidden={!isAdmin}
+            hidden={!isOrgOwner}
             variant="outlined"
             style={{ marginBottom: '1rem' }}
             onClick={e => setInviteUserMenuAnchor(e.currentTarget)}
@@ -229,7 +231,7 @@ export default function MembersTab() {
                   <React.Fragment key={member.id}>
                     <ListItem
                       secondaryAction={
-                        isAdmin ?
+                        isOrgOwner ?
                           <Tooltip title="Remove Member">
                             <IconButton
                               edge="end"
@@ -280,7 +282,7 @@ export default function MembersTab() {
                 return (
                   <React.Fragment key={member.id}>
                     <ListItem
-                      secondaryAction={!isYou && isAdmin ?
+                      secondaryAction={!isYou && isOrgOwner ?
                         <Tooltip title="Remove Administrator">
                           <IconButton
                             edge="end"

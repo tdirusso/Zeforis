@@ -71,12 +71,12 @@ const boot = async () => {
   app.post('/api/users/authenticate', authenticate);
   app.get('/api/users/verify', verify);
   app.post('/api/users/register', register);
-  app.post('/api/users/invite', checkEngagementAdminMW, inviteEngagementUser);
-  app.delete('/api/users/removeEngagementUser', checkEngagementAdminMW, removeEngagementUser);
-  app.delete('/api/removeOrgUser', checkEngagementAdminMW, removeOrgUser);
+  app.post('/api/users/invite', checkOrgOwnerMW, inviteEngagementUser);
+  app.delete('/api/users/removeEngagementUser', checkOrgOwnerMW, removeEngagementUser);
+  app.delete('/api/removeOrgUser', checkOrgOwnerMW, removeOrgUser);
   app.patch('/api/users', checkAuthMW, updateProfile);
-  app.patch('/api/users/permissions', checkEngagementAdminMW, updatePermission);
-  app.patch('/api/users/access', checkEngagementAdminMW, updateAccess);
+  app.patch('/api/users/permissions', checkOrgOwnerMW, updatePermission);
+  app.patch('/api/users/access', checkOrgOwnerMW, updateAccess);
   app.patch('/api/users/password', updatePassword);
   app.get('/api/users/invitation', getInvitationData);
   app.post('/api/users/sendPasswordResetLink', sendPasswordResetLink);
@@ -84,8 +84,8 @@ const boot = async () => {
 
   app.post('/api/engagements', checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', checkEngagementMemberMW, getEngagement);
-  app.patch('/api/engagements', checkEngagementAdminMW, updateEngagement);
-  app.delete('/api/engagements', checkEngagementAdminMW, deleteEngagement);
+  app.patch('/api/engagements', checkOrgOwnerMW, updateEngagement);
+  app.delete('/api/engagements', checkOrgOwnerMW, deleteEngagement);
   app.delete('/api/engagements/leave', checkEngagementMemberMW, leaveEngagement);
 
   app.post('/api/folders', checkEngagementAdminMW, createFolder);
@@ -103,7 +103,7 @@ const boot = async () => {
   app.patch('/api/tags', checkEngagementAdminMW, updateTag);
 
   app.post('/api/orgs', checkAuthMW, createOrg);
-  app.patch('/api/orgs', checkEngagementAdminMW, updateOrg);
+  app.patch('/api/orgs', checkOrgOwnerMW, updateOrg);
   app.get('/api/orgs', getOrg);
   app.delete('/api/orgs', checkOrgOwnerMW, deleteOrg);
   app.delete('/api/orgs/leave', checkEngagementMemberMW, leaveOrg);

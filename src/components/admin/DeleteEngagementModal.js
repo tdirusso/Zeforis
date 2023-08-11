@@ -13,7 +13,8 @@ export default function DeleteEngagementModal(props) {
     close,
     isOpen,
     engagement,
-    openSnackBar
+    openSnackBar,
+    org
   } = props;
 
   const engagementId = engagement.id;
@@ -25,7 +26,8 @@ export default function DeleteEngagementModal(props) {
 
     try {
       const { success, message } = await deleteEngagement({
-        engagementId
+        engagementId,
+        org: org.id
       });
 
       if (success) {

@@ -35,7 +35,8 @@ export default function GeneralTab() {
     try {
       const { success, message } = await updateEngagement({
         name: engagementName,
-        engagementId: engagement.id
+        engagementId: engagement.id,
+        orgId: org.id
       });
 
       if (success) {
@@ -91,15 +92,18 @@ export default function GeneralTab() {
           disabled={loading}
           onChange={e => setEngagementName(e.target.value)}
           variant="standard"
-          helperText={`Current engagement name`}
+          helperText="Current engagement name"
           InputProps={{
-            endAdornment: <InputAdornment position="end">
-              <LoadingButton
-                loading={loading}
-                onClick={handleUpdateEngagement}>
-                Save
-              </LoadingButton>
-            </InputAdornment>
+            readOnly: !isOrgOwner,
+            endAdornment: isOrgOwner ?
+              <InputAdornment position="end">
+                <LoadingButton
+                  loading={loading}
+                  onClick={handleUpdateEngagement}>
+                  Save
+                </LoadingButton>
+              </InputAdornment>
+              : null
           }}>
         </TextField>
       </Box>
