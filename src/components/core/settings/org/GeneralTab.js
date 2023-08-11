@@ -1,9 +1,9 @@
-import { Box, Button, TextField, InputAdornment, Divider, Skeleton, createTheme, Typography, IconButton, Tooltip } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Divider, Skeleton, createTheme, Typography, IconButton, Tooltip, Menu } from "@mui/material";
 import React, { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { useOutletContext } from "react-router";
-import { updateOrg } from "../../../../api/orgs";
+import { deleteActiveOrgId, leaveOrg, updateOrg } from "../../../../api/orgs";
 import { TwitterPicker } from "react-color";
 import { hexToRgb } from "../../../../lib/utils";
 import themeConfig from "../../../../theme";
@@ -11,6 +11,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { deleteActiveEngagementId } from "../../../../api/engagements";
 
 export default function GeneralTab() {
   const {
@@ -19,7 +21,9 @@ export default function GeneralTab() {
     setOrg,
     org,
     setTheme,
-    openModal
+    openModal,
+    isOrgOwner,
+    engagement
   } = useOutletContext();
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
@@ -33,6 +37,10 @@ export default function GeneralTab() {
   const [isLogoChanged, setLogoChanged] = useState(false);
   const [isLogoLoading, setLogoLoading] = useState(org.logo !== '');
   const [copyButtonText, setCopyButtonText] = useState('Copy link');
+  const [confirmLeaveOrgMenu, setConfirmLeaveOrgMenu] = useState(null);
+  const [leaving, setLeaving] = useState(false);
+
+  const confirmLeaveOrgMenuOpen = Boolean(confirmLeaveOrgMenu);
 
   const fileInput = useRef();
 
@@ -131,6 +139,37 @@ export default function GeneralTab() {
     setTimeout(() => {
       setCopyButtonText('Copy link');
     }, 750);
+  };
+
+  const handleLeaveOrg = async () => {
+    if (isOrgOwner) {
+      openSnackBar('As the org owner, you may only delete the organization.');
+      return;
+    }
+
+    setLeaving(true);
+
+    try {
+      const { success, message } = await leaveOrg({
+        orgId: org.id,
+        engagementId: engagement.id
+      });
+
+      if (success) {
+        openSnackBar('Left organization.', 'success');
+        deleteActiveEngagementId();
+        deleteActiveOrgId();
+        setTimeout(() => {
+          window.location.reload();
+        }, 750);
+      } else {
+        openSnackBar(message, 'error');
+        setLeaving(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLeaving(false);
+    }
   };
 
   return (
@@ -300,14 +339,38 @@ export default function GeneralTab() {
             Once you delete an organization, there is no going back - all folders, tasks, tags, etc. will be permanently deleted.  Please be certain.
           </Typography>
           <Button
-          onClick={() => openModal('delete-org')}
-          style={{marginTop: '1rem'}}
+            startIcon={isOrgOwner ? null : <LogoutIcon />}
+            onClick={
+              isOrgOwner ? () => openModal('delete-org') :
+                e => setConfirmLeaveOrgMenu(e.currentTarget)
+            }
+            style={{ marginTop: '1rem' }}
             variant="contained"
             color="error">
-            Delete organization
+            {
+              isOrgOwner ? 'Delete organization' : 'Leave organization'
+            }
           </Button>
         </Box>
       </Box>
+
+      <Menu
+        anchorEl={confirmLeaveOrgMenu}
+        open={confirmLeaveOrgMenuOpen}
+        onClose={() => setConfirmLeaveOrgMenu(null)}>
+        <Box px={2} py={1}>
+          <Typography variant="body2" mb={1}>
+            Are you sure you want to leave this entire organization?
+          </Typography>
+          <LoadingButton
+            color='error'
+            variant='contained'
+            loading={leaving}
+            onClick={handleLeaveOrg}>
+            Yes, leave
+          </LoadingButton>
+        </Box>
+      </Menu>
     </>
   );
 };

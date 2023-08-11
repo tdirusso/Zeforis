@@ -15,7 +15,14 @@ axiosClient.interceptors.request.use(req => {
 
 axiosClient.interceptors.response.use(response => {
   if (response.data?.token) {
-    setToken(response.data?.token)
+    setToken(response.data.token);
+  }
+
+  if (response.data?.message) {
+    if (response.data.message === 'jwt expired') {
+      alert('Session expired.');
+      window.location.href = '/login';
+    }
   }
 
   return response;

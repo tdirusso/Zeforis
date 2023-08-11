@@ -1,5 +1,4 @@
 import { Box, Button, TextField, InputAdornment, Divider, Menu, Typography } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
@@ -116,13 +115,13 @@ export default function GeneralTab() {
       <Divider className="my4" />
       <Box>
         <Button
-          startIcon={isOrgOwner ? <DeleteIcon /> : <LogoutIcon />}
+          startIcon={isOrgOwner ? null : <LogoutIcon />}
           color="error"
           onClick={
             isOrgOwner ?
               () => openModal('delete-engagement') :
               e => setConfirmLeaveEngagementMenu(e.currentTarget)}
-          variant="outlined">
+          variant="contained">
           {
             isOrgOwner ? 'Delete engagement' : 'Leave engagement'
           }
@@ -141,8 +140,7 @@ export default function GeneralTab() {
             color='error'
             variant='contained'
             loading={leaving}
-            onClick={
-              () => handleLeaveEngagement()}>
+            onClick={handleLeaveEngagement}>
             Yes, leave
           </LoadingButton>
         </Box>

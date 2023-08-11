@@ -36,6 +36,13 @@ const deleteOrg = async (payload) => {
   return data;
 };
 
+
+const leaveOrg = async (payload) => {
+  const { data } = await request.delete(`orgs/leave`, { data: payload });
+
+  return data;
+};
+
 export {
   getActiveOrgId,
   setActiveOrgId,
@@ -43,5 +50,6 @@ export {
   updateOrg,
   createOrg,
   getOrg,
-  deleteOrg
+  deleteOrg,
+  leaveOrg
 };

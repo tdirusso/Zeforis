@@ -40,6 +40,7 @@ const sendPasswordResetLink = require('./routes/users/sendPasswordResetLink');
 const resendVerificationLink = require('./routes/users/resendVerificationLink');
 const deleteOrg = require('./routes/orgs/deleteOrg');
 const leaveEngagement = require('./routes/engagements/leaveEngagement');
+const leaveOrg = require('./routes/orgs/leaveOrg');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -105,6 +106,7 @@ const boot = async () => {
   app.patch('/api/orgs', checkEngagementAdminMW, updateOrg);
   app.get('/api/orgs', getOrg);
   app.delete('/api/orgs', checkOrgOwnerMW, deleteOrg);
+  app.delete('/api/orgs/leave', checkEngagementMemberMW, leaveOrg);
 
   app.post('/api/widgets', checkEngagementAdminMW, createWidget);
   app.patch('/api/widgets', checkEngagementAdminMW, updatedWidget);

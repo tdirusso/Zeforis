@@ -42,6 +42,7 @@ module.exports = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    //console.log(error, error instanceof jwt.TokenExpiredError);
     return res.json({ message: error.message });
   }
 };
