@@ -38,9 +38,11 @@ const updatePassword = require('./routes/users/updatePassword');
 const getOrg = require('./routes/orgs/getOrg');
 const sendPasswordResetLink = require('./routes/users/sendPasswordResetLink');
 const resendVerificationLink = require('./routes/users/resendVerificationLink');
+const deleteOrg = require('./routes/orgs/deleteOrg');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
+const checkOrgOwnerMW = require('./middlewares/checkOrgOwner');
 const checkAuthMW = require('./middlewares/checkAuth');
 
 const app = express();
@@ -78,7 +80,7 @@ const boot = async () => {
   app.post('/api/users/sendPasswordResetLink', sendPasswordResetLink);
   app.post('/api/users/resendVerificationLink', resendVerificationLink);
 
-  app.post('/api/engagements', checkEngagementAdminMW, createEngagement);
+  app.post('/api/engagements', checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', checkEngagementMemberMW, getEngagement);
   app.patch('/api/engagements', checkEngagementAdminMW, updateEngagement);
   app.delete('/api/engagements', checkEngagementAdminMW, deleteEngagement);
@@ -100,6 +102,7 @@ const boot = async () => {
   app.post('/api/orgs', checkAuthMW, createOrg);
   app.patch('/api/orgs', checkEngagementAdminMW, updateOrg);
   app.get('/api/orgs', getOrg);
+  app.delete('/api/orgs', checkOrgOwnerMW, deleteOrg);
 
   app.post('/api/widgets', checkEngagementAdminMW, createWidget);
   app.patch('/api/widgets', checkEngagementAdminMW, updatedWidget);

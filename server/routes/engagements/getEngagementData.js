@@ -2,7 +2,11 @@ const pool = require('../../../database');
 
 module.exports = async (req, res) => {
 
-  const { engagementId, orgId } = req.query;
+  const {
+    engagementId,
+    orgId,
+    isOrgOwner
+  } = req.query;
 
   if (!engagementId) {
     return res.json({ message: 'No engagementId provided.' });
@@ -22,62 +26,66 @@ module.exports = async (req, res) => {
       [engagementId]
     );
 
-    const [orgUsers] = await connection.query(
-      `
-        SELECT 
-          users.id as user_id,
-          users.first_name, 
-          users.last_name,
-          users.email,
-          engagements.id as engagement_id,
-          engagements.name as engagement_name,
-          engagement_users.role
-        FROM engagement_users
-        LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
-        LEFT JOIN users ON engagement_users.user_id = users.id
-        LEFT JOIN orgs ON orgs.id = engagements.org_id
-        WHERE engagements.org_id = ?
-        ORDER BY users.first_name
-      `,
-      [orgId]
-    );
-
     const orgUsersMap = {};
 
-    orgUsers.forEach(row => {
-      const {
-        engagement_id,
-        engagement_name,
-        user_id,
-        first_name,
-        last_name,
-        role,
-        email
-      } = row;
+    const shouldIncludeOrgUsers = isOrgOwner === 'true';
 
-      if (!orgUsersMap[user_id]) {
-        orgUsersMap[user_id] = {
-          firstName: first_name,
-          lastName: last_name,
-          email,
-          id: user_id,
-          memberOfEngagements: [],
-          adminOfEngagements: []
-        };
-      }
+    if (shouldIncludeOrgUsers) {
+      const [orgUsers] = await connection.query(
+        `
+          SELECT 
+            users.id as user_id,
+            users.first_name, 
+            users.last_name,
+            users.email,
+            engagements.id as engagement_id,
+            engagements.name as engagement_name,
+            engagement_users.role
+          FROM engagement_users
+          LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
+          LEFT JOIN users ON engagement_users.user_id = users.id
+          LEFT JOIN orgs ON orgs.id = engagements.org_id
+          WHERE engagements.org_id = ?
+          ORDER BY users.first_name
+        `,
+        [orgId]
+      );
 
-      if (role === 'admin') {
-        orgUsersMap[user_id].adminOfEngagements.push({
-          id: engagement_id,
-          name: engagement_name
-        });
-      } else {
-        orgUsersMap[user_id].memberOfEngagements.push({
-          id: engagement_id,
-          name: engagement_name
-        });
-      }
-    });
+      orgUsers.forEach(row => {
+        const {
+          engagement_id,
+          engagement_name,
+          user_id,
+          first_name,
+          last_name,
+          role,
+          email
+        } = row;
+
+        if (!orgUsersMap[user_id]) {
+          orgUsersMap[user_id] = {
+            firstName: first_name,
+            lastName: last_name,
+            email,
+            id: user_id,
+            memberOfEngagements: [],
+            adminOfEngagements: []
+          };
+        }
+
+        if (role === 'admin') {
+          orgUsersMap[user_id].adminOfEngagements.push({
+            id: engagement_id,
+            name: engagement_name
+          });
+        } else {
+          orgUsersMap[user_id].memberOfEngagements.push({
+            id: engagement_id,
+            name: engagement_name
+          });
+        }
+      });
+    }
 
     const foldersIds = folders.length > 0 ? folders.map(folder => folder.id) : null;
 
@@ -137,13 +145,15 @@ module.exports = async (req, res) => {
 
     connection.release();
 
-    return res.json({
+    const engagementData = {
       folders,
       tasks,
       tags,
       widgets,
       orgUsers: Object.values(orgUsersMap)
-    });
+    };
+
+    return res.json(engagementData);
 
   } catch (error) {
     console.log(error);

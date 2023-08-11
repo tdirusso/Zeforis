@@ -5,34 +5,32 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { deleteEngagement } from '../../api/engagements';
+import { deleteOrg } from '../../api/orgs';
 
-export default function DeleteEngagementModal(props) {
+export default function DeleteOrgModal(props) {
 
   const {
     close,
     isOpen,
-    engagement,
-    openSnackBar
+    openSnackBar,
+    org
   } = props;
-
-  const engagementId = engagement.id;
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleDeleteEngagement = async () => {
+  const handleDeleteOrg = async () => {
     setLoading(true);
 
     try {
-      const { success, message } = await deleteEngagement({
-        engagementId
+      const { success, message } = await deleteOrg({
+        orgId: org.id
       });
 
       if (success) {
         setTimeout(() => {
-          openSnackBar('Engagement deleted.', 'success');
+          openSnackBar('Organization deleted.', 'success');
           window.location.href = '/home/dashboard';
-        }, 250);
+        }, 1000);
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -48,10 +46,10 @@ export default function DeleteEngagementModal(props) {
       <Dialog open={isOpen} onClose={close}>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to <strong>permanently delete {engagement.name}?</strong>
+            Are you sure you want to <strong>permanently delete {org.name}?</strong>
             <br></br>
             <br></br>
-            If you proceed, all data for this engagement will be permanently deleted.
+            If you proceed, all data for this organization will be permanently deleted.
           </DialogContentText>
           <DialogActions style={{ marginTop: '2rem', padding: 0 }}>
             <Button
@@ -64,11 +62,11 @@ export default function DeleteEngagementModal(props) {
             <LoadingButton
               variant='contained'
               fullWidth
-              onClick={handleDeleteEngagement}
+              onClick={handleDeleteOrg}
               required
               loading={isLoading}
               color="error">
-              Yes, delete {engagement.name}
+              Yes, delete {org.name}
             </LoadingButton>
           </DialogActions>
         </DialogContent>

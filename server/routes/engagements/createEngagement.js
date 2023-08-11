@@ -8,6 +8,8 @@ module.exports = async (req, res) => {
 
   const { userId } = req;
 
+  console.log(req.body);
+
   if (!name) {
     return res.json({
       message: 'Missing engagement name.'

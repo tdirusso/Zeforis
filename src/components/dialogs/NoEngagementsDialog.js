@@ -1,35 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Divider, Fade, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-import { createEngagement, deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
+import { deleteActiveEngagementId } from '../../api/engagements';
 import CloseIcon from '@mui/icons-material/Close';
 import Watermark from '../core/Watermark';
 import { SwapHorizOutlined } from '@mui/icons-material';
 import { setActiveOrgId } from '../../api/orgs';
 
-const toggleableTransition = forwardRef(function Transition(props, ref) {
-  return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 300 }} />;
-});
-
 const fixedTransition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={{ enter: 0 }} />;
 });
 
-export default function CreateEngagementDialog(props) {
+export default function NoEngagementsDialog(props) {
   const {
     org,
-    openSnackBar,
     isOpen,
     close,
     user
   } = props;
 
-  const name = useRef();
-
   const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
   const [isLoadingOrg, setLoadingOrg] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [orgId, setOrgId] = useState();
 
   const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
@@ -48,42 +39,6 @@ export default function CreateEngagementDialog(props) {
       }, 500);
     }
   }, [orgId]);
-
-  const handleCreateEngagement = e => {
-    e.preventDefault();
-
-    const nameVal = name.current.value;
-
-    if (!nameVal) {
-      openSnackBar('Please enter a name for the engagement.');
-      return;
-    }
-
-    setLoading(true);
-
-    setTimeout(async () => {
-      try {
-        const { engagement, message } = await createEngagement({
-          name: nameVal,
-          orgId: org.id
-        });
-
-        if (engagement) {
-          setActiveEngagementId(engagement.id);
-          openSnackBar('Engagement created.', 'success');
-          setTimeout(() => {
-            window.location.href = close ? '/home/dashboard' : '/home/dashboard?gettingStarted=true';
-          }, 500);
-        } else {
-          openSnackBar(message, 'error');
-          setLoading(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
-        setLoading(false);
-      }
-    }, 1500);
-  };
 
   const handleClose = () => {
     close();
@@ -105,7 +60,7 @@ export default function CreateEngagementDialog(props) {
     <Dialog
       open={isOpen}
       onClose={handleClose}
-      TransitionComponent={close ? toggleableTransition : fixedTransition}
+      TransitionComponent={fixedTransition}
       fullScreen>
       <Box className="flex-centered" style={{ height: '100%' }}>
         <Box textAlign="center" mb={'100px'} maxWidth={600}>
@@ -133,37 +88,23 @@ export default function CreateEngagementDialog(props) {
           <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '125ms' }}>
             <Box>
               <Box component="h2" mb={1} mt={2}>
-                Create an Engagement
+                No Engagements
               </Box>
               <Divider className='my3' />
               <Typography>
-                An engagement is a project with one of your customers/clients.
+                The organization owner has not yet shared any engagements with you.
               </Typography>
               <Typography mt={1}>
-                The engagement name should be the company name for the customer you're engaging with, or just a simple project name.
+                You may change organizations (top right menu) or return to the login page.
               </Typography>
-            </Box>
-          </Fade>
-          <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '200ms' }}>
-            <form onSubmit={handleCreateEngagement}>
-              <Box className='my3'>
-                <TextField
-                  placeholder="Engagement Name"
-                  fullWidth
-                  autoFocus
-                  disabled={isLoading}
-                  inputRef={name}>
-                </TextField>
-              </Box>
-              <LoadingButton
+              <Button
+                style={{ marginTop: '1.5rem' }}
                 variant='contained'
-                fullWidth
-                size='large'
-                type='submit'
-                loading={isLoading}>
-                Create Engagement
-              </LoadingButton>
-            </form>
+                onClick={() => window.location.href = '/login'}
+                size='large'>
+                Return to login
+              </Button>
+            </Box>
           </Fade>
           <Grow appear in>
             <Box>

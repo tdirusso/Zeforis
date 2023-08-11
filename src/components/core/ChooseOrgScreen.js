@@ -29,7 +29,7 @@ export default function ChooseOrgScreen(props) {
 
   return (
     <Box>
-      <DialogContent className='m0a' style={{ width: 1200 }}>
+      <DialogContent className='m0a' style={{ maxWidth: 1200 }}>
         <Box style={{ marginBottom: '4rem' }}>
           <Box
             display="flex"

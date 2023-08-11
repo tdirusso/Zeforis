@@ -18,7 +18,8 @@ export default function GeneralTab() {
     openSnackBar,
     setOrg,
     org,
-    setTheme
+    setTheme,
+    openModal
   } = useOutletContext();
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
@@ -287,6 +288,24 @@ export default function GeneralTab() {
                 </>
             }}>
           </TextField>
+        </Box>
+      </Box>
+      <Divider className="my4" />
+      <Box>
+        <Box component="h4" mb={2}>
+          Danger Zone
+        </Box>
+        <Box>
+          <Typography variant="body2">
+            Once you delete an organization, there is no going back - all folders, tasks, tags, etc. will be permanently deleted.  Please be certain.
+          </Typography>
+          <Button
+          onClick={() => openModal('delete-org')}
+          style={{marginTop: '1rem'}}
+            variant="contained"
+            color="error">
+            Delete organization
+          </Button>
         </Box>
       </Box>
     </>

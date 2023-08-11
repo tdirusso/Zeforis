@@ -23,6 +23,7 @@ import useDialog from "../../hooks/useDialog";
 import Dialogs from "../../components/dialogs";
 import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
 import './styles.scss';
+import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
 
 export default function Home({ setTheme }) {
   const { search } = useLocation();
@@ -145,8 +146,8 @@ export default function Home({ setTheme }) {
     }
 
     async function fetchEngagementData() {
-      const result = await getEngagementData(engagement.id, org.id);
-      
+      const result = await getEngagementData(engagement.id, org.id, isOrgOwner);
+
       if (!result.tasks) {
         openSnackBar(result.message || 'Something went wrong...');
         return;
@@ -186,7 +187,7 @@ export default function Home({ setTheme }) {
       const engagementAdminsResult = [];
       let isAdminResult = false;
 
-      orgUsers.forEach(orgUser => {
+      orgUsers?.forEach(orgUser => {
         orgUsersMapResult[orgUser.id] = orgUser;
 
         if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
@@ -249,10 +250,23 @@ export default function Home({ setTheme }) {
   if (engagements.length === 0) {
     return (
       <Box className="flex-centered" style={{ height: '100%' }}>
-        <CreateEngagementDialog
-          org={org}
-          openSnackBar={openSnackBar}
-          isOpen={true}
+        {
+          isOrgOwner ? <CreateEngagementDialog
+            org={org}
+            openSnackBar={openSnackBar}
+            isOpen={true}
+            user={user}
+          /> :
+            <NoEngagementsDialog
+              org={org}
+              isOpen={true}
+              user={user}
+            />
+        }
+        <Snackbar
+          isOpen={isOpen}
+          type={type}
+          message={message}
         />
       </Box>
     );
