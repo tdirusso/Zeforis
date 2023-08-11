@@ -72,6 +72,14 @@ const deleteEngagement = async (payload) => {
   return data;
 };
 
+
+const leaveEngagement = async (payload) => {
+  const { data } = await request.delete(`engagements/leave`, { data: payload });
+
+  return data;
+};
+
+
 export {
   createEngagement,
   updateEngagement,
@@ -83,5 +91,6 @@ export {
   removeEngagementUser,
   getEngagementData,
   deleteEngagement,
-  removeUser
+  removeUser,
+  leaveEngagement
 };

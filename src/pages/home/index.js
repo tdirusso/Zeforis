@@ -308,6 +308,7 @@ export default function Home({ setTheme }) {
     isAdmin,
     widgets,
     setTheme,
+    isOrgOwner,
     setTags,
     setEngagement,
     setOrg,

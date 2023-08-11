@@ -1,10 +1,11 @@
-import { Box, Button, TextField, InputAdornment, Divider } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Divider, Menu, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { useOutletContext } from "react-router";
-import { updateEngagement } from "../../../../api/engagements";
+import { deleteActiveEngagementId, leaveEngagement, updateEngagement } from "../../../../api/engagements";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function GeneralTab() {
   const {
@@ -12,11 +13,17 @@ export default function GeneralTab() {
     openDialog,
     openModal,
     openSnackBar,
-    setEngagement
+    setEngagement,
+    isOrgOwner,
+    org
   } = useOutletContext();
 
   const [engagementName, setEngagementName] = useState(engagement.name);
+  const [confirmLeaveEngagementMenu, setConfirmLeaveEngagementMenu] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+
+  const confirmLeaveEngagementMenuOpen = Boolean(confirmLeaveEngagementMenu);
 
   const handleUpdateEngagement = async () => {
     if (!engagementName) {
@@ -34,7 +41,6 @@ export default function GeneralTab() {
 
       if (success) {
         openSnackBar('Engagement updated.', 'success');
-        console.log({ ...engagement, name: engagementName, });
         setEngagement({ ...engagement, name: engagementName });
         setLoading(false);
       } else {
@@ -44,6 +50,36 @@ export default function GeneralTab() {
     } catch (error) {
       openSnackBar(error.message, 'error');
       setLoading(false);
+    }
+  };
+
+  const handleLeaveEngagement = async () => {
+    if (isOrgOwner) {
+      openSnackBar('As the org owner, you may only delete the engagement.');
+      return;
+    }
+
+    setLeaving(true);
+
+    try {
+      const { success, message } = await leaveEngagement({
+        orgId: org.id,
+        engagementId: engagement.id
+      });
+
+      if (success) {
+        openSnackBar('Left engagement.', 'success');
+        deleteActiveEngagementId();
+        setTimeout(() => {
+          window.location.reload();
+        }, 750);
+      } else {
+        openSnackBar(message, 'error');
+        setLeaving(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLeaving(false);
     }
   };
 
@@ -80,13 +116,37 @@ export default function GeneralTab() {
       <Divider className="my4" />
       <Box>
         <Button
-          startIcon={<DeleteIcon />}
+          startIcon={isOrgOwner ? <DeleteIcon /> : <LogoutIcon />}
           color="error"
-          onClick={() => openModal('delete-engagement')}
+          onClick={
+            isOrgOwner ?
+              () => openModal('delete-engagement') :
+              e => setConfirmLeaveEngagementMenu(e.currentTarget)}
           variant="outlined">
-          Delete engagement
+          {
+            isOrgOwner ? 'Delete engagement' : 'Leave engagement'
+          }
         </Button>
       </Box>
+
+      <Menu
+        anchorEl={confirmLeaveEngagementMenu}
+        open={confirmLeaveEngagementMenuOpen}
+        onClose={() => setConfirmLeaveEngagementMenu(null)}>
+        <Box px={2} py={1}>
+          <Typography variant="body2" mb={1}>
+            Are you sure you want to leave this engagement?
+          </Typography>
+          <LoadingButton
+            color='error'
+            variant='contained'
+            loading={leaving}
+            onClick={
+              () => handleLeaveEngagement()}>
+            Yes, leave
+          </LoadingButton>
+        </Box>
+      </Menu>
     </>
   );
 };

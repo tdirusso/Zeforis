@@ -402,13 +402,13 @@ export default function TaskDrawer(props) {
               <DeleteOutlineIcon htmlColor="red" />
             </IconButton>
           </Tooltip>
+
           <Menu
             anchorEl={deleteMenuAnchor}
             open={deleteMenuOpen}
             onClose={() => setDeleteMenuAnchor(null)}>
             <Box px={2} py={1}>
               <LoadingButton
-                disabled={isDeleting}
                 color='error'
                 variant='contained'
                 loading={isDeleting}
