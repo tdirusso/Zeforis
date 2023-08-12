@@ -2,7 +2,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
-import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, } from '@mui/material';
+import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import { updateAccess, updatePermission, batchUpdateAccess, batchUpdatePermission } from '../../api/users';
 import Switch from '@mui/material/Switch';
@@ -11,7 +11,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
-
+import HelpIcon from '@mui/icons-material/Help';
 export default function EditUserPermissionsModal(props) {
   const {
     open,
@@ -157,16 +157,17 @@ export default function EditUserPermissionsModal(props) {
         setOrgUsers(Object.values(orgUsersMap));
         setEnablingAccess(false);
         setDisablingAccess(false);
+        setBulkAccessMenu(null);
         openSnackBar('Access updated.', 'success');
       } else {
         openSnackBar(message, 'error');
         setEnablingAccess(false);
-        setDisablingAccess(true);
+        setDisablingAccess(false);
       }
     } catch (error) {
       openSnackBar(error.message, 'error');
       setEnablingAccess(false);
-      setDisablingAccess(true);
+      setDisablingAccess(false);
     }
   };
 
@@ -186,25 +187,26 @@ export default function EditUserPermissionsModal(props) {
 
       if (success) {
         if (isAdmin) {
+          theUser.adminOfEngagements = [...theUser.adminOfEngagements, ...theUser.memberOfEngagements];
           theUser.memberOfEngagements = [];
-          theUser.adminOfEngagements = engagements;
         } else {
+          theUser.memberOfEngagements = [...theUser.adminOfEngagements, ...theUser.memberOfEngagements];;
           theUser.adminOfEngagements = [];
-          theUser.memberOfEngagements = engagements;
         }
 
         setOrgUsers(Object.values(orgUsersMap));
-        setEnablingAdmin(true);
+        setEnablingAdmin(false);
         setDisablingAdmin(false);
+        setBulkAdminMenu(null);
         openSnackBar('Permissions updated.', 'success');
       } else {
         openSnackBar(message, 'error');
-        setEnablingAdmin(true);
+        setEnablingAdmin(false);
         setDisablingAdmin(false);
       }
     } catch (error) {
       openSnackBar(error.message, 'error');
-      setEnablingAdmin(true);
+      setEnablingAdmin(false);
       setDisablingAdmin(false);
     }
   };
@@ -236,6 +238,24 @@ export default function EditUserPermissionsModal(props) {
             </Box>
             <Box flexBasis="33%" textAlign='center'>
               <Box component="h5">
+                <Tooltip
+                  title={
+                    <>Enabling access will default to read only access.
+                      <br></br><br></br>
+                      If all engagements are disabled and this window is closed, the user is removed from this list and will need to be re-invited to an engagement.
+                    </>
+                  }
+                  placement="bottom">
+                  <HelpIcon
+                    fontSize="small"
+                    style={{
+                      position: 'relative',
+                      top: '4px',
+                      left: '-5px'
+                    }}
+                    htmlColor="#c7c7c7"
+                  />
+                </Tooltip>
                 Access
                 <IconButton
                   style={{ marginLeft: '3px' }}
