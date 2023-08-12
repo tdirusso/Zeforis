@@ -24,9 +24,10 @@ module.exports = async (req, res) => {
     if (hasAccess) {
       const insertValues = allOrgEngagementsResult.map(engagement => [engagement.id, userId, 'member']);
 
-      await pool.query('INSERT IGNORE INTO engagement_users (engagement_id, user_id, role) VALUES ?',
+      await connection.query('INSERT IGNORE INTO engagement_users (engagement_id, user_id, role) VALUES ?',
         [insertValues]
       );
+
     } else {
       await connection.query(
         `

@@ -16,6 +16,8 @@ module.exports = async (req, res) => {
 
   const connection = await pool.getConnection();
 
+  await connection.beginTransaction();
+
   try {
     const [existingFolders] = await connection.query(
       `SELECT id, name FROM folders WHERE engagement_id = ?`,
@@ -101,7 +103,7 @@ module.exports = async (req, res) => {
           status,
           folderNameToIdMap[folder],
           url,
-          isKeyTask,
+          Number(isKeyTask),
           creatorUserId,
           creatorUserId
         ]);
@@ -132,10 +134,14 @@ module.exports = async (req, res) => {
       insertId++;
     });
 
-    await connection.query(
-      `INSERT INTO task_tags (task_id, tag_id) VALUES ?`,
-      [taskTagsInsertVals]
-    );
+    if (taskTagsInsertVals.length) {
+      await connection.query(
+        `INSERT INTO task_tags (task_id, tag_id) VALUES ?`,
+        [taskTagsInsertVals]
+      );
+    }
+
+    await connection.commit();
 
     connection.release();
 
@@ -144,6 +150,7 @@ module.exports = async (req, res) => {
     });
 
   } catch (error) {
+    await connection.rollback();
     console.log(error);
 
     connection.release();
