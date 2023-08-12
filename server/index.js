@@ -41,6 +41,8 @@ const resendVerificationLink = require('./routes/users/resendVerificationLink');
 const deleteOrg = require('./routes/orgs/deleteOrg');
 const leaveEngagement = require('./routes/engagements/leaveEngagement');
 const leaveOrg = require('./routes/orgs/leaveOrg');
+const batchUpdateAccess = require('./routes/users/batchUpdateAccess');
+const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -81,6 +83,8 @@ const boot = async () => {
   app.get('/api/users/invitation', getInvitationData);
   app.post('/api/users/sendPasswordResetLink', sendPasswordResetLink);
   app.post('/api/users/resendVerificationLink', resendVerificationLink);
+  app.patch('/api/users/access/batch', checkOrgOwnerMW, batchUpdateAccess);
+  app.patch('/api/users/permissions/batch', checkOrgOwnerMW, batchUpdatePermission);
 
   app.post('/api/engagements', checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', checkEngagementMemberMW, getEngagement);

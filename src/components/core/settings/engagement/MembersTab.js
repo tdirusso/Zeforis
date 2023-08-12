@@ -12,6 +12,7 @@ import { LoadingButton } from "@mui/lab";
 import { inviteEngagementUser, removeEngagementUser } from "../../../../api/engagements";
 import HelpIcon from '@mui/icons-material/Help';
 import { MailOutline } from "@mui/icons-material";
+import SendIcon from '@mui/icons-material/Send';
 
 const inviteUserAdminTooltip = <>
   Administrators can edit tasks, folders and engagement settings (best for contributors).
@@ -27,7 +28,6 @@ export default function MembersTab() {
     engagementMembers,
     engagementAdmins,
     user,
-    isAdmin,
     openSnackBar,
     setOrgUsers,
     orgUsersMap,
@@ -101,7 +101,7 @@ export default function MembersTab() {
     e.preventDefault();
 
     if (!inviteeEmail) {
-      openSnackBar("Please enter the user's email address to invite.");
+      openSnackBar("Please enter the user's email address.");
       return;
     }
 
@@ -306,6 +306,7 @@ export default function MembersTab() {
           </List>
         </Box>
       </Box>
+
       <Menu
         anchorEl={removeUserMenuAnchor}
         open={removeUserMenuOpen}
@@ -328,7 +329,7 @@ export default function MembersTab() {
         open={inviteUserMenuOpen}
         onClose={handleInviteUserMenuClose}>
         <Box
-          style={{ padding: '1rem', minWidth: 300 }}
+          style={{ padding: '1rem', minWidth: 300, maxWidth: 450 }}
           component="form"
           onSubmit={handleInviteEngagementUser}>
           <Box>
@@ -352,7 +353,7 @@ export default function MembersTab() {
               }}>
             </TextField>
           </Box>
-          <Box mb={2} mt={1.5}>
+          <Box mb={2} mt={0.5}>
             <FormGroup>
               <FormControlLabel
                 control={<Switch
@@ -374,15 +375,20 @@ export default function MembersTab() {
               />
             </FormGroup>
           </Box>
+          <Typography variant="body2" mb={2}>
+            Once the invitation is sent, you can edit this user's permissions
+            for other engagements from the Organizations tab &rarr; Users.
+          </Typography>
           <Box py={1} display="flex">
             <LoadingButton
+              startIcon={<SendIcon />}
               disabled={isInvitingUser}
               variant='contained'
               size="small"
               fullWidth
               type="submit"
               loading={isInvitingUser}>
-              Send Invitation
+              Send invitation
             </LoadingButton>
           </Box>
         </Box>

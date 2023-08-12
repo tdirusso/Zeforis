@@ -22,7 +22,7 @@ export default function EngagementsTab() {
         </Box>
         <List dense>
           {
-            engagements.map((engagement, index) => {
+            engagements.map((engagement) => {
               return (
                 <React.Fragment key={engagement.id}>
                   <ListItem>

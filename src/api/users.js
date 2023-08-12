@@ -16,8 +16,18 @@ const updatePermission = async (payload) => {
   return data;
 };
 
+const batchUpdatePermission = async (payload) => {
+  const { data } = await request.patch(`users/permissions/batch`, payload);
+  return data;
+};
+
 const updateAccess = async (payload) => {
   const { data } = await request.patch(`users/access`, payload);
+  return data;
+};
+
+const batchUpdateAccess = async (payload) => {
+  const { data } = await request.patch(`users/access/batch`, payload);
   return data;
 };
 
@@ -36,7 +46,6 @@ const sendPasswordResetLink = async (payload) => {
   return data;
 };
 
-
 const resendVerificationLink = async (payload) => {
   const { data } = await request.post(`users/resendVerificationLink`, payload);
   return data;
@@ -50,5 +59,7 @@ export {
   getInvitationData,
   updatePassword,
   sendPasswordResetLink,
-  resendVerificationLink
+  resendVerificationLink,
+  batchUpdateAccess,
+  batchUpdatePermission
 };

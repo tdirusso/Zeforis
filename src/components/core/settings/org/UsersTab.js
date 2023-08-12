@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Divider, Tooltip } from "@mui/material";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -40,6 +40,9 @@ export default function UsersTab() {
         <Box component="h4" ml={1.75} mb={1}>
           {org.name} Users
         </Box>
+        <Typography ml={1.75} mb={2}>
+          This list is a collection of all users from each engagement combined.
+        </Typography>
         <List dense>
           {
             orgUsers.map((orgUser, index) => {

@@ -2,10 +2,15 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
-import { Box, Checkbox, CircularProgress, Divider, Typography, } from '@mui/material';
+import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-import { updateAccess, updatePermission } from '../../api/users';
+import { updateAccess, updatePermission, batchUpdateAccess, batchUpdatePermission } from '../../api/users';
 import Switch from '@mui/material/Switch';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 
 export default function EditUserPermissionsModal(props) {
   const {
@@ -17,7 +22,16 @@ export default function EditUserPermissionsModal(props) {
   const memberOfEngagementIds = user?.memberOfEngagements.map(({ id }) => id) || [];
   const adminOfEngagementIds = user?.adminOfEngagements.map(({ id }) => id) || [];
 
+  const [bulkAccessMenu, setBulkAccessMenu] = useState(false);
+  const [bulkAdminMenu, setBulkAdminMenu] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [isEnablingAccess, setEnablingAccess] = useState(false);
+  const [isDisablingAccess, setDisablingAccess] = useState(false);
+  const [isEnablingAdmin, setEnablingAdmin] = useState(false);
+  const [isDisablingAdmin, setDisablingAdmin] = useState(false);
+
+  const bulkAccessMenuOpen = Boolean(bulkAccessMenu);
+  const bulkAdminMenuOpen = Boolean(bulkAdminMenu);
 
   const {
     engagements,
@@ -116,8 +130,87 @@ export default function EditUserPermissionsModal(props) {
     }, 500);
   };
 
+  const handleBulkUpdateAccess = async hasAccess => {
+    if (hasAccess) {
+      setEnablingAccess(true);
+    } else {
+      setDisablingAccess(true);
+    }
+
+    try {
+      const { success, message } = await batchUpdateAccess({
+        hasAccess,
+        userId: user.id,
+        orgId: org.id
+      });
+
+      if (success) {
+        if (hasAccess) {
+          theUser.memberOfEngagements = engagements.filter(({ id }) => {
+            return !adminOfEngagementIds.includes(id);
+          });
+        } else {
+          theUser.adminOfEngagements = [];
+          theUser.memberOfEngagements = [];
+        }
+
+        setOrgUsers(Object.values(orgUsersMap));
+        setEnablingAccess(false);
+        setDisablingAccess(false);
+        openSnackBar('Access updated.', 'success');
+      } else {
+        openSnackBar(message, 'error');
+        setEnablingAccess(false);
+        setDisablingAccess(true);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setEnablingAccess(false);
+      setDisablingAccess(true);
+    }
+  };
+
+  const handleBulkUpdatePermission = async isAdmin => {
+    if (isAdmin) {
+      setEnablingAdmin(true);
+    } else {
+      setDisablingAdmin(true);
+    }
+
+    try {
+      const { success, message } = await batchUpdatePermission({
+        isAdmin,
+        userId: user.id,
+        orgId: org.id
+      });
+
+      if (success) {
+        if (isAdmin) {
+          theUser.memberOfEngagements = [];
+          theUser.adminOfEngagements = engagements;
+        } else {
+          theUser.adminOfEngagements = [];
+          theUser.memberOfEngagements = engagements;
+        }
+
+        setOrgUsers(Object.values(orgUsersMap));
+        setEnablingAdmin(true);
+        setDisablingAdmin(false);
+        openSnackBar('Permissions updated.', 'success');
+      } else {
+        openSnackBar(message, 'error');
+        setEnablingAdmin(true);
+        setDisablingAdmin(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setEnablingAdmin(true);
+      setDisablingAdmin(false);
+    }
+  };
+
   return (
-    <div>
+    <>
       <Dialog open={open} onClose={handleClose} PaperProps={{ style: { minWidth: 900 } }}>
         <DialogContent>
           <DialogContentText style={{ marginBottom: '1rem' }} className='flex-ac'>
@@ -134,20 +227,33 @@ export default function EditUserPermissionsModal(props) {
             Removing access entirely will automatically unassign all tasks to this user for the associated engagement.
           </Typography>
           <Box
+            mb={1}
             mt={3}
             display="flex"
             alignItems="center">
             <Box component="h5" flexBasis="33%" >
               Engagement
             </Box>
-            <Box component="h5" flexBasis="33%" textAlign='center'>
-              Access
+            <Box flexBasis="33%" textAlign='center'>
+              <Box component="h5">
+                Access
+                <IconButton
+                  style={{ marginLeft: '3px' }}
+                  onClick={e => setBulkAccessMenu(e.currentTarget)}>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              </Box>
             </Box>
-            <Box component="h5" flexBasis="33%" textAlign='center'>
-              Administrator
+            <Box flexBasis="33%" textAlign='center'>
+              <Box component="h5">
+                Administrator
+                <IconButton style={{ marginLeft: '3px' }}
+                  onClick={e => setBulkAdminMenu(e.currentTarget)}>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              </Box>
             </Box>
           </Box>
-          <Divider style={{ margin: '0.5rem 0' }} />
           {
             engagements.map(engagement => {
               const isMember = memberOfEngagementIds.includes(engagement.id);
@@ -159,32 +265,90 @@ export default function EditUserPermissionsModal(props) {
               }
 
               return (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  key={engagement.id}>
-                  <Typography flexBasis="33%">
-                    {engagementName}
-                  </Typography>
-                  <Box flexBasis='33%' textAlign='center'>
-                    <Checkbox
-                      checked={isMember || isAdmin}
-                      onChange={(_, isChecked) => handleUpdateAccess(isChecked, engagement)}
-                    />
+                <Box key={engagement.id}>
+                  <Box
+                    display="flex"
+                    alignItems="center">
+                    <Typography flexBasis="33%">
+                      {engagementName}
+                    </Typography>
+                    <Box flexBasis='33%' textAlign='center'>
+                      <Checkbox
+                        checked={isMember || isAdmin}
+                        onChange={(_, isChecked) => handleUpdateAccess(isChecked, engagement)}
+                      />
+                    </Box>
+                    <Box flexBasis='33%' textAlign='center'>
+                      <Switch
+                        disabled={!isMember && !isAdmin}
+                        onChange={(_, isChecked) => handleUpdatePermission(isChecked, engagement)}
+                        checked={isAdmin}
+                      />
+                    </Box>
                   </Box>
-                  <Box flexBasis='33%' textAlign='center'>
-                    <Switch
-                      disabled={!isMember && !isAdmin}
-                      onChange={(_, isChecked) => handleUpdatePermission(isChecked, engagement)}
-                      checked={isAdmin}
-                    />
-                  </Box>
+                  <Divider />
                 </Box>
               );
             })
           }
         </DialogContent>
       </Dialog>
-    </div>
+
+      <Menu
+        anchorEl={bulkAccessMenu}
+        open={bulkAccessMenuOpen}
+        onClose={() => setBulkAccessMenu(null)}>
+        <MenuItem onClick={() => handleBulkUpdateAccess(true)}>
+          <ListItemIcon>
+            <CheckBoxIcon color='primary' />
+          </ListItemIcon>
+          Enable all
+          <CircularProgress
+            hidden={!isEnablingAccess}
+            style={{ marginLeft: '5px' }}
+            size={17}
+          />
+        </MenuItem>
+        <MenuItem onClick={() => handleBulkUpdateAccess(false)}>
+          <ListItemIcon>
+            <CheckBoxOutlineBlankIcon color='primary' />
+          </ListItemIcon>
+          Disable all
+          <CircularProgress
+            hidden={!isDisablingAccess}
+            style={{ marginLeft: '5px' }}
+            size={17}
+          />
+        </MenuItem>
+      </Menu>
+
+      <Menu
+        anchorEl={bulkAdminMenu}
+        open={bulkAdminMenuOpen}
+        onClose={() => setBulkAdminMenu(null)}>
+        <MenuItem onClick={() => handleBulkUpdatePermission(true)}>
+          <ListItemIcon>
+            <ToggleOnIcon color='primary' />
+          </ListItemIcon>
+          Enable all
+          <CircularProgress
+            hidden={!isEnablingAdmin}
+            style={{ marginLeft: '5px' }}
+            size={17}
+          />
+        </MenuItem>
+        <MenuItem onClick={() => handleBulkUpdatePermission(false)}>
+          <ListItemIcon>
+            <ToggleOffIcon />
+          </ListItemIcon>
+          Disable all
+          <CircularProgress
+            hidden={!isDisablingAdmin}
+            style={{ marginLeft: '5px' }}
+            size={17}
+          />
+        </MenuItem>
+      </Menu>
+    </>
   );
 };
