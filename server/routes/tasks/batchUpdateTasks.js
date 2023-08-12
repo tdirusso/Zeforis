@@ -1,7 +1,7 @@
 const pool = require('../../../database');
 const moment = require('moment');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     action,
     folderId,
@@ -123,12 +123,8 @@ module.exports = async (req, res) => {
 
     return res.json({ updatedTasks });
   } catch (error) {
-    console.log(error);
-
     connection.release();
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 

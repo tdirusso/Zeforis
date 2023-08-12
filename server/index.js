@@ -49,6 +49,7 @@ const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
 const checkOrgOwnerMW = require('./middlewares/checkOrgOwner');
 const checkAuthMW = require('./middlewares/checkAuth');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -89,56 +90,54 @@ const unAuthenicatedUserRateLimit = rateLimit({
   }
 });
 
-const boot = async () => {
-  app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
-  app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
-  app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
-  app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
-  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUser);
-  app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
-  app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
-  app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
-  app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
-  app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
-  app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
-  app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
-  app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
-  app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
-  app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
-  app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
+app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
+app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
+app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
+app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
+app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUser);
+app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
+app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
+app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
+app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
+app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
+app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
+app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
+app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
+app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
+app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
+app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
 
-  app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
-  app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
-  app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
-  app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
-  app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);
+app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
+app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
+app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
+app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
+app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);
 
-  app.post('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, createFolder);
-  app.delete('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, deleteFolder);
-  app.patch('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, updateFolder);
+app.post('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, createFolder);
+app.delete('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, deleteFolder);
+app.patch('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, updateFolder);
 
-  app.post('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, createTask);
-  app.delete('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTasks);
-  app.patch('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, updateTask);
-  app.patch('/api/tasks/batch', authenicatedUserRateLimit, checkEngagementAdminMW, batchUpdateTasks);
-  app.post('/api/tasks/import', authenicatedUserRateLimit, checkEngagementAdminMW, importTasks);
+app.post('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, createTask);
+app.delete('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTasks);
+app.patch('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, updateTask);
+app.patch('/api/tasks/batch', authenicatedUserRateLimit, checkEngagementAdminMW, batchUpdateTasks);
+app.post('/api/tasks/import', authenicatedUserRateLimit, checkEngagementAdminMW, importTasks);
 
-  app.post('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, createTag);
-  app.delete('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTag);
-  app.patch('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, updateTag);
+app.post('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, createTag);
+app.delete('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTag);
+app.patch('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, updateTag);
 
-  app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
-  app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);
-  app.get('/api/orgs', unAuthenicatedUserRateLimit, getOrg);
-  app.delete('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, deleteOrg);
-  app.delete('/api/orgs/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveOrg);
+app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
+app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);
+app.get('/api/orgs', unAuthenicatedUserRateLimit, getOrg);
+app.delete('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, deleteOrg);
+app.delete('/api/orgs/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveOrg);
 
-  app.post('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, createWidget);
-  app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
-  app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
+app.post('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, createWidget);
+app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
+app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
 
-  app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
-  app.listen(port, () => console.log('App is running'));
-};
+app.use(errorHandler);
 
-boot();
+app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
+app.listen(port, () => console.log('App is running'));

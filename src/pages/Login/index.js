@@ -78,6 +78,7 @@ export default function LoginPage({ setTheme }) {
         }
       } catch (error) {
         openSnackBar(error.message, 'error');
+        setLoading(false);
       }
     } else {
       setLoading(false);
@@ -184,6 +185,7 @@ export default function LoginPage({ setTheme }) {
       }
     } catch (error) {
       openSnackBar(error.message, 'error');
+      setLoading(false);
     }
   };
 
@@ -212,6 +214,7 @@ export default function LoginPage({ setTheme }) {
         }
       } catch (error) {
         openSnackBar(error.message, 'error');
+        setVerificationContent(unverifiedText);
       }
     }, 1000);
   };
@@ -306,7 +309,7 @@ export default function LoginPage({ setTheme }) {
             disabled={isLoading}
             fullWidth
             size="large"
-            style={{padding: '0.75rem 0.5rem'}}
+            style={{ padding: '0.75rem 0.5rem' }}
             variant="contained"
             type="submit">
             Sign in

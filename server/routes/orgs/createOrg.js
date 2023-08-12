@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name
   } = req.body;
@@ -27,9 +27,6 @@ module.exports = async (req, res) => {
 
     return res.json({ orgId: newOrg[0].insertId });
   } catch (error) {
-    console.log(error);
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

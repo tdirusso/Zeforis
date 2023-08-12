@@ -1,7 +1,7 @@
 const pool = require('../../../database');
 const moment = require('moment');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     description,
@@ -83,10 +83,6 @@ module.exports = async (req, res) => {
 
     return res.json({ message: 'Task not found.' });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
 
   const {
     engagementId,
@@ -151,8 +151,7 @@ module.exports = async (req, res) => {
     return res.json(engagementData);
 
   } catch (error) {
-    console.log(error);
     connection.release();
-    return res.json({ message: error.message });
+    next(error);
   }
 };

@@ -43,7 +43,7 @@ export default function SideNav(props) {
         <Divider className="divider" />
         <Box className="menu">
           <ul>
-            <NavLink to="/home/dashboard">
+            <NavLink draggable={false} to="/home/dashboard">
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -57,7 +57,7 @@ export default function SideNav(props) {
               </li>
 
             </NavLink>
-            <NavLink to="/home/tasks">
+            <NavLink to="/home/tasks" draggable={false}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -70,7 +70,7 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/folders">
+            <NavLink to="/home/folders" draggable={false}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -83,7 +83,7 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/analytics">
+            <NavLink to="/home/analytics" draggable={false}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -97,7 +97,7 @@ export default function SideNav(props) {
               </li>
             </NavLink>
             {
-              isAdmin ? <NavLink to="/home/tools">
+              isAdmin ? <NavLink to="/home/tools" draggable={false}>
                 <li>
                   <ButtonBase className='nav-button'>
                     <Typography
@@ -112,7 +112,7 @@ export default function SideNav(props) {
               </NavLink> :
                 null
             }
-            <NavLink to="/home/settings">
+            <NavLink to="/home/settings" draggable={false}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography

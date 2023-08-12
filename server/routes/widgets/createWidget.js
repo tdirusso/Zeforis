@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     engagementId,
     name,
@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     backgroundColor = '#ffffff',
     textColor = '#000000'
   } = req.body;
-  
+
   if (!name) {
     return res.json({
       message: 'Missing widget name.'
@@ -52,11 +52,6 @@ module.exports = async (req, res) => {
       widget: widgetObject
     });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      error: true,
-      message: error.message
-    });
+    next(error);
   }
 };

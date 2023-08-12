@@ -1,8 +1,14 @@
-module.exports = (err, req, res, next) => {
-  console.error(err); // Log the error for debugging purposes
+const { TokenExpiredError } = require("jsonwebtoken");
+const pool = require('../../database');
 
-  return res.status(500).json({
+module.exports = async (error, req, res, next) => {
+  if (!(error instanceof TokenExpiredError)) {
+    console.error('Application error:  ', error);
+    await pool.query('INSERT INTO app_logs (type, data) VALUES (?,?)', ['error', error.stack]);
+  }
+
+  return res.json({
     error: true,
-    message: 'An error occurred on the server.'
+    message: error.message
   });
 };

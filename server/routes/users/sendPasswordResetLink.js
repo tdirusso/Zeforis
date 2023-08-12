@@ -14,7 +14,7 @@ if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     email
   } = req.body;
@@ -70,11 +70,8 @@ module.exports = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     connection.release();
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 

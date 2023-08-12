@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
@@ -119,10 +119,6 @@ module.exports = async (req, res) => {
     return res.json({ message: 'Unauthenticated.' });
 
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

@@ -9,15 +9,19 @@ if (process.env.NODE_ENV === 'development') {
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     isFromCustomLoginPage = false
   } = req.body;
 
-  if (isFromCustomLoginPage) {
-    handleCustomPageLogin(req, res);
-  } else {
-    handleUniversalLogin(req, res);
+  try {
+    if (isFromCustomLoginPage) {
+      await handleCustomPageLogin(req, res, next);
+    } else {
+      await handleUniversalLogin(req, res, next);
+    }
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -51,18 +55,17 @@ async function handleCustomPageLogin(req, res) {
     });
   }
 
-  try {
-    if (googleCredential) {
-      const ticket = await authClient.verifyIdToken({
-        idToken: googleCredential,
-        audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-      });
+  if (googleCredential) {
+    const ticket = await authClient.verifyIdToken({
+      idToken: googleCredential,
+      audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+    });
 
-      const payload = ticket.getPayload();
-      const googleEmail = payload.email.toLowerCase();
+    const payload = ticket.getPayload();
+    const googleEmail = payload.email.toLowerCase();
 
-      const [userResult] = await pool.query(
-        `
+    const [userResult] = await pool.query(
+      `
         SELECT id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ? AND EXISTS
         (
           SELECT 1 FROM engagement_users 
@@ -71,29 +74,29 @@ async function handleCustomPageLogin(req, res) {
           WHERE engagements.org_id = ? and users.email = ?
         )
         `,
-        [googleEmail, orgId, googleEmail]
-      );
+      [googleEmail, orgId, googleEmail]
+    );
 
-      const user = userResult[0];
+    const user = userResult[0];
 
-      if (user) {
-        if (!user.is_verified) {
-          await pool.query(
-            'UPDATE users SET is_verified = 1 WHERE id = ?',
-            [user.id]
-          );
-        }
-
-        const token = createToken(user);
-        return res.json({ token });
-      } else {
-        return res.json({ message: 'You are not a member of this organization.' });
+    if (user) {
+      if (!user.is_verified) {
+        await pool.query(
+          'UPDATE users SET is_verified = 1 WHERE id = ?',
+          [user.id]
+        );
       }
-    } else {
-      const lcEmail = email.toLowerCase();
 
-      const [userResult] = await pool.query(
-        `
+      const token = createToken(user);
+      return res.json({ token });
+    } else {
+      return res.json({ message: 'You are not a member of this organization.' });
+    }
+  } else {
+    const lcEmail = email.toLowerCase();
+
+    const [userResult] = await pool.query(
+      `
         SELECT password, id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ? AND EXISTS
         (
           SELECT 1 FROM engagement_users 
@@ -102,38 +105,31 @@ async function handleCustomPageLogin(req, res) {
           WHERE engagements.org_id = ? and users.email = ?
         )
         `,
-        [lcEmail, orgId, lcEmail]
-      );
+      [lcEmail, orgId, lcEmail]
+    );
 
-      const user = userResult[0];
+    const user = userResult[0];
 
-      if (user) {
-        const match = await bcrypt.compare(password, user.password);
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
 
-        if (match) {
-          if (!user.is_verified) {
-            return res.json({
-              unverified: true,
-              message: 'Please verify your email address.'
-            });
-          }
-          const token = createToken(user);
-          return res.json({ token });
+      if (match) {
+        if (!user.is_verified) {
+          return res.json({
+            unverified: true,
+            message: 'Please verify your email address.'
+          });
         }
-
-        return res.json({
-          message: 'Incorrect username or password.  Please try again.'
-        });
-      } else {
-        return res.json({ message: 'You are not a member of this organization.' });
+        const token = createToken(user);
+        return res.json({ token });
       }
-    }
-  } catch (error) {
-    console.log(error);
 
-    return res.json({
-      message: error.message
-    });
+      return res.json({
+        message: 'Incorrect username or password.  Please try again.'
+      });
+    } else {
+      return res.json({ message: 'You are not a member of this organization.' });
+    }
   }
 }
 
@@ -150,89 +146,82 @@ async function handleUniversalLogin(req, res) {
     });
   }
 
-  try {
-    if (googleCredential) {
-      const ticket = await authClient.verifyIdToken({
-        idToken: googleCredential,
-        audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-      });
 
-      const payload = ticket.getPayload();
-      const googleEmail = payload.email.toLowerCase();
+  if (googleCredential) {
+    const ticket = await authClient.verifyIdToken({
+      idToken: googleCredential,
+      audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+    });
 
-      const [userResult] = await pool.query(
-        'SELECT id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ?',
-        [googleEmail]
-      );
+    const payload = ticket.getPayload();
+    const googleEmail = payload.email.toLowerCase();
 
-      const user = userResult[0];
+    const [userResult] = await pool.query(
+      'SELECT id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ?',
+      [googleEmail]
+    );
 
-      if (user) {
+    const user = userResult[0];
+
+    if (user) {
+      if (!user.is_verified) {
+        await pool.query(
+          'UPDATE users SET is_verified = 1 WHERE id = ?',
+          [user.id]
+        );
+      }
+
+      const token = createToken(user);
+      return res.json({ token });
+    } else {
+      const createUserResult = await pool.query(
+        'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
+        [payload.given_name, payload.family_name, googleEmail]);
+
+      const newUser = {
+        id: createUserResult[0].insertId,
+        email: googleEmail,
+        first_name: payload.given_name,
+        last_name: payload.family_name,
+        date_created: new Date().toISOString(),
+      };
+
+      const token = createToken(newUser);
+
+      return res.json({ token });
+    }
+  } else {
+    const lcEmail = email.toLowerCase();
+
+    const [userResult] = await pool.query(
+      'SELECT id, is_verified, first_name, last_name, email, date_created password FROM users WHERE email = ?',
+      [lcEmail]
+    );
+
+    const user = userResult[0];
+
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
         if (!user.is_verified) {
-          await pool.query(
-            'UPDATE users SET is_verified = 1 WHERE id = ?',
-            [user.id]
-          );
+          return res.json({
+            unverified: true,
+            message: 'Please verify your email address.'
+          });
         }
 
         const token = createToken(user);
         return res.json({ token });
-      } else {
-        const createUserResult = await pool.query(
-          'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
-          [payload.given_name, payload.family_name, googleEmail]);
-
-        const newUser = {
-          id: createUserResult[0].insertId,
-          email: googleEmail,
-          first_name: payload.given_name,
-          last_name: payload.family_name,
-          date_created: new Date().toISOString(),
-        };
-
-        const token = createToken(newUser);
-
-        return res.json({ token });
-      }
-    } else {
-      const lcEmail = email.toLowerCase();
-
-      const [userResult] = await pool.query(
-        'SELECT id, is_verified, first_name, last_name, email, date_created password FROM users WHERE email = ?',
-        [lcEmail]
-      );
-
-      const user = userResult[0];
-
-      if (user) {
-        const match = await bcrypt.compare(password, user.password);
-
-        if (match) {
-          if (!user.is_verified) {
-            return res.json({
-              unverified: true,
-              message: 'Please verify your email address.'
-            });
-          }
-
-          const token = createToken(user);
-          return res.json({ token });
-        }
-
-        return res.json({
-          message: 'Incorrect username or password.  Please try again.'
-        });
       }
 
       return res.json({
-        message: `Incorrect username or password.  Please try again.`
+        message: 'Incorrect username or password.  Please try again.'
       });
     }
-  } catch (error) {
-    console.log(error);
 
     return res.json({
-      message: error.message
+      message: `Incorrect username or password.  Please try again.`
     });
   }
 }

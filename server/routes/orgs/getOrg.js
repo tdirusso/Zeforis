@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     orgId
   } = req.query;
@@ -29,9 +29,6 @@ module.exports = async (req, res) => {
       error: 'Org does not exist.'
     });
   } catch (error) {
-    console.log(error);
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

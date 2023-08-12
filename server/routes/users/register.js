@@ -17,7 +17,7 @@ if (isDev) {
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     email,
     firstName,
@@ -93,10 +93,7 @@ module.exports = async (req, res) => {
       return res.json({ success: true });
     }
   } catch (error) {
-    console.log(error);
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 

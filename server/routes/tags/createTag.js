@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     engagementId
@@ -13,7 +13,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-
     const newTag = await pool.query(
       'INSERT INTO tags (name, engagement_id) VALUES (?,?)',
       [name, engagementId]
@@ -32,10 +31,6 @@ module.exports = async (req, res) => {
       tag: tagObject
     });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

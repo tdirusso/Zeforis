@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     engagementId,
     importRows = []
@@ -151,12 +151,7 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     await connection.rollback();
-    console.log(error);
-
     connection.release();
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

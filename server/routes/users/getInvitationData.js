@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     userId,
     engagementId,
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
         message: 'No invitation found.'
       });
     }
-    
+
     //User used Google (passwordless) if first name exists and no password
     const userNeedsPassword = Boolean(!user.password && !user.first_name);
 
@@ -62,10 +62,7 @@ module.exports = async (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error);
     connection.release();
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

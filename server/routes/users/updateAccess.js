@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     engagementId,
     userId,
@@ -14,7 +14,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-
     if (hasAccess) {
       await pool.query('INSERT INTO engagement_users (engagement_id, user_id, role) VALUES (?,?,?)', [engagementId, userId, 'member']);
     } else {
@@ -35,10 +34,6 @@ module.exports = async (req, res) => {
 
     return res.json({ success: true });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

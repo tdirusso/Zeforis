@@ -13,7 +13,7 @@ if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     email
   } = req.body;
@@ -51,10 +51,7 @@ module.exports = async (req, res) => {
       message: 'User does not exist.'
     });
   } catch (error) {
-    console.log(error);
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 

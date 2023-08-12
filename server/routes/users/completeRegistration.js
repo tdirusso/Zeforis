@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const validator = require("email-validator");
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     email,
     password,
@@ -56,9 +56,6 @@ module.exports = async (req, res) => {
       return res.json({ message: 'User is not a member or administrator of this engagement.' });
     }
   } catch (error) {
-    console.log(error);
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

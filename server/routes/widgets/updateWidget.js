@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     widgetId,
     name,
@@ -36,10 +36,6 @@ module.exports = async (req, res) => {
       success: true
     });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

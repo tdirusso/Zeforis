@@ -10,7 +10,7 @@ if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     brandColor = '#3365f6',
@@ -62,11 +62,7 @@ module.exports = async (req, res) => {
 
     return res.json({ message: 'Org does not exist.' });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 

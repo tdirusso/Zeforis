@@ -1,6 +1,6 @@
 const pool = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     description = '',
@@ -70,11 +70,6 @@ module.exports = async (req, res) => {
       task: taskObject
     });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      error: true,
-      message: error.message
-    });
+    next(error);
   }
 };
