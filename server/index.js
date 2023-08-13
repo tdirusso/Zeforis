@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fileUpload = require('express-fileupload');
+const { initializeDatabase, pool } = require('../database');
+const emailService = require('../email');
 
 const login = require('./routes/users/login');
 const authenticate = require('./routes/users/authenticate');
@@ -49,7 +51,7 @@ const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
 const checkOrgOwnerMW = require('./middlewares/checkOrgOwner');
 const checkAuthMW = require('./middlewares/checkAuth');
-const errorHandler = require('./middlewares/errorHandler');
+const errorHandlerMW = require('./middlewares/errorHandler');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -90,54 +92,86 @@ const unAuthenicatedUserRateLimit = rateLimit({
   }
 });
 
-app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
-app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
-app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
-app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
-app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUser);
-app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
-app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
-app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
-app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
-app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
-app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
-app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
-app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
-app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
-app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
-app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
+const boot = async () => {
+  await initializeDatabase();
 
-app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
-app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
-app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
-app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
-app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);
+  process.on('uncaughtException', async (error, origin) => {
+    const logData = `Origin: ${origin} - ${error.stack}`;
 
-app.post('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, createFolder);
-app.delete('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, deleteFolder);
-app.patch('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, updateFolder);
+    console.log('Uncaught Exception:  ', logData);
 
-app.post('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, createTask);
-app.delete('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTasks);
-app.patch('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, updateTask);
-app.patch('/api/tasks/batch', authenicatedUserRateLimit, checkEngagementAdminMW, batchUpdateTasks);
-app.post('/api/tasks/import', authenicatedUserRateLimit, checkEngagementAdminMW, importTasks);
+    try {
+      await pool.query(
+        'INSERT INTO app_logs (type, data) VALUES (?,?)',
+        ['uncaught-error', logData]
+      );
 
-app.post('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, createTag);
-app.delete('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTag);
-app.patch('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, updateTag);
+      await emailService.sendMail({
+        from: 'Zeforis',
+        to: process.env.MAILER_SUPPORT_EMAIL,
+        subject: `Zeforis - Uncaught Error`,
+        text: logData,
+        html: logData
+      });
+    } catch (newError) {
+      console.log('Error handling uncaughtException:  ', newError);
+    } finally {
+      process.exit(1);
+    }
+  });
 
-app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
-app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);
-app.get('/api/orgs', unAuthenicatedUserRateLimit, getOrg);
-app.delete('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, deleteOrg);
-app.delete('/api/orgs/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveOrg);
+  app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
+  app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
+  app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
+  app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
+  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUser);
+  app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
+  app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
+  app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
+  app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
+  app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
+  app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
+  app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
+  app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
+  app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
+  app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
+  app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
 
-app.post('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, createWidget);
-app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
-app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
+  app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
+  app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
+  app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
+  app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
+  app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);
 
-app.use(errorHandler);
+  app.post('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, createFolder);
+  app.delete('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, deleteFolder);
+  app.patch('/api/folders', authenicatedUserRateLimit, checkEngagementAdminMW, updateFolder);
 
-app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
-app.listen(port, () => console.log('App is running'));
+  app.post('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, createTask);
+  app.delete('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTasks);
+  app.patch('/api/tasks', authenicatedUserRateLimit, checkEngagementAdminMW, updateTask);
+  app.patch('/api/tasks/batch', authenicatedUserRateLimit, checkEngagementAdminMW, batchUpdateTasks);
+  app.post('/api/tasks/import', authenicatedUserRateLimit, checkEngagementAdminMW, importTasks);
+
+  app.post('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, createTag);
+  app.delete('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTag);
+  app.patch('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, updateTag);
+
+  app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
+  app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);
+  app.get('/api/orgs', unAuthenicatedUserRateLimit, getOrg);
+  app.delete('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, deleteOrg);
+  app.delete('/api/orgs/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveOrg);
+
+  app.post('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, createWidget);
+  app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
+  app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
+
+  app.use(errorHandlerMW);
+
+  app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
+
+  app.listen(port, () => console.log('App is running'));
+};
+
+boot();

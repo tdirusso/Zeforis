@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const pool = require('../../database');
+const { pool } = require('../../database');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -41,7 +41,6 @@ module.exports = async (req, res, next) => {
       }
     }
   } catch (error) {
-    console.log(error);
-    return res.json({ message: error.message });
+    next(error);
   }
 };

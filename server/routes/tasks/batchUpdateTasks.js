@@ -1,4 +1,4 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 const moment = require('moment');
 
 module.exports = async (req, res, next) => {

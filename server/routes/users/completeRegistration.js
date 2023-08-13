@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const validator = require("email-validator");
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 const { OAuth2Client } = require('google-auth-library');
 
 if (process.env.NODE_ENV === 'development') {

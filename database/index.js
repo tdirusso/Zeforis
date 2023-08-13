@@ -18,4 +18,16 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-module.exports = pool;
+const initializeDatabase = async () => {
+  try {
+    const connection = await pool.getConnection();
+    connection.release();
+  } catch (error) {
+    console.error('Error establishing database connection:  ', error);
+  }
+};
+
+module.exports = {
+  pool,
+  initializeDatabase
+};

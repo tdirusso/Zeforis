@@ -1,4 +1,4 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 

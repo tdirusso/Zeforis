@@ -5,7 +5,7 @@ const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
 const isDev = process.env.NODE_ENV === 'development';
 

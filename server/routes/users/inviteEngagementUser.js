@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const emailService = require('../../../email');
 const validator = require("email-validator");
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 const { v4: uuidv4 } = require('uuid');
 
 const isDev = process.env.NODE_ENV === 'development';

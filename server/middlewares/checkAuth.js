@@ -23,6 +23,6 @@ module.exports = async (req, res, next) => {
 
     return res.json({ message: 'User does not exist.' });
   } catch (error) {
-    return res.json({ message: error.message });
+    next(error);
   }
 };
