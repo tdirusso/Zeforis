@@ -4,10 +4,6 @@ const { slackbotClient } = require('../../slackbot');
 
 const isDev = process.env.NODE_ENV === 'development';
 
-if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
-}
-
 module.exports = async (error, req, res, _) => {
   if (!(error instanceof TokenExpiredError)) {
     console.error('Application error:  ', error);

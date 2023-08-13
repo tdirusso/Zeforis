@@ -4,10 +4,6 @@ const { pool } = require('../../../database');
 const { OAuth2Client } = require('google-auth-library');
 const { slackbotClient } = require('../../../slackbot');
 
-if (process.env.NODE_ENV === 'development') {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
-}
-
 const slackEventsChannelId = 'C05ML3A3DC3';
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);

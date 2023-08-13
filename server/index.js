@@ -1,3 +1,9 @@
+const isDev = process.env.NODE_ENV === 'development';
+
+if (isDev) {
+  require('dotenv').config({ path: __dirname + '/../.env.local' });
+}
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
@@ -58,10 +64,7 @@ const checkSlackSignature = require('./middlewares/checkSlackSignature');
 const app = express();
 const port = process.env.PORT || 8080;
 
-const isDev = process.env.NODE_ENV === 'development';
-
 if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
   const cors = require('cors');
 
   app.use(cors({

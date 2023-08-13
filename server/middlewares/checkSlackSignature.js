@@ -1,11 +1,5 @@
 const crypto = require('crypto');
 
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
-}
-
 module.exports = (req, res, next) => {
   const slackSignature = req.headers['x-slack-signature'];
   const slackTimestamp = req.headers['x-slack-request-timestamp'];

@@ -4,12 +4,6 @@ const { pool } = require('../../../database');
 
 const acceptMimes = ['image/png', 'image/jpeg'];
 
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
-}
-
 module.exports = async (req, res, next) => {
   const {
     name,

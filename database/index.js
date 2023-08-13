@@ -1,13 +1,5 @@
 const mysql = require('mysql2/promise');
 
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  require('dotenv').config({
-    path: __dirname + '/../.env.local'
-  });
-}
-
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,

@@ -6,12 +6,6 @@ const validator = require("email-validator");
 const { pool } = require('../../../database');
 const { v4: uuidv4 } = require('uuid');
 
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
-}
-
 module.exports = async (req, res, next) => {
   const {
     email,

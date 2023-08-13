@@ -8,12 +8,6 @@ const moment = require('moment');
 
 const { pool } = require('../../../database');
 
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
-}
-
 module.exports = async (req, res, next) => {
   const {
     email
