@@ -2,10 +2,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../../../database');
 const { OAuth2Client } = require('google-auth-library');
+const { slackbotClient } = require('../../../slackbot');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
+
+const slackEventsChannelId = 'C05ML3A3DC3';
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
@@ -177,6 +180,11 @@ async function handleUniversalLogin(req, res) {
       const createUserResult = await pool.query(
         'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
         [payload.given_name, payload.family_name, googleEmail]);
+
+      await slackbotClient.chat.postMessage({
+        text: `*New Zeforis User*\n${googleEmail}`,
+        channel: slackEventsChannelId
+      });
 
       const newUser = {
         id: createUserResult[0].insertId,

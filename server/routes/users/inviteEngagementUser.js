@@ -41,9 +41,11 @@ module.exports = async (req, res, next) => {
   }
 
   try {
+    const lcEmail = email.toLowerCase();
+
     const [userResult] = await pool.query(
       'SELECT id, first_name, last_name, email FROM users WHERE email = ?',
-      [email.toLowerCase()]);
+      [lcEmail]);
 
     const user = userResult[0];
     const role = isAdmin ? 'admin' : 'member';
@@ -68,7 +70,7 @@ module.exports = async (req, res, next) => {
       );
 
       await sendInvitationEmail({
-        email: email.toLowerCase(),
+        email: lcEmail,
         engagementId,
         userId: user.id,
         orgName,
@@ -88,7 +90,7 @@ module.exports = async (req, res, next) => {
     } else {
       const newUserResult = await pool.query(
         'INSERT INTO users (email) VALUES (?)',
-        [email.toLowerCase()]
+        [lcEmail]
       );
 
       const newUserId = newUserResult[0].insertId;
@@ -99,7 +101,7 @@ module.exports = async (req, res, next) => {
       );
 
       await sendInvitationEmail({
-        email: email.toLowerCase(),
+        email: lcEmail,
         engagementId,
         userId: newUserId,
         orgName,

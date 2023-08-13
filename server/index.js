@@ -46,17 +46,21 @@ const leaveEngagement = require('./routes/engagements/leaveEngagement');
 const leaveOrg = require('./routes/orgs/leaveOrg');
 const batchUpdateAccess = require('./routes/users/batchUpdateAccess');
 const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
+const slackbotStats = require('./routes/slackbot/stats');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
 const checkOrgOwnerMW = require('./middlewares/checkOrgOwner');
 const checkAuthMW = require('./middlewares/checkAuth');
 const errorHandlerMW = require('./middlewares/errorHandler');
+const checkSlackSignature = require('./middlewares/checkSlackSignature');
 
 const app = express();
 const port = process.env.PORT || 8080;
 
-if (process.env.NODE_ENV === 'development') {
+const isDev = process.env.NODE_ENV === 'development';
+
+if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
   const cors = require('cors');
 
@@ -68,7 +72,12 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(express.static(path.join(__dirname + '/../', 'build')));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true,
+  verify: (req, _, buf) => {
+    req.rawBody = buf;
+  }
+}));
 app.use(cookieParser());
 app.use(fileUpload({}));
 
@@ -94,31 +103,6 @@ const unAuthenicatedUserRateLimit = rateLimit({
 
 const boot = async () => {
   await initializeDatabase();
-
-  process.on('uncaughtException', async (error, origin) => {
-    const logData = `Origin: ${origin} - ${error.stack}`;
-
-    console.log('Uncaught Exception:  ', logData);
-
-    try {
-      await pool.query(
-        'INSERT INTO app_logs (type, data) VALUES (?,?)',
-        ['uncaught-error', logData]
-      );
-
-      await emailService.sendMail({
-        from: 'Zeforis',
-        to: process.env.MAILER_SUPPORT_EMAIL,
-        subject: `Zeforis - Uncaught Error`,
-        text: logData,
-        html: logData
-      });
-    } catch (newError) {
-      console.log('Error handling uncaughtException:  ', newError);
-    } finally {
-      process.exit(1);
-    }
-  });
 
   app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
   app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
@@ -167,11 +151,40 @@ const boot = async () => {
   app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
   app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
 
+  app.post('/api/slackbot/stats', checkSlackSignature, slackbotStats);
+
   app.use(errorHandlerMW);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
 
   app.listen(port, () => console.log('App is running'));
+
+  process.on('uncaughtException', async (error, origin) => {
+    const logData = `Origin: ${origin} - ${error.stack}`;
+
+    console.log('Uncaught Exception:  ', logData);
+
+    try {
+      if (!isDev) {
+        await pool.query(
+          'INSERT INTO app_logs (type, data) VALUES (?,?)',
+          ['uncaught-error', logData]
+        );
+
+        await emailService.sendMail({
+          from: 'Zeforis',
+          to: process.env.MAILER_SUPPORT_EMAIL,
+          subject: `Zeforis - Uncaught Error`,
+          text: logData,
+          html: logData
+        });
+      }
+    } catch (newError) {
+      console.log('Error handling uncaughtException:  ', newError);
+    } finally {
+      process.exit(1);
+    }
+  });
 };
 
 boot();

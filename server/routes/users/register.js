@@ -6,6 +6,7 @@ const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 const { OAuth2Client } = require('google-auth-library');
+const { slackbotClient } = require('../../../slackbot');
 
 const { pool } = require('../../../database');
 
@@ -14,6 +15,8 @@ const isDev = process.env.NODE_ENV === 'development';
 if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
 }
+
+const slackEventsChannelId = 'C05ML3A3DC3';
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
@@ -37,7 +40,6 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-
     if (googleCredential) {
       const ticket = await authClient.verifyIdToken({
         idToken: googleCredential,
@@ -45,11 +47,11 @@ module.exports = async (req, res, next) => {
       });
 
       const payload = ticket.getPayload();
-      const googleEmail = payload.email;
+      const googleEmail = payload.email.toLowerCase();
 
       const [userResult] = await pool.query(
         'SELECT id, is_verified FROM users WHERE email = ?',
-        [googleEmail.toLowerCase()]
+        [googleEmail]
       );
 
       const user = userResult[0];
@@ -66,11 +68,19 @@ module.exports = async (req, res, next) => {
       } else {
         await pool.query(
           'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
-          [payload.given_name, payload.family_name, googleEmail.toLowerCase()]);
+          [payload.given_name, payload.family_name, googleEmail]);
+
+        await slackbotClient.chat.postMessage({
+          text: `*New Zeforis User*\n${googleEmail}`,
+          channel: slackEventsChannelId
+        });
+
         return res.json({ success: true });
       }
     } else {
-      const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [email.toLowerCase()]);
+      const lcEmail = email.toLowerCase();
+
+      const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [lcEmail]);
 
       if (existsResult.length) {
         return res.json({
@@ -84,11 +94,16 @@ module.exports = async (req, res, next) => {
 
       const createUserResult = await pool.query(
         'INSERT INTO users (first_name, last_name, email, password, verification_code) VALUES (?,?,?,?,?)',
-        [firstName, lastName, email.toLowerCase(), hashedPassword, verificationCode]);
+        [firstName, lastName, lcEmail, hashedPassword, verificationCode]);
 
       const userId = createUserResult[0].insertId;
 
-      await sendVerifyEmail(userId, verificationCode, email);
+      await sendVerifyEmail(userId, verificationCode, lcEmail);
+
+      await slackbotClient.chat.postMessage({
+        text: `*New Zeforis User*\n${lcEmail}`,
+        channel: slackEventsChannelId
+      });
 
       return res.json({ success: true });
     }
