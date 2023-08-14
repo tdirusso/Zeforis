@@ -30,6 +30,7 @@ export default function Drawers(props) {
       />
 
       <AdminGettingStartedDrawer
+        {...props}
         isOpen={drawerToOpen === 'getting-started-admin'}
         close={closeDrawer}
       />

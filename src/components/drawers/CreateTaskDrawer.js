@@ -280,6 +280,7 @@ export default function CreateTaskDrawer(props) {
                   onChange={(_, newVal) => setSelectedTags(newVal)}
                   renderInput={(params) => (
                     <TextField
+                      helperText="Create new tags by pressing 'Enter'."
                       {...params}
                       placeholder="Tags"
                       InputProps={{
