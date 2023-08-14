@@ -2,7 +2,7 @@ const { TokenExpiredError } = require("jsonwebtoken");
 const { pool } = require('../../database');
 const { slackbotClient } = require('../../slackbot');
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = require('../../config');
 
 module.exports = async (error, req, res, _) => {
   if (!(error instanceof TokenExpiredError)) {
@@ -11,12 +11,12 @@ module.exports = async (error, req, res, _) => {
     if (!isDev) {
       try {
         await pool.query(
-          'INSERT INTO app_logs (type, data) VALUES (?,?)',
-          ['handled-error', error.stack]
+          'INSERT INTO app_logs (type, data) VALUES ("handled-error", ?)',
+          [error.stack]
         );
 
         await slackbotClient.chat.postMessage({
-          text: `*New Zeforis Error*\n${error.stack}`,
+          text: `*Zeforis Server Error*\n${error.stack}`,
           channel: 'C05MNK33N7N'
         });
 

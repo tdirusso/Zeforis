@@ -1,4 +1,4 @@
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = require('../config');
 
 if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -53,6 +53,7 @@ const leaveOrg = require('./routes/orgs/leaveOrg');
 const batchUpdateAccess = require('./routes/users/batchUpdateAccess');
 const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
 const slackbotStats = require('./routes/slackbot/stats');
+const logFrontendError = require('./routes/logs/logFrontendError');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -156,6 +157,8 @@ const boot = async () => {
 
   app.post('/api/slackbot/stats', checkSlackSignature, slackbotStats);
 
+  app.post('/api/logs/logFrontendError', logFrontendError);
+
   app.use(errorHandlerMW);
 
   app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
@@ -170,8 +173,8 @@ const boot = async () => {
     try {
       if (!isDev) {
         await pool.query(
-          'INSERT INTO app_logs (type, data) VALUES (?,?)',
-          ['uncaught-error', logData]
+          'INSERT INTO app_logs (type, data) VALUES ("uncaught-error", ?)',
+          [logData]
         );
 
         await emailService.sendMail({

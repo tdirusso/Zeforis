@@ -198,7 +198,7 @@ async function handleUniversalLogin(req, res) {
     const lcEmail = email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name, last_name, email, date_created password FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name, last_name, email, date_created, password FROM users WHERE email = ?',
       [lcEmail]
     );
 
