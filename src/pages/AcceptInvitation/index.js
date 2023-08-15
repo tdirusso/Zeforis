@@ -63,6 +63,7 @@ export default function AcceptInvitationPage() {
           if (!Boolean(invitation.userNeedsPassword)) {
             openSnackBar('Invitation accepted.', 'success');
             setActiveOrgId(orgId);
+            localStorage.setItem('openGettingStarted', 'true');
             setTimeout(() => {
               window.location.href = customLoginPageUrl;
             }, 1000);
@@ -129,6 +130,7 @@ export default function AcceptInvitationPage() {
 
       if (success) {
         openSnackBar('Registration successful.', 'success');
+        localStorage.setItem('openGettingStarted', 'true');
         setTimeout(() => {
           window.location.href = customLoginPageUrl;
         }, 2000);
@@ -153,6 +155,7 @@ export default function AcceptInvitationPage() {
 
         if (success) {
           openSnackBar('Registration successful.', 'success');
+          localStorage.setItem('openGettingStarted', 'true');
           setTimeout(() => {
             window.location.href = customLoginPageUrl;
           }, 2000);

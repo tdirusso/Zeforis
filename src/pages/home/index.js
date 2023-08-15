@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid, createTheme } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
@@ -26,18 +26,6 @@ import './styles.scss';
 import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
 
 export default function Home({ setTheme }) {
-  const { search } = useLocation();
-  const queryParams = new URLSearchParams(search);
-
-  const orgIdPassed = queryParams.get('orgId');
-  const engagementIdPassed = queryParams.get('engagementId');
-
-  if (orgIdPassed && engagementIdPassed) {
-    setActiveOrgId(orgIdPassed);
-    setActiveEngagementId(engagementIdPassed);
-    window.location = window.location.href.split('?')[0];
-  }
-
   let activeOrgId = getActiveOrgId();
   let activeEngagementId = getActiveEngagementId();
 
@@ -45,6 +33,7 @@ export default function Home({ setTheme }) {
   const [isDataFetched, setDataFetched] = useState(false);
   const [isReadyToRender, setReadyToRender] = useState(false);
   const [engagement, setEngagement] = useState(null);
+  const [engagements, setEngagements] = useState([]);
   const [org, setOrg] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -98,6 +87,7 @@ export default function Home({ setTheme }) {
     if (user) {
       if (activeOrgId) {
         const activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
+        setEngagements(getUserEngagementListForOrg(user, activeOrgId));
 
         if (activeOrg) {
           const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
@@ -139,14 +129,20 @@ export default function Home({ setTheme }) {
           }
         });
 
-        fetchEngagementData();
-      } else if (!engagement) {
-        setDataFetched(true);
+        fetchEngagementData(engagement.id, org.id);
+      } else if (!engagement && org) {
+        if (engagements.length === 1) {
+          setActiveEngagementId(engagements[0].id);
+          setEngagement(engagements[0]);
+          fetchEngagementData(engagements[0].id, org.id);
+        }
+      } else {
+        setReadyToRender(true);
       }
     }
 
-    async function fetchEngagementData() {
-      const result = await getEngagementData(engagement.id, org.id);
+    async function fetchEngagementData(engagementId, orgId) {
+      const result = await getEngagementData(engagementId, orgId);
 
       if (!result.tasks) {
         openSnackBar(result.message || 'Something went wrong...');
@@ -245,8 +241,6 @@ export default function Home({ setTheme }) {
     }
   }
 
-  const engagements = getUserEngagementListForOrg(user, activeOrgId);
-
   if (engagements.length === 0) {
     return (
       <Box className="flex-centered" style={{ height: '100%' }}>
@@ -273,21 +267,16 @@ export default function Home({ setTheme }) {
   }
 
   if (!engagement) {
-    if (engagements.length === 1) {
-      setActiveEngagementId(engagements[0].id);
-      setEngagement(engagements[0]);
-    } else {
-      return (
-        <Box className="flex-centered" style={{ height: '100%' }}>
-          <ChooseEngagementDialog
-            engagements={engagements}
-            org={org}
-            user={user}
-            isOpen={true}
-          />
-        </Box>
-      );
-    }
+    return (
+      <Box className="flex-centered" style={{ height: '100%' }}>
+        <ChooseEngagementDialog
+          engagements={engagements}
+          org={org}
+          user={user}
+          isOpen={true}
+        />
+      </Box>
+    );
   }
 
   const context = {

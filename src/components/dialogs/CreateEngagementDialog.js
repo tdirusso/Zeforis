@@ -71,8 +71,13 @@ export default function CreateEngagementDialog(props) {
         if (engagement) {
           setActiveEngagementId(engagement.id);
           openSnackBar('Engagement created.', 'success');
+
+          if (!close) {
+            localStorage.setItem('openGettingStarted', 'true');
+          }
+          
           setTimeout(() => {
-            window.location.href = close ? '/home/dashboard' : '/home/dashboard?gettingStarted=true';
+            window.location.href = '/home/dashboard';
           }, 500);
         } else {
           openSnackBar(message, 'error');

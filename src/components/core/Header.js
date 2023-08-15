@@ -82,7 +82,7 @@ export default function Header(props) {
 
   const openGettingStartedDrawer = () => {
     setAnchorEl(null);
-    openDrawer('getting-started-admin');
+    openDrawer('getting-started');
   };
 
   return (

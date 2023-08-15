@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useLocation, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import KeyFolders from "../../../components/core/dashboard/KeyFolders";
 import KeyTasks from "../../../components/core/dashboard/KeyTasks";
 import TaskStats from "../../../components/core/dashboard/TaskStats";
@@ -12,8 +12,6 @@ import { useEffect } from "react";
 
 export default function Dashboard() {
 
-  const { search } = useLocation();
-
   const {
     tasks,
     folders,
@@ -23,11 +21,11 @@ export default function Dashboard() {
   } = useOutletContext();
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(search);
-    const isGettingStarted = queryParams.get('gettingStarted');
+    const isGettingStarted = localStorage.getItem('openGettingStarted');
 
     if (isGettingStarted) {
-      openDrawer('getting-started-admin');
+      localStorage.removeItem('openGettingStarted');
+      openDrawer('getting-started');
     }
   }, []);
 

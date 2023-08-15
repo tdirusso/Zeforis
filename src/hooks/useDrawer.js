@@ -5,7 +5,7 @@ export default function useDrawer() {
   const [drawerProps, setDrawerProps] = useState({});
 
   const openDrawer = (drawerType, props) => {
-    if (drawerToOpen === 'getting-started-admin' || drawerToOpen === 'getting-started-member') {
+    if (drawerToOpen === 'getting-started') {
       localStorage.setItem('gsDrawerToReopen', drawerToOpen);
     } else {
       localStorage.removeItem('gsDrawerToReopen');
