@@ -135,6 +135,8 @@ export default function Home({ setTheme }) {
           setActiveEngagementId(engagements[0].id);
           setEngagement(engagements[0]);
           fetchEngagementData(engagements[0].id, org.id);
+        } else {
+          setReadyToRender(true);
         }
       } else {
         setReadyToRender(true);

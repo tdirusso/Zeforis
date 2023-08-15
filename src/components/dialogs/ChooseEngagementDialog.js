@@ -108,11 +108,18 @@ export default function ChooseEngagementDialog(props) {
   return (
     <Box>
       <Dialog
+        className='choose-engagement-dialog'
         open={isOpen}
         onClose={handleClose}
         TransitionComponent={close ? toggleableTransition : fixedTransition}
+        PaperProps={{
+          style: {
+            padding: '1rem',
+            overflowX: 'hidden'
+          }
+        }}
         fullScreen>
-        <DialogContent style={{ width: 1200, margin: '0 auto' }}>
+        <DialogContent className='content'>
           <Box className='my3'>
             <Box
               display="flex"
@@ -136,9 +143,9 @@ export default function ChooseEngagementDialog(props) {
                 </Box>
               </Box>
               <Button
+                className='change-org-btn'
                 startIcon={<SwapHorizOutlined />}
                 onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
-                style={{ position: 'absolute', right: '8px' }}
                 variant='outlined'>
                 Change org
               </Button>
@@ -161,8 +168,7 @@ export default function ChooseEngagementDialog(props) {
                     </InputAdornment>
                   )
                 }}
-                fullWidth
-                autoFocus>
+                fullWidth>
               </TextField>
             </Box>
             <Box
@@ -177,7 +183,6 @@ export default function ChooseEngagementDialog(props) {
                     <Zoom key={e.id} appear={shouldAnimate} in style={{ transitionDelay: `${(index * 15) + 100}ms` }}>
                       <Paper
                         onClick={() => handleLoadEngagement(e.id)}
-                        style={{ margin: '1rem' }}
                         className={`choose-engagement-btn ${engagement?.id === e.id ? 'active' : ''}`}>
                         {
                           isLoadingEngagement && engagementId === e.id ?
