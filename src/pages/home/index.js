@@ -87,7 +87,6 @@ export default function Home({ setTheme }) {
     if (user) {
       if (activeOrgId) {
         const activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
-        setEngagements(getUserEngagementListForOrg(user, activeOrgId));
 
         if (activeOrg) {
           const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
@@ -101,6 +100,7 @@ export default function Home({ setTheme }) {
           setTheme(createTheme(themeConfig));
           setOrg(activeOrg);
           setIsOrgOwner(isOwnerOfActiveOrg);
+          setEngagements(getUserEngagementListForOrg(user, activeOrgId));
         }
       }
 

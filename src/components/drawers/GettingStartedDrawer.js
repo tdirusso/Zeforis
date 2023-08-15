@@ -23,6 +23,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 
 export default function GettingStartedDrawer(props) {
   const {
@@ -73,7 +74,7 @@ export default function GettingStartedDrawer(props) {
         {
           isAdmin ?
             <AdminGettingStartedDrawer close={close} org={org} engagement={engagement} /> :
-            <MemberGettingStartedDrawer close={close} org={org} engagement={engagement} />
+            <MemberGettingStartedDrawer close={close} org={org} />
         }
       </DialogContent>
     </Drawer>
@@ -85,11 +86,8 @@ export default function GettingStartedDrawer(props) {
 function MemberGettingStartedDrawer(props) {
   const {
     close,
-    org,
-    engagement
+    org
   } = props;
-
-  const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
 
   return (
     <>
@@ -142,7 +140,7 @@ function MemberGettingStartedDrawer(props) {
         They appear on the dashboard, displaying up to 5 essential tasks within that specific folder. You can quickly access these tasks
         from the dashboard and open their URL links directly, if applicable.
       </Typography>
-      
+
       <Divider className='my2' />
       <Box component="h3" mt={0.5} className='flex-ac'>
         <TaskAltIcon htmlColor='grey' style={{ marginRight: '5px' }} />
@@ -199,6 +197,23 @@ function MemberGettingStartedDrawer(props) {
         <StarIcon htmlColor='gold' style={{ verticalAlign: 'text-bottom' }} />Key tasks, similar to key folders, are
         automatically displayed on the dashboard.
       </Typography>
+
+      <Divider className='my2' />
+      <Box component="h3" mt={0.5} className='flex-ac'>
+        <GridViewRoundedIcon htmlColor='grey' style={{ marginRight: '5px' }} />
+        Dashboard
+      </Box>
+      <Typography mt={2}>
+        Now that you're familiar with folders and tasks, let's head back to the dashboard.
+      </Typography>
+      <Typography mt={2}>
+        <Link to="/home/dashboard" component="a">Go to dashboard &rarr;</Link>
+      </Typography>
+      <Typography mt={2}>
+        The dashboard gives you a general overview of the engagement, including key tasks, key folders,
+        upcoming tasks (based on due date), task metrics, and more.
+      </Typography>
+
       <Divider className='my2' />
       <Box component="h3" mt={0.5} className='flex-ac'>
         <VerifiedIcon htmlColor='mediumseagreen' style={{ marginRight: '5px' }} />

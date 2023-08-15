@@ -4,10 +4,10 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
-import SpeedIcon from '@mui/icons-material/Speed';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BuildIcon from '@mui/icons-material/Build';
 import Watermark from "./Watermark";
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 
 export default function SideNav(props) {
 
@@ -50,7 +50,7 @@ export default function SideNav(props) {
                     variant="body2"
                     display="flex"
                     alignItems="center">
-                    <SpeedIcon />
+                    <GridViewRoundedIcon />
                     Dashboard
                   </Typography>
                 </ButtonBase>
