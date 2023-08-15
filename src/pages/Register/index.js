@@ -8,16 +8,17 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import './Register.css';
 import { register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, useMediaQuery } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 export default function RegisterPage() {
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
+
   const email = useRef();
   const password = useRef();
   const firstName = useRef();
@@ -68,7 +69,7 @@ export default function RegisterPage() {
       {
         theme: "outline",
         size: "large",
-        width: 325,
+        width: isSmallScreen ? 300 : 325,
         text: 'signup_with'
       }
     );
@@ -115,25 +116,27 @@ export default function RegisterPage() {
   }, []);
 
   return (
-    <Box className="Login flex-centered">
+    <Box className="info-page flex-centered">
       <Box component="header">
         <Box component="a" href="https://www.zeforis.com" target="_blank">
-          <img src={zeforisLogo} alt="Zeforis" height={30} />
+          <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
         <Box display="flex" alignItems="center">
-          <Box mr={1.5}>Already have an account?</Box>
+          <Box mr={1.5} display={isSmallScreen ? 'none' : 'block'}>
+            Already have an account?
+          </Box>
           <Button
             variant="contained"
             component={'a'}
             href='/login'
-            size="large">
+            size={isSmallScreen ? 'medium' : 'large'}>
             Sign In
           </Button>
         </Box>
       </Box>
-      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+      <Paper className="container">
         <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>Sign Up</Typography>
-        <form onSubmit={handleRegistration} >
+        <form onSubmit={handleRegistration}>
           <TextField
             placeholder="First name"
             variant="outlined"

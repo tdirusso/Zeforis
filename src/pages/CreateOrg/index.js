@@ -30,7 +30,7 @@ export default function CreateOrgPage({ setTheme }) {
 
   return (
     <Box className="flex-centered" style={{ height: '100%' }}>
-      <Box textAlign="center" mb={'100px'} maxWidth={600}>
+      <Box textAlign="center" maxWidth={600} p={3}>
         {
           step === 1 ?
             <Step1
@@ -96,7 +96,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
     <Box textAlign="center" mb={'100px'} maxWidth={600}>
       <Grow appear in timeout={{ enter: 500 }}>
         <Box mb={2}>
-          <img src={createOrgIcon} alt="" width={150} />
+          <img src={createOrgIcon} alt="" width={125} />
         </Box>
       </Grow>
       <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '150ms' }}>
@@ -227,7 +227,7 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   }
 
   return (
-    <Box className="Login flex-centered">
+    <Box className="info-page flex-centered">
       <Box component="header">
         {pageIcon}
       </Box>

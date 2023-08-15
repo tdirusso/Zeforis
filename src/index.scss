@@ -9,6 +9,7 @@ body,
 #root {
   height: 100%;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 body {
@@ -16,7 +17,6 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--colors-body-background);
   color: #121f43;
-  overflow-x: hidden;
 }
 
 body * {

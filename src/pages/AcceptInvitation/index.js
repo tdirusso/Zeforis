@@ -10,7 +10,7 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import { updatePassword, getInvitationData, register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import { Button, CircularProgress, Divider } from "@mui/material";
+import { Button, CircularProgress, Divider, useMediaQuery } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { AccountCircle } from "@mui/icons-material";
@@ -19,6 +19,8 @@ import { setActiveOrgId } from "../../api/orgs";
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
+
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
   const engagementId = queryParams.get('engagementId');
   const invitationCode = queryParams.get('invitationCode');
@@ -70,23 +72,6 @@ export default function AcceptInvitationPage() {
           } else {
             setUserNeedsPassword(true);
             setFetchingInvitation(false);
-
-            setTimeout(() => {
-              window.google.accounts.id.initialize({
-                client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-                callback: handleGoogleRegistration
-              });
-
-              window.google.accounts.id.renderButton(
-                document.getElementById('google-signin'),
-                {
-                  theme: "outline",
-                  size: "large",
-                  width: 400,
-                  text: 'continue_with'
-                }
-              );
-            }, 0);
           }
         } else {
           setFetchingInvitation(false);
@@ -97,6 +82,25 @@ export default function AcceptInvitationPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (userNeedsPassword) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        callback: handleGoogleRegistration
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin'),
+        {
+          theme: "outline",
+          size: "large",
+          width: isSmallScreen ? 300 : 325,
+          text: 'continue_with'
+        }
+      );
+    }
+  }, [userNeedsPassword]);
 
   const handleUpdatePassword = async e => {
     e.preventDefault();
@@ -171,10 +175,10 @@ export default function AcceptInvitationPage() {
 
   if (userNeedsPassword === null) {
     return (
-      <div className="Login flex-centered">
+      <div className="info-page flex-centered">
         <header>
           <Box component="a" href="https://www.zeforis.com" target="_blank">
-            <img src={zeforisLogo} alt="Zeforis" height={30} />
+            <img src={zeforisLogo} alt="Zeforis" className="header-logo"/>
           </Box>
         </header>
 
@@ -189,7 +193,7 @@ export default function AcceptInvitationPage() {
             />
           </Box>
             :
-            <Paper style={{ padding: '2.5rem', minWidth: '500px' }} className="container">
+            <Paper className="container">
               <Typography>Invitation does not exist or has expired.</Typography>
               <Snackbar
                 isOpen={isOpen}
@@ -204,19 +208,19 @@ export default function AcceptInvitationPage() {
   }
 
   return (
-    <div className="Login flex-centered">
+    <div className="info-page flex-centered">
       <header>
         <Box component="a" href="https://www.zeforis.com" target="_blank">
-          <img src={zeforisLogo} alt="Zeforis" height={30} />
+          <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
         <Box display="flex" alignItems="center">
-          <Box mr={1.5}>Already have an account?</Box>
+          <Box mr={1.5} display={isSmallScreen ? 'none' : 'block'}>Already have an account?</Box>
           <Button
             variant="contained"
             disabled={isLoading}
             component={'a'}
             href="/login"
-            size="large">
+            size={isSmallScreen ? 'medium' : 'large'}>
             Sign In
           </Button>
         </Box>
@@ -228,14 +232,15 @@ export default function AcceptInvitationPage() {
           <CircularProgress />
         </Box>
           :
-          <Paper style={{ padding: '4rem', paddingTop: '2.5rem', minWidth: '600px' }} className="container">
+          <Paper className="container">
             <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
             <form onSubmit={handleUpdatePassword}>
-              <Box className="flex-centered" style={{ marginBottom: '1rem' }}>
+              <Box style={{ marginBottom: '1.5rem' }}>
                 <TextField
+                  style={{ marginBottom: '0.5rem' }}
+                  fullWidth
                   placeholder="First name"
                   variant="outlined"
-                  style={{ marginRight: '10px' }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -248,9 +253,9 @@ export default function AcceptInvitationPage() {
                   autoFocus
                 />
                 <TextField
+                  fullWidth
                   placeholder="Last name"
                   variant="outlined"
-                  style={{ marginLeft: '10px' }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

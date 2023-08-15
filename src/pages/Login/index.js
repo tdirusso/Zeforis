@@ -10,8 +10,8 @@ import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import './Login.css';
-import { Button, CircularProgress, Divider, createTheme } from "@mui/material";
+import '../styles.scss';
+import { Button, CircularProgress, Divider, createTheme, useMediaQuery } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
@@ -24,6 +24,9 @@ import Watermark from "../../components/core/Watermark";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
+  
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
+
   const searchParams = new URLSearchParams(search);
 
   const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
@@ -97,7 +100,7 @@ export default function LoginPage({ setTheme }) {
       {
         theme: "outline",
         size: "large",
-        width: 325
+        width: isSmallScreen ? 300 : 325
       }
     );
   };
@@ -234,14 +237,15 @@ export default function LoginPage({ setTheme }) {
     );
   }
 
-  let pageIcon = <Box component="a" href="https://www.zeforis.com" target="_blank">
-    <img src={zeforisLogo} alt="Zeforis" height={30} />
-  </Box>;
+  let pageIcon =
+    <Box component="a" href="https://www.zeforis.com" target="_blank">
+      <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
+    </Box>;
 
   if (needsCustomPage) {
     if (customPageData.logo_url) {
       pageIcon = <Box>
-        <img src={customPageData.logo_url} alt={customPageData.name} height={50} />
+        <img src={customPageData.logo_url} alt={customPageData.name} className="header-logo" />
       </Box>;
     } else {
       pageIcon = <Box component="h1" color={customPageData.brand_color}>{customPageData.name}</Box>;
@@ -249,21 +253,21 @@ export default function LoginPage({ setTheme }) {
   }
 
   return (
-    <Box className="Login flex-centered">
+    <Box className="info-page flex-centered">
       <Box component="header">
         {pageIcon}
         <Box display="flex" alignItems="center">
-          <Box mr={1.5}>Don't have an account?</Box>
+          <Box mr={1.5}>No account?</Box>
           <Button
             variant="contained"
             component={'a'}
             href="/register"
-            size="large">
+            size={isSmallScreen ? 'medium' : 'large'}>
             Sign Up
           </Button>
         </Box>
       </Box>
-      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+      <Paper className="container">
         <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Sign in
         </Typography>

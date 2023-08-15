@@ -9,6 +9,7 @@ const statuses = [
   { name: 'Complete', color: '#27ce88' }
 ];
 
+
 export {
   statuses
 };

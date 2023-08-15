@@ -3,7 +3,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 export default function RegisterSuccess() {
   return (
-    <Box style={{ textAlign: 'center', paddingTop: '15%' }}>
+    <Box style={{ textAlign: 'center', padding: '15%' }}>
       <Typography variant="h5">
         Thank you for registering.
       </Typography>

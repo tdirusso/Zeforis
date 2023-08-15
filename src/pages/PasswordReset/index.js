@@ -32,10 +32,10 @@ export default function PasswordResetPage() {
   } = useSnackbar();
 
   return (
-    <Box className="Login flex-centered">
+    <Box className="info-page flex-centered">
       <Box component="header">
         <Box component="a" href="https://www.zeforis.com" target="_blank">
-          <img src={zeforisLogo} alt="Zeforis" height={30} />
+          <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
         <Box display="flex" alignItems="center">
           <Box
@@ -48,7 +48,7 @@ export default function PasswordResetPage() {
           </Box>
         </Box>
       </Box>
-      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+      <Paper className="container">
         <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Password Reset
         </Typography>
