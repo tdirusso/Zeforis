@@ -2,7 +2,6 @@ import { Grid, Paper, Tabs, Tab } from "@mui/material";
 import React, { useState } from "react";
 import GeneralTab from "./GeneralTab";
 import UsersTab from "./UsersTab";
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import InfoIcon from '@mui/icons-material/Info';
 import { useOutletContext } from "react-router-dom";

@@ -1,12 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import {
   Alert,
   Box,
+  Button,
   DialogTitle,
   Divider,
   Drawer,
   IconButton,
+  Paper,
+  TextField,
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -17,6 +19,11 @@ import './styles.scss';
 import StarIcon from '@mui/icons-material/Star';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+
 export default function AdminGettingStartedDrawer(props) {
   const {
     isOpen,
@@ -24,6 +31,8 @@ export default function AdminGettingStartedDrawer(props) {
     org,
     engagement
   } = props;
+
+  const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
 
   return (
     <Drawer
@@ -35,7 +44,7 @@ export default function AdminGettingStartedDrawer(props) {
       variant='persistent'
       PaperProps={{
         style: {
-          width: '450px',
+          width: '475px',
         }
       }}>
       <DialogContent>
@@ -219,6 +228,103 @@ export default function AdminGettingStartedDrawer(props) {
           <Typography mt={0.5} variant='body2'>
             &mdash; Best for admins & employees.
           </Typography>
+        </Box>
+        <Divider className='my2' />
+        <Box component="h3" mt={0.5} className='flex-ac'>
+          <AutoAwesomeIcon htmlColor='grey' style={{ marginRight: '5px' }} />
+          Customization
+        </Box>
+        <Box component="h4" mt={3}>
+          Branding
+        </Box>
+        <Typography mt={1}>
+          You can apply your own custom branding to the {org.name} org, including color, logo, and a custom login page just for your org.
+        </Typography>
+        <Typography mt={2}>
+          Anyone who logs in to view or work on engagements in {org.name} will also see your branding.
+        </Typography>
+        <Typography mt={2}>
+          These customizations can be done from Settings &rarr; Organization &rarr; Branding.
+        </Typography>
+        <Typography mt={2}>
+          <Link to="/home/settings?tab=1" component="a">Go to branding settings &rarr;</Link>
+        </Typography>
+        <Typography mt={2}>
+          The "Custom Login Page" feature provides your customers with a custom login experience by incorporating your branding into the login page, delivering a professional touch while
+          enhancing your brand, customer retention, marketing opportunities, and overall user experience.
+        </Typography>
+        <Box mt={2}>
+          <Button
+            startIcon={<OpenInNewIcon />}
+            onClick={() => window.open(customLoginPageUrl, '_blank')}
+            variant='contained'>
+            Open custom login page
+          </Button>
+        </Box>
+        <Typography mt={2}>
+          The URL link for the custom login page can always be found in the organization settings.
+        </Typography>
+        <Box component="h4" mt={3}>
+          Widgets
+        </Box>
+        <Typography mt={1}>
+          You can create custom widgets that will display on the dashboard from the <Link to="/home/tools" component="a">Tools page</Link> (Tools &rarr; Widgets).
+        </Typography>
+        <Typography mt={2}>
+          These widgets are great for things like announcements, general messages, etc.  You can
+          customize titles, content, and color.
+        </Typography>
+        <Box mt={3} mb={4}>
+          <Paper style={{
+            minHeight: '250px',
+          }}>
+            <Box
+              component="h5"
+              mb={1}>This is an example widget
+            </Box>
+            <TextField
+              className="readonly-textfield"
+              fullWidth
+              inputProps={{
+                style: {
+                  fontWeight: 400,
+                  fontSize: '0.875rem'
+                }
+              }}
+              InputProps={{ readOnly: true }}
+              variant="standard"
+              value={
+                `Meeting Schedule:
+-  Wed. Jan. 1st, 2:30pm
+-  Thur. Jan 3rd, 12:30pm
+
+Announcements
+-  ${org.name} is awesome!
+`
+              }
+              multiline>
+            </TextField>
+          </Paper>
+        </Box>
+        <Divider className='my2' />
+        <Box component="h3" mt={0.5} className='flex-ac'>
+          <VerifiedIcon htmlColor='mediumseagreen' style={{ marginRight: '5px' }} />
+          Finishing Up
+        </Box>
+        <Typography mt={2}>
+          The platform offers other tools and capabilities like analytics, custom report generation, data exporting, and more.
+        </Typography>
+        <Typography mt={2}>
+          Any questions and feedback are always welcome and appreciated, just send us an email
+          at <a href="mailto:info@zeforis.com">info@zeforis.com</a>.
+        </Typography>
+        <Box mt={3}>
+          <Button
+            startIcon={<RocketLaunchIcon />}
+            onClick={close}
+            variant='contained'>
+            Let's go!
+          </Button>
         </Box>
       </DialogContent>
     </Drawer>
