@@ -177,7 +177,7 @@ export default function GeneralTab() {
     <>
       <Box mt={4}>
         <TextField
-          style={{ minWidth: '400px' }}
+          fullWidth
           value={orgName}
           disabled={isUpdatingName}
           onChange={e => setOrgName(e.target.value)}
@@ -212,7 +212,7 @@ export default function GeneralTab() {
         <Box component="h4" mb={3}>
           Branding
         </Box>
-        <Box my={2} display='flex' alignItems='center'>
+        <Box my={2} display='flex' alignItems='center' flexWrap='wrap' gap='20px'>
           <Box>
             <TwitterPicker
               triangle="hide"
@@ -232,12 +232,11 @@ export default function GeneralTab() {
           </Box>
         </Box>
 
-        <Box className="flex-ac" style={{ margin: '1.5rem 0' }}>
+        <Box className="flex-ac" style={{ margin: '1.5rem 0' }} flexWrap='wrap' gap='20px'>
           <Button
             startIcon={<ImageOutlinedIcon />}
             variant='outlined'
             component='label'
-            style={{ marginRight: '0.5rem' }}
             disabled={isUpdatingBranding}>
             Upload Logo
             <input
@@ -252,7 +251,6 @@ export default function GeneralTab() {
           <Button
             style={{
               display: logoSrc && !isLogoLoading ? 'block' : 'none',
-              marginRight: '1rem'
             }}
             disabled={isUpdatingBranding}
             onClick={handleLogoClear}>

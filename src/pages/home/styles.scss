@@ -8,3 +8,15 @@ main {
     padding-bottom: 2.5rem;
   }
 }
+
+.settings-divider {
+  width: 1px;
+  margin: 0 0.5rem;
+  background: var(--colors-primary);
+}
+
+@media screen and (max-width: 500px) {
+  .settings-divider {
+    display: none;
+  }
+}

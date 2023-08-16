@@ -196,7 +196,7 @@ export default function MembersTab() {
           <Button
             hidden={!isOrgOwner}
             variant="outlined"
-            style={{ marginBottom: '1rem' }}
+            style={{ marginBottom: '1rem', whiteSpace: 'break-spaces' }}
             onClick={e => setInviteUserMenuAnchor(e.currentTarget)}
             startIcon={<PersonAddIcon />}>
             Invite someone to {engagement.name}

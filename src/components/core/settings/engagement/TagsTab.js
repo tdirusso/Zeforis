@@ -175,7 +175,7 @@ export default function TagsTab() {
             onDelete={e => setNewTagMenuAnchor(e.currentTarget)}>
           </Chip>
         </Box>
-        <Box display="flex">
+        <Box display="flex" flexWrap='wrap'>
           {
             tags.map(tag =>
               <Box

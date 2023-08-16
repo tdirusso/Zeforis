@@ -97,38 +97,41 @@ export default function GeneralTab() {
   return (
     <>
       <Box component="h4" my={3} >Personal</Box>
-      <Box style={{ display: 'flex', maxWidth: '600px' }}>
-        <TextField
-          fullWidth
-          variant="standard"
-          label="First Name"
-          disabled={isUpdatingName}
-          inputRef={firstName}
-          defaultValue={user.firstName}
-          style={{ marginRight: '2rem' }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <AccountCircleIcon htmlColor="#cbcbcb" />
-              </InputAdornment>
-            )
-          }}
-        />
-        <TextField
-          fullWidth
-          variant="standard"
-          label="Last Name"
-          disabled={isUpdatingName}
-          inputRef={lastName}
-          defaultValue={user.lastName}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <AccountCircleIcon htmlColor="#cbcbcb" />
-              </InputAdornment>
-            )
-          }}
-        />
+      <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+        <Box maxWidth={450} flex={1} minWidth={250}>
+          <TextField
+            fullWidth
+            variant="standard"
+            label="First Name"
+            disabled={isUpdatingName}
+            inputRef={firstName}
+            defaultValue={user.firstName}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Box>
+        <Box maxWidth={450} flex={1} minWidth={250}>
+          <TextField
+            fullWidth
+            variant="standard"
+            label="Last Name"
+            disabled={isUpdatingName}
+            inputRef={lastName}
+            defaultValue={user.lastName}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Box>
       </Box>
       <Box my={4}>
         <LoadingButton

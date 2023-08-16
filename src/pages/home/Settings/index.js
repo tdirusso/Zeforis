@@ -52,7 +52,7 @@ export default function Settings() {
   return (
     <>
       <Grid item xs={12}>
-        <Box display='flex' gap={1.5}>
+        <Box display='flex' gap={1.5} flexWrap='wrap'>
           <Paper style={{
             ...paperStyles,
             background:
@@ -68,7 +68,7 @@ export default function Settings() {
               Engagement
             </Button>
           </Paper>
-          <Box style={{
+          <Box className="settings-divider" style={{
             width: '1px',
             margin: '0 0.5rem',
             background: 'var(--colors-primary)'

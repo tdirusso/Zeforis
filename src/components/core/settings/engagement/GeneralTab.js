@@ -87,7 +87,7 @@ export default function GeneralTab() {
     <>
       <Box mt={4}>
         <TextField
-          style={{ minWidth: '400px' }}
+          fullWidth
           value={engagementName}
           disabled={loading}
           onChange={e => setEngagementName(e.target.value)}

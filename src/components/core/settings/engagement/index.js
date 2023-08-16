@@ -25,17 +25,22 @@ export default function EngagementTab() {
 
   return (
     <Grid item xs={12}>
-        <Paper>
-          <Tabs value={tabVal} onChange={(_, newVal) => setTabVal(newVal)}>
-            <Tab label="General" icon={<InfoIcon fontSize="small" />} iconPosition="start" />
-            <Tab label="Members" icon={<PeopleAltIcon fontSize="small" />} iconPosition="start" />
-            <Tab label="Tags" icon={<LocalOfferIcon fontSize="small" />} iconPosition="start" />
-          </Tabs>
+      <Paper>
+        <Tabs
+          value={tabVal}
+          allowScrollButtonsMobile
+          onChange={(_, newVal) => setTabVal(newVal)}
+          variant="scrollable"
+          scrollButtons="auto">
+          <Tab label="General" icon={<InfoIcon fontSize="small" />} iconPosition="start" />
+          <Tab label="Members" icon={<PeopleAltIcon fontSize="small" />} iconPosition="start" />
+          <Tab label="Tags" icon={<LocalOfferIcon fontSize="small" />} iconPosition="start" />
+        </Tabs>
 
-          {
-            getTabContent()
-          }
-        </Paper>
+        {
+          getTabContent()
+        }
+      </Paper>
     </Grid>
   );
 };
