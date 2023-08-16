@@ -38,7 +38,15 @@ const options = {
       fontSize: '14px',
       fontFamily: "Inter"
     }
-  }
+  },
+  responsive: [{
+    breakpoint: 500,
+    options: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }]
 };
 
 export default function StatusBreakdownChart(props) {

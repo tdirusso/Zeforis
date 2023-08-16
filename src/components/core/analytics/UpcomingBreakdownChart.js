@@ -72,6 +72,7 @@ export default function UpcomingBreakdownChart(props) {
   } = useOutletContext();
 
   options.colors = org.brandColor;
+
   useEffect(() => {
     const {
       statusColors,
