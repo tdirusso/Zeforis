@@ -44,7 +44,7 @@ export default function CreateTaskDrawer(props) {
   useEffect(() => {
     setFolder(defaultFolder || null);
 
-    if (isOpen) {
+    if (isOpen && !isMobile) {
       name.current.focus();
     }
   }, [defaultFolder, isOpen]);
@@ -157,7 +157,7 @@ export default function CreateTaskDrawer(props) {
       onClose={handleClose}
       hideBackdrop
       variant='persistent'
-      PaperProps={{ style: { width: '450px' } }}>
+      PaperProps={{ className: 'drawer' }}>
       <DialogContent>
         <Box style={{ marginBottom: '1.5rem' }}>
           <Grid container rowSpacing={2} columnSpacing={1.5}>

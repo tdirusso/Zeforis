@@ -197,7 +197,8 @@ export default function Header(props) {
               PaperProps={{
                 style: {
                   minWidth: '300px',
-                  paddingBottom: '15px !important'
+                  paddingBottom: '15px !important',
+                  maxWidth: '350px'
                 }
               }}>
               <Box p="23px 28px 14px 25px">
@@ -210,13 +211,14 @@ export default function Header(props) {
               </Box>
 
               <Divider style={{ margin: '8px 0' }} />
-
               <Box
+                flexDirection='column'
                 py={1}
                 ml={2.25}
                 gap={2.5}
                 mr={2.25}
-                display="flex">
+                display="flex"
+                flexWrap='wrap'>
                 <Box>
                   <Box display="flex">
                     <Typography color="#a5a5a5" mr={1}>
@@ -237,8 +239,6 @@ export default function Header(props) {
                 </Box>
                 <Button
                   startIcon={<SwapHorizOutlined />}
-                  style={{ margin: '10px 0 5px 0' }}
-                  size="small"
                   onClick={openChangeOrgOrEngagement}
                   variant="outlined">
                   Change

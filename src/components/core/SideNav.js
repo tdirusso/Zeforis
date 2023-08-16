@@ -50,7 +50,7 @@ export default function SideNav(props) {
             alt=""
             width={110}
           /> :
-            <Typography color="primary" variant="h6" fontWeight={600}>
+            <Typography color="primary" variant="h6" fontWeight={600} textAlign='center'>
               {org.name}
             </Typography>
         }

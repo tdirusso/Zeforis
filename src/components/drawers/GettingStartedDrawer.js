@@ -43,9 +43,7 @@ export default function GettingStartedDrawer(props) {
       className='getting-started-drawer'
       variant='persistent'
       PaperProps={{
-        style: {
-          width: '475px',
-        }
+        className: 'drawer'
       }}>
       <DialogContent>
         <Box

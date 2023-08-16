@@ -29,7 +29,10 @@ export default function FolderDrawer(props) {
 
   useEffect(() => {
     if (isOpen) {
-      name.current.focus();
+      if (!isMobile) {
+        name.current.focus();
+      }
+
       if (folderProp) {
         name.current.value = folderProp.name;
         setIsKeyFolder(Boolean(folderProp.is_key_folder));
@@ -122,7 +125,7 @@ export default function FolderDrawer(props) {
       onClose={handleClose}
       hideBackdrop
       variant='persistent'
-      PaperProps={{ style: { width: '450px' } }}>
+      PaperProps={{ className: 'drawer' }}>
       <DialogContent>
         <Box style={{ marginBottom: '1.5rem' }}>
           <Grid container rowSpacing={0} columnSpacing={1.5}>

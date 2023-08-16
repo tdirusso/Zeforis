@@ -15,7 +15,8 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
-  Tooltip
+  Tooltip,
+  Grid
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -368,56 +369,47 @@ export default function TaskDrawer(props) {
       hideBackdrop
       variant='persistent'
       PaperProps={{
-        style: {
-          width: '550px',
-          paddingTop: '3.5rem'
-        }
+        className: 'drawer'
       }}>
-      <DialogContent>
-        <Box
-          mb={5}
-          mt={1}
-          width={'450px'}
-          top={0}
-          position="absolute">
-          <Tooltip title='Close'>
-            <IconButton
-              size='large'
-              onClick={handleClose}
-              style={{
-                position: 'absolute',
-                left: '-15px',
-              }}>
-              <CloseIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Delete task' hidden={!isAdmin}>
-            <IconButton
-              size='large'
-              onClick={e => setDeleteMenuAnchor(e.currentTarget)}
-              style={{
-                position: 'absolute',
-                right: '0',
-              }}>
-              <DeleteOutlineIcon htmlColor="red" />
-            </IconButton>
-          </Tooltip>
+      <DialogContent style={{ paddingTop: '15px' }}>
+        <Grid container rowSpacing={0} columnSpacing={1.5}>
+          <Grid item xs={12} mb={2}>
+            <Box display='flex' justifyContent='space-between'>
+              <Tooltip title='Close'>
+                <IconButton
 
-          <Menu
-            anchorEl={deleteMenuAnchor}
-            open={deleteMenuOpen}
-            onClose={() => setDeleteMenuAnchor(null)}>
-            <Box px={2} py={1}>
-              <LoadingButton
-                color='error'
-                variant='contained'
-                loading={isDeleting}
-                onClick={() => handleDeleteTask()}>
-                Delete
-              </LoadingButton>
+                  onClick={handleClose}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title='Delete task' hidden={!isAdmin}>
+                <IconButton
+
+                  onClick={e => setDeleteMenuAnchor(e.currentTarget)}>
+                  <DeleteOutlineIcon htmlColor="red" />
+                </IconButton>
+              </Tooltip>
+
+              <Menu
+                anchorEl={deleteMenuAnchor}
+                open={deleteMenuOpen}
+                onClose={() => setDeleteMenuAnchor(null)}>
+                <Box px={2} py={1}>
+                  <LoadingButton
+                    color='error'
+                    variant='contained'
+                    loading={isDeleting}
+                    onClick={() => handleDeleteTask()}>
+                    Delete
+                  </LoadingButton>
+                </Box>
+              </Menu>
             </Box>
-          </Menu>
-        </Box>
+          </Grid>
+        </Grid>
+
+
+
         <Box>
           <Box>
             <TextField
