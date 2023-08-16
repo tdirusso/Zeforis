@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton, useMediaQuery } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
@@ -12,7 +12,7 @@ export default function UpcomingTasks({ tasks }) {
   const navigate = useNavigate();
 
   return (
-    <Grid item xs={12} md={5}>
+    <Grid item xs={12} md={6}>
       <Paper style={{ height: '100%' }}>
         <Box
           display="flex"
@@ -63,6 +63,8 @@ function UpcomingTaskRow({ task }) {
     openDrawer
   } = useOutletContext();
 
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
+
   let taskName = task.task_name;
 
   if (taskName.length > 40) {
@@ -86,7 +88,7 @@ function UpcomingTaskRow({ task }) {
       className="task-row"
       onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="center">
-      <Box flexBasis='40%' minWidth={75}>
+      <Box flexBasis={isSmallScreen ? 'unset' : '60%'} minWidth={75}>
         <Typography
           variant="body2">
           {taskName}
@@ -95,7 +97,7 @@ function UpcomingTaskRow({ task }) {
           {`${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}`}
         </Typography>
       </Box>
-      <Box flex={1} textAlign="center">
+      <Box flex={1} textAlign="center" display={isSmallScreen ? 'none' : 'block'}>
         <Chip
           label={task.status}
           style={{ cursor: 'pointer' }}

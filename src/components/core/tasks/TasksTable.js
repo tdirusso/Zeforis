@@ -11,7 +11,8 @@ import {
   Tooltip,
   FormGroup,
   FormControlLabel,
-  Switch
+  Switch,
+  useMediaQuery
 } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -40,6 +41,8 @@ export default function TasksTable({ tasks }) {
     isAdmin,
     openDrawer
   } = useOutletContext();
+
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
   const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
   const [deleteTasksModalOpen, setDeleteTasksModalOpen] = useState(false);
@@ -154,13 +157,13 @@ export default function TasksTable({ tasks }) {
               New Task
             </Button>
           </Box>
-          <Box 
-          hidden={!isAdmin}
-          display='flex' 
-          alignItems='center' 
-          px={3} 
-          mb={2} 
-          height={40}>
+          <Box
+            hidden={!isAdmin}
+            display='flex'
+            alignItems='center'
+            px={3}
+            mb={2}
+            height={40}>
             <FormGroup>
               <FormControlLabel
                 fontSize="small"
@@ -183,25 +186,31 @@ export default function TasksTable({ tasks }) {
               onClick={() => setEditSelectedTasksModalOpen(true)}
               disabled={selectedTasks.length === 0}
               startIcon={<EditIcon />}>
-              Edit tasks
+              Edit
             </Button>
             {
               selectedTasks.length > 0 ?
-                <Box component="h6">
+                <Box component="h6" textAlign='center'>
                   {selectedTasks.length} selected
                 </Box> :
-                ''
+                null
             }
             {
               selectedTasks.length > 0 ?
-                <Button
-                  style={{ marginLeft: 'auto' }}
-                  onClick={() => setDeleteTasksModalOpen(true)}
-                  startIcon={<DeleteIcon />}
-                  color="error">
-                  Delete tasks
-                </Button> :
-                ''
+                isSmallScreen ?
+                  <IconButton
+                    onClick={() => setDeleteTasksModalOpen(true)}
+                    style={{ marginLeft: 'auto' }} color="error">
+                    <DeleteIcon />
+                  </IconButton> :
+                  <Button
+                    style={{ marginLeft: 'auto' }}
+                    onClick={() => setDeleteTasksModalOpen(true)}
+                    startIcon={<DeleteIcon />}
+                    color="error">
+                    Delete
+                  </Button> :
+                null
             }
           </Box>
           <Table

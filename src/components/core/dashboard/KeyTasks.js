@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip, useMediaQuery } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -9,7 +9,7 @@ export default function KeyTasks({ tasks }) {
   const navigate = useNavigate();
 
   return (
-    <Grid item xs={12} md={7}>
+    <Grid item xs={12} md={6}>
       <Paper style={{ height: '100%' }}>
         <Box
           display="flex"
@@ -23,7 +23,7 @@ export default function KeyTasks({ tasks }) {
             <StarIcon
               fontSize="small"
               htmlColor="gold"
-              style={{marginRight: '5px'}}
+              style={{ marginRight: '5px' }}
             />
             Key Tasks
           </Box>
@@ -60,6 +60,8 @@ function KeyTaskRow({ task }) {
     openDrawer
   } = useOutletContext();
 
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
+
   let taskName = task.task_name;
 
   if (taskName.length > 75) {
@@ -81,11 +83,11 @@ function KeyTaskRow({ task }) {
       onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="space-between">
       <Typography
-        flexBasis='60%'
+        flexBasis={isSmallScreen ? 'unset' : '60%'}
         variant="body2">
         {taskName}
       </Typography>
-      <Box>
+      <Box display={isSmallScreen ? 'none' : 'block'}>
         <Chip
           label={task.status}
           className={task.status}

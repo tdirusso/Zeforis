@@ -280,7 +280,7 @@ export default function Header(props) {
           </Box>
         </Box>
       </Box>
-      <Divider style={{ marginTop: '1.25rem', marginBottom: '2rem' }} />
+      <Divider style={{ marginTop: '1.25rem', marginBottom: '1rem' }} />
     </Grid>
   );
 };
