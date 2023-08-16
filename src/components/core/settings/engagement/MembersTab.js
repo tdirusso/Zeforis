@@ -13,6 +13,7 @@ import { inviteEngagementUser, removeEngagementUser } from "../../../../api/enga
 import HelpIcon from '@mui/icons-material/Help';
 import { MailOutline } from "@mui/icons-material";
 import SendIcon from '@mui/icons-material/Send';
+import { isMobile } from "../../../../lib/constants";
 
 const inviteUserAdminTooltip = <>
   Administrators can edit tasks, folders and engagement settings (best for contributors).
@@ -339,7 +340,7 @@ export default function MembersTab() {
               size="small"
               placeholder="user@gmail.com"
               fullWidth
-              autoFocus
+              autoFocus={!isMobile}
               disabled={isInvitingUser}
               value={inviteeEmail}
               onChange={e => setInviteeEmail(e.target.value)}

@@ -12,6 +12,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import CloseIcon from '@mui/icons-material/Close';
+import { isMobile } from '../../lib/constants';
 
 export default function CreateTaskDrawer(props) {
   const {
@@ -188,7 +189,7 @@ export default function CreateTaskDrawer(props) {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                autoFocus
+                autoFocus={!isMobile}
                 disabled={isLoading}
                 inputRef={name}
                 placeholder='Task name'

@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import { createTag, deleteTag, updateTag } from "../../../../api/tags";
 import { LoadingButton } from "@mui/lab";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { isMobile } from "../../../../lib/constants";
 
 export default function TagsTab() {
 
@@ -211,7 +212,7 @@ export default function TagsTab() {
         onClose={() => setEditTagMenuAnchor(null)}>
         <Box px={2} py={1} width={225}>
           <TextField
-            autoFocus
+            autoFocus={!isMobile}
             variant="standard"
             value={editingTagName}
             onChange={e => setEditingTagName(e.target.value)}
@@ -240,7 +241,7 @@ export default function TagsTab() {
         onClose={handleCloseNewTagMenu}>
         <Box px={2} py={1} width={225}>
           <TextField
-            autoFocus
+            autoFocus={!isMobile}
             variant="standard"
             value={newTagName}
             onChange={e => setNewTagName(e.target.value)}

@@ -21,6 +21,7 @@ import { hexToRgb } from "../../lib/utils";
 import themeConfig from "../../theme";
 import { resendVerificationLink } from "../../api/users";
 import Watermark from "../../components/core/Watermark";
+import { isMobile } from "../../lib/constants";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
@@ -286,7 +287,7 @@ export default function LoginPage({ setTheme }) {
             }}
             inputRef={email}
             disabled={isLoading}
-            autoFocus
+            autoFocus={!isMobile}
           />
           <TextField
             placeholder="Password"

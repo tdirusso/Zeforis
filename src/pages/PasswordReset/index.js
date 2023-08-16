@@ -16,6 +16,7 @@ import { sendPasswordResetLink, updatePassword } from "../../api/users";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import { isMobile } from "../../lib/constants";
 
 export default function PasswordResetPage() {
   const { search } = useLocation();
@@ -123,7 +124,7 @@ function PasswordResetStep1({ openSnackBar }) {
             )
           }}
           disabled={isSendingResetLink}
-          autoFocus
+          autoFocus={!isMobile}
         />
 
         <LoadingButton
@@ -203,7 +204,7 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
           }}
           style={{ marginBottom: '2rem' }}
           disabled={isResettingPassword}
-          autoFocus
+          autoFocus={!isMobile}
           value={password}
           onChange={e => setPassword(e.target.value)}
         />

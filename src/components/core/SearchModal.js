@@ -10,6 +10,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
+import { isMobile } from '../../lib/constants';
 
 export default function SearchModal(props) {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function SearchModal(props) {
 
         <Box minWidth={500}>
           <TextField
-            autoFocus
+            autoFocus={!isMobile}
             size='small'
             fullWidth
             onChange={e => setQuery(e.target.value)}

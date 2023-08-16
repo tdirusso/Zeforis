@@ -9,6 +9,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import FolderIcon from '@mui/icons-material/Folder';
 import HelpIcon from '@mui/icons-material/Help';
+import { isMobile } from '../../lib/constants';
 
 export default function FolderDrawer(props) {
   const {
@@ -159,7 +160,7 @@ export default function FolderDrawer(props) {
                       </InputAdornment>
                   }}
                   fullWidth
-                  autoFocus
+                  autoFocus={!isMobile}
                   disabled={isLoading}
                   inputRef={name}
                   placeholder='Folder name'>

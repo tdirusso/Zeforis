@@ -321,6 +321,7 @@ export default function Home({ setTheme }) {
         engagement={engagement}
         isSideNavOpen={isSideNavOpen}
         isAdmin={isAdmin}
+        toggleSideNav={toggleSideNav}
       />
       <Box
         component="main"

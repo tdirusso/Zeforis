@@ -15,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { AccountCircle } from "@mui/icons-material";
 import { setActiveOrgId } from "../../api/orgs";
+import { isMobile } from "../../lib/constants";
 
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
@@ -250,7 +251,7 @@ export default function AcceptInvitationPage() {
                   }}
                   inputRef={firstName}
                   disabled={isLoading}
-                  autoFocus
+                  autoFocus={!isMobile}
                 />
                 <TextField
                   fullWidth

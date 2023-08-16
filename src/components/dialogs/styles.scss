@@ -8,9 +8,14 @@
 
   .change-org-btn {
     position: absolute;
-    right: 20px;
+    right: 25px;
     background-color: white;
     z-index: 1;
+  }
+
+  .close-btn {
+    position: absolute;
+    left: 15px;
   }
 
   .choose-engagement-btn {
@@ -41,6 +46,13 @@
 
     .choose-engagement-btn {
       margin: 0.5rem;
+    }
+
+    .close-btn {
+      position: fixed;
+      left: 15px;
+      top: 20px;
+      z-index: 1;
     }
   }
 }

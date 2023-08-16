@@ -127,13 +127,10 @@ export default function ChooseEngagementDialog(props) {
               justifyContent="center"
               alignItems="flex-start">
               <IconButton
+              className='close-btn'
                 hidden={!close}
                 size='large'
-                onClick={handleClose}
-                style={{
-                  position: 'absolute',
-                  left: '-8px',
-                }}>
+                onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
               <Box display="flex" flexDirection="column" alignItems="center">

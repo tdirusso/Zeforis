@@ -7,6 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Watermark from '../core/Watermark';
 import { SwapHorizOutlined } from '@mui/icons-material';
 import { setActiveOrgId } from '../../api/orgs';
+import { isMobile } from '../../lib/constants';
 
 const toggleableTransition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 300 }} />;
@@ -155,7 +156,7 @@ export default function CreateEngagementDialog(props) {
                 <TextField
                   placeholder="Engagement Name"
                   fullWidth
-                  autoFocus
+                  autoFocus={!isMobile}
                   disabled={isLoading}
                   inputRef={name}>
                 </TextField>

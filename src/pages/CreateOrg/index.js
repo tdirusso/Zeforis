@@ -10,6 +10,7 @@ import themeConfig from '../../theme';
 import { TwitterPicker } from 'react-color';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import Watermark from '../../components/core/Watermark';
+import { isMobile } from '../../lib/constants';
 
 export default function CreateOrgPage({ setTheme }) {
   const [step, setStep] = useState(1);
@@ -119,7 +120,7 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
             <TextField
               placeholder="Organization Name"
               fullWidth
-              autoFocus
+              autoFocus={!isMobile}
               disabled={isLoading}
               onChange={e => setOrgName(e.target.value)}
               value={orgName}>

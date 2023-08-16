@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Divider, Typography } from "@mui/material";
+import { Box, ButtonBase, Divider, IconButton, Typography, useMediaQuery } from "@mui/material";
 import './styles/SideNav.scss';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -8,22 +8,41 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import BuildIcon from '@mui/icons-material/Build';
 import Watermark from "./Watermark";
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+
 
 export default function SideNav(props) {
+
+  const isSmallScreen = useMediaQuery('(max-width: 900px)');
 
   const {
     engagement,
     org,
     isSideNavOpen,
-    isAdmin
+    isAdmin,
+    toggleSideNav
   } = props;
 
-  const sideNavPosition = isSideNavOpen ? '0px' : '-281px';
+  const handleNavClick = () => {
+    if (isSmallScreen) {
+      toggleSideNav();
+    }
+  };
 
   return (
     <Box
-      className="Sidenav"
-      style={{ left: sideNavPosition }}>
+      className={`Sidenav ${isSideNavOpen ? 'open' : 'closed'}`}>
+      <IconButton
+        className="close-btn"
+        size="large"
+        onClick={toggleSideNav}>
+        <MenuOpenIcon
+          style={{
+            transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 200ms'
+          }}
+        />
+      </IconButton>
       <Box className="flex-centered container">
         {
           org.logo ? <img
@@ -43,7 +62,7 @@ export default function SideNav(props) {
         <Divider className="divider" />
         <Box className="menu">
           <ul>
-            <NavLink draggable={false} to="/home/dashboard">
+            <NavLink draggable={false} to="/home/dashboard" onClick={handleNavClick}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -55,9 +74,8 @@ export default function SideNav(props) {
                   </Typography>
                 </ButtonBase>
               </li>
-
             </NavLink>
-            <NavLink to="/home/tasks" draggable={false}>
+            <NavLink to="/home/tasks" draggable={false} onClick={handleNavClick}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -70,7 +88,7 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/folders" draggable={false}>
+            <NavLink to="/home/folders" draggable={false} onClick={handleNavClick}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -83,7 +101,7 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/analytics" draggable={false}>
+            <NavLink to="/home/analytics" draggable={false} onClick={handleNavClick}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography
@@ -97,7 +115,7 @@ export default function SideNav(props) {
               </li>
             </NavLink>
             {
-              isAdmin ? <NavLink to="/home/tools" draggable={false}>
+              isAdmin ? <NavLink to="/home/tools" draggable={false} onClick={handleNavClick}>
                 <li>
                   <ButtonBase className='nav-button'>
                     <Typography
@@ -112,7 +130,7 @@ export default function SideNav(props) {
               </NavLink> :
                 null
             }
-            <NavLink to="/home/settings" draggable={false}>
+            <NavLink to="/home/settings" draggable={false} onClick={handleNavClick}>
               <li>
                 <ButtonBase className='nav-button'>
                   <Typography

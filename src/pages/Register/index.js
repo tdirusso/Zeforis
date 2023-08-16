@@ -15,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { isMobile } from "../../lib/constants";
 
 export default function RegisterPage() {
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
@@ -144,7 +145,7 @@ export default function RegisterPage() {
             disabled={isLoading}
             autoComplete="off"
             style={{ marginBottom: '1rem' }}
-            autoFocus
+            autoFocus={!isMobile}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
