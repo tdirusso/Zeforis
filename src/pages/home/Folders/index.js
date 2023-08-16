@@ -59,67 +59,62 @@ export default function FoldersPage() {
 
   return (
     <>
-      <Grid item>
+      <Grid item xs textAlign='center'>
         <Button
+          style={{ marginBottom: '0.5rem' }}
           hidden={!isAdmin}
           onClick={() => openDrawer('folder')}
-          size="large"
           variant="contained">
           New Folder
         </Button>
-        <Tooltip title='Folders are used to organize tasks.  Every task must reside in a folder.' placement="top">
-          <HelpIcon
-            fontSize="small"
-            style={{
-              position: 'relative',
-              top: '5px',
-              left: '7px'
-            }}
-            htmlColor="#c7c7c7"
-          />
-        </Tooltip>
       </Grid>
       <Grid item xs={12}>
-        <Divider textAlign="left">
+        <Divider textAlign="center">
           <Chip
+            color="primary"
             icon={<StarIcon style={{ color: '#fffd00' }} />}
             label="Key Folders"
           />
         </Divider>
       </Grid>
-      {
-        keyFolders.length === 0 ? <Grid item xs={12}>
-          <Typography>No key folders.</Typography>
-        </Grid> :
-          null
-      }
-      {
-        keyFolders.map(folder =>
-          <Folder
-            key={folder.id}
-            folder={folder}
-            handleMenuClick={handleMenuClick}
-          />)
-      }
+
       <Grid item xs={12}>
-        <Divider textAlign="left">
-          <Chip label="Other Folders" />
+        <Box className="flex-centered" gap={3} flexWrap='wrap'>
+          {
+            keyFolders.length === 0 ? <Grid item xs={12}>
+              <Typography>No key folders.</Typography>
+            </Grid> :
+              keyFolders.map(folder =>
+                <Folder
+                  key={folder.id}
+                  folder={folder}
+                  handleMenuClick={handleMenuClick}
+                />)
+          }
+        </Box>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Divider textAlign="center">
+          <Chip label="Other Folders" color="primary"/>
         </Divider>
       </Grid>
-      {
-        otherFolders.length === 0 ? <Grid item xs={12}>
-          <Typography>No other folders.</Typography>
-        </Grid> :
-          null
-      }
-      {
-        otherFolders.map(folder =>
-          <Folder
-            key={folder.id}
-            folder={folder}
-            handleMenuClick={handleMenuClick}
-          />)
-      }
+
+      <Grid item xs={12}>
+        <Box className="flex-centered" gap={3} flexWrap='wrap'>
+          {
+            otherFolders.length === 0 ? <Grid item xs={12}>
+              <Typography>No other folders.</Typography>
+            </Grid> :
+              otherFolders.map(folder =>
+                <Folder
+                  key={folder.id}
+                  folder={folder}
+                  handleMenuClick={handleMenuClick}
+                />)
+          }
+        </Box>
+      </Grid>
 
       <Menu
         anchorEl={anchorEl}
@@ -175,7 +170,7 @@ function Folder({ folder, handleMenuClick }) {
   }
 
   return (
-    <Grid item>
+    <Box>
       <Paper
         className="folder-item"
         onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}
@@ -219,6 +214,6 @@ function Folder({ folder, handleMenuClick }) {
           </Typography>
         </Box>
       </Paper>
-    </Grid>
+    </Box>
   );
 }

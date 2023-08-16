@@ -138,7 +138,7 @@ function AnalyticsCharts(props) {
 
   return (
     <>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <Paper>
           <Box
             component="h4"
@@ -157,7 +157,7 @@ function AnalyticsCharts(props) {
           />
         </Paper>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <Paper>
           <Box
             component="h4"
