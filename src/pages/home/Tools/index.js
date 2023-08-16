@@ -43,7 +43,7 @@ export default function ToolsPage() {
   return (
     <>
       <Grid item xs={12}>
-        <Box display='flex' gap={1.5}>
+        <Box display='flex' gap={1.5} flexWrap='wrap'>
           <Paper style={{
             ...paperStyles,
             background:

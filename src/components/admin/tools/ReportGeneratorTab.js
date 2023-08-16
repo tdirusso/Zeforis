@@ -124,7 +124,7 @@ export default function ReportGeneratorTab() {
         reportData={reportData}
       />
       :
-      <Grid item xs={12}>
+      <Grid item xs={12} className="report-generator">
         <Paper>
           <Typography variant="body2">
             The Report Generator is a powerful tool allows you to effortlessly customize and generate reports for efficient customer communications.
@@ -214,7 +214,7 @@ export default function ReportGeneratorTab() {
           </Box>
           <Box component='h4' mt={4}>Status Criteria</Box>
           <Box my={2} mt={3}>
-            <FormControl style={{ width: 550 }}>
+            <FormControl className="status-criteria">
               <InputLabel id="to-label">Choose statuses</InputLabel>
               <Select
                 renderValue={(selected) => (

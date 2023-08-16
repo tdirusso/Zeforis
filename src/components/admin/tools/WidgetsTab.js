@@ -167,7 +167,7 @@ export default function WidgetsTab() {
           </Typography>
         </Paper>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={12} md={3}>
         <Paper className="px0">
           <Box component="h5" mx={2} style={{ marginBottom: '20px' }}>Your Widgets</Box>
           <Divider className="my1" />
@@ -203,8 +203,8 @@ export default function WidgetsTab() {
         </Paper>
       </Grid>
 
-      <Grid item xs={9}>
-        <Paper style={{ display: selectedWidget ? 'flex' : 'none' }}>
+      <Grid item xs={12} md={9} className="widget-preview">
+        <Paper style={{ display: selectedWidget ? 'flex' : 'none' }} className="widget-preview-container">
           <Box flexBasis={'50%'} py={2} px={2}>
             <Box mb={2}>
               <FormGroup>
@@ -221,7 +221,7 @@ export default function WidgetsTab() {
               </FormGroup>
             </Box>
             <Box mb={2}>
-              <Box display="flex" justifyContent='space-between'>
+              <Box display="flex" justifyContent='space-between' flexDirection='column' gap='8px'>
                 <Box display='flex'>
                   <Typography>Background color</Typography>
                   <Box
@@ -306,7 +306,7 @@ export default function WidgetsTab() {
             </Box>
           </Box>
 
-          <Box style={{ flexBasis: '50%', padding: '40px' }}>
+          <Box style={{ flexBasis: '50%', padding: '25px' }}>
             <Paper style={{
               minHeight: '250px',
               background: backgroundColor
