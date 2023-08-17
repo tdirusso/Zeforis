@@ -15,12 +15,6 @@ const buttonStyles = {
   transition: 'color 200ms linear'
 };
 
-const paperStyles = {
-  padding: 0,
-  borderRadius: '24px',
-  transition: 'background 200ms linear'
-};
-
 export default function Settings() {
   const { search } = useLocation();
 
@@ -53,11 +47,7 @@ export default function Settings() {
     <>
       <Grid item xs={12}>
         <Box display='flex' gap={1.5} flexWrap='wrap'>
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 0 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 0 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(0)}
               style={{
@@ -74,11 +64,7 @@ export default function Settings() {
             background: 'var(--colors-primary)'
           }}></Box>
 
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 1 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 1 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(1)}
               style={{
@@ -89,11 +75,7 @@ export default function Settings() {
               Organization
             </Button>
           </Paper>
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 2 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 2 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(2)}
               style={{

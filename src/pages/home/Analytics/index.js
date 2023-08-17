@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper } from "@mui/material";
+import { Box, Grid, Paper, useTheme } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import moment from 'moment';
 import { statuses } from "../../../lib/constants";
@@ -124,6 +124,8 @@ export default function AnalyticsPage() {
 
 function AnalyticsCharts(props) {
 
+  const themeMode = useTheme().palette.mode;
+
   const {
     analyticsData: {
       completed5WeeksAgo = 0,
@@ -154,6 +156,7 @@ function AnalyticsCharts(props) {
               completed1WeeksAgo,
               completedThisWeek
             ]}
+            theme={themeMode}
           />
         </Paper>
       </Grid>
@@ -167,6 +170,7 @@ function AnalyticsCharts(props) {
           <StatusBreakdownChart
             statusCount={statusCount}
             statusColors={statusColors}
+            theme={themeMode}
           />
         </Paper>
       </Grid>
@@ -181,6 +185,7 @@ function AnalyticsCharts(props) {
           <UpcomingBreakdownChart
             statusCount={statusCount}
             statusColors={statusColors}
+            theme={themeMode}
           />
         </Paper>
       </Grid>

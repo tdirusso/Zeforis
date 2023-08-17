@@ -8,17 +8,12 @@ import ReportGeneratorTab from "../../../components/admin/tools/ReportGeneratorT
 import ImportTab from "../../../components/admin/tools/ImportTab";
 import ExportTab from "../../../components/admin/tools/ExportTab";
 import WidgetsTab from "../../../components/admin/tools/WidgetsTab";
+import '../styles.scss';
 
 const buttonStyles = {
   padding: '10px 15px',
   borderRadius: '24px',
   transition: 'color 200ms linear'
-};
-
-const paperStyles = {
-  padding: 0,
-  borderRadius: '24px',
-  transition: 'background 200ms linear'
 };
 
 export default function ToolsPage() {
@@ -44,11 +39,7 @@ export default function ToolsPage() {
     <>
       <Grid item xs={12}>
         <Box display='flex' gap={1.5} flexWrap='wrap'>
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 0 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 0 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(0)}
               style={{
@@ -59,11 +50,7 @@ export default function ToolsPage() {
               Report Generator
             </Button>
           </Paper>
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 1 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 1 ? 'active' : ''}`} >
             <Button
               onClick={() => setTabVal(1)}
               style={{
@@ -74,11 +61,7 @@ export default function ToolsPage() {
               Widgets
             </Button>
           </Paper>
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 2 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 2 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(2)}
               style={{
@@ -89,11 +72,7 @@ export default function ToolsPage() {
               Import
             </Button>
           </Paper>
-          <Paper style={{
-            ...paperStyles,
-            background:
-              tabVal === 3 ? 'var(--colors-primary)' : 'white'
-          }}>
+          <Paper className={`custom-tab ${tabVal === 3 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(3)}
               style={{
