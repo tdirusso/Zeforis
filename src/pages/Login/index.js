@@ -25,7 +25,7 @@ import { isMobile } from "../../lib/constants";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
-  
+
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
   const searchParams = new URLSearchParams(search);

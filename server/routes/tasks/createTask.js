@@ -4,7 +4,7 @@ module.exports = async (req, res, next) => {
   const {
     name,
     description = '',
-    status = 'New',
+    status,
     folderId,
     linkUrl,
     assignedToId = null,
@@ -38,7 +38,7 @@ module.exports = async (req, res, next) => {
         ) 
         VALUES
         (?,?,?,?,?,?,?,?,?,?)`,
-      [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
+      [name, description, status || 'New', folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
     );
 
     const newTaskId = newTask[0].insertId;

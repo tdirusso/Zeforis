@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
     dateDue,
     taskId,
     currentTags = [],
-    status = 'New'
+    status
   } = req.body;
 
   const creatorUserId = req.userId;
@@ -43,7 +43,7 @@ module.exports = async (req, res, next) => {
       [
         name,
         description,
-        status,
+        status || 'New',
         folderId,
         linkUrl,
         assignedToId,

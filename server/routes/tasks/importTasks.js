@@ -90,7 +90,7 @@ module.exports = async (req, res, next) => {
       const {
         name,
         description = '',
-        status = 'New',
+        status,
         folder,
         url = '',
         isKeyTask = false
@@ -100,7 +100,7 @@ module.exports = async (req, res, next) => {
         taskInsertVals.push([
           name,
           description,
-          status,
+          status || 'New',
           folderNameToIdMap[folder],
           url,
           Number(isKeyTask),
