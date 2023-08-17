@@ -72,7 +72,7 @@ module.exports = async (req, res, next) => {
 async function sendPasswordResetLink(resetCode, email) {
   const qs = `resetCode=${resetCode}&email=${email}`;
 
-  const resetLinkUrl = `${process.env.APP_DOMAIN}/password-reset?${qs}`;
+  const resetLinkUrl = `${process.env.REACT_APP_APP_DOMAIN}/password-reset?${qs}`;
 
   const ejsData = {
     resetLinkUrl

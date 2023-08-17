@@ -116,7 +116,7 @@ module.exports = async (req, res, next) => {
 async function sendInvitationEmail({ email, engagementId, orgName, engagementName, userId, orgColor, orgLogo, invitationCode, orgId }) {
   let qs = `engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}`;
 
-  let verificationUrl = `${process.env.APP_DOMAIN}/accept-invitation?${qs}`;
+  let verificationUrl = `${process.env.REACT_APP_APP_DOMAIN}/accept-invitation?${qs}`;
 
   const ejsData = {
     verificationUrl,
