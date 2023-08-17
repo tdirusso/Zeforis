@@ -11,7 +11,8 @@ import {
   Tooltip,
   FormGroup,
   FormControlLabel,
-  Switch
+  Switch,
+  useMediaQuery
 } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -19,14 +20,10 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useLocation, useOutletContext } from "react-router-dom";
-import './styles.css';
-import { useEffect, useState } from "react";
-import { LoadingButton } from "@mui/lab";
+import './styles.scss';
+import { useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
-import AddTaskIcon from '@mui/icons-material/AddTask';
 import TasksFilter from "./TasksFilter";
-import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
-import DeleteTasksModal from "../../admin/DeleteTasksModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -40,11 +37,11 @@ export default function TasksTable({ tasks }) {
     foldersMap,
     tagsMap,
     isAdmin,
-    openDrawer
+    openDrawer,
+    openModal
   } = useOutletContext();
 
-  const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
-  const [deleteTasksModalOpen, setDeleteTasksModalOpen] = useState(false);
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -65,11 +62,6 @@ export default function TasksTable({ tasks }) {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterKeyTasks, setFilterKeyTasks] = useState(Boolean(preFilterKeyTasks));
   const [sortBy, setSortBy] = useState(preSort);
-  const [theTasks, setTheTasks] = useState(tasks);
-
-  useEffect(() => {
-    setTheTasks(tasks);
-  }, [tasks]);
 
   const handleTaskSelection = task => {
     if (isEditMode) {
@@ -96,53 +88,15 @@ export default function TasksTable({ tasks }) {
     setIsEditMode(val);
   };
 
-  let filteredTasks = [...theTasks];
+  const filteredTasks = tasks.filter(task => {
+    const tagIds = task.tags?.split(',').filter(Boolean).map(id => String(id)) || [];
 
-  filteredTasks = filteredTasks.filter(task => {
-    let shouldReturnTask = true;
-
-    if (filterName) {
-      shouldReturnTask = task.task_name.toLowerCase().includes(filterName.toLowerCase());
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterAssignedTo) {
-      shouldReturnTask = filterAssignedTo.id === task.assigned_to_id;
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterTags.length > 0) {
-      const tagIds = task.tags?.split(',').filter(Boolean) || [];
-
-      shouldReturnTask = filterTags.every(({ id }) => tagIds.includes(String(id)));
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterFolder) {
-      shouldReturnTask = filterFolder.id === task.folder_id;
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterStatus !== 'all') {
-      shouldReturnTask = filterStatus === task.status;
-      if (!shouldReturnTask) {
-        return false;
-      }
-    }
-
-    if (filterKeyTasks) {
-      shouldReturnTask = Boolean(task.is_key_task);
-    }
-
-    return shouldReturnTask;;
+    return (!filterName || task.task_name.toLowerCase().includes(filterName.toLowerCase())) &&
+      (!filterAssignedTo || filterAssignedTo.id === task.assigned_to_id) &&
+      (filterTags.length === 0 || filterTags.every(tag => tagIds.includes(tag.id.toString()))) &&
+      (!filterFolder || filterFolder.id === task.folder_id) &&
+      (filterStatus === 'all' || filterStatus === task.status) &&
+      (!filterKeyTasks || task.is_key_task);
   });
 
   switch (sortBy) {
@@ -190,88 +144,88 @@ export default function TasksTable({ tasks }) {
         filterTags={filterTags}
       />
 
-      <Grid item xs={12} hidden={!isAdmin}>
-        <Box
-          display="flex">
-          <Box display="flex" alignItems="center">
+      <Grid item xs={12}>
+        <Paper className="px0" style={{ overflowX: 'auto' }}>
+          <Box px={3} mb={2} hidden={!isAdmin}>
             <Button
-              variant="outlined"
-              sx={{ mr: 5 }}
-              onClick={() => openDrawer('create-task')}
-              startIcon={<AddTaskIcon />}>
+              variant="contained"
+              onClick={() => openDrawer('create-task')}>
               New Task
             </Button>
-            <LoadingButton
-              variant="contained"
-              sx={{ mr: 1.5 }}
-              onClick={() => setEditSelectedTasksModalOpen(true)}
+          </Box>
+          <Box
+            hidden={!isAdmin}
+            display='flex'
+            alignItems='center'
+            px={3}
+            mb={2}
+            height={40}>
+            <FormGroup>
+              <FormControlLabel
+                fontSize="small"
+                control={<Switch
+                  size="small"
+                  onChange={handleEditModeChange}
+                />}
+                label={
+                  <Typography
+                    variant="body2">
+                    Edit
+                  </Typography>
+                }
+              />
+            </FormGroup>
+            <Button
+              hidden={!isEditMode}
+              variant="outlined"
+              style={{ marginRight: '0.75rem' }}
+              onClick={() => openModal('edit-tasks', { taskIds: selectedTasks, setSelectedTasks })}
               disabled={selectedTasks.length === 0}
               startIcon={<EditIcon />}>
-              Edit Selected
-            </LoadingButton>
+              Edit
+            </Button>
             {
               selectedTasks.length > 0 ?
-                <Button
-                  variant="outlined"
-                  sx={{ mr: 1.5 }}
-                  onClick={() => setDeleteTasksModalOpen(true)}
-                  startIcon={<DeleteIcon />}
-                  color="error">
-                  Delete Selected
-                </Button> :
-                ''
-            }
-            {
-              selectedTasks.length > 0 ?
-                <Box component="h6">
+                <Box component="h6" textAlign='center'>
                   {selectedTasks.length} selected
                 </Box> :
-                ''
+                null
+            }
+            {
+              selectedTasks.length > 0 ?
+                isSmallScreen ?
+                  <IconButton
+                    onClick={() => openModal('delete-tasks', { taskIds: selectedTasks, setSelectedTasks })}
+                    style={{ marginLeft: 'auto' }} color="error">
+                    <DeleteIcon />
+                  </IconButton> :
+                  <Button
+                    style={{ marginLeft: 'auto' }}
+                    onClick={() => openModal('delete-tasks', { taskIds: selectedTasks, setSelectedTasks })}
+                    startIcon={<DeleteIcon />}
+                    color="error">
+                    Delete
+                  </Button> :
+                null
             }
           </Box>
-        </Box>
-      </Grid>
-
-      <Grid item xs={2} hidden={!isAdmin}>
-        <Box>
-          <FormGroup>
-            <FormControlLabel
-              fontSize="small"
-              control={<Switch
-                size="small"
-                onChange={handleEditModeChange}
-              />}
-              label={
-                <Typography
-                  variant="body2">
-                  Editing mode
-                </Typography>
-              }
-            />
-          </FormGroup>
-        </Box>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Paper sx={{ px: 0, overflowX: 'auto' }}>
           <Table
-            sx={{ minWidth: 650 }}
             className="tasks-table"
             size="small">
             <TableHead>
-              <TableRow sx={{ pb: 3 }}>
-                <TableCell hidden={!isEditMode}>
+              <TableRow style={{ paddingBottom: '1.5rem' }}>
+                <TableCell hidden={!isEditMode} style={{ width: '60px' }}>
                   <Checkbox
                     onChange={handleSelectAll}
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '350px' }}>Name</TableCell>
+                <TableCell style={{ width: '350px' }}>Name</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Folder</TableCell>
                 <TableCell>Due</TableCell>
-                <TableCell sx={{ width: '175px' }}>Tags</TableCell>
-                <TableCell sx={{ width: '30px' }}></TableCell>
+                <TableCell style={{ width: '175px' }}>Tags</TableCell>
+                <TableCell style={{ width: '30px' }}></TableCell>
               </TableRow>
             </TableHead>
 
@@ -296,23 +250,21 @@ export default function TasksTable({ tasks }) {
                       onClick={() => handleTaskSelection(task)}
                       key={task.task_id}
                       className={isSelectedRow ? 'selected' : ''}
-                      sx={{ position: 'relative', }}>
+                      style={{ position: 'relative', }}>
                       <TableCell hidden={!isEditMode}>
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
                       <TableCell scope="row">
-                        <Box display="flex" alignItems="center">
-                          {
-                            task.is_key_task ?
-                              <StarIcon
-                                htmlColor="gold"
-                                sx={{ mr: 0.3 }}
-                                fontSize="small"
-                              /> :
-                              ''
-                          }
-                          {taskName}
-                        </Box>
+                        {
+                          task.is_key_task ?
+                            <StarIcon
+                              htmlColor="gold"
+                              style={{ position: 'relative', top: '4px', right: '2px' }}
+                              fontSize="small"
+                            /> :
+                            ''
+                        }
+                        {taskName}
                       </TableCell>
                       <TableCell>
                         <Chip
@@ -335,7 +287,7 @@ export default function TasksTable({ tasks }) {
                             key={tagId}
                             label={tagsMap[tagId].name}
                             size="small"
-                            sx={{ m: 0.5 }}
+                            style={{ marginRight: '10px', marginBottom: '5px' }}
                           />)}
                       </TableCell>
                       <TableCell>
@@ -374,20 +326,6 @@ export default function TasksTable({ tasks }) {
           </Box>
         </Paper>
       </Grid>
-
-      <EditSelectedTasksModal
-        taskIds={selectedTasks}
-        open={editSelectedTasksModalOpen}
-        setOpen={setEditSelectedTasksModalOpen}
-        setSelectedTasks={setSelectedTasks}
-      />
-
-      <DeleteTasksModal
-        open={deleteTasksModalOpen}
-        setOpen={setDeleteTasksModalOpen}
-        taskIds={selectedTasks}
-        setSelectedTasks={setSelectedTasks}
-      />
     </>
   );
 };

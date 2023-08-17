@@ -11,14 +11,12 @@ const deleteTag = async (payload) => {
 
   return data;
 };
-
-
+      
 const updateTag = async (payload) => {
   const { data } = await request.patch(`tags`, payload);
 
   return data;
 };
-
 
 export {
   updateTag,

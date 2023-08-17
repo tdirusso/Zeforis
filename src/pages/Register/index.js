@@ -1,22 +1,29 @@
-import { useRef, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import { Link } from "react-router-dom";
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import './Register.css';
 import { register } from '../../api/users';
+import zeforisLogo from '../../assets/zeforis-logo.png';
+import { Button, Divider, useMediaQuery } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { isMobile } from "../../lib/constants";
 
 export default function RegisterPage() {
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
+
   const email = useRef();
   const password = useRef();
   const firstName = useRef();
   const lastName = useRef();
-  const orgName = useRef();
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -28,6 +35,47 @@ export default function RegisterPage() {
 
   const navigate = useNavigate();
 
+  const handleGoogleRegistration = authResponse => {
+    if (authResponse.credential) {
+      setLoading(true);
+
+      setTimeout(async () => {
+        const { success, message } = await register({
+          googleCredential: authResponse.credential
+        });
+
+        if (success) {
+          openSnackBar('Registration successful.', 'success');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          setLoading(false);
+          openSnackBar(message, 'error');
+        }
+      }, 1000);
+    } else {
+      openSnackBar('Error signing in with Google (missing credential).');
+    }
+  };
+
+  const initializeGoogleButton = () => {
+    window.google.accounts.id.initialize({
+      client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+      callback: handleGoogleRegistration
+    });
+
+    window.google.accounts.id.renderButton(
+      document.getElementById('google-signin'),
+      {
+        theme: "outline",
+        size: "large",
+        width: isSmallScreen ? 300 : 325,
+        text: 'signup_with'
+      }
+    );
+  };
+
   const handleRegistration = e => {
     e.preventDefault();
 
@@ -35,9 +83,8 @@ export default function RegisterPage() {
     const passwordVal = password.current.value;
     const firstNameVal = firstName.current.value;
     const lastNameVal = lastName.current.value;
-    const orgNameVal = orgName.current.value;
 
-    if (!emailVal || !passwordVal || !firstNameVal || !lastNameVal || !orgNameVal) {
+    if (!emailVal || !passwordVal || !firstNameVal || !lastNameVal) {
       openSnackBar('Please enter all required fields above.', 'error');
       return;
     }
@@ -48,7 +95,6 @@ export default function RegisterPage() {
       const { success, message } = await register({
         email: emailVal,
         password: passwordVal,
-        orgName: orgNameVal,
         firstName: firstNameVal,
         lastName: lastNameVal
       });
@@ -62,57 +108,97 @@ export default function RegisterPage() {
     }, 1000);
   };
 
+  useEffect(() => {
+    if (document.readyState === 'complete') {
+      initializeGoogleButton();
+    } else {
+      window.onload = initializeGoogleButton;
+    }
+  }, []);
+
   return (
-    <div className="Register flex-centered">
-      <Paper sx={{ p: 8, pt: 5 }} className="container">
-        <Typography variant="h5" sx={{ mb: 5 }}>Create an Account</Typography>
-        <form onSubmit={handleRegistration} >
-          <Box sx={{ display: 'flex', mb: 4 }}>
-            <TextField
-              label="First name"
-              variant="outlined"
-              sx={{ mr: 1 }}
-              required
-              inputRef={firstName}
-              disabled={isLoading}
-              autoComplete="off"
-            />
-            <TextField
-              label="Last name"
-              variant="outlined"
-              sx={{ ml: 1 }}
-              required
-              inputRef={lastName}
-              disabled={isLoading}
-              autoComplete="off"
-            />
+    <Box className="info-page flex-centered">
+      <Box component="header">
+        <Box component="a" href="https://www.zeforis.com" target="_blank">
+          <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Box mr={1.5} display={isSmallScreen ? 'none' : 'block'}>
+            Already have an account?
           </Box>
+          <Button
+            variant="contained"
+            component={'a'}
+            href='/login'
+            size={isSmallScreen ? 'medium' : 'large'}>
+            Sign In
+          </Button>
+        </Box>
+      </Box>
+      <Paper className="container">
+        <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>Sign Up</Typography>
+        <form onSubmit={handleRegistration}>
           <TextField
-            label="Org / Company name"
+            placeholder="First name"
             variant="outlined"
-            sx={{ mb: 4 }}
-            required
-            inputRef={orgName}
+            inputRef={firstName}
             disabled={isLoading}
             autoComplete="off"
+            style={{ marginBottom: '1rem' }}
+            autoFocus={!isMobile}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
-            label="Email"
+            placeholder="Last name"
             variant="outlined"
-            sx={{ mb: 4 }}
+            inputRef={lastName}
+            disabled={isLoading}
+            autoComplete="off"
+            style={{ marginBottom: '2.5rem' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
+          />
+
+          <TextField
+            placeholder="Email"
+            variant="outlined"
+            style={{ marginBottom: '1rem' }}
             type="email"
-            required
             inputRef={email}
             disabled={isLoading}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutlineIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
-            label="Password"
+            placeholder="Password"
             variant="outlined"
             type="password"
-            sx={{ mb: 5 }}
-            required
+            style={{ marginBottom: '2.5rem' }}
             inputRef={password}
             disabled={isLoading}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <VpnKeyIcon htmlColor="#cbcbcb" />
+                </InputAdornment>
+              )
+            }}
           />
           <LoadingButton
             loading={isLoading}
@@ -120,24 +206,20 @@ export default function RegisterPage() {
             fullWidth
             variant="contained"
             type="submit"
-            sx={{ mb: 4 }}>
+            size="large"
+            style={{ marginBottom: '2rem' }}>
             Create Account
           </LoadingButton>
         </form>
-        <Box component="span" sx={{ textAlign: 'right' }}>
-          <Typography
-            variant="p"
-            component={Link}
-            to="/login">
-            Have an account?  Sign in here.
-          </Typography>
-        </Box>
+        <Divider style={{ marginBottom: '2rem' }} />
+        <Box id="google-signin"></Box>
       </Paper>
+      <Box className="circle"></Box>
       <Snackbar
         isOpen={isOpen}
         type={type}
         message={message}
       />
-    </div>
+    </Box>
   );
 };

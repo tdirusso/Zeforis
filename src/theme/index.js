@@ -10,6 +10,13 @@ const theme = {
     fontFamily: 'Inter',
   },
   components: {
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          justifyContent: 'center',
+        }
+      }
+    },
     MuiTooltip: {
       defaultProps: {
         arrow: true,
@@ -53,7 +60,9 @@ const theme = {
       }
     },
     MuiButton: {
-      defaultProps: {},
+      defaultProps: {
+        disableFocusRipple: true
+      },
       styleOverrides: {
         root: {
           textTransform: 'none',
@@ -69,6 +78,7 @@ const theme = {
       }
     },
     MuiLoadingButton: {
+      defaultProps: { disableFocusRipple: true },
       styleOverrides: {
         root: {
           textTransform: 'none',
@@ -85,12 +95,12 @@ const theme = {
     MuiTextField: {
       defaultProps: {
         InputLabelProps: {
-          sx: {
+          style: {
             fontWeight: 300
           }
         },
         inputProps: {
-          sx: {
+          style: {
             fontWeight: 400
           }
         },
@@ -105,14 +115,14 @@ const theme = {
     },
     MuiAlertTitle: {
       defaultProps: {
-        sx: {
+        style: {
           fontWeight: 300
         }
       }
     },
     MuiTab: {
       defaultProps: {
-        sx: {
+        style: {
           textTransform: 'none'
         }
       }
@@ -125,8 +135,61 @@ const theme = {
           }
         }
       }
+    },
+    MuiIconButton: {
+      defaultProps: { disableFocusRipple: true },
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none'
+        }
+      }
+    }
+  }
+};
+
+const darkThemeOverrides = {
+  components: {
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          padding: '0 !important'
+        }
+      },
+      defaultProps: {
+        transitionDuration: 150,
+        disableScrollLock: true
+      }
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          padding: '0 !important'
+        }
+      }
+    },
+    MuiPickersPopper: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          padding: '0 !important'
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px',
+          borderRadius: '24px',
+          padding: '24px'
+        }
+      }
     }
   }
 };
 
 export default theme;
+export { darkThemeOverrides };

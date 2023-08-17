@@ -1,51 +1,54 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
-import { Box, Grid, createTheme } from "@mui/material";
-import SelectClientScreen from "../../components/core/SelectClientScreen";
+import { Box, Grid } from "@mui/material";
+import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { getActiveClientId, getClientData, getUserClientListForOrg, setActiveClientId } from "../../api/clients";
-import AddClientScreen from "../../components/admin/AddClientScreen";
+import { getActiveEngagementId, getEngagementData, getUserEngagementListForOrg, setActiveEngagementId } from "../../api/engagements";
+import CreateEngagementDialog from "../../components/dialogs/CreateEngagementDialog";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
-import SelectOrgModal from "../../components/core/SelectOrgModal";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
-import AddOrgScreen from "../../components/admin/AddOrgScreen";
 import Header from "../../components/core/Header";
-import Modals from "../../components/core/Modals";
+import Modals from "../../components/modals";
 import useModal from "../../hooks/useModal";
-import Drawers from "../../components/core/Drawers";
+import Drawers from "../../components/drawers";
 import useDrawer from "../../hooks/useDrawer";
 import useSideNav from "../../hooks/useSideNav";
+import { hexToRgb, updateTheme } from "../../lib/utils";
+import useDialog from "../../hooks/useDialog";
+import Dialogs from "../../components/dialogs";
+import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
+import './styles.scss';
+import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
 
 export default function Home({ setTheme }) {
-  const { search } = useLocation();
-  const queryParams = new URLSearchParams(search);
-
-  const orgIdPassed = queryParams.get('orgId');
-  const clientIdPassed = queryParams.get('clientId');
-
-  if (orgIdPassed && clientIdPassed) {
-    setActiveOrgId(orgIdPassed);
-    setActiveClientId(clientIdPassed);
-    window.location = window.location.href.split('?')[0];
-  }
-
   let activeOrgId = getActiveOrgId();
-  let activeClientId = getActiveClientId();
+  let activeEngagementId = getActiveEngagementId();
 
   const { user, authError, setUser } = useAuth();
-  const [isLoading, setLoading] = useState(true);
-  const [client, setClient] = useState(null);
+  const [isDataFetched, setDataFetched] = useState(false);
+  const [isReadyToRender, setReadyToRender] = useState(false);
+  const [engagement, setEngagement] = useState(null);
+  const [engagements, setEngagements] = useState([]);
   const [org, setOrg] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [tags, setTags] = useState([]);
+  const [widgets, setWidgets] = useState([]);
   const [orgUsers, setOrgUsers] = useState([]);
-  const [triedOrgAndClient, setTriedOrgAndClient] = useState(false);
+  const [tasksMap, setTasksMap] = useState({});
+  const [tagsMap, setTagsMap] = useState({});
+  const [foldersMap, setFoldersMap] = useState({});
+  const [orgUsersMap, setOrgUsersMap] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isOrgOwner, setIsOrgOwner] = useState(false);
+  const [engagementMembers, setEngagementMembers] = useState([]);
+  const [engagementAdmins, setEngagementAdmins] = useState([]);
+  const [triedOrgAndEngagement, setTriedOrgAndEngagement] = useState(false);
 
   const {
     isOpen,
@@ -56,6 +59,7 @@ export default function Home({ setTheme }) {
 
   const {
     modalToOpen,
+    modalProps,
     openModal,
     closeModal
   } = useModal();
@@ -72,101 +76,150 @@ export default function Home({ setTheme }) {
     closeDrawer
   } = useDrawer();
 
+  const {
+    dialogToOpen,
+    dialogProps,
+    openDialog,
+    closeDialog
+  } = useDialog();
+
   useEffect(() => {
     if (user) {
       if (activeOrgId) {
-        const activeOrg = user.memberOfOrgs.find(org => {
-          return org.id === activeOrgId;
-        });
+        const activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
 
         if (activeOrg) {
+          const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
+
           const brandRGB = hexToRgb(activeOrg.brandColor);
           document.documentElement.style.setProperty('--colors-primary', activeOrg.brandColor);
           document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
           themeConfig.palette.primary.main = activeOrg.brandColor;
           document.title = `${activeOrg.name} Portal`;
-          setTheme(createTheme(themeConfig));
+
+          updateTheme(setTheme);
           setOrg(activeOrg);
+          setIsOrgOwner(isOwnerOfActiveOrg);
+          setEngagements(getUserEngagementListForOrg(user, activeOrgId));
         }
       }
 
-      if (activeClientId) {
-        const activeClient = user.adminOfClients.concat(user.memberOfClients).find(client => {
-          return client.id === activeClientId;
+      if (activeEngagementId) {
+        const activeEngagement = user.adminOfEngagements.concat(user.memberOfEngagements).find(engagement => {
+          return engagement.id === activeEngagementId;
         });
 
-        if (activeClient) {
-          setClient(activeClient);
+        if (activeEngagement) {
+          setEngagement(activeEngagement);
         }
       }
 
-      setTriedOrgAndClient(true);
+      setTriedOrgAndEngagement(true);
     } else if (authError) {
       openSnackBar(authError, 'error');
     }
   }, [user, authError]);
 
   useEffect(() => {
-    if (triedOrgAndClient) {
-      if (client && tasks.length === 0) {
-        fetchClientData();
-      } else if (!client) {
-        setLoading(false);
+    if (triedOrgAndEngagement) {
+      if (engagement && tasks.length === 0) {
+        document.addEventListener('keyup', e => {
+          if (e.key === 'Escape') {
+            closeDrawer();
+          }
+        });
+
+        fetchEngagementData(engagement.id, org.id);
+      } else if (!engagement && org) {
+        if (engagements.length === 1) {
+          setActiveEngagementId(engagements[0].id);
+          setEngagement(engagements[0]);
+          fetchEngagementData(engagements[0].id, org.id);
+        } else {
+          setReadyToRender(true);
+        }
+      } else {
+        setReadyToRender(true);
       }
     }
 
-    async function fetchClientData() {
-      const result = await getClientData(client.id, org.id);
+    async function fetchEngagementData(engagementId, orgId) {
+      const result = await getEngagementData(engagementId, orgId);
+
+      if (!result.tasks) {
+        openSnackBar(result.message || 'Something went wrong...');
+        return;
+      }
+
       setTasks(result.tasks);
       setFolders(result.folders);
       setTags(result.tags);
       setOrgUsers(result.orgUsers);
-      setLoading(false);
+      setWidgets(result.widgets);
+      setDataFetched(true);
     }
-  }, [triedOrgAndClient]);
+  }, [triedOrgAndEngagement]);
 
-  const foldersMap = {};
-  const tasksMap = {};
-  const tagsMap = {};
-  const orgUsersMap = {};
+  useEffect(() => {
+    if (isDataFetched) {
+      const foldersMapResult = {};
+      folders.forEach(folder => {
+        foldersMapResult[String(folder.id)] = { ...folder, tasks: [] };
+      });
 
-  orgUsers.forEach(user => orgUsersMap[user.id] = user);
+      const tasksMapResult = {};
 
-  const sortedTasks = [...tasks].sort((a, b) => a.task_name.localeCompare(b.task_name));
+      tasks.forEach(task => {
+        foldersMapResult[task.folder_id].tasks.push(task);
+        tasksMapResult[task.task_id] = task;
+      });
 
-  folders.forEach(folder => {
-    foldersMap[String(folder.id)] = { ...folder, tasks: [] };
-  });
+      const tagsMapResult = {};
 
-  sortedTasks.forEach(task => {
-    foldersMap[task.folder_id].tasks.push(task);
-    tasksMap[task.task_id] = task;
-  });
+      tags.forEach(tag => {
+        tagsMapResult[tag.id] = tag;
+      });
 
-  tags.forEach(tag => {
-    tagsMap[tag.id] = tag;
-  });
+      const orgUsersMapResult = {};
+      const engagementMembersResult = [];
+      const engagementAdminsResult = [];
+      let isAdminResult = false;
 
-  const sortedFolders = Object.values(foldersMap).sort((a, b) => a.name.localeCompare(b.name));
-  const sortedTags = Object.values(tagsMap).sort((a, b) => a.name.localeCompare(b.name));
+      orgUsers?.forEach(orgUser => {
+        orgUsersMapResult[orgUser.id] = orgUser;
 
-  let isAdmin = false;
-  const clientMembers = [];
-  const clientAdmins = [];
+        if (orgUser.adminOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
+          engagementAdminsResult.push({ ...orgUser, role: 'Administrator' });
+          if (orgUser.id === user.id) isAdminResult = true;
+        }
 
-  orgUsers.forEach(orgUser => {
-    if (orgUser.adminOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientAdmins.push({ ...orgUser, role: 'Administrator' });
-      if (orgUser.id === user.id) isAdmin = true;
+        if (orgUser.memberOfEngagements.some(engagementObj => engagementObj.id === engagement?.id)) {
+          engagementMembersResult.push({ ...orgUser, role: 'Member' });
+        }
+      });
+
+      setFoldersMap(foldersMapResult);
+      setTasksMap(tasksMapResult);
+      setTagsMap(tagsMapResult);
+      setOrgUsersMap(orgUsersMapResult);
+      setEngagementMembers(engagementMembersResult);
+      setEngagementAdmins(engagementAdminsResult);
+      setIsAdmin(isAdminResult);
+      setReadyToRender(true);
     }
+  }, [tasks, folders, tags, orgUsers, isDataFetched]);
 
-    if (orgUser.memberOfClients.some(clientObj => clientObj.id === client?.id)) {
-      clientMembers.push({ ...orgUser, role: 'Member' });
-    }
-  });
-
-  if (isLoading) {
-    return <Loader />;
+  if (!isReadyToRender) {
+    return (
+      <>
+        <Loader />
+        <Snackbar
+          isOpen={isOpen}
+          type={type}
+          message={message}
+        />
+      </>
+    );
   }
 
   if (!org) {
@@ -174,18 +227,14 @@ export default function Home({ setTheme }) {
       setActiveOrgId(user.memberOfOrgs[0].id);
       setOrg(user.memberOfOrgs[0]);
     } else if (user.memberOfOrgs.length === 0) {
-      return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
-          <AddOrgScreen user={user} />
-        </Box>
-      );
+      window.location.href = '/create-org';
+      return;
     } else {
       return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectOrgModal
+        <Box className="flex-centered" style={{ height: '100%' }}>
+          <ChooseOrgScreen
             open={true}
             setOpen={() => { }}
-            hideCancel={true}
             orgs={user.memberOfOrgs}
             user={user}
           />
@@ -194,89 +243,114 @@ export default function Home({ setTheme }) {
     }
   }
 
-  const clients = getUserClientListForOrg(user, activeOrgId);
-
-  if (clients.length === 0) {
+  if (engagements.length === 0) {
     return (
-      <Box className="flex-centered" sx={{ height: '100%' }}>
-        <AddClientScreen org={org} />
+      <Box className="flex-centered" style={{ height: '100%' }}>
+        {
+          isOrgOwner ? <CreateEngagementDialog
+            org={org}
+            openSnackBar={openSnackBar}
+            isOpen={true}
+            user={user}
+          /> :
+            <NoEngagementsDialog
+              org={org}
+              isOpen={true}
+              user={user}
+            />
+        }
+        <Snackbar
+          isOpen={isOpen}
+          type={type}
+          message={message}
+        />
       </Box>
     );
   }
 
-  if (!client) {
-    if (clients.length === 1) {
-      setActiveClientId(clients[0].id);
-      setClient(clients[0]);
-    } else {
-      return (
-        <Box className="flex-centered" sx={{ height: '100%' }}>
-          <SelectClientScreen
-            client={client}
-            clients={clients}
-          />
-        </Box>
-      );
-    }
+  if (!engagement) {
+    return (
+      <Box className="flex-centered" style={{ height: '100%' }}>
+        <ChooseEngagementDialog
+          engagements={engagements}
+          org={org}
+          user={user}
+          isOpen={true}
+        />
+      </Box>
+    );
   }
 
   const context = {
-    client,
-    clients,
+    engagement,
+    engagements,
     org,
     user,
-    folders: sortedFolders,
-    tasks: sortedTasks,
-    tags: sortedTags,
-    clientMembers,
-    clientAdmins,
+    folders: Object.values(foldersMap),
+    tasks,
+    tags,
+    engagementMembers,
+    engagementAdmins,
     orgUsers,
     orgUsersMap,
     tagsMap,
     foldersMap,
     tasksMap,
     isAdmin,
+    widgets,
+    setTheme,
+    isOrgOwner,
     setTags,
+    setEngagement,
+    setOrg,
     setTasks,
     setFolders,
     setOrgUsers,
+    setWidgets,
     setUser,
     openSnackBar,
     openModal,
-    openDrawer
+    openDrawer,
+    openDialog
   };
 
   return (
     <Box>
       <SideNav
         org={org}
-        client={client}
+        engagement={engagement}
         isSideNavOpen={isSideNavOpen}
+        isAdmin={isAdmin}
+        toggleSideNav={toggleSideNav}
       />
       <Box
         component="main"
-        ml={isSideNavOpen ? '280px' : '0px'}
-        sx={{ transition: 'margin 200ms' }}
-        px={5}>
+        style={{
+          marginLeft: isSideNavOpen ? '280px' : '0px'
+        }}>
         <Box
-          maxWidth={isSideNavOpen ? '1200px' : '1450px'}
-          m='auto'
-          pt={2}
-          pb={5}>
+          className="content"
+          style={{
+            maxWidth: isSideNavOpen ? '1200px' : '1450px'
+          }}>
           <Grid container spacing={3}>
             <Header
               isAdmin={isAdmin}
               user={user}
               org={org}
-              client={client}
+              engagement={engagement}
               openModal={openModal}
               openDrawer={openDrawer}
+              openDialog={openDialog}
               toggleSideNav={toggleSideNav}
               isSideNavOpen={isSideNavOpen}
+              setTheme={setTheme}
+              isOrgOwner={isOrgOwner}
             />
 
             <Modals
               {...context}
+              {...modalProps}
               modalToOpen={modalToOpen}
               closeModal={closeModal}
             />
@@ -287,6 +361,14 @@ export default function Home({ setTheme }) {
               drawerToOpen={drawerToOpen}
               closeDrawer={closeDrawer}
             />
+
+            <Dialogs
+              {...context}
+              {...dialogProps}
+              dialogToOpen={dialogToOpen}
+              closeDialog={closeDialog}
+            />
+
             <Outlet context={context} />
           </Grid>
         </Box>
@@ -297,20 +379,6 @@ export default function Home({ setTheme }) {
         type={type}
         message={message}
       />
-    </Box >
+    </Box>
   );
 };
-
-function hexToRgb(hex) {
-  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, function (m, r, g, b) {
-    return r + r + g + g + b + b;
-  });
-
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
-}

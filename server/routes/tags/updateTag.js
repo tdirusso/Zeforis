@@ -1,6 +1,6 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     tagId
@@ -20,11 +20,6 @@ module.exports = async (req, res) => {
 
     return res.json({ success: true });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      error: true,
-      message: error.message
-    });
+    next(error);
   }
 };

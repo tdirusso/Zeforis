@@ -1,38 +1,48 @@
-import { Box, Button, ButtonBase, Divider, Typography } from "@mui/material";
-import './styles/SideNav.css';
+import { Box, ButtonBase, Divider, IconButton, Typography, useMediaQuery } from "@mui/material";
+import './styles/SideNav.scss';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { NavLink } from "react-router-dom";
-import SpeedIcon from '@mui/icons-material/Speed';
-import zeforisIcon from '../../assets/zeforis-logo.png';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import BuildIcon from '@mui/icons-material/Build';
+import Watermark from "./Watermark";
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+
 
 export default function SideNav(props) {
 
+  const isSmallScreen = useMediaQuery('(max-width: 900px)');
+
   const {
-    client,
+    engagement,
     org,
-    isSideNavOpen
+    isSideNavOpen,
+    isAdmin,
+    toggleSideNav
   } = props;
 
-  const buttonBaseStyles = {
-    width: '100%',
-    height: '100%',
-    px: 2,
-    py: 1.5,
-    borderRadius: '8px',
-    justifyContent: 'flex-start'
+  const handleNavClick = () => {
+    if (isSmallScreen) {
+      toggleSideNav();
+    }
   };
-
-  const sideNavPosition = isSideNavOpen ? '0px' : '-281px';
 
   return (
     <Box
-      className="Sidenav"
-      sx={{ left: sideNavPosition }}
-    >
+      className={`Sidenav ${isSideNavOpen ? 'open' : 'closed'}`}>
+      <IconButton
+        className="close-btn"
+        size="large"
+        onClick={toggleSideNav}>
+        <MenuOpenIcon
+          style={{
+            transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 200ms'
+          }}
+        />
+      </IconButton>
       <Box className="flex-centered container">
         {
           org.logo ? <img
@@ -40,43 +50,34 @@ export default function SideNav(props) {
             alt=""
             width={110}
           /> :
-            <Typography color="primary" variant="h6" fontWeight={600}>
+            <Typography color="primary" variant="h6" fontWeight={600} textAlign='center'>
               {org.name}
             </Typography>
         }
         <Typography
           variant="body1"
           mt={1}>
-          {client.name}
+          {engagement.name}
         </Typography>
-        <Divider
-          sx={{
-            borderWidth: '1px',
-            borderColor: '#eceef1',
-            mt: 2,
-            mb: 5,
-            width: '200px'
-          }}
-        />
+        <Divider className="divider" />
         <Box className="menu">
           <ul>
-            <NavLink to="/home/dashboard">
+            <NavLink draggable={false} to="/home/dashboard" onClick={handleNavClick}>
               <li>
-                <ButtonBase sx={buttonBaseStyles}>
+                <ButtonBase className='nav-button'>
                   <Typography
                     variant="body2"
                     display="flex"
                     alignItems="center">
-                    <SpeedIcon />
+                    <GridViewRoundedIcon />
                     Dashboard
                   </Typography>
                 </ButtonBase>
               </li>
-
             </NavLink>
-            <NavLink to="/home/tasks">
+            <NavLink to="/home/tasks" draggable={false} onClick={handleNavClick}>
               <li>
-                <ButtonBase sx={buttonBaseStyles}>
+                <ButtonBase className='nav-button'>
                   <Typography
                     variant="body2"
                     display="flex"
@@ -87,9 +88,9 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/folders">
+            <NavLink to="/home/folders" draggable={false} onClick={handleNavClick}>
               <li>
-                <ButtonBase sx={buttonBaseStyles}>
+                <ButtonBase className='nav-button'>
                   <Typography
                     variant="body2"
                     display="flex"
@@ -100,9 +101,9 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/analytics">
+            <NavLink to="/home/analytics" draggable={false} onClick={handleNavClick}>
               <li>
-                <ButtonBase sx={buttonBaseStyles}>
+                <ButtonBase className='nav-button'>
                   <Typography
                     variant="body2"
                     display="flex"
@@ -113,22 +114,25 @@ export default function SideNav(props) {
                 </ButtonBase>
               </li>
             </NavLink>
-            <NavLink to="/home/tools">
+            {
+              isAdmin ? <NavLink to="/home/tools" draggable={false} onClick={handleNavClick}>
+                <li>
+                  <ButtonBase className='nav-button'>
+                    <Typography
+                      variant="body2"
+                      display="flex"
+                      alignItems="center">
+                      <BuildIcon />
+                      Tools
+                    </Typography>
+                  </ButtonBase>
+                </li>
+              </NavLink> :
+                null
+            }
+            <NavLink to="/home/settings" draggable={false} onClick={handleNavClick}>
               <li>
-                <ButtonBase sx={buttonBaseStyles}>
-                  <Typography
-                    variant="body2"
-                    display="flex"
-                    alignItems="center">
-                    <BuildIcon />
-                    Tools
-                  </Typography>
-                </ButtonBase>
-              </li>
-            </NavLink>
-            <NavLink to="/home/settings">
-              <li>
-                <ButtonBase sx={buttonBaseStyles}>
+                <ButtonBase className='nav-button'>
                   <Typography
                     variant="body2"
                     display="flex"
@@ -143,15 +147,7 @@ export default function SideNav(props) {
         </Box>
       </Box>
       <Box className="buttons">
-        <Button
-          onClick={() => window.location.href = 'mailto:timgdirusso@gmail.com?subject=Zeforis Support Inquiry'}
-          variant="contained"
-          fullWidth>
-          Contact Support
-        </Button>
-        <Box mt={1.5} textAlign="center">
-          <img src={zeforisIcon} alt="Zeforis" height={15}></img>
-        </Box>
+        <Watermark />
       </Box>
     </Box>
   );

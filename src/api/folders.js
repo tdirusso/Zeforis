@@ -10,7 +10,7 @@ const updateFolder = async (payload) => {
   return data;
 };
 
-const removeFoldeer = async (payload) => {
+const deleteFolder = async (payload) => {
   const { data } = await request.delete(`folders`, { data: payload });
 
   return data;
@@ -19,5 +19,5 @@ const removeFoldeer = async (payload) => {
 export {
   createFolder,
   updateFolder,
-  removeFoldeer
+  deleteFolder
 };

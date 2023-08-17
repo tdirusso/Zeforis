@@ -9,12 +9,12 @@ export default function Snackbar({ isOpen, message, type }) {
         open={isOpen}>
         <Alert
           severity={type}
-          sx={{ width: '100%', fontWeight: 300 }}
+          className='alert'
           elevation={6}
           variant="filled">
           {message}
         </Alert>
       </MUISnackbar>
     </div>
-  )
+  );
 };

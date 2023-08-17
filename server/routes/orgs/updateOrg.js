@@ -1,15 +1,15 @@
 const s3 = require('../../../aws/s3');
 const sharp = require('sharp');
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
 const acceptMimes = ['image/png', 'image/jpeg'];
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     brandColor = '#3365f6',
     orgId,
-    isLogoChanged
+    isLogoChanged = false
   } = req.body;
 
   const logoFile = req.files?.logoFile;
@@ -34,25 +34,29 @@ module.exports = async (req, res) => {
 
     const org = orgResult[0];
 
+    let updatedLogoUrl = org.logo_url;
+
     if (org) {
       if (isLogoChanged === 'true') {
-        await updateOrgWithLogoChange(name, brandColor, orgId, org.logo_url, logoFile);
+        updatedLogoUrl = await updateOrgWithLogoChange(name, brandColor, orgId, org.logo_url, logoFile);
       } else {
         await updateOrg(name, brandColor, orgId);
       }
 
       return res.json({
-        success: true
+        success: true,
+        org: {
+          id: org.id,
+          name,
+          brandColor,
+          logo: updatedLogoUrl
+        }
       });
     }
 
     return res.json({ message: 'Org does not exist.' });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 
@@ -80,7 +84,7 @@ async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl,
       const resizedLogoSize = Buffer.byteLength(resizedLogoBuffer);
       if (resizedLogoSize <= 250000) { //250,000 bytes -> 250 kb -> 0.25 mb
         const now = Date.now();
-        const uploadFileName = `org-logos/${orgId}-${now}.png`;
+        const uploadFileName = `${process.env.AWS_S3_ORG_LOGO_FOLDER}/${orgId}-${now}.png`;
 
         const s3ObjectParams = {
           Key: uploadFileName,
@@ -99,4 +103,6 @@ async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl,
     'UPDATE orgs SET name = ?, brand_color = ?, logo_url = ? WHERE id = ?',
     [name, brandColor, updatedLogoUrl, orgId]
   );
+
+  return updatedLogoUrl;
 }

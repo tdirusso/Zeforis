@@ -1,6 +1,7 @@
-import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -10,9 +11,12 @@ export default function UpcomingTasks({ tasks }) {
 
   const navigate = useNavigate();
 
+  const theme = useTheme();
+  const taskButtonTextColor = theme.palette.text.primary;
+
   return (
-    <Grid item xs={12} md={5}>
-      <Paper sx={{ height: '100%' }}>
+    <Grid item xs={12} md={6}>
+      <Paper style={{ height: '100%' }}>
         <Box
           display="flex"
           alignItems="center"
@@ -22,17 +26,22 @@ export default function UpcomingTasks({ tasks }) {
             component="h5"
             display="flex"
             alignItems="center">
+            <AccessAlarmIcon
+              fontSize="small"
+              color="primary"
+              style={{ marginRight: '5px' }}
+            />
             Upcoming Tasks
           </Box>
           <Button
             onClick={() => navigate('/home/tasks?preSort=dateDue')}
-            sx={{ display: tasksLength > 0 ? 'block' : 'none' }}>
+            style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View All
           </Button>
         </Box>
         {
           tasksLength > 0 ?
-            <UpcomingTasksList tasks={tasks} /> :
+            <UpcomingTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
             <NoUpcomingTasksMessage />
         }
       </Paper>
@@ -50,12 +59,17 @@ function NoUpcomingTasksMessage() {
   );
 }
 
-const UpcomingTasksList = ({ tasks }) => tasks.map(task => <UpcomingTaskRow task={task} key={task.task_id} />);
+const UpcomingTasksList = ({ tasks, buttonColor }) => tasks.map(task =>
+  <UpcomingTaskRow task={task} key={task.task_id} buttonColor={buttonColor}
+  />
+);
 
-function UpcomingTaskRow({ task }) {
+function UpcomingTaskRow({ task, buttonColor }) {
   const {
     openDrawer
   } = useOutletContext();
+
+  const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
   let taskName = task.task_name;
 
@@ -69,6 +83,9 @@ function UpcomingTaskRow({ task }) {
 
   return (
     <Box
+      style={{ color: buttonColor }}
+      color={buttonColor}
+      className="task-button"
       display="flex"
       alignItems="center"
       gap={1.5}
@@ -77,10 +94,10 @@ function UpcomingTaskRow({ task }) {
       py={1}
       borderRadius='8px'
       key={task.task_id}
-      className="task-row"
+      component={Button}
       onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="center">
-      <Box flexBasis='40%' minWidth={75}>
+      <Box flexBasis={isSmallScreen ? 'unset' : '60%'} minWidth={75} mr='auto'>
         <Typography
           variant="body2">
           {taskName}
@@ -89,10 +106,10 @@ function UpcomingTaskRow({ task }) {
           {`${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}, ${dateDue.getFullYear()}`}
         </Typography>
       </Box>
-      <Box flex={1} textAlign="center">
+      <Box flex={1} textAlign="center" display={isSmallScreen ? 'none' : 'block'}>
         <Chip
           label={task.status}
-          sx={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer' }}
           className={task.status} />
       </Box>
       <Box flexBasis={'10%'}>
@@ -100,6 +117,7 @@ function UpcomingTaskRow({ task }) {
           task.link_url ?
             <Tooltip title="Open Link">
               <IconButton
+                component="div"
                 disabled={!task.link_url}
                 onClick={e => {
                   e.stopPropagation();

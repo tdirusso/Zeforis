@@ -1,11 +1,11 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     isKeyFolder,
     folderId,
-    clientId
+    engagementId
   } = req.body;
 
   if (!name || !folderId) {
@@ -23,16 +23,12 @@ module.exports = async (req, res) => {
     const folderObject = {
       id: folderId,
       name,
-      client_id: clientId,
+      engagement_id: engagementId,
       is_key_folder: isKeyFolder
     };
 
     return res.json({ updatedFolder: folderObject });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

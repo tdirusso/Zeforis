@@ -1,4 +1,5 @@
-import { Box, Grid, Paper, Tab, Tabs } from "@mui/material";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Box, Grid, Paper, useTheme } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import moment from 'moment';
 import { statuses } from "../../../lib/constants";
@@ -40,7 +41,6 @@ export default function AnalyticsPage() {
     tasks,
   } = useOutletContext();
 
-  const [tabVal, setTabVal] = useState(0);
   const [analyticsData, setAnalyticsData] = useState({});
 
   let completed5WeeksAgo = 0;
@@ -115,29 +115,16 @@ export default function AnalyticsPage() {
 
   return (
     <>
-      <Grid item xs={12}>
-        <Paper>
-          <Tabs
-            variant="fullWidth"
-            value={tabVal}
-            onChange={(_, val) => setTabVal(val)}>
-            <Tab label="Analytics" />
-            <Tab label="Reports" />
-          </Tabs>
-        </Paper>
-      </Grid>
-      {
-        tabVal === 0 ?
-          <AnalyticsTab
-            analyticsData={analyticsData}
-          />
-          : 'test'
-      }
+      <AnalyticsCharts
+        analyticsData={analyticsData}
+      />
     </>
   );
 };
 
-function AnalyticsTab(props) {
+function AnalyticsCharts(props) {
+
+  const themeMode = useTheme().palette.mode;
 
   const {
     analyticsData: {
@@ -153,7 +140,7 @@ function AnalyticsTab(props) {
 
   return (
     <>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <Paper>
           <Box
             component="h4"
@@ -169,10 +156,11 @@ function AnalyticsTab(props) {
               completed1WeeksAgo,
               completedThisWeek
             ]}
+            theme={themeMode}
           />
         </Paper>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <Paper>
           <Box
             component="h4"
@@ -182,12 +170,13 @@ function AnalyticsTab(props) {
           <StatusBreakdownChart
             statusCount={statusCount}
             statusColors={statusColors}
+            theme={themeMode}
           />
         </Paper>
       </Grid>
 
       <Grid item xs={12}>
-        <Paper sx={{ maxHeight: '700px', minHeight: '450px' }}>
+        <Paper style={{ maxHeight: '700px', minHeight: '450px' }}>
           <Box
             component="h4"
             mb={2}>
@@ -196,6 +185,7 @@ function AnalyticsTab(props) {
           <UpcomingBreakdownChart
             statusCount={statusCount}
             statusColors={statusColors}
+            theme={themeMode}
           />
         </Paper>
       </Grid>

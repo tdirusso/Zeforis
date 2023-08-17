@@ -6,20 +6,23 @@ import {
   Route,
   Navigate
 } from 'react-router-dom';
-import './index.css';
+import './index.scss';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
-import CompleteRegistrationPage from './pages/CompleteRegistration';
-import Dashboard from './pages/Home/Dashboard';
-import Settings from './pages/Home/Settings';
+import AcceptInvitationPage from './pages/AcceptInvitation';
+import DashboardPage from './pages/Home/Dashboard';
+import SettingsPage from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders';
 import TasksPage from './pages/Home/Tasks';
-import ToolsPage from './pages/Tools';
+import ToolsPage from './pages/Home/Tools';
 import AnalyticsPage from './pages/Home/Analytics';
+import PasswordResetPage from './pages/PasswordReset';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
+import CreateOrgPage from './pages/CreateOrg';
+import { ErrorBoundary } from './components/core/ErrorBoundary';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -28,25 +31,29 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="register-success" element={<RegisterSuccessPage />} />
-          <Route path="complete-registration" element={<CompleteRegistrationPage />} />
+      <ErrorBoundary>
+        <Router>
+          <Routes>
+            <Route path="login" element={<LoginPage setTheme={setTheme} />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="register-success" element={<RegisterSuccessPage />} />
+            <Route path="accept-invitation" element={<AcceptInvitationPage />} />
+            <Route path="password-reset" element={<PasswordResetPage />} />
+            <Route path="create-org" element={<CreateOrgPage setTheme={setTheme} />} />
 
-          <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="tasks" element={<TasksPage />} />
-            <Route path="folders" element={<FoldersPage />} />
-            <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="tools" element={<ToolsPage />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
+            <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+              <Route path="folders" element={<FoldersPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="tools" element={<ToolsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="login" />} />
-        </Routes>
-      </Router>
+            <Route path="*" element={<Navigate to="login" />} />
+          </Routes>
+        </Router>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

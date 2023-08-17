@@ -1,87 +1,96 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Button, Divider, Grid, Paper } from "@mui/material";
-import './styles.css';
-import React, { useState } from "react";
-import { logout } from "../../../api/auth";
-import PersonIcon from '@mui/icons-material/Person';
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
+import { Box, Button, Grid, Paper } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import ApartmentIcon from '@mui/icons-material/Apartment';
-//import PaidIcon from '@mui/icons-material/Paid';
-import Account from "../../../components/core/settings/Account";
-import Clients from "../../../components/core/settings/Clients";
-import Organizations from "../../../components/core/settings/Organizations";
-import LogoutIcon from '@mui/icons-material/Logout';
+import EngagementTab from "../../../components/core/settings/engagement";
+import OrgTab from "../../../components/core/settings/org";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import AccountTab from "../../../components/core/settings/account/";
 import { useLocation } from "react-router-dom";
 
-const settings = [
-  { name: 'Clients', icon: <SwitchAccountIcon fontSize="small" /> },
-  { name: 'Organizations', icon: <ApartmentIcon fontSize="small" /> },
-  { name: 'Account', icon: <PersonIcon fontSize="small" /> },
-  // { name: 'Billing', icon: <PaidIcon fontSize="small" /> }
-];
+const buttonStyles = {
+  padding: '10px 15px',
+  borderRadius: '24px',
+  transition: 'color 200ms linear'
+};
 
 export default function Settings() {
   const { search } = useLocation();
+
   const queryParams = new URLSearchParams(search);
+  const qsTab = queryParams.get('tab');
 
-  const defaultTab = queryParams.get('tab');
+  const [tabVal, setTabVal] = useState(Number(qsTab) || 0);
 
-  const [tab, setTab] = useState(defaultTab || 'Clients');
+  useEffect(() => {
+    const newQsTab = queryParams.get('tab');
+    if ((Number(newQsTab) || 0) !== tabVal) {
+      setTabVal(Number(newQsTab));
+    }
+  }, [search]);
 
-  let componentToShow = <></>;
-
-  switch (tab) {
-    case 'Account':
-      componentToShow = <Account />;
-      break;
-    case 'Clients':
-      componentToShow = <Clients />;
-      break;
-    case 'Organizations':
-      componentToShow = <Organizations />;
-      break;
-    default:
-      break;
-  }
+  const getTabContent = () => {
+    switch (tabVal) {
+      case 0:
+        return <EngagementTab />;
+      case 1:
+        return <OrgTab />;
+      case 2:
+        return <AccountTab />;
+      default:
+        break;
+    }
+  };
 
   return (
     <>
-      <Grid item xs={12} md={3}>
-        <Paper sx={{ px: 0 }}>
-          <Box className="settings-buttons">
-            {
-              settings.map(setting => {
-                return (
-                  <Button
-                    fullWidth
-                    size="small"
-                    className={tab === setting.name ? 'active' : ''}
-                    key={setting.name}
-                    onClick={() => setTab(setting.name)}
-                    sx={{
-                      px: 3,
-                      py: 1.5
-                    }}
-                    startIcon={setting.icon} >
-                    {setting.name}
-                  </Button>
-                );
-              })
-            }
-            <Divider />
+      <Grid item xs={12}>
+        <Box display='flex' gap={1.5} flexWrap='wrap'>
+          <Paper className={`custom-tab ${tabVal === 0 ? 'active' : ''}`}>
             <Button
-              size="small"
-              fullWidth
-              onClick={logout}
-              startIcon={<LogoutIcon fontSize="small" />}
-              sx={{ px: 3, py: 1.5 }}>Log Out</Button>
-          </Box>
-        </Paper>
-      </Grid>
+              onClick={() => setTabVal(0)}
+              style={{
+                ...buttonStyles,
+                color: tabVal === 0 ? 'white' : 'var(--colors-primary)'
+              }}
+              startIcon={<AccountBoxIcon />}>
+              Engagement
+            </Button>
+          </Paper>
+          <Box className="settings-divider" style={{
+            width: '1px',
+            margin: '0 0.5rem',
+            background: 'var(--colors-primary)'
+          }}></Box>
 
-      <Grid item xs={12} md={9}>
-        {componentToShow}
+          <Paper className={`custom-tab ${tabVal === 1 ? 'active' : ''}`}>
+            <Button
+              onClick={() => setTabVal(1)}
+              style={{
+                ...buttonStyles,
+                color: tabVal === 1 ? 'white' : 'var(--colors-primary)'
+              }}
+              startIcon={<ApartmentIcon />}>
+              Organization
+            </Button>
+          </Paper>
+          <Paper className={`custom-tab ${tabVal === 2 ? 'active' : ''}`}>
+            <Button
+              onClick={() => setTabVal(2)}
+              style={{
+                ...buttonStyles,
+                color: tabVal === 2 ? 'white' : 'var(--colors-primary)'
+              }}
+              startIcon={<ManageAccountsIcon />}>
+              Account
+            </Button>
+          </Paper>
+        </Box>
       </Grid>
+      {
+        getTabContent()
+      }
     </>
   );
 };

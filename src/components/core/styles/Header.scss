@@ -1,0 +1,26 @@
+.header {
+  .org-circle::after {
+    content: '';
+    height: 8px;
+    width: 8px;
+    background: #43e335;
+    position: absolute;
+    display: block;
+    bottom: 11px;
+    left: 25px;
+    border-radius: 50%;
+  }
+
+  .header-box {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .header-button {
+    padding: 0;
+    border-radius: 50%;
+  }
+}

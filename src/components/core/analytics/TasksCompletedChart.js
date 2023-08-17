@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Chart from "react-apexcharts";
 import moment from 'moment';
 import { useOutletContext } from "react-router-dom";
@@ -8,6 +9,13 @@ const _5weeksAgoStart = moment().subtract(5, 'weeks').startOf('week');
 const _4weeksAgoStart = moment().subtract(4, 'weeks').startOf('week');
 const _3weeksAgoStart = moment().subtract(3, 'weeks').startOf('week');
 const _2weeksAgoStart = moment().subtract(2, 'weeks').startOf('week');
+
+export default function TasksCompletedChart({ series, theme }) {
+
+  const {
+    org
+  } = useOutletContext();
+
 
 const options = {
   series: [
@@ -56,14 +64,11 @@ const options = {
       fontSize: '14px',
       fontFamily: "Inter"
     }
+  },
+  theme: {
+    mode: theme
   }
 };
-
-export default function TasksCompletedChart({ series }) {
-
-  const {
-    org
-  } = useOutletContext();
 
   options.colors = org.brandColor;
 

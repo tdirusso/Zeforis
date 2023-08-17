@@ -1,13 +1,13 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
-    clientId,
+    engagementId,
     userId,
     isAdmin = false
   } = req.body;
 
-  if (!userId || !clientId) {
+  if (!userId || !engagementId) {
     return res.json({
       message: 'Missing permissions parameters.'
     });
@@ -17,16 +17,12 @@ module.exports = async (req, res) => {
     const newRole = isAdmin ? 'admin' : 'member';
 
     await pool.query(
-      'UPDATE client_users SET role = ? WHERE client_id = ? AND user_id = ?',
-      [newRole, clientId, userId]
+      'UPDATE engagement_users SET role = ? WHERE engagement_id = ? AND user_id = ?',
+      [newRole, engagementId, userId]
     );
 
     return res.json({ success: true });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

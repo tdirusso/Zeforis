@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useOutletContext } from "react-router-dom";
 import KeyFolders from "../../../components/core/dashboard/KeyFolders";
 import KeyTasks from "../../../components/core/dashboard/KeyTasks";
@@ -6,13 +7,27 @@ import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
 import './styles.css';
 import { Paper, Typography, Button, Grid } from "@mui/material";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import CustomWidgets from "../../../components/core/dashboard/CustomWidgets";
+import { useEffect } from "react";
 
 export default function Dashboard() {
+
   const {
     tasks,
     folders,
-    openDrawer
+    openDrawer,
+    widgets,
+    isAdmin
   } = useOutletContext();
+
+  useEffect(() => {
+    const isGettingStarted = localStorage.getItem('openGettingStarted');
+
+    if (isGettingStarted) {
+      localStorage.removeItem('openGettingStarted');
+      openDrawer('getting-started');
+    }
+  }, []);
 
   const tasksSortedByDate = tasks.sort((a, b) => {
     return new Date(a.date_due) - new Date(b.date_due);
@@ -35,7 +50,7 @@ export default function Dashboard() {
       numTasksCompleted++;
     }
 
-    if (dateDue && dateDue < now) {
+    if (dateDue && (dateDue < now && task.status !== 'Complete')) {
       numTasksPastDue++;
     }
 
@@ -48,6 +63,7 @@ export default function Dashboard() {
     <>
       <KeyTasks tasks={keyTasks.slice(0, 5)} />
       <UpcomingTasks tasks={tasksSortedByDate.slice(0, 5)} />
+      <CustomWidgets widgets={widgets} />
       <TaskStats
         numComplete={numTasksCompleted}
         numPastDue={numTasksPastDue}
@@ -57,6 +73,7 @@ export default function Dashboard() {
         keyFolders.length > 0 ?
           <KeyFolders folders={keyFolders} /> :
           <NoFoldersMessage
+            isAdmin={isAdmin}
             openDrawer={openDrawer}
           />
       }
@@ -64,17 +81,18 @@ export default function Dashboard() {
   );
 };
 
-function NoFoldersMessage({ openDrawer }) {
+function NoFoldersMessage({ openDrawer, isAdmin }) {
   return (
     <Grid item xs={12} md={4}>
-      <Paper sx={{ height: '100%' }}>
+      <Paper>
         <Typography variant="body2">
           There are currently no key folders.
         </Typography>
         <Button
-          sx={{ mt: 1.5 }}
+          hidden={!isAdmin}
+          style={{ marginTop: '0.75rem' }}
           variant="outlined"
-          onClick={() => openDrawer('create-folder')}
+          onClick={() => openDrawer('folder')}
           startIcon={<CreateNewFolderIcon />}>
           Create Folder
         </Button>

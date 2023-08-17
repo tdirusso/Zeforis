@@ -1,16 +1,16 @@
 const bcrypt = require('bcrypt');
 const validator = require("email-validator");
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     email,
     password,
-    clientId
+    engagementId
   } = req.body;
 
-  if (!clientId) {
-    return res.json({ message: 'No clientId.' });
+  if (!engagementId) {
+    return res.json({ message: 'No engagementId.' });
   }
 
   if (!email || !password) {
@@ -39,8 +39,8 @@ module.exports = async (req, res) => {
     }
 
     const [isAdminOrMemberResult] = await pool.query(
-      `SELECT 1 FROM client_users WHERE user_id = ? AND client_id = ? LIMIT 1`,
-      [user.id, clientId]
+      `SELECT 1 FROM engagement_users WHERE user_id = ? AND engagement_id = ? LIMIT 1`,
+      [user.id, engagementId]
     );
 
     if (isAdminOrMemberResult.length) {
@@ -53,12 +53,9 @@ module.exports = async (req, res) => {
 
       return res.json({ success: true });
     } else {
-      return res.json({ message: 'User is not a member or administrator of this client.' });
+      return res.json({ message: 'User is not a member or administrator of this engagement.' });
     }
   } catch (error) {
-    console.log(error);
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };

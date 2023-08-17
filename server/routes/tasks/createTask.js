@@ -1,6 +1,6 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     name,
     description = '',
@@ -8,7 +8,6 @@ module.exports = async (req, res) => {
     folderId,
     linkUrl,
     assignedToId = null,
-    progress = 0,
     tags = [],
     isKeyTask = false,
     dueDate = null
@@ -32,15 +31,14 @@ module.exports = async (req, res) => {
           folder_id, 
           link_url,
           assigned_to_id, 
-          progress, 
           created_by_id,
           is_key_task,
           date_due, 
           last_updated_by_id
         ) 
         VALUES
-        (?,?,?,?,?,?,?,?,?,?,?)`,
-      [name, description, status, folderId, linkUrl, assignedToId, progress, creatorUserId, isKeyTask, dueDate, creatorUserId]
+        (?,?,?,?,?,?,?,?,?,?)`,
+      [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
     );
 
     const newTaskId = newTask[0].insertId;
@@ -55,14 +53,13 @@ module.exports = async (req, res) => {
     }
 
     const taskObject = {
-      id: newTask,
+      id: newTaskId,
       name,
       description,
       status,
       folderId,
       linkUrl,
       assignedToId,
-      progress,
       tags,
       isKeyTask,
       dueDate
@@ -73,11 +70,6 @@ module.exports = async (req, res) => {
       task: taskObject
     });
   } catch (error) {
-    console.log(error);
-
-    return res.json({
-      error: true,
-      message: error.message
-    });
+    next(error);
   }
 };

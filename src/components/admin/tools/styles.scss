@@ -1,0 +1,31 @@
+.import-tab {
+  .field-mappings-accordion {
+    padding: 0 !important;
+    border-radius: 16px !important;
+  }
+
+  .MuiAccordionSummary-content {
+    flex-grow: unset !important;
+    margin-right: 8px !important;
+  }
+}
+
+.widget-color-picker-menu .MuiList-root {
+  padding: 0 !important;
+}
+
+.report-generator {
+  .status-criteria {
+    width: 550px;
+
+    @media screen and (max-width: 670px) {
+      width: auto;
+    }
+  }
+}
+
+.widget-preview-container {
+  @media screen and (max-width: 900px) {
+    flex-direction: column;
+  }
+}

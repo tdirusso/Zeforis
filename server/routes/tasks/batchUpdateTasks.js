@@ -1,21 +1,30 @@
-const pool = require('../../../database');
+const { pool } = require('../../../database');
 const moment = require('moment');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const {
     action,
     folderId,
     assigneeId,
     status,
     taskIds,
-    dateDue
+    dateDue,
+    isKey,
+    tags = [],
+    tagAction = 'add'
   } = req.body;
 
   const updaterUserId = req.userId;
 
-  if (!action || !taskIds || taskIds.length === 0 || (action !== 'dateDue' && (!folderId && !assigneeId && !status))) {
+  if (!action) {
     return res.json({
-      message: 'Missing task parameters.'
+      message: 'Missing action.'
+    });
+  }
+
+  if (!taskIds || taskIds.length === 0) {
+    return res.json({
+      message: 'Missing taskIds.'
     });
   }
 
@@ -24,16 +33,52 @@ module.exports = async (req, res) => {
   try {
     switch (action) {
       case 'assignee':
-        await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
+        if (!assigneeId) {
+          return res.json({
+            message: 'Missing assigneeId.'
+          });
+        } else {
+          await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
+        }
         break;
       case 'folder':
-        await updateFolders(taskIds, folderId, updaterUserId, connection);
+        if (!folderId) {
+          return res.json({
+            message: 'Missing folderId.'
+          });
+        } else {
+          await updateFolders(taskIds, folderId, updaterUserId, connection);
+        }
         break;
       case 'status':
-        await updateStatuses(taskIds, status, updaterUserId, connection);
+        if (!status) {
+          return res.json({
+            message: 'Missing status.'
+          });
+        } else {
+          await updateStatuses(taskIds, status, updaterUserId, connection);
+        }
         break;
       case 'dateDue':
         await updateDateDue(taskIds, dateDue, updaterUserId, connection);
+        break;
+      case 'keyTask':
+        if (!isKey) {
+          return res.json({
+            message: 'Missing isKey.'
+          });
+        } else {
+          await updateKeyTask(taskIds, isKey, updaterUserId, connection);
+        }
+        break;
+      case 'tags':
+        if (tags.length === 0 || !tagAction) {
+          return res.json({
+            message: 'Missing tags or tag action.'
+          });
+        } else {
+          await updateTags(taskIds, tags, tagAction, connection);
+        }
         break;
       default:
         break;
@@ -51,7 +96,6 @@ module.exports = async (req, res) => {
             tasks.folder_id,
             tasks.link_url,
             tasks.assigned_to_id,
-            tasks.progress,
             tasks.date_completed,
             tasks.is_key_task,
             tasks.date_due,
@@ -79,12 +123,8 @@ module.exports = async (req, res) => {
 
     return res.json({ updatedTasks });
   } catch (error) {
-    console.log(error);
-
     connection.release();
-    return res.json({
-      message: error.message
-    });
+    next(error);
   }
 };
 
@@ -116,13 +156,40 @@ async function updateFolders(taskIds, folderId, updaterUserId, connection) {
 async function updateStatuses(taskIds, status, updaterUserId, connection) {
   if (status === 'Complete') {
     await connection.query(
-      'UPDATE tasks SET status = ?, last_updated_by_id = ?, progress = 100, date_completed = CURRENT_TIMESTAMP WHERE tasks.id IN (?)',
+      'UPDATE tasks SET status = ?, last_updated_by_id = ?, date_completed = CURRENT_TIMESTAMP WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
     );
   } else {
     await connection.query(
       'UPDATE tasks SET status = ?, last_updated_by_id = ?, date_completed = NULL WHERE tasks.id IN (?)',
       [status, updaterUserId, taskIds]
+    );
+  }
+}
+
+async function updateKeyTask(taskIds, isKey, updaterUserId, connection) {
+  await connection.query(
+    'UPDATE tasks SET is_key_task = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
+    [isKey === 'yes' ? 1 : 0, updaterUserId, taskIds]
+  );
+}
+
+async function updateTags(taskIds, tags, tagAction, connection) {
+  const combinations = taskIds.flatMap(taskId =>
+    tags.map(tag => [tag.id, taskId])
+  );
+
+  if (tagAction === 'add') {
+    await connection.query(
+      'INSERT IGNORE INTO task_tags (tag_id, task_id) VALUES ?',
+      [combinations]
+    );
+  } else {
+    const placeholders = combinations.map(() => '(?, ?)').join(', ');
+
+    await connection.query(
+      `DELETE FROM task_tags WHERE (tag_id, task_id) IN (${placeholders})`,
+      combinations.flat()
     );
   }
 }

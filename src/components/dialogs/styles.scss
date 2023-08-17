@@ -1,0 +1,57 @@
+.choose-engagement-dialog {
+  .content {
+    margin: 0 auto;
+    min-width: 700px;
+    padding: 0;
+    padding-top: 2rem;
+  }
+
+  .change-org-btn {
+    position: absolute;
+    right: 25px;
+    z-index: 1;
+  }
+
+  .close-btn {
+    position: absolute;
+    left: 15px;
+  }
+
+  .choose-engagement-btn {
+    margin: 1rem;
+
+    &.active::after {
+      content: 'Current';
+      position: absolute;
+      top: -8px;
+      right: -15px;
+      background: var(--colors-primary);
+      padding: 5px 7px;
+      border-radius: 20px;
+      font-size: 10px;
+      color: white;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .content {
+      min-width: unset;
+    }
+
+    .change-org-btn {
+      position: fixed;
+      top: 30px;
+    }
+
+    .choose-engagement-btn {
+      margin: 0.5rem;
+    }
+
+    .close-btn {
+      position: fixed;
+      left: 15px;
+      top: 20px;
+      z-index: 1;
+    }
+  }
+}

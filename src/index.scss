@@ -1,0 +1,230 @@
+:root {
+  --colors-primary: #3365f6;
+  --colors-primary-rgb: 35, 153, 239;
+  --colors-body-background: #f3f4f9;
+  --colors-body-background-dark: #101418;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--colors-body-background);
+  color: #121f43;
+  transition: background-color 250ms, color 250ms;
+}
+
+body * {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body.dark {
+  color: white;
+  background-color: var(--colors-body-background-dark);
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-ac {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.flex-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.my1 {
+  margin: 0.5rem 0 !important;
+}
+
+.my2 {
+  margin: 1.3rem 0 !important;
+}
+
+.my3 {
+  margin: 1.8rem 0 !important;
+}
+
+.my4 {
+  margin: 2.25rem 0 !important;
+}
+
+.mb3 {
+  margin-bottom: 1.75rem !important;
+}
+
+.m0 {
+  margin: 0 !important;
+}
+
+.m2 {
+  margin: 1rem;
+}
+
+.m0a {
+  margin: 0 auto !important;
+}
+
+.p0 {
+  padding: 0 !important;
+}
+
+.mx0 {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.px0 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+a,
+a:visited {
+  color: var(--colors-primary);
+}
+
+a.MuiButtonBase-root {
+  color: white;
+}
+
+
+a.MuiListItem-root {
+  color: initial;
+}
+
+h2,
+h4,
+h6 {
+  font-weight: 600;
+}
+
+h5,
+h6 {
+  font-size: 0.9rem;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: white;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8da2b799;
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8da2b799;
+}
+
+.MuiChip-root.Complete {
+  background-color: #27ce881a;
+  color: #27ce88;
+}
+
+.MuiChip-root.New {
+  background-color: #0040ff17;
+  color: #273bce;
+}
+
+.MuiChip-root.Next.Up {
+  background-color: #8527ce1a;
+  color: #8527ce;
+}
+
+.MuiChip-root.In.Progress {
+  background-color: #ffa5001c;
+  color: orange;
+}
+
+.MuiChip-root.Currently.Writing {
+  background-color: #ffc0cb2b;
+  color: pink;
+}
+
+.MuiChip-root.Pending.Approval {
+  background-color: #ff00000f;
+  color: red;
+}
+
+.MuiChip-root.Approved {
+  background-color: #00d0d01c;
+  color: #00d0d0;
+}
+
+.MuiChip-root.Ready.to.Implement {
+  background-color: #a52a2a12;
+  color: brown;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  transition: all 250ms;
+  border-width: 1px !important;
+}
+
+.MuiDrawer-paperAnchorRight {
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}
+
+.alert {
+  width: 100% !important;
+  font-weight: 300 !important;
+}
+
+.readonly-textfield {
+
+  & .MuiInputBase-root::before,
+  & .MuiInputBase-root::after {
+    border-bottom: none !important;
+  }
+}
+
+.MuiDialogActions-root>:not(:first-of-type) {
+  margin-left: 0px !important;
+}
+
+.MuiDialogActions-root {
+  gap: 8px;
+}
+
+.MuiTab-root {
+  font-weight: 400 !important;
+}
+
+@media screen and (max-width: 550px) {
+  .wrap-on-small {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+}

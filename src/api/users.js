@@ -6,12 +6,6 @@ const register = async (payload) => {
   return data;
 };
 
-const completeRegistration = async (payload) => {
-  const { data } = await request.post('users/completeRegistration', payload);
-
-  return data;
-};
-
 const updateProfile = async (payload) => {
   const { data } = await request.patch(`users`, payload);
   return data;
@@ -22,8 +16,38 @@ const updatePermission = async (payload) => {
   return data;
 };
 
+const batchUpdatePermission = async (payload) => {
+  const { data } = await request.patch(`users/permissions/batch`, payload);
+  return data;
+};
+
 const updateAccess = async (payload) => {
   const { data } = await request.patch(`users/access`, payload);
+  return data;
+};
+
+const batchUpdateAccess = async (payload) => {
+  const { data } = await request.patch(`users/access/batch`, payload);
+  return data;
+};
+
+const getInvitationData = async ({ userId, engagementId, invitationCode }) => {
+  const { data } = await request.get(`users/invitation?userId=${userId}&engagementId=${engagementId}&invitationCode=${invitationCode}`);
+  return data;
+};
+
+const updatePassword = async (payload) => {
+  const { data } = await request.patch(`users/password`, payload);
+  return data;
+};
+
+const sendPasswordResetLink = async (payload) => {
+  const { data } = await request.post(`users/sendPasswordResetLink`, payload);
+  return data;
+};
+
+const resendVerificationLink = async (payload) => {
+  const { data } = await request.post(`users/resendVerificationLink`, payload);
   return data;
 };
 
@@ -32,5 +56,10 @@ export {
   updatePermission,
   updateAccess,
   register,
-  completeRegistration
+  getInvitationData,
+  updatePassword,
+  sendPasswordResetLink,
+  resendVerificationLink,
+  batchUpdateAccess,
+  batchUpdatePermission
 };

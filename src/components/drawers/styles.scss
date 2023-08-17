@@ -1,0 +1,30 @@
+.getting-started-drawer {
+  a {
+    text-decoration: underline;
+  }
+}
+
+.task-drawer {
+  .MuiInput-underline:before {
+    border-bottom: none !important;
+  }
+}
+
+.drawer {
+  width: 450px;
+  position: relative;
+}
+
+.getting-started-drawer .drawer {
+  width: 475px;
+}
+
+.task-drawer .drawer {
+  width: 550px;
+}
+
+@media screen and (max-width: 550px) {
+  .drawer {
+    width: 100% !important;
+  }
+}
