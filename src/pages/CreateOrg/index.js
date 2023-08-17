@@ -229,7 +229,7 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
 
   return (
     <Box className="info-page flex-centered">
-      <Box component="header">
+      <Box component="header" style={{ justifyContent: 'center' }}>
         {pageIcon}
       </Box>
       <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
