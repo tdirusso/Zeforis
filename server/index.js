@@ -1,4 +1,4 @@
-const isDev = require('../config');
+const { isDev } = require('../config');
 
 if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });

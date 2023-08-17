@@ -2,7 +2,7 @@ const { TokenExpiredError } = require("jsonwebtoken");
 const { pool } = require('../../database');
 const { slackbotClient } = require('../../slackbot');
 
-const isDev = require('../../config');
+const { isDev } = require('../../config');
 
 module.exports = async (error, req, res, _) => {
   if (!(error instanceof TokenExpiredError)) {
