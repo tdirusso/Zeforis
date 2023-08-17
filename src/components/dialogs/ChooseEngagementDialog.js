@@ -127,7 +127,7 @@ export default function ChooseEngagementDialog(props) {
               justifyContent="center"
               alignItems="flex-start">
               <IconButton
-              className='close-btn'
+                className='close-btn'
                 hidden={!close}
                 size='large'
                 onClick={handleClose}>
@@ -179,6 +179,7 @@ export default function ChooseEngagementDialog(props) {
                   return (
                     <Zoom key={e.id} appear={shouldAnimate} in style={{ transitionDelay: `${(index * 15) + 100}ms` }}>
                       <Paper
+                        component={Button}
                         onClick={() => handleLoadEngagement(e.id)}
                         className={`choose-engagement-btn ${engagement?.id === e.id ? 'active' : ''}`}>
                         {

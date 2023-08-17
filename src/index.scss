@@ -210,16 +210,6 @@ h6 {
   }
 }
 
-.choose-engagement-btn,
-.choose-org-btn {
-  cursor: pointer;
-  position: relative;
-
-  &:hover {
-    background: #f6f6f6;
-  }
-}
-
 .MuiDialogActions-root>:not(:first-of-type) {
   margin-left: 0px !important;
 }

@@ -282,8 +282,9 @@ export default function Header(props) {
 
               <Divider />
 
-              <Box ml={2} width={200}>
+              <Box textAlign='center'>
                 <ToggleButtonGroup
+                  style={{ width: '200px' }}
                   size="small"
                   onChange={handleThemeChange}
                   exclusive

@@ -2,7 +2,7 @@
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress, Paper, Zoom } from '@mui/material';
+import { Box, Button, CircularProgress, Paper, Zoom } from '@mui/material';
 import { setActiveOrgId } from '../../api/orgs';
 
 export default function ChooseOrgScreen(props) {
@@ -51,8 +51,9 @@ export default function ChooseOrgScreen(props) {
                 return (
                   <Zoom key={org.id} appear in style={{ transitionDelay: `${index * 50}ms` }}>
                     <Paper
+                      component={Button}
                       onClick={() => handleLoadOrg(org.id)}
-                      className='m2 choose-org-btn'>
+                      className='m2'>
                       {
                         isLoadingOrg && orgId === org.id ? <CircularProgress size={20} /> : org.name
                       }
