@@ -2,6 +2,7 @@
   --colors-primary: #3365f6;
   --colors-primary-rgb: 35, 153, 239;
   --colors-body-background: #f3f4f9;
+  --colors-body-background-dark: #101418;
 }
 
 html,
@@ -17,11 +18,17 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--colors-body-background);
   color: #121f43;
+  transition: background-color 250ms, color 250ms;
 }
 
 body * {
   box-sizing: border-box;
   margin: 0;
+}
+
+body.dark {
+  color: white;
+  background-color: var(--colors-body-background-dark);
 }
 
 .flex {
@@ -219,6 +226,10 @@ h6 {
 
 .MuiDialogActions-root {
   gap: 8px;
+}
+
+.MuiTab-root {
+  font-weight: 400 !important;
 }
 
 @media screen and (max-width: 550px) {

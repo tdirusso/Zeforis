@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
-import { Box, Grid, createTheme } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
@@ -18,7 +18,7 @@ import useModal from "../../hooks/useModal";
 import Drawers from "../../components/drawers";
 import useDrawer from "../../hooks/useDrawer";
 import useSideNav from "../../hooks/useSideNav";
-import { hexToRgb } from "../../lib/utils";
+import { hexToRgb, updateTheme } from "../../lib/utils";
 import useDialog from "../../hooks/useDialog";
 import Dialogs from "../../components/dialogs";
 import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
@@ -97,7 +97,7 @@ export default function Home({ setTheme }) {
           themeConfig.palette.primary.main = activeOrg.brandColor;
           document.title = `${activeOrg.name} Portal`;
 
-          setTheme(createTheme(themeConfig));
+          updateTheme(setTheme);
           setOrg(activeOrg);
           setIsOrgOwner(isOwnerOfActiveOrg);
           setEngagements(getUserEngagementListForOrg(user, activeOrgId));
@@ -344,6 +344,7 @@ export default function Home({ setTheme }) {
               openDialog={openDialog}
               toggleSideNav={toggleSideNav}
               isSideNavOpen={isSideNavOpen}
+              setTheme={setTheme}
             />
 
             <Modals

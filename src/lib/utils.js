@@ -1,3 +1,6 @@
+import { createTheme } from "@mui/material";
+import themeConfig, { darkThemeOverrides } from "../theme";
+
 function hexToRgb(hex) {
   var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, function (m, r, g, b) {
@@ -12,6 +15,30 @@ function hexToRgb(hex) {
   } : null;
 }
 
+function updateTheme(setTheme, mode) {
+  if (!mode) {
+    mode = localStorage.getItem('theme') || 'light';
+  }
+
+  localStorage.setItem('theme', mode);
+
+  const newThemeObject = {
+    ...themeConfig,
+    palette: {
+      ...themeConfig.palette,
+      mode: mode
+    },
+    components: {
+      ...themeConfig.components,
+      ...(mode === 'dark' ? darkThemeOverrides.components : {})
+    }
+  };
+
+  document.body.className = mode;
+  setTheme(createTheme(newThemeObject));
+}
+
 export {
-  hexToRgb
+  hexToRgb,
+  updateTheme
 };

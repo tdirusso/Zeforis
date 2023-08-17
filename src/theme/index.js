@@ -138,8 +138,58 @@ const theme = {
     },
     MuiIconButton: {
       defaultProps: { disableFocusRipple: true },
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none'
+        }
+      }
+    }
+  }
+};
+
+const darkThemeOverrides = {
+  components: {
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          padding: '0 !important'
+        }
+      },
+      defaultProps: {
+        transitionDuration: 150,
+        disableScrollLock: true
+      }
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          padding: '0 !important'
+        }
+      }
+    },
+    MuiPickersPopper: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          padding: '0 !important'
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px',
+          borderRadius: '24px',
+          padding: '24px'
+        }
+      }
     }
   }
 };
 
 export default theme;
+export { darkThemeOverrides };

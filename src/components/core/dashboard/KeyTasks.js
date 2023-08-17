@@ -1,10 +1,13 @@
-import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip, useMediaQuery } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 export default function KeyTasks({ tasks }) {
   const tasksLength = tasks.length;
+
+  const theme = useTheme();
+  const taskButtonTextColor = theme.palette.text.primary;
 
   const navigate = useNavigate();
 
@@ -35,7 +38,7 @@ export default function KeyTasks({ tasks }) {
         </Box>
         {
           tasksLength > 0 ?
-            <KeyTasksList tasks={tasks} /> :
+            <KeyTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
             <NoKeyTasksMessage />
         }
       </Paper>
@@ -53,9 +56,14 @@ function NoKeyTasksMessage() {
   );
 }
 
-const KeyTasksList = ({ tasks }) => tasks.map(task => <KeyTaskRow task={task} key={task.task_id} />);
+const KeyTasksList = ({ tasks, buttonColor }) => tasks.map(task =>
+  <KeyTaskRow
+    buttonColor={buttonColor}
+    task={task}
+    key={task.task_id} />
+);
 
-function KeyTaskRow({ task }) {
+function KeyTaskRow({ task, buttonColor }) {
   const {
     openDrawer
   } = useOutletContext();
@@ -70,6 +78,9 @@ function KeyTaskRow({ task }) {
 
   return (
     <Box
+      style={{ color: buttonColor }}
+      className="task-button"
+      component={Button}
       display="flex"
       alignItems="center"
       gap={1}
@@ -79,7 +90,6 @@ function KeyTaskRow({ task }) {
       minHeight={50}
       borderRadius='8px'
       key={task.task_id}
-      className="task-row"
       onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="space-between">
       <Typography
@@ -98,6 +108,7 @@ function KeyTaskRow({ task }) {
           task.link_url ?
             <Tooltip title="Open Link">
               <IconButton
+              component="div"
                 disabled={!task.link_url}
                 onClick={e => {
                   e.stopPropagation();

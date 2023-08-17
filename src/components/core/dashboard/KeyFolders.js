@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, useTheme } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
 import { useNavigate, useOutletContext } from "react-router-dom";
 import AddTaskIcon from '@mui/icons-material/AddTask';
@@ -11,6 +11,9 @@ export default function KeyFolders({ folders }) {
   } = useOutletContext();
 
   const navigate = useNavigate();
+
+  const theme = useTheme();
+  const taskButtonTextColor = theme.palette.text.primary;
 
   const handleOpenCreateTaskDrawer = folder => {
     openDrawer('create-task', { defaultFolder: folder });
@@ -50,6 +53,7 @@ export default function KeyFolders({ folders }) {
                     <TaskList
                       tasks={folder.tasks.slice(0, 5)}
                       openDrawer={openDrawer}
+                      buttonColor={taskButtonTextColor}
                     /> :
                     <NoTasksMessage
                       handleOpenCreateTaskDrawer={() => handleOpenCreateTaskDrawer(folder)}
@@ -81,7 +85,7 @@ function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
   );
 }
 
-function TaskList({ tasks, openDrawer }) {
+function TaskList({ tasks, openDrawer, buttonColor }) {
   return tasks.map(task => {
     let taskName = task.task_name;
 
@@ -91,10 +95,12 @@ function TaskList({ tasks, openDrawer }) {
 
     return (
       <Box
+        style={{ color: buttonColor }}
+        className="task-button"
+        component={Button}
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        className="task-row"
         mb={0.25}
         px={1}
         py={0.5}
@@ -110,6 +116,7 @@ function TaskList({ tasks, openDrawer }) {
           task.link_url ?
             <Tooltip title="Open Link">
               <IconButton
+                component="div"
                 disabled={!task.link_url}
                 onClick={e => {
                   e.stopPropagation();

@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip, Divider } from "@mui/material";
+import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip, Divider, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -19,9 +19,13 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { SwapHorizOutlined } from "@mui/icons-material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import HelpIcon from '@mui/icons-material/Help';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import { updateTheme } from "../../lib/utils";
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [themeVal, setThemeVal] = useState(localStorage.getItem('theme') || 'light');
 
   const navigate = useNavigate();
 
@@ -34,7 +38,8 @@ export default function Header(props) {
     openDrawer,
     toggleSideNav,
     isSideNavOpen,
-    openDialog
+    openDialog,
+    setTheme
   } = props;
 
   const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
@@ -83,6 +88,14 @@ export default function Header(props) {
   const openGettingStartedDrawer = () => {
     setAnchorEl(null);
     openDrawer('getting-started');
+  };
+
+  const handleThemeChange = (_, newThemeMode) => {
+    if (newThemeMode) {
+      updateTheme(setTheme, newThemeMode);
+      setThemeVal(newThemeMode);
+      setAnchorEl(null);
+    }
   };
 
   return (
@@ -266,7 +279,31 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
+
               <Divider />
+
+              <Box ml={2} width={200}>
+                <ToggleButtonGroup
+                  size="small"
+                  onChange={handleThemeChange}
+                  exclusive
+                  fullWidth
+                  value={themeVal}>
+                  <ToggleButton
+                    value='light'
+                    color="primary">
+                    <LightModeIcon style={{ marginRight: '5px' }} fontSize="small" /> Light
+                  </ToggleButton>
+                  <ToggleButton
+                    value='dark'
+                    color="primary">
+                    <DarkModeIcon style={{ marginRight: '5px' }} fontSize="small" /> Dark
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+
+              <Divider style={{ margin: '8px 0' }} />
+
               <MenuItem onClick={() => logout(user.email, customLoginPageUrl)} dense>
                 <ListItemIcon>
                   <LogoutIcon />

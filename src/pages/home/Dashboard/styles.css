@@ -1,12 +1,3 @@
-.task-row {
-  transition: all 250ms;
-  cursor: pointer;
-}
-
-.task-row:hover {
-  background: var(--colors-body-background);
-}
-
 .in-progress-icon {
   background-color: #ffa5001c;
   color: orange;
@@ -29,4 +20,10 @@
   display: inline-flex;
   border-radius: 50%;
   padding: 15px;
+}
+
+.task-button {
+  white-space: break-spaces !important;
+  text-align: left;
+  width: 100%;
 }

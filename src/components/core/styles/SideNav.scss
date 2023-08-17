@@ -8,8 +8,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  transition: left 200ms;
+  transition: left 200ms, background-color 250ms, box-shadow 250ms;
   z-index: 1;
+  box-shadow: rgba(204, 207, 242, 0.4) 0px 7px 24px 0px;
 
   .close-btn {
     position: absolute;
@@ -41,6 +42,11 @@
   }
 }
 
+body.dark .Sidenav {
+  background-color: var(--colors-body-background-dark);
+  box-shadow: rgba(0, 0, 0, 0.75) -2px 52px 35px 1px;
+}
+
 .Sidenav .container {
   padding: 30px 15px 40px 15px;
   flex-direction: column;
@@ -65,7 +71,6 @@
 .Sidenav .menu li {
   margin: 8px 0;
   border-radius: 8px;
-  background-color: white;
   cursor: pointer;
   transition: all 200ms;
   color: #5f748d;

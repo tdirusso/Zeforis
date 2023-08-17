@@ -1,11 +1,11 @@
-import { Box, Button, TextField, InputAdornment, Divider, Skeleton, createTheme, Typography, IconButton, Tooltip, Menu } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Divider, Skeleton,Typography, IconButton, Tooltip, Menu } from "@mui/material";
 import React, { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { useOutletContext } from "react-router";
 import { deleteActiveOrgId, leaveOrg, updateOrg } from "../../../../api/orgs";
 import { TwitterPicker } from "react-color";
-import { hexToRgb } from "../../../../lib/utils";
+import { hexToRgb, updateTheme } from "../../../../lib/utils";
 import themeConfig from "../../../../theme";
 import LinkIcon from '@mui/icons-material/Link';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -131,7 +131,7 @@ export default function GeneralTab() {
     document.documentElement.style.setProperty('--colors-primary', brandColor);
     document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
     themeConfig.palette.primary.main = brandColor;
-    setTheme(createTheme(themeConfig));
+    updateTheme(setTheme);
   };
 
   const handleCopyLoginLink = () => {

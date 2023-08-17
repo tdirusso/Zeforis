@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton, useMediaQuery } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
@@ -10,6 +10,9 @@ export default function UpcomingTasks({ tasks }) {
   const tasksLength = tasks.length;
 
   const navigate = useNavigate();
+
+  const theme = useTheme();
+  const taskButtonTextColor = theme.palette.text.primary;
 
   return (
     <Grid item xs={12} md={6}>
@@ -38,7 +41,7 @@ export default function UpcomingTasks({ tasks }) {
         </Box>
         {
           tasksLength > 0 ?
-            <UpcomingTasksList tasks={tasks} /> :
+            <UpcomingTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
             <NoUpcomingTasksMessage />
         }
       </Paper>
@@ -56,9 +59,12 @@ function NoUpcomingTasksMessage() {
   );
 }
 
-const UpcomingTasksList = ({ tasks }) => tasks.map(task => <UpcomingTaskRow task={task} key={task.task_id} />);
+const UpcomingTasksList = ({ tasks, buttonColor }) => tasks.map(task =>
+  <UpcomingTaskRow task={task} key={task.task_id} buttonColor={buttonColor}
+  />
+);
 
-function UpcomingTaskRow({ task }) {
+function UpcomingTaskRow({ task, buttonColor }) {
   const {
     openDrawer
   } = useOutletContext();
@@ -77,6 +83,9 @@ function UpcomingTaskRow({ task }) {
 
   return (
     <Box
+      style={{ color: buttonColor }}
+      color={buttonColor}
+      className="task-button"
       display="flex"
       alignItems="center"
       gap={1.5}
@@ -85,10 +94,10 @@ function UpcomingTaskRow({ task }) {
       py={1}
       borderRadius='8px'
       key={task.task_id}
-      className="task-row"
+      component={Button}
       onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="center">
-      <Box flexBasis={isSmallScreen ? 'unset' : '60%'} minWidth={75}>
+      <Box flexBasis={isSmallScreen ? 'unset' : '60%'} minWidth={75} mr='auto'>
         <Typography
           variant="body2">
           {taskName}
@@ -108,6 +117,7 @@ function UpcomingTaskRow({ task }) {
           task.link_url ?
             <Tooltip title="Open Link">
               <IconButton
+                component="div"
                 disabled={!task.link_url}
                 onClick={e => {
                   e.stopPropagation();
