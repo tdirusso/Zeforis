@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { Divider, Tooltip } from "@mui/material";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -7,9 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import { useOutletContext } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import React, { useState } from "react";
-import EditUserPermissionsModal from "../../../admin/EditUserPermissionsModal";
-import RemoveOrgUserModal from "../../../admin/RemoveOrgUserModal";
+import React from "react";
 
 export default function UsersTab() {
 
@@ -17,21 +15,18 @@ export default function UsersTab() {
     user,
     orgUsers,
     isAdmin,
-    org
+    org,
+    openModal
   } = useOutletContext();
 
-  const [userToModify, setUserToModify] = useState(null);
-  const [editUserPermissionsModalOpen, setEditUserPermissionsModalOpen] = useState(false);
-  const [removeUserModalOpen, setRemoveUserModalOpen] = useState(false);
+  const isSmallScreen = useMediaQuery('(max-width: 525px)');
 
   const handleEditUser = (userObject) => {
-    setUserToModify(userObject);
-    setEditUserPermissionsModalOpen(true);
+    openModal('edit-permissions', { user: userObject });
   };
 
   const handleRemoveUser = (userObject) => {
-    setUserToModify(userObject);
-    setRemoveUserModalOpen(true);
+    openModal('remove-user', { userToRemove: userObject });
   };
 
   return (
@@ -88,7 +83,7 @@ export default function UsersTab() {
                     }>
                     <ListItemText
                       primary={primaryText}
-                      secondary={orgUser.email}
+                      secondary={isSmallScreen ? '' : orgUser.email}
                     />
                   </ListItem>
                   {index !== orgUser.length - 1 ? <Divider /> : null}
@@ -98,18 +93,6 @@ export default function UsersTab() {
           }
         </List>
       </Box>
-
-      <EditUserPermissionsModal
-        user={userToModify}
-        open={editUserPermissionsModalOpen}
-        setOpen={setEditUserPermissionsModalOpen}
-      />
-
-      <RemoveOrgUserModal
-        open={removeUserModalOpen}
-        setOpen={setRemoveUserModalOpen}
-        user={userToModify}
-      />
     </>
   );
 };

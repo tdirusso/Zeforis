@@ -8,15 +8,12 @@ import Divider from '@mui/material/Divider';
 import React from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteFolderModal from "../../../components/admin/DeleteFolderModal";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import HelpIcon from '@mui/icons-material/Help';
 
 export default function FoldersPage() {
-  const [deleteFolderModalOpen, setDeleteFolderModalOpen] = useState(false);
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -25,7 +22,8 @@ export default function FoldersPage() {
   const {
     folders,
     isAdmin,
-    openDrawer
+    openDrawer,
+    openModal
   } = useOutletContext();
 
   const handleMenuClick = (e, folder) => {
@@ -53,7 +51,7 @@ export default function FoldersPage() {
   };
 
   const handleDeleteClick = () => {
-    setDeleteFolderModalOpen(true);
+    openModal('delete-folder', { folder: folderToEdit });
     setAnchorEl(null);
   };
 
@@ -96,7 +94,7 @@ export default function FoldersPage() {
 
       <Grid item xs={12}>
         <Divider textAlign="center">
-          <Chip label="Other Folders" color="primary"/>
+          <Chip label="Other Folders" color="primary" />
         </Divider>
       </Grid>
 
@@ -144,16 +142,9 @@ export default function FoldersPage() {
                 Delete Folder
               </Typography>
             </Box>
-
           </ListItemText>
         </MenuItem>
       </Menu>
-
-      <DeleteFolderModal
-        open={deleteFolderModalOpen}
-        setOpen={setDeleteFolderModalOpen}
-        folder={folderToEdit}
-      />
     </>
   );
 };

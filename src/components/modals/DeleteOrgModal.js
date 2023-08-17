@@ -51,7 +51,7 @@ export default function DeleteOrgModal(props) {
             <br></br>
             If you proceed, all data for this organization will be permanently deleted.
           </DialogContentText>
-          <DialogActions style={{ marginTop: '2rem', padding: 0 }}>
+          <DialogActions style={{ marginTop: '2rem', padding: 0 }} className='wrap-on-small'>
             <Button
               disabled={isLoading}
               fullWidth

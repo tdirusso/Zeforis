@@ -25,7 +25,7 @@ module.exports = async (req, res, next) => {
       [engagementId]
     );
 
-    const orgUsersMap = {};
+    const orgUsersMap = new Map();
 
     const [orgUsers] = await connection.query(
       `
@@ -58,24 +58,28 @@ module.exports = async (req, res, next) => {
         email
       } = row;
 
-      if (!orgUsersMap[user_id]) {
-        orgUsersMap[user_id] = {
+      let mappedUser = orgUsersMap.get(user_id);
+
+      if (!mappedUser) {
+        orgUsersMap.set(user_id, {
           firstName: first_name,
           lastName: last_name,
           email,
           id: user_id,
           memberOfEngagements: [],
           adminOfEngagements: []
-        };
+        });
+
+        mappedUser = orgUsersMap.get(user_id);
       }
 
       if (role === 'admin') {
-        orgUsersMap[user_id].adminOfEngagements.push({
+        mappedUser.adminOfEngagements.push({
           id: engagement_id,
           name: engagement_name
         });
       } else {
-        orgUsersMap[user_id].memberOfEngagements.push({
+        mappedUser.memberOfEngagements.push({
           id: engagement_id,
           name: engagement_name
         });
@@ -145,7 +149,7 @@ module.exports = async (req, res, next) => {
       tasks,
       tags,
       widgets,
-      orgUsers: Object.values(orgUsersMap)
+      orgUsers: [...orgUsersMap.values()]
     };
 
     return res.json(engagementData);

@@ -377,7 +377,6 @@ export default function TaskDrawer(props) {
             <Box display='flex' justifyContent='space-between'>
               <Tooltip title='Close'>
                 <IconButton
-
                   onClick={handleClose}>
                   <CloseIcon />
                 </IconButton>

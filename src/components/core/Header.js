@@ -201,7 +201,7 @@ export default function Header(props) {
                   maxWidth: '350px'
                 }
               }}>
-              <Box p="23px 28px 14px 25px">
+              <Box p="10px 20px 5px 20px">
                 <Typography>
                   <b>{user.firstName} {user.lastName}</b>
                 </Typography>
@@ -238,6 +238,7 @@ export default function Header(props) {
                   </Box>
                 </Box>
                 <Button
+                  size="small"
                   startIcon={<SwapHorizOutlined />}
                   onClick={openChangeOrgOrEngagement}
                   variant="outlined">
@@ -245,7 +246,7 @@ export default function Header(props) {
                 </Button>
               </Box>
               <Divider style={{ margin: '8px 0' }} />
-              <MenuItem onClick={openSettings}>
+              <MenuItem onClick={openSettings} dense>
                 <ListItemIcon>
                   <SettingsIcon />
                 </ListItemIcon>
@@ -255,7 +256,7 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
-              <MenuItem onClick={openGettingStartedDrawer}>
+              <MenuItem onClick={openGettingStartedDrawer} dense>
                 <ListItemIcon>
                   <HelpIcon />
                 </ListItemIcon>
@@ -266,7 +267,7 @@ export default function Header(props) {
                 </ListItemText>
               </MenuItem>
               <Divider />
-              <MenuItem onClick={() => logout(user.email, customLoginPageUrl)}>
+              <MenuItem onClick={() => logout(user.email, customLoginPageUrl)} dense>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>

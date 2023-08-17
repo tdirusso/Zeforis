@@ -13,7 +13,7 @@ import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
 import Header from "../../components/core/Header";
-import Modals from "../../components/core/Modals";
+import Modals from "../../components/modals";
 import useModal from "../../hooks/useModal";
 import Drawers from "../../components/drawers";
 import useDrawer from "../../hooks/useDrawer";

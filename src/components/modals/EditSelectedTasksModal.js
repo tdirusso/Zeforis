@@ -360,7 +360,7 @@ export default function EditSelectedTasksModal(props) {
           </Grid>
         </Grid>
 
-        <DialogActions style={{ padding: 0, marginTop: '2rem' }}>
+        <DialogActions style={{ padding: 0, marginTop: '2rem' }} className='wrap-on-small'>
           <Button
             fullWidth
             variant="outlined"

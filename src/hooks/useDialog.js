@@ -11,7 +11,6 @@ export default function useDialog() {
 
   const closeDialog = () => {
     setDialogToOpen('');
-    setDialogProps({});
   };
 
   return {

@@ -212,3 +212,18 @@ h6 {
     background: #f6f6f6;
   }
 }
+
+.MuiDialogActions-root>:not(:first-of-type) {
+  margin-left: 0px !important;
+}
+
+.MuiDialogActions-root {
+  gap: 8px;
+}
+
+@media screen and (max-width: 550px) {
+  .wrap-on-small {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+}

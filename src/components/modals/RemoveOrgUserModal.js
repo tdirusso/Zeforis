@@ -6,19 +6,21 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { removeUser } from '../../api/engagements';
-import { useOutletContext } from 'react-router-dom';
 
-export default function RemoveOrgUserModal({ open, setOpen, user }) {
+export default function RemoveOrgUserModal(props) {
   const {
+    isOpen,
+    close,
     org,
     setOrgUsers,
-    openSnackBar
-  } = useOutletContext();
+    openSnackBar,
+    userToRemove
+  } = props;
 
   const orgId = org.id;
   const orgName = org.name;
-  const userId = user?.id;
-  const name = user?.firstName + ' ' + user?.lastName;
+  const userId = userToRemove?.id;
+  const name = userToRemove?.firstName + ' ' + userToRemove?.lastName;
 
   const [isLoading, setLoading] = useState(false);
 
@@ -39,7 +41,7 @@ export default function RemoveOrgUserModal({ open, setOpen, user }) {
           openSnackBar('Successully removed.', 'success');
         }, 250);
 
-        setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== user.id));
+        setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== userToRemove.id));
         handleClose();
       } else {
         openSnackBar(resultMessage, 'error');
@@ -52,13 +54,13 @@ export default function RemoveOrgUserModal({ open, setOpen, user }) {
   };
 
   const handleClose = () => {
-    setOpen(false);
+    close();
     setLoading(false);
   };
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={close}>
         <DialogContent >
           <DialogContentText style={{ marginBottom: '2rem' }}>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>
@@ -66,7 +68,7 @@ export default function RemoveOrgUserModal({ open, setOpen, user }) {
             <br></br>
             Proceeding will remove them from all engagements within {orgName} and unassign all tasks that are currently assigned to them.
           </DialogContentText>
-          <DialogActions style={{ padding: 0 }}>
+          <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
               fullWidth
               disabled={isLoading}

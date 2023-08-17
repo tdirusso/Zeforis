@@ -6,25 +6,22 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteTasks } from '../../api/tasks';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function DeleteTasksModal(props) {
 
   const {
-    open,
-    setOpen,
-    taskIds,
+    isOpen,
+    close,
+    taskIds = [],
     exitPath,
-    setSelectedTasks
-  } = props;
-
-  const {
+    setSelectedTasks,
     setTasks,
     engagement,
     tasksMap,
     openSnackBar
-  } = useOutletContext();
+  } = props;
 
   const engagementId = engagement.id;
 
@@ -86,7 +83,7 @@ export default function DeleteTasksModal(props) {
   };
 
   const handleClose = () => {
-    setOpen(false);
+    close();
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -94,12 +91,12 @@ export default function DeleteTasksModal(props) {
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose}>
         <DialogContent>
           <DialogContentText style={{ marginBottom: '2rem' }}>
             Are you sure you want to <strong>permanently delete</strong> {taskIds.length} tasks?
           </DialogContentText>
-          <DialogActions style={{ padding: 0 }}>
+          <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
               disabled={isLoading}
               fullWidth

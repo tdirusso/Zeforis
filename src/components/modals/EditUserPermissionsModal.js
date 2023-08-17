@@ -2,8 +2,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
-import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip } from '@mui/material';
-import { useOutletContext } from 'react-router-dom';
+import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery } from '@mui/material';
 import { updateAccess, updatePermission, batchUpdateAccess, batchUpdatePermission } from '../../api/users';
 import Switch from '@mui/material/Switch';
 import EditIcon from '@mui/icons-material/Edit';
@@ -12,12 +11,21 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import HelpIcon from '@mui/icons-material/Help';
+import CloseIcon from '@mui/icons-material/Close';
+
 export default function EditUserPermissionsModal(props) {
   const {
-    open,
-    setOpen,
-    user
+    isOpen,
+    close,
+    user,
+    engagements,
+    setOrgUsers,
+    orgUsersMap,
+    openSnackBar,
+    org
   } = props;
+
+  const isSmallScreen = useMediaQuery('(max-width: 800px)');
 
   const memberOfEngagementIds = user?.memberOfEngagements.map(({ id }) => id) || [];
   const adminOfEngagementIds = user?.adminOfEngagements.map(({ id }) => id) || [];
@@ -32,14 +40,6 @@ export default function EditUserPermissionsModal(props) {
 
   const bulkAccessMenuOpen = Boolean(bulkAccessMenu);
   const bulkAdminMenuOpen = Boolean(bulkAdminMenu);
-
-  const {
-    engagements,
-    setOrgUsers,
-    orgUsersMap,
-    openSnackBar,
-    org
-  } = useOutletContext();
 
   const theUser = orgUsersMap[user?.id];
 
@@ -124,7 +124,7 @@ export default function EditUserPermissionsModal(props) {
   };
 
   const handleClose = () => {
-    setOpen(false);
+    close();
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -213,10 +213,26 @@ export default function EditUserPermissionsModal(props) {
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose} PaperProps={{ style: { minWidth: 900 } }}>
-        <DialogContent>
+      <Dialog
+        fullScreen={isSmallScreen}
+        open={isOpen}
+        onClose={handleClose}
+        PaperProps={{
+          className: 'permissions-dialog'
+        }}>
+        <DialogContent className='content'>
+          <Box>
+            <IconButton
+              size="large"
+              onClick={handleClose}>
+              <CloseIcon
+              />
+            </IconButton>
+          </Box>
           <DialogContentText style={{ marginBottom: '1rem' }} className='flex-ac'>
-            Viewing permissions for&nbsp; <strong>{user?.firstName} {user?.lastName}</strong>
+            <Typography>
+              Viewing permissions for&nbsp; <strong>{user?.firstName} {user?.lastName} - {user?.email}.</strong>
+            </Typography>
             <CircularProgress
               size={20}
               style={{
@@ -233,10 +249,10 @@ export default function EditUserPermissionsModal(props) {
             mt={3}
             display="flex"
             alignItems="center">
-            <Box component="h5" flexBasis="33%" >
+            <Box component="h5" flexBasis="55%" >
               Engagement
             </Box>
-            <Box flexBasis="33%" textAlign='center'>
+            <Box flexBasis="22%" textAlign='center'>
               <Box component="h5">
                 <Tooltip
                   title={
@@ -264,9 +280,9 @@ export default function EditUserPermissionsModal(props) {
                 </IconButton>
               </Box>
             </Box>
-            <Box flexBasis="33%" textAlign='center'>
+            <Box flexBasis="22" textAlign='center'>
               <Box component="h5">
-                Administrator
+                Admin.
                 <IconButton style={{ marginLeft: '3px' }}
                   onClick={e => setBulkAdminMenu(e.currentTarget)}>
                   <EditIcon fontSize='small' />
@@ -281,7 +297,7 @@ export default function EditUserPermissionsModal(props) {
 
               let engagementName = engagement.name;
               if (engagementName.length > 30) {
-                engagementName = engagementName.substring(0, 40) + '...';
+                engagementName = engagementName.substring(0, 30) + '...';
               }
 
               return (
@@ -289,16 +305,16 @@ export default function EditUserPermissionsModal(props) {
                   <Box
                     display="flex"
                     alignItems="center">
-                    <Typography flexBasis="33%">
+                    <Typography flexBasis="55%">
                       {engagementName}
                     </Typography>
-                    <Box flexBasis='33%' textAlign='center'>
+                    <Box flexBasis='20%' textAlign='center'>
                       <Checkbox
                         checked={isMember || isAdmin}
                         onChange={(_, isChecked) => handleUpdateAccess(isChecked, engagement)}
                       />
                     </Box>
-                    <Box flexBasis='33%' textAlign='center'>
+                    <Box flexBasis='20%' textAlign='center'>
                       <Switch
                         disabled={!isMember && !isAdmin}
                         onChange={(_, isChecked) => handleUpdatePermission(isChecked, engagement)}

@@ -24,8 +24,6 @@ import './styles.scss';
 import { useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import TasksFilter from "./TasksFilter";
-import EditSelectedTasksModal from "../../admin/EditSelectedTasksModal";
-import DeleteTasksModal from "../../admin/DeleteTasksModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -39,13 +37,11 @@ export default function TasksTable({ tasks }) {
     foldersMap,
     tagsMap,
     isAdmin,
-    openDrawer
+    openDrawer,
+    openModal
   } = useOutletContext();
 
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
-
-  const [editSelectedTasksModalOpen, setEditSelectedTasksModalOpen] = useState(false);
-  const [deleteTasksModalOpen, setDeleteTasksModalOpen] = useState(false);
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -183,7 +179,7 @@ export default function TasksTable({ tasks }) {
               hidden={!isEditMode}
               variant="outlined"
               style={{ marginRight: '0.75rem' }}
-              onClick={() => setEditSelectedTasksModalOpen(true)}
+              onClick={() => openModal('edit-tasks', { taskIds: selectedTasks, setSelectedTasks })}
               disabled={selectedTasks.length === 0}
               startIcon={<EditIcon />}>
               Edit
@@ -199,13 +195,13 @@ export default function TasksTable({ tasks }) {
               selectedTasks.length > 0 ?
                 isSmallScreen ?
                   <IconButton
-                    onClick={() => setDeleteTasksModalOpen(true)}
+                    onClick={() => openModal('delete-tasks', { taskIds: selectedTasks, setSelectedTasks })}
                     style={{ marginLeft: 'auto' }} color="error">
                     <DeleteIcon />
                   </IconButton> :
                   <Button
                     style={{ marginLeft: 'auto' }}
-                    onClick={() => setDeleteTasksModalOpen(true)}
+                    onClick={() => openModal('delete-tasks', { taskIds: selectedTasks, setSelectedTasks })}
                     startIcon={<DeleteIcon />}
                     color="error">
                     Delete
@@ -330,20 +326,6 @@ export default function TasksTable({ tasks }) {
           </Box>
         </Paper>
       </Grid>
-
-      <EditSelectedTasksModal
-        taskIds={selectedTasks}
-        open={editSelectedTasksModalOpen}
-        setOpen={setEditSelectedTasksModalOpen}
-        setSelectedTasks={setSelectedTasks}
-      />
-
-      <DeleteTasksModal
-        open={deleteTasksModalOpen}
-        setOpen={setDeleteTasksModalOpen}
-        taskIds={selectedTasks}
-        setSelectedTasks={setSelectedTasks}
-      />
     </>
   );
 };

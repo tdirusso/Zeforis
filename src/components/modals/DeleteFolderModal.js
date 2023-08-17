@@ -5,36 +5,44 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { deleteEngagement } from '../../api/engagements';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { deleteFolder } from '../../api/folders';
 
-export default function DeleteEngagementModal(props) {
+export default function DeleteFolderModal(props) {
 
   const {
-    close,
     isOpen,
+    close,
+    folder,
     engagement,
-    openSnackBar,
-    org
+    foldersMap,
+    setFolders,
+    setTasks,
+    openSnackBar
   } = props;
 
   const engagementId = engagement.id;
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleDeleteEngagement = async () => {
+  const handleDeleteFolder = async () => {
     setLoading(true);
-
     try {
-      const { success, message } = await deleteEngagement({
+      const { success, message } = await deleteFolder({
         engagementId,
-        org: org.id
+        folderId: folder.id
       });
 
       if (success) {
         setTimeout(() => {
-          openSnackBar('Engagement deleted.', 'success');
-          window.location.href = '/home/dashboard';
+          openSnackBar(`Successfully deleted.`, 'success');
         }, 250);
+
+        delete foldersMap[folder.id];
+
+        setTasks(tasks => tasks.filter(t => t.folder_id !== folder.id));
+        setFolders(Object.values(foldersMap));
+        handleClose();
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -45,32 +53,38 @@ export default function DeleteEngagementModal(props) {
     }
   };
 
+  const handleClose = () => {
+    close();
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  };
+
   return (
     <div>
-      <Dialog open={isOpen} onClose={close}>
+      <Dialog open={isOpen} onClose={handleClose}>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to <strong>permanently delete {engagement.name}?</strong>
-            <br></br>
-            <br></br>
-            If you proceed, all data for this engagement will be permanently deleted.
+          <DialogContentText style={{ marginBottom: '2rem' }}>
+            Are you sure you want to <strong>permanently delete {folder?.name}</strong>?
+            All tasks in this folder will be deleted.
           </DialogContentText>
-          <DialogActions style={{ marginTop: '2rem', padding: 0 }}>
+          <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
               disabled={isLoading}
               fullWidth
               variant='outlined'
-              onClick={close}>
+              onClick={handleClose}>
               Cancel
             </Button>
             <LoadingButton
               variant='contained'
-              fullWidth
-              onClick={handleDeleteEngagement}
+              onClick={handleDeleteFolder}
               required
+              fullWidth
               loading={isLoading}
+              startIcon={<DeleteIcon />}
               color="error">
-              Yes, delete {engagement.name}
+              Yes, Delete
             </LoadingButton>
           </DialogActions>
         </DialogContent>
