@@ -1,4 +1,4 @@
-import { Divider, TextField, Typography } from '@mui/material';
+import { Divider, InputAdornment, TextField, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { Box } from '@mui/system';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import { isMobile } from '../../lib/constants';
+import SearchIcon from '@mui/icons-material/Search';
 
 export default function SearchModal(props) {
   const navigate = useNavigate();
@@ -69,21 +70,24 @@ export default function SearchModal(props) {
     <div>
       <Dialog
         PaperProps={{
-          style: {
-            height: 400,
-            overflow: 'hidden'
-          }
+          className: 'search-dialog'
         }}
         open={isOpen}
         onClose={handleClose}>
-
-        <Box minWidth={500}>
+        <Box>
           <TextField
             autoFocus={!isMobile}
             size='small'
             fullWidth
             onChange={e => setQuery(e.target.value)}
             placeholder="Search..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
           />
         </Box>
         <Divider className='my2' />

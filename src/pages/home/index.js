@@ -345,6 +345,7 @@ export default function Home({ setTheme }) {
               toggleSideNav={toggleSideNav}
               isSideNavOpen={isSideNavOpen}
               setTheme={setTheme}
+              isOrgOwner={isOrgOwner}
             />
 
             <Modals

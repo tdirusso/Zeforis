@@ -130,7 +130,7 @@ export default function CreateEngagementDialog(props) {
             startIcon={<SwapHorizOutlined />}
             onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
             style={{ position: 'absolute', right: '100px', top: '30px' }}
-            variant='outlined'>
+            variant='contained'>
             Change org
           </Button>
           <Grow appear in timeout={{ enter: 500 }}>

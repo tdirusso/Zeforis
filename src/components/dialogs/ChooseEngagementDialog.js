@@ -143,7 +143,7 @@ export default function ChooseEngagementDialog(props) {
                 className='change-org-btn'
                 startIcon={<SwapHorizOutlined />}
                 onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
-                variant='outlined'>
+                variant='contained'>
                 Change org
               </Button>
             </Box>

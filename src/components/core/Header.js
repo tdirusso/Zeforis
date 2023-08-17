@@ -39,7 +39,8 @@ export default function Header(props) {
     toggleSideNav,
     isSideNavOpen,
     openDialog,
-    setTheme
+    setTheme,
+    isOrgOwner
   } = props;
 
   const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
@@ -173,8 +174,8 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
-              <Divider />
-              <MenuItem onClick={openCreateEngagementDialog}>
+              <Divider hidden={!isOrgOwner}/>
+              <MenuItem onClick={openCreateEngagementDialog} hidden={!isOrgOwner}>
                 <ListItemIcon>
                   <AccountBoxIcon />
                 </ListItemIcon>
