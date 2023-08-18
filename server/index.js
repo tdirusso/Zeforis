@@ -85,6 +85,14 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(fileUpload({}));
 
+app.use((req, res, next) => {
+  if (!req.secure && req.get('x-forwarded-proto') !== 'https' && !isDev) {
+    return res.redirect('https://' + req.get('host') + req.url);
+  }
+
+  next();
+});
+
 const authenicatedUserRateLimit = rateLimit({
   windowMs: 60000, // 1 minute
   max: 200, // Limit each IP to 200 requests per 1 minute

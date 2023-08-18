@@ -306,7 +306,7 @@ export default function Header(props) {
 
               <Divider style={{ margin: '8px 0' }} />
 
-              <MenuItem onClick={() => logout(user.email, customLoginPageUrl)} dense>
+              <MenuItem onClick={() => logout(customLoginPageUrl)} dense>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>

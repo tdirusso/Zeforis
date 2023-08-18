@@ -127,7 +127,7 @@ export default function ReportGeneratorTab() {
       <Grid item xs={12} className="report-generator">
         <Paper>
           <Typography variant="body2">
-            The Report Generator is a powerful tool allows you to effortlessly customize and generate reports for efficient customer communications.
+            The Report Generator is a powerful tool that allows you to effortlessly customize and generate reports for efficient customer communications.
             You can define date ranges and choose relevant fields to curate a report that provides valuable task insights to your engagement.
             <br></br><br></br>
             Our generator includes seamless integration with
