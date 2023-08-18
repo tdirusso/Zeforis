@@ -110,6 +110,12 @@ async function handleCustomPageLogin(req, res) {
     const user = userResult[0];
 
     if (user) {
+      if (!user.password) {
+        return res.json({
+          message: `No password set for ${lcEmail} - try Google or password reset.`
+        });
+      }
+
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
@@ -205,6 +211,12 @@ async function handleUniversalLogin(req, res) {
     const user = userResult[0];
 
     if (user) {
+      if (!user.password) {
+        return res.json({
+          message: `No password set for ${lcEmail} - try Google or password reset.`
+        });
+      }
+      
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
