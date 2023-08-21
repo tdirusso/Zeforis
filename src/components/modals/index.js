@@ -6,6 +6,7 @@ import EditUserPermissionsModal from "./EditUserPermissionsModal";
 import RemoveOrgUserModal from "./RemoveOrgUserModal";
 import SearchModal from "./SearchModal";
 import './styles.scss';
+import EditSelectedTasksModal from "./EditSelectedTasksModal";
 
 export default function Modals(props) {
   const {
@@ -53,6 +54,12 @@ export default function Modals(props) {
 
       <RemoveOrgUserModal
         isOpen={modalToOpen === 'remove-user'}
+        close={closeModal}
+        {...props}
+      />
+
+      <EditSelectedTasksModal
+        isOpen={modalToOpen === 'edit-tasks'}
         close={closeModal}
         {...props}
       />
