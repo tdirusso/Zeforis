@@ -7,7 +7,6 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { batchUpdateTasks } from '../../api/tasks';
 import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip, ListItemIcon, ListItemText, Box, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { useOutletContext } from 'react-router-dom';
 import { statuses } from '../../lib/constants';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -21,13 +20,10 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 export default function EditSelectedTasksModal(props) {
   const {
-    taskIds,
-    open,
-    setOpen,
-    setSelectedTasks
-  } = props;
-
-  const {
+    taskIds = [],
+    isOpen,
+    close,
+    setSelectedTasks,
     engagementAdmins,
     engagementMembers,
     folders,
@@ -36,7 +32,7 @@ export default function EditSelectedTasksModal(props) {
     tasksMap,
     openSnackBar,
     tags
-  } = useOutletContext();
+  } = props;
 
   const engagementId = engagement.id;
 
@@ -104,7 +100,7 @@ export default function EditSelectedTasksModal(props) {
   };
 
   const handleClose = () => {
-    setOpen(false);
+    close();
     setTimeout(() => {
       setLoading(false);
       setAction('');
@@ -289,7 +285,7 @@ export default function EditSelectedTasksModal(props) {
 
   return (
     <Dialog
-      open={open}
+      open={isOpen}
       onClose={handleClose}
       PaperProps={{
         style: {
