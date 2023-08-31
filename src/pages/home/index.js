@@ -85,8 +85,11 @@ export default function Home({ setTheme }) {
 
   useEffect(() => {
     if (user) {
+
+      let activeOrg = null;
+
       if (activeOrgId) {
-        const activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
+        activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
 
         if (activeOrg) {
           const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
@@ -104,9 +107,9 @@ export default function Home({ setTheme }) {
         }
       }
 
-      if (activeEngagementId) {
+      if (activeOrg && activeEngagementId) {
         const activeEngagement = user.adminOfEngagements.concat(user.memberOfEngagements).find(engagement => {
-          return engagement.id === activeEngagementId;
+          return engagement.id === activeEngagementId && engagement.orgId === activeOrg.id;
         });
 
         if (activeEngagement) {

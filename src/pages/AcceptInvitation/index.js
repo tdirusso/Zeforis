@@ -15,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { AccountCircle } from "@mui/icons-material";
 import { setActiveOrgId } from "../../api/orgs";
+import { setActiveEngagementId } from "../../api/engagements";
 import { isMobile } from "../../lib/constants";
 
 export default function AcceptInvitationPage() {
@@ -66,6 +67,7 @@ export default function AcceptInvitationPage() {
           if (!Boolean(invitation.userNeedsPassword)) {
             openSnackBar('Invitation accepted.', 'success');
             setActiveOrgId(orgId);
+            setActiveEngagementId(engagementId);
             localStorage.setItem('openGettingStarted', 'true');
             setTimeout(() => {
               window.location.href = customLoginPageUrl;
@@ -179,7 +181,7 @@ export default function AcceptInvitationPage() {
       <div className="info-page flex-centered">
         <header>
           <Box component="a" href="https://www.zeforis.com" target="_blank">
-            <img src={zeforisLogo} alt="Zeforis" className="header-logo"/>
+            <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
           </Box>
         </header>
 
