@@ -88,7 +88,10 @@ app.use(cookieParser());
 app.use(fileUpload({}));
 
 app.use((req, res, next) => {
+  console.log('Middleware running - ', req.secure, req.get('x-forwarded-proto'));
+
   if (!req.secure && req.get('x-forwarded-proto') !== 'https' && !isDev) {
+    console.log('Redirecting...');
     return res.redirect('https://' + req.get('host') + req.url);
   }
 
@@ -171,7 +174,9 @@ const boot = async () => {
 
   app.use(errorHandlerMW);
 
-  app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
+  app.get('*', (_, res) => {
+    return res.sendFile(path.join(__dirname + '/../', 'build', 'index.html'));
+  });
 
   app.listen(port, () => console.log('App is running'));
 
