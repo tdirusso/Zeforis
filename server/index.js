@@ -88,10 +88,8 @@ app.use(cookieParser());
 app.use(fileUpload({}));
 
 const forceSSL = (req, res, next) => {
-  console.log('Middleware running - ', req.secure, req.get('x-forwarded-proto'));
 
   if (!req.secure && req.get('x-forwarded-proto') !== 'https' && !isDev) {
-    console.log('Redirecting...');
     return res.redirect(301, 'https://' + req.get('host') + req.url);
   }
 
