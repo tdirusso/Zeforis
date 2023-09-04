@@ -87,16 +87,18 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(fileUpload({}));
 
-app.use((req, res, next) => {
+const forceSSL = (req, res, next) => {
   console.log('Middleware running - ', req.secure, req.get('x-forwarded-proto'));
 
   if (!req.secure && req.get('x-forwarded-proto') !== 'https' && !isDev) {
     console.log('Redirecting...');
-    return res.redirect('https://' + req.get('host') + req.url);
+    return res.redirect(301, 'https://' + req.get('host') + req.url);
   }
 
   next();
-});
+};
+
+app.use(forceSSL);
 
 const authenicatedUserRateLimit = rateLimit({
   windowMs: 60000, // 1 minute
@@ -174,7 +176,7 @@ const boot = async () => {
 
   app.use(errorHandlerMW);
 
-  app.get('*', (_, res) => {
+  app.get('*', forceSSL, (_, res) => {
     return res.sendFile(path.join(__dirname + '/../', 'build', 'index.html'));
   });
 
