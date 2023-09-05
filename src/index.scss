@@ -153,32 +153,22 @@ h6 {
   color: #273bce;
 }
 
-.MuiChip-root.Next.Up {
-  background-color: #8527ce1a;
-  color: #8527ce;
-}
-
 .MuiChip-root.In.Progress {
   background-color: #ffa5001c;
   color: orange;
 }
 
-.MuiChip-root.Currently.Writing {
-  background-color: #ffc0cb2b;
-  color: pink;
-}
-
-.MuiChip-root.Pending.Approval {
+.MuiChip-root.Blocked {
   background-color: #ff00000f;
   color: red;
 }
 
-.MuiChip-root.Approved {
+.MuiChip-root.Review {
   background-color: #00d0d01c;
   color: #00d0d0;
 }
 
-.MuiChip-root.Ready.to.Implement {
+.MuiChip-root.On.Hold {
   background-color: #a52a2a12;
   color: brown;
 }

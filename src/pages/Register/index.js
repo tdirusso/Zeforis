@@ -60,20 +60,22 @@ export default function RegisterPage() {
   };
 
   const initializeGoogleButton = () => {
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-      callback: handleGoogleRegistration
-    });
+    if (window.google?.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        callback: handleGoogleRegistration
+      });
 
-    window.google.accounts.id.renderButton(
-      document.getElementById('google-signin'),
-      {
-        theme: "outline",
-        size: "large",
-        width: isSmallScreen ? 300 : 325,
-        text: 'signup_with'
-      }
-    );
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin'),
+        {
+          theme: "outline",
+          size: "large",
+          width: isSmallScreen ? 300 : 325,
+          text: 'signup_with'
+        }
+      );
+    }
   };
 
   const handleRegistration = e => {

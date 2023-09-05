@@ -91,19 +91,21 @@ export default function LoginPage({ setTheme }) {
   };
 
   const initializeGoogleButton = () => {
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-      callback: handleGoogleLogin
-    });
+    if (window.google?.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        callback: handleGoogleLogin
+      });
 
-    window.google.accounts.id.renderButton(
-      document.getElementById('google-signin'),
-      {
-        theme: "outline",
-        size: "large",
-        width: isSmallScreen ? 300 : 325
-      }
-    );
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin'),
+        {
+          theme: "outline",
+          size: "large",
+          width: isSmallScreen ? 300 : 325
+        }
+      );
+    }
   };
 
   useEffect(() => {
