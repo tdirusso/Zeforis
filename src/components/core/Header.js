@@ -22,6 +22,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { updateTheme } from "../../lib/utils";
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -108,19 +109,32 @@ export default function Header(props) {
       <Box className="header-box">
         <Box>
           <Tooltip title={isSideNavOpen ? 'Close Menu' : 'Open Menu'}>
-            <Paper className="header-button">
-              <IconButton
-                size="large"
-                onClick={toggleSideNav}>
-                <MenuOpenIcon
-                  style={{
-                    transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
-                    transition: 'transform 200ms'
-                  }}
-                />
-              </IconButton>
-            </Paper>
+            <IconButton
+              size="large"
+              onClick={toggleSideNav}>
+              <MenuOpenIcon
+                style={{
+                  transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
+                  transition: 'transform 200ms'
+                }}
+              />
+            </IconButton>
           </Tooltip>
+        </Box>
+        <Box className="engagement-title">
+          <Box className="flex-ac">
+            <Typography variant='h1' style={{ fontSize: '2rem', fontWeight: 200 }} mr={2}>
+              {engagement.name}
+            </Typography>
+            <Tooltip title="Change Engagement">
+              <Paper className="header-button">
+                <IconButton
+                  onClick={() => openDialog('choose-engagement')}>
+                  <SwapHorizIcon />
+                </IconButton>
+              </Paper>
+            </Tooltip>
+          </Box>
         </Box>
         <Box display="flex">
           <Box mr={2}>
@@ -174,7 +188,7 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
-              <Divider hidden={!isOrgOwner}/>
+              <Divider hidden={!isOrgOwner} />
               <MenuItem onClick={openCreateEngagementDialog} hidden={!isOrgOwner}>
                 <ListItemIcon>
                   <AccountBoxIcon />

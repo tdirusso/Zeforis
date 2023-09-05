@@ -3,7 +3,7 @@
   width: 100%;
   text-align: center;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
 
   header {
     top: 0;
@@ -13,6 +13,7 @@
     align-items: center;
     height: auto;
     padding: 35px 7.5%;
+    position: absolute;
   }
 
   form {
@@ -24,7 +25,6 @@
     padding: 4rem;
     padding-top: 2.5rem;
     width: 450px;
-    margin-top: 2rem;
   }
 
   .circle {

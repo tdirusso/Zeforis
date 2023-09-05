@@ -6,7 +6,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteTasks } from '../../api/tasks';
-import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function DeleteTasksModal(props) {
@@ -15,7 +14,6 @@ export default function DeleteTasksModal(props) {
     isOpen,
     close,
     taskIds = [],
-    exitPath,
     setSelectedTasks,
     setTasks,
     engagement,
@@ -24,8 +22,6 @@ export default function DeleteTasksModal(props) {
   } = props;
 
   const engagementId = engagement.id;
-
-  const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
 
@@ -44,34 +40,15 @@ export default function DeleteTasksModal(props) {
       if (success) {
         const deletedLength = taskIds.length;
 
-        if (exitPath) {
+        setTimeout(() => {
           openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
+        }, 250);
 
-          setTimeout(() => {
-            navigate(exitPath);
+        taskIds.forEach(id => delete tasksMap[id]);
 
-            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
-          }, 1000);
-        } else if (window.location.pathname.includes('/home/task/')) {
-          openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
-
-          setTimeout(() => {
-            navigate('/home/dashboard');
-            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
-          }, 250);
-
-          taskIds.forEach(id => delete tasksMap[id]);
-
-          setTasks(Object.values(tasksMap));
-          if (setSelectedTasks) {
-            setSelectedTasks([]);
-          }
-          handleClose();
-        }
+        setTasks(Object.values(tasksMap));
+        setSelectedTasks([]);
+        handleClose();
       } else {
         openSnackBar(resultMessage, 'error');
         setLoading(false);

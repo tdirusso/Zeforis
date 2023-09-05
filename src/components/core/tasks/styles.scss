@@ -1,5 +1,4 @@
-.tasks-table {
-}
+.tasks-table {}
 
 .tasks-table .MuiCheckbox-root {
   padding: 0;
@@ -15,7 +14,7 @@
 }
 
 .tasks-table .selected {
-  background-color: #e5f3fd80 !important;
+  background-color: rgba(var(--colors-primary-rgb), 0.075) !important;
 }
 
 .tasks-table .selected::after {

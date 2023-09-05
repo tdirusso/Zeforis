@@ -17,6 +17,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { isMobile } from "../../lib/constants";
+import { Button } from "@mui/material";
 
 export default function PasswordResetPage() {
   const { search } = useLocation();
@@ -38,16 +39,11 @@ export default function PasswordResetPage() {
         <Box component="a" href="https://www.zeforis.com" target="_blank">
           <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
-        <Box display="flex" alignItems="center">
-          <Box
-            display="flex"
-            alignItems="center"
-            mr={1.5}
-            component="a"
-            href="/login">
-            <ArrowBackRoundedIcon fontSize="small" /> &nbsp;Back to login
-          </Box>
-        </Box>
+        <a href='/login'>
+          <Button size="large" startIcon={<ArrowBackRoundedIcon />}>
+            Back to login
+          </Button>
+        </a>
       </Box>
       <Paper className="container">
         <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
@@ -55,8 +51,14 @@ export default function PasswordResetPage() {
         </Typography>
         {
           !email || !resetCode ?
-            <PasswordResetStep1 openSnackBar={openSnackBar} /> :
-            <PasswordResetStep2 openSnackBar={openSnackBar} email={email} resetCode={resetCode} />
+            <PasswordResetStep1
+              openSnackBar={openSnackBar}
+            /> :
+            <PasswordResetStep2
+              openSnackBar={openSnackBar}
+              email={email}
+              resetCode={resetCode}
+            />
         }
       </Paper>
       <Box className="circle"></Box>

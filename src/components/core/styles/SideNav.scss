@@ -28,9 +28,9 @@
   }
 
   .divider {
-    margin-top: 1.25rem;
-    margin-bottom: 3rem;
-    width: 200px
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+    width: 200px;
   }
 
   .nav-button {
@@ -39,6 +39,23 @@
     padding: 0.75rem 1.25rem;
     border-radius: 8px;
     justify-content: flex-start;
+  }
+
+  .engagement-header {
+    display: none;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 500px) {
+    .divider {
+      margin-top: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+
+    .engagement-header {
+      display: block;
+    }
   }
 }
 

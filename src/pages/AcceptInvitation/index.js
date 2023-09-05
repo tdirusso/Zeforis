@@ -179,12 +179,11 @@ export default function AcceptInvitationPage() {
   if (userNeedsPassword === null) {
     return (
       <div className="info-page flex-centered">
-        <header>
+        <header style={{ position: 'absolute' }}>
           <Box component="a" href="https://www.zeforis.com" target="_blank">
             <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
           </Box>
         </header>
-
         {
           fetchingInvitation ? <Box>
             <Typography mb={2}>Fetching invitation...</Typography>
@@ -197,7 +196,13 @@ export default function AcceptInvitationPage() {
           </Box>
             :
             <Paper className="container">
-              <Typography>Invitation does not exist or has expired.</Typography>
+              <Typography mb={2}>Invitation does not exist or has expired.</Typography>
+              <a href='/login'>
+                <Button size="large" variant="contained">
+                  Return to Homepage
+                </Button>
+              </a>
+
               <Snackbar
                 isOpen={isOpen}
                 type={type}
@@ -212,7 +217,7 @@ export default function AcceptInvitationPage() {
 
   return (
     <div className="info-page flex-centered">
-      <header>
+      <header style={{ position: 'fixed' }}>
         <Box component="a" href="https://www.zeforis.com" target="_blank">
           <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
@@ -238,9 +243,8 @@ export default function AcceptInvitationPage() {
           <Paper className="container">
             <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
             <form onSubmit={handleUpdatePassword}>
-              <Box style={{ marginBottom: '1.5rem' }}>
+              <Box mb={2}>
                 <TextField
-                  style={{ marginBottom: '0.5rem' }}
                   fullWidth
                   placeholder="First name"
                   variant="outlined"
@@ -255,6 +259,8 @@ export default function AcceptInvitationPage() {
                   disabled={isLoading}
                   autoFocus={!isMobile}
                 />
+              </Box>
+              <Box mb={2}>
                 <TextField
                   fullWidth
                   placeholder="Last name"

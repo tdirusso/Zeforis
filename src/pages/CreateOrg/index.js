@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Box, Button, Divider, Fade, Grow, Paper, TextField, Typography, createTheme } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../../components/core/Snackbar';
-import createOrgIcon from '../../assets/create-org-icon.png';
+import rocketGif from '../../assets/rocket.gif';
 import { createOrg, setActiveOrgId, updateOrg } from '../../api/orgs';
 import useSnackbar from '../../hooks/useSnackbar';
 import { hexToRgb } from '../../lib/utils';
@@ -30,7 +30,7 @@ export default function CreateOrgPage({ setTheme }) {
   }
 
   return (
-    <Box className="flex-centered" style={{ height: '100%' }}>
+    <Box className="flex-centered" style={{ height: '100vh' }}>
       <Box textAlign="center" maxWidth={600} p={3}>
         {
           step === 1 ?
@@ -96,8 +96,8 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
   return (
     <Box textAlign="center" mb={'100px'} maxWidth={600}>
       <Grow appear in timeout={{ enter: 500 }}>
-        <Box mb={2}>
-          <img src={createOrgIcon} alt="" width={125} />
+        <Box mb={1}>
+          <img src={rocketGif} alt="" width={100} />
         </Box>
       </Grow>
       <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '150ms' }}>
