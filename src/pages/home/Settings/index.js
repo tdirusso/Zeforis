@@ -46,7 +46,7 @@ export default function Settings() {
   return (
     <>
       <Grid item xs={12}>
-        <Box display='flex' gap={1.5} flexWrap='wrap'>
+        <Box display='flex' gap='1rem' flexWrap='wrap'>
           <Paper className={`custom-tab ${tabVal === 0 ? 'active' : ''}`}>
             <Button
               onClick={() => setTabVal(0)}
@@ -58,11 +58,6 @@ export default function Settings() {
               Engagement
             </Button>
           </Paper>
-          <Box className="settings-divider" style={{
-            width: '1px',
-            margin: '0 0.5rem',
-            background: 'var(--colors-primary)'
-          }}></Box>
 
           <Paper className={`custom-tab ${tabVal === 1 ? 'active' : ''}`}>
             <Button
@@ -83,7 +78,7 @@ export default function Settings() {
                 color: tabVal === 2 ? 'white' : 'var(--colors-primary)'
               }}
               startIcon={<ManageAccountsIcon />}>
-              Account
+              My Account
             </Button>
           </Paper>
         </Box>

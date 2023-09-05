@@ -32,7 +32,8 @@ const createToken = user => {
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
-        dateCreated: user.date_created
+        dateCreated: user.date_created,
+        plan: user.plan
       }
     },
     process.env.SECRET_KEY,
@@ -65,7 +66,7 @@ async function handleCustomPageLogin(req, res) {
 
     const [userResult] = await pool.query(
       `
-        SELECT id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ? AND EXISTS
+        SELECT id, is_verified, first_name, last_name, email, date_created, plan FROM users WHERE email = ? AND EXISTS
         (
           SELECT 1 FROM engagement_users 
           JOIN engagements ON engagements.id = engagement_users.engagement_id
@@ -96,7 +97,7 @@ async function handleCustomPageLogin(req, res) {
 
     const [userResult] = await pool.query(
       `
-        SELECT password, id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ? AND EXISTS
+        SELECT password, id, is_verified, first_name, last_name, email, date_created, plan FROM users WHERE email = ? AND EXISTS
         (
           SELECT 1 FROM engagement_users 
           JOIN engagements ON engagements.id = engagement_users.engagement_id
@@ -162,7 +163,7 @@ async function handleUniversalLogin(req, res) {
     const googleEmail = payload.email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name, last_name, email, date_created FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name, last_name, email, date_created, plan FROM users WHERE email = ?',
       [googleEmail]
     );
 
@@ -204,7 +205,7 @@ async function handleUniversalLogin(req, res) {
     const lcEmail = email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name, last_name, email, date_created, password FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name, last_name, email, date_created, password, plan FROM users WHERE email = ?',
       [lcEmail]
     );
 

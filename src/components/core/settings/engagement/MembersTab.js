@@ -190,7 +190,7 @@ export default function MembersTab() {
 
   return (
     <>
-      <Box mt={3} component="h4">Members of {engagement.name}</Box>
+      <Box mt={3} component="h4">Collaborators in {engagement.name}</Box>
       <Box mt={3}>
         <Box>
           <Button
@@ -199,11 +199,11 @@ export default function MembersTab() {
             style={{ marginBottom: '1rem', whiteSpace: 'break-spaces' }}
             onClick={e => setInviteUserMenuAnchor(e.currentTarget)}
             startIcon={<PersonAddIcon />}>
-            Invite someone to {engagement.name}
+            Add collaborators
           </Button>
         </Box>
         <Box>
-          <Divider textAlign="center">
+          <Divider textAlign="left">
             <Chip label="Members" />
           </Divider>
           <List dense>
@@ -255,7 +255,7 @@ export default function MembersTab() {
         </Box>
 
         <Box>
-          <Divider textAlign="center">
+          <Divider textAlign="left">
             <Chip label="Administrators" />
           </Divider>
           <List dense>

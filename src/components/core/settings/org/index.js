@@ -1,9 +1,7 @@
-import { Grid, Paper, Tabs, Tab } from "@mui/material";
+import { Grid, Paper, Tabs, Tab, Box } from "@mui/material";
 import React, { useState } from "react";
 import GeneralTab from "./GeneralTab";
 import UsersTab from "./UsersTab";
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import InfoIcon from '@mui/icons-material/Info';
 import { useOutletContext } from "react-router-dom";
 
 export default function OrgTab() {
@@ -27,15 +25,16 @@ export default function OrgTab() {
 
   return (
     <Grid item xs={12}>
-      <Paper>
-        <Tabs value={tabVal} onChange={(_, newVal) => setTabVal(newVal)}>
-          <Tab label="General" icon={<InfoIcon fontSize="small" />} iconPosition="start" />
-          <Tab hidden={!isOrgOwner} label="Users" icon={<PeopleAltIcon fontSize="small" />} iconPosition="start" />
+      <Paper className="settings-container">
+        <Tabs value={tabVal} onChange={(_, newVal) => setTabVal(newVal)} className="settings-tabs">
+          <Tab label="General" />
+          <Tab hidden={!isOrgOwner} label="Manage Members" />
         </Tabs>
-
-        {
-          getTabContent()
-        }
+        <Box p={2}>
+          {
+            getTabContent()
+          }
+        </Box>
       </Paper>
     </Grid>
   );

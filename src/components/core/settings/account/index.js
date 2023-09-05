@@ -1,9 +1,8 @@
-import { Grid, Paper, Tabs, Tab } from "@mui/material";
+import { Grid, Paper, Tabs, Tab, Box } from "@mui/material";
 import React, { useState } from "react";
 import GeneralTab from "./GeneralTab";
-import InfoIcon from '@mui/icons-material/Info';
-import PaidIcon from '@mui/icons-material/Paid';
 import BillingTab from "./BillingTab";
+import '../../styles/settings.scss';
 
 export default function AccountTab() {
   const [tabVal, setTabVal] = useState(0);
@@ -21,14 +20,16 @@ export default function AccountTab() {
 
   return (
     <Grid item xs={12}>
-      <Paper>
-        <Tabs value={tabVal} onChange={(_, newVal) => setTabVal(newVal)}>
-          <Tab label="General" icon={<InfoIcon fontSize="small" />} iconPosition="start" />
-          <Tab label="Plan & Billing" icon={<PaidIcon fontSize="small" />} iconPosition="start" />
+      <Paper className="settings-container">
+        <Tabs value={tabVal} onChange={(_, newVal) => setTabVal(newVal)} className="settings-tabs">
+          <Tab label="General" />
+          <Tab label="Plan & Billing" />
         </Tabs>
-        {
-          getTabContent()
-        }
+        <Box p='2rem'>
+          {
+            getTabContent()
+          }
+        </Box>
       </Paper>
     </Grid>
   );

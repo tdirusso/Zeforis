@@ -271,14 +271,15 @@ export default function LoginPage({ setTheme }) {
         </Box>
       </Box>
       <Paper className="container">
-        <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
+        <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>
           Sign in
         </Typography>
-        <form onSubmit={handleLogin}>
+        <Box id="google-signin"></Box>
+        <Divider className="my4" />
+        <Box component='form' onSubmit={handleLogin} display='flex' flexDirection='column' gap='1rem'>
           <TextField
             placeholder="Email"
             variant="outlined"
-            style={{ marginBottom: '2rem' }}
             type="email"
             InputProps={{
               startAdornment: (
@@ -295,6 +296,7 @@ export default function LoginPage({ setTheme }) {
             placeholder="Password"
             variant="outlined"
             type="password"
+            helperText={<a tabIndex={1} href="password-reset">Forgot password?</a>}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -305,18 +307,13 @@ export default function LoginPage({ setTheme }) {
             inputRef={password}
             disabled={isLoading}
           />
-          <Box component="span" style={{ textAlign: 'right', marginBottom: '1.75rem' }}>
-            <Box component="a" href="/password-reset" fontSize="small">
-              Forgot password?
-            </Box>
-          </Box>
 
           <LoadingButton
             loading={isLoading}
             disabled={isLoading}
             fullWidth
             size="large"
-            style={{ padding: '0.75rem 0.5rem' }}
+            style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
             variant="contained"
             type="submit">
             Sign in
@@ -324,9 +321,7 @@ export default function LoginPage({ setTheme }) {
           <Box mt={1} hidden={!Boolean(verificationContent)}>
             {verificationContent}
           </Box>
-          <Divider className="my4" />
-          <Box id="google-signin"></Box>
-        </form>
+        </Box>
       </Paper>
       <Box
         hidden={!needsCustomPage}

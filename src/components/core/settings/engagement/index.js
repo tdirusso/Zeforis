@@ -1,13 +1,11 @@
-import { Grid, Paper, Tabs, Tab } from "@mui/material";
+import { Grid, Paper, Tabs, Tab, Box } from "@mui/material";
 import React, { useState } from "react";
 import GeneralTab from "./GeneralTab";
 import MembersTab from "./MembersTab";
 import TagsTab from "./TagsTab";
-import InfoIcon from '@mui/icons-material/Info';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 export default function EngagementTab() {
+
   const [tabVal, setTabVal] = useState(0);
 
   const getTabContent = () => {
@@ -25,21 +23,23 @@ export default function EngagementTab() {
 
   return (
     <Grid item xs={12}>
-      <Paper>
+      <Paper className="settings-container">
         <Tabs
+          className="settings-tabs"
           value={tabVal}
           allowScrollButtonsMobile
           onChange={(_, newVal) => setTabVal(newVal)}
           variant="scrollable"
           scrollButtons="auto">
-          <Tab label="General" icon={<InfoIcon fontSize="small" />} iconPosition="start" />
-          <Tab label="Members" icon={<PeopleAltIcon fontSize="small" />} iconPosition="start" />
-          <Tab label="Tags" icon={<LocalOfferIcon fontSize="small" />} iconPosition="start" />
+          <Tab label="General" />
+          <Tab label="Collaborators" />
+          <Tab label="Tags" />
         </Tabs>
-
-        {
-          getTabContent()
-        }
+        <Box p='2rem'>
+          {
+            getTabContent()
+          }
+        </Box>
       </Paper>
     </Grid>
   );

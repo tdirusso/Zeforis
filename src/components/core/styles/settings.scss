@@ -1,0 +1,36 @@
+.settings-container {
+  padding: 0 !important;
+  margin-top: 1rem;
+
+  .settings-tabs {
+    background: var(--colors-body-background);
+
+    .MuiTab-root {
+      font-weight: 600 !important;
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  .MuiTabs-indicator {
+    display: none;
+  }
+
+  .MuiButtonBase-root.Mui-selected {
+    background: white;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+  }
+}
+
+body.dark {
+  .settings-container {
+    .settings-tabs {
+      background: var(--colors-body-background-dark);
+    }
+
+    .MuiButtonBase-root.Mui-selected {
+      background: #222222;
+    }
+  }
+}

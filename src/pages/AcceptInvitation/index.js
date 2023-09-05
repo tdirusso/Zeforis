@@ -16,7 +16,6 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { AccountCircle } from "@mui/icons-material";
 import { setActiveOrgId } from "../../api/orgs";
 import { setActiveEngagementId } from "../../api/engagements";
-import { isMobile } from "../../lib/constants";
 
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
@@ -35,8 +34,8 @@ export default function AcceptInvitationPage() {
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${orgId}`)}`;
 
-  const [fetchingInvitation, setFetchingInvitation] = useState(true);
-  const [userNeedsPassword, setUserNeedsPassword] = useState(null);
+  const [fetchingInvitation, setFetchingInvitation] = useState(false);
+  const [userNeedsPassword, setUserNeedsPassword] = useState(true);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -242,6 +241,11 @@ export default function AcceptInvitationPage() {
           :
           <Paper className="container">
             <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              <Box id="google-signin" style={{ width: 400 }}></Box>
+            </Box>
+            <Divider className="my4"></Divider>
+
             <form onSubmit={handleUpdatePassword}>
               <Box mb={2}>
                 <TextField
@@ -257,7 +261,6 @@ export default function AcceptInvitationPage() {
                   }}
                   inputRef={firstName}
                   disabled={isLoading}
-                  autoFocus={!isMobile}
                 />
               </Box>
               <Box mb={2}>
@@ -301,10 +304,6 @@ export default function AcceptInvitationPage() {
                 type="submit">
                 Complete Registration
               </LoadingButton>
-              <Divider className="my4">Or</Divider>
-              <Box style={{ display: 'flex', justifyContent: 'center' }}>
-                <Box id="google-signin" style={{ width: 400 }}></Box>
-              </Box>
             </form>
           </Paper>
       }

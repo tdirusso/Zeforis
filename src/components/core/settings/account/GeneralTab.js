@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Menu, TextField, Typography } from "@mui/material";
+import { Box, Button, Menu, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { useOutletContext } from "react-router";
@@ -96,7 +96,7 @@ export default function GeneralTab() {
 
   return (
     <>
-      <Box component="h4" my={3} >Personal</Box>
+      <Box component="h4" mt='1rem'>Personal</Box>
       <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
         <Box maxWidth={450} flex={1} minWidth={250}>
           <TextField
@@ -141,8 +141,8 @@ export default function GeneralTab() {
           Save changes
         </LoadingButton>
       </Box>
-      <Divider className="my4" />
-      <Box component="h4" my={3} >Email & Password</Box>
+
+      <Box component="h4" mt='4rem'>Email & Password</Box>
       <Box my={3}>
         <Box maxWidth={600}>
           <TextField
@@ -178,7 +178,7 @@ export default function GeneralTab() {
         onClose={() => setChangePasswordMenuAnchor(null)}>
         <Box px={2} py={1}>
           <Typography variant="body2">
-            To change your password, click on the button below to send a special password reset link to your email listed above (expires after 1 hour).
+            To change your password, click on the button below to send a password reset link to your email listed above (expires after 1 hour).
           </Typography>
           <Box mt={2}>
             <LoadingButton

@@ -33,10 +33,10 @@ export default function UsersTab() {
     <>
       <Box mt={4}>
         <Box component="h4" ml={1.75} mb={1}>
-          {org.name} Users
+          All members of {org.name}
         </Box>
         <Typography ml={1.75} mb={2}>
-          This list is a collection of all users from each engagement combined.
+          This list is a collection of all users from all engagements.
         </Typography>
         <List dense>
           {

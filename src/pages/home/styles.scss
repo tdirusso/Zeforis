@@ -9,12 +9,6 @@ main {
   }
 }
 
-.settings-divider {
-  width: 1px;
-  margin: 0 0.5rem;
-  background: var(--colors-primary);
-}
-
 .custom-tab {
   padding: 0 !important;
   border-radius: 24px !important;
@@ -28,10 +22,4 @@ body.dark .custom-tab {
 
 .custom-tab.active {
   background: var(--colors-primary) !important;
-}
-
-@media screen and (max-width: 500px) {
-  .settings-divider {
-    display: none;
-  }
 }
