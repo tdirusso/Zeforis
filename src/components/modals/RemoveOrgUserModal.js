@@ -60,7 +60,7 @@ export default function RemoveOrgUserModal(props) {
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={close}>
+      <Dialog open={isOpen} onClose={close} className='modal'>
         <DialogContent >
           <DialogContentText style={{ marginBottom: '2rem' }}>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>

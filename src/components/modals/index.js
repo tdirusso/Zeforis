@@ -7,6 +7,7 @@ import RemoveOrgUserModal from "./RemoveOrgUserModal";
 import SearchModal from "./SearchModal";
 import './styles.scss';
 import EditSelectedTasksModal from "./EditSelectedTasksModal";
+import InviteEngagementUser from "./InviteEngagementUser";
 
 export default function Modals(props) {
   const {
@@ -60,6 +61,12 @@ export default function Modals(props) {
 
       <EditSelectedTasksModal
         isOpen={modalToOpen === 'edit-tasks'}
+        close={closeModal}
+        {...props}
+      />
+
+      <InviteEngagementUser
+        isOpen={modalToOpen === 'invite-engagement-user'}
         close={closeModal}
         {...props}
       />

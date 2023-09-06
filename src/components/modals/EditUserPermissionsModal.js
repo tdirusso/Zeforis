@@ -214,6 +214,7 @@ export default function EditUserPermissionsModal(props) {
   return (
     <>
       <Dialog
+      className='modal'
         fullScreen={isSmallScreen}
         open={isOpen}
         onClose={handleClose}

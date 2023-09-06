@@ -43,7 +43,7 @@ export default function DeleteOrgModal(props) {
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={close}>
+      <Dialog open={isOpen} onClose={close} className='modal'>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to <strong>permanently delete {org.name}?</strong>

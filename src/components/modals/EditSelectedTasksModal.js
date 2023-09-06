@@ -285,6 +285,7 @@ export default function EditSelectedTasksModal(props) {
 
   return (
     <Dialog
+      className='modal'
       open={isOpen}
       onClose={handleClose}
       PaperProps={{

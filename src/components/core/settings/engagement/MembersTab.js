@@ -33,7 +33,8 @@ export default function MembersTab() {
     setOrgUsers,
     orgUsersMap,
     org,
-    isOrgOwner
+    isOrgOwner,
+    openModal
   } = useOutletContext();
 
   const engagementId = engagement.id;
@@ -197,7 +198,7 @@ export default function MembersTab() {
             hidden={!isOrgOwner}
             variant="outlined"
             style={{ marginBottom: '1rem', whiteSpace: 'break-spaces' }}
-            onClick={e => setInviteUserMenuAnchor(e.currentTarget)}
+            onClick={() => openModal('invite-engagement-user')}
             startIcon={<PersonAddIcon />}>
             Add collaborators
           </Button>
