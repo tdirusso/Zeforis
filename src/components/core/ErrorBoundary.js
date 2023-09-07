@@ -49,7 +49,7 @@ function DefaultErrorFallback({ error }) {
       margin="0 auto"
       maxWidth={650}
       className="flex-centered"
-      height='100%'
+      height='100vh'
       flexDirection="column">
       <Box>
         <ErrorOutlineIcon style={{ fontSize: '5rem' }} color="error" />

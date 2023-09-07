@@ -1,7 +1,4 @@
 const bcrypt = require('bcrypt');
-const ejs = require('ejs');
-const fs = require('fs');
-const path = require('path');
 const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
@@ -111,18 +108,12 @@ async function sendVerifyEmail(userId, verificationCode, email) {
 
   const verificationUrl = `${process.env.REACT_APP_API_DOMAIN}/api/users/verify?${qs}`;
 
-  const ejsData = {
-    verificationUrl
-  };
-
-  const templatePath = path.resolve(__dirname, '../../../email/templates/verifyEmail.ejs');
-  const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
-
-  await emailService.sendMail({
-    from: 'Zeforis',
+  await emailService.sendEmailFromTemplate({
     to: email,
-    subject: `Zeforis - Verify your Email`,
-    text: template,
-    html: template
+    from: emailService.senders.info,
+    templateId: emailService.templates.emailVerification,
+    templateData: {
+      verificationUrl
+    }
   });
 }

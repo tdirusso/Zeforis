@@ -222,10 +222,17 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
           Reset password
         </LoadingButton>
       </form>
-      <Typography className="flex-ac" hidden={!passwordReset}>
+      <Typography className="flex-centered" hidden={!passwordReset}>
         <CheckCircleRoundedIcon htmlColor="#4caf50" />
         &nbsp;Password successfully reset.
       </Typography>
+      <Box mt={2}>
+        <Box component='a' href="/login">
+          <Button size="large" variant="contained">
+            Return to login
+          </Button>
+        </Box>
+      </Box>
     </>
   );
 }

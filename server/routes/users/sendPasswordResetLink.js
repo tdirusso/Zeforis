@@ -1,6 +1,3 @@
-const ejs = require('ejs');
-const fs = require('fs');
-const path = require('path');
 const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
@@ -72,20 +69,14 @@ module.exports = async (req, res, next) => {
 async function sendPasswordResetLink(resetCode, email) {
   const qs = `resetCode=${resetCode}&email=${email}`;
 
-  const resetLinkUrl = `${process.env.REACT_APP_APP_DOMAIN}/password-reset?${qs}`;
+  const passwordResetUrl = `${process.env.REACT_APP_APP_DOMAIN}/password-reset?${qs}`;
 
-  const ejsData = {
-    resetLinkUrl
-  };
-
-  const templatePath = path.resolve(__dirname, '../../../email/templates/passwordReset.ejs');
-  const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
-
-  await emailService.sendMail({
-    from: 'Zeforis',
+  await emailService.sendEmailFromTemplate({
     to: email,
-    subject: `Zeforis - Password Reset`,
-    text: template,
-    html: template
+    from: emailService.senders.info,
+    templateId: emailService.templates.passwordReset,
+    templateData: {
+      passwordResetUrl
+    }
   });
 }

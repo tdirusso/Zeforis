@@ -20,7 +20,7 @@ const getActiveEngagementId = () => {
   return Number(localStorage.getItem('activeEngagementId'));
 };
 
-const getUserEngagementListForOrg = (user, activeOrgId) => {
+const getUserEngagementsForOrg = (user, activeOrgId) => {
   const result = [];
 
   user.adminOfEngagements.forEach(engagement => {
@@ -85,7 +85,7 @@ export {
   updateEngagement,
   setActiveEngagementId,
   getActiveEngagementId,
-  getUserEngagementListForOrg,
+  getUserEngagementsForOrg,
   deleteActiveEngagementId,
   inviteEngagementUser,
   removeEngagementUser,

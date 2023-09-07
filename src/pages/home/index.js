@@ -7,7 +7,7 @@ import { Box, Grid } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { getActiveEngagementId, getEngagementData, getUserEngagementListForOrg, setActiveEngagementId } from "../../api/engagements";
+import { getActiveEngagementId, getEngagementData, getUserEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
 import CreateEngagementDialog from "../../components/dialogs/CreateEngagementDialog";
 import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
@@ -88,29 +88,35 @@ export default function Home({ setTheme }) {
 
       let activeOrg = null;
 
-      if (activeOrgId) {
+      if (user.memberOfOrgs.length === 1) {
+        activeOrg = user.memberOfOrgs[0];
+      } else if (activeOrgId) {
         activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
-
-        if (activeOrg) {
-          const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
-
-          const brandRGB = hexToRgb(activeOrg.brandColor);
-          document.documentElement.style.setProperty('--colors-primary', activeOrg.brandColor);
-          document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
-          themeConfig.palette.primary.main = activeOrg.brandColor;
-          document.title = `${activeOrg.name} Portal`;
-
-          updateTheme(setTheme);
-          setOrg(activeOrg);
-          setIsOrgOwner(isOwnerOfActiveOrg);
-          setEngagements(getUserEngagementListForOrg(user, activeOrgId));
-        }
       }
 
-      if (activeOrg && activeEngagementId) {
-        const activeEngagement = user.adminOfEngagements.concat(user.memberOfEngagements).find(engagement => {
-          return engagement.id === activeEngagementId && engagement.orgId === activeOrg.id;
-        });
+      if (activeOrg) {
+        const isOwnerOfActiveOrg = activeOrg.ownerId === user.id;
+
+        const brandRGB = hexToRgb(activeOrg.brandColor);
+        document.documentElement.style.setProperty('--colors-primary', activeOrg.brandColor);
+        document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
+        themeConfig.palette.primary.main = activeOrg.brandColor;
+        document.title = `${activeOrg.name} Portal`;
+
+        const userEngagementsForOrg = getUserEngagementsForOrg(user, activeOrg.id);
+
+        updateTheme(setTheme);
+        setOrg(activeOrg);
+        setIsOrgOwner(isOwnerOfActiveOrg);
+        setEngagements(userEngagementsForOrg);
+
+        let activeEngagement = null;
+
+        if (userEngagementsForOrg.length === 1) {
+          activeEngagement = userEngagementsForOrg[0];
+        } else if (activeEngagementId) {
+          activeEngagement = userEngagementsForOrg.find(engagement => engagement.id === activeEngagementId);
+        }
 
         if (activeEngagement) {
           setEngagement(activeEngagement);
@@ -250,12 +256,13 @@ export default function Home({ setTheme }) {
     return (
       <Box className="flex-centered" style={{ height: '100%' }}>
         {
-          isOrgOwner ? <CreateEngagementDialog
-            org={org}
-            openSnackBar={openSnackBar}
-            isOpen={true}
-            user={user}
-          /> :
+          isOrgOwner ?
+            <CreateEngagementDialog
+              org={org}
+              openSnackBar={openSnackBar}
+              isOpen={true}
+              user={user}
+            /> :
             <NoEngagementsDialog
               org={org}
               isOpen={true}

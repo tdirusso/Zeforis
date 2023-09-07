@@ -193,8 +193,8 @@ const boot = async () => {
         );
 
         await emailService.sendMail({
-          from: 'Zeforis',
-          to: process.env.MAILER_SUPPORT_EMAIL,
+          from: emailService.senders.info,
+          to: emailService.senders.error,
           subject: `Zeforis - Uncaught Error`,
           text: logData,
           html: logData
