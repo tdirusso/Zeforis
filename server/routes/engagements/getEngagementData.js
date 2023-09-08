@@ -61,16 +61,14 @@ module.exports = async (req, res, next) => {
       let mappedUser = orgUsersMap.get(user_id);
 
       if (!mappedUser) {
-        orgUsersMap.set(user_id, {
+        mappedUser = orgUsersMap.set(user_id, {
           firstName: first_name,
           lastName: last_name,
           email,
           id: user_id,
           memberOfEngagements: [],
           adminOfEngagements: []
-        });
-
-        mappedUser = orgUsersMap.get(user_id);
+        }).get(user_id);
       }
 
       if (role === 'admin') {

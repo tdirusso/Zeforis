@@ -7,6 +7,12 @@ const statuses = [
   { name: 'Blocked', color: '#ff0000' },
 ];
 
+const appConstants = {
+  limits: {
+    invites: 20
+  }
+};
+
 const isMobile = Boolean(
   navigator.userAgent.match(/Android/i)
   || navigator.userAgent.match(/webOS/i)
@@ -19,5 +25,6 @@ const isMobile = Boolean(
 
 export {
   statuses,
-  isMobile
+  isMobile,
+  appConstants
 };

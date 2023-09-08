@@ -20,7 +20,7 @@ const createFolder = require('./routes/folders/createFolder');
 const updateEngagement = require('./routes/engagements/updateEngagement');
 const register = require('./routes/users/register');
 const verify = require('./routes/users/verify');
-const inviteEngagementUser = require('./routes/users/inviteEngagementUser');
+const inviteEngagementUsers = require('./routes/users/inviteEngagementUsers');
 const removeEngagementUser = require('./routes/users/removeEngagementUser');
 const updateProfile = require('./routes/users/updateProfile');
 const updateFolder = require('./routes/folders/updateFolder');
@@ -125,7 +125,7 @@ const boot = async () => {
   app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
   app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
   app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
-  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUser);
+  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUsers);
   app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
   app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
   app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);

@@ -1,14 +1,5 @@
-const nodemailer = require('nodemailer');
 const sgMail = require('@sendgrid/mail');
 const { isDev } = require('../config');
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.MAILER_USERNAME,
-    pass: process.env.MAILER_PASSWORD
-  }
-});
 
 class EmailService {
   constructor() {
@@ -26,7 +17,8 @@ class EmailService {
 
     this.templates = {
       emailVerification: 'd-700a472b0af44176b3f18068e70363c0',
-      passwordReset: 'd-c48f47ff6b0b4f8e874c07a4a8669e55'
+      passwordReset: 'd-c48f47ff6b0b4f8e874c07a4a8669e55',
+      engagementInvitation: 'd-3070cc2e1f93499692376b90b4bbef04'
     };
 
     this.instance = this;
@@ -38,6 +30,11 @@ class EmailService {
 
   async sendEmailFromTemplate({ to, from, templateId, templateData }) {
     await sgMail.send({ to, from, templateId, dynamicTemplateData: templateData, hideWarnings: !isDev });
+  }
+
+  async sendMultipleEmailsFromTemplate(emailsArray) {
+    await sgMail.send(emailsArray);
+
   }
 }
 

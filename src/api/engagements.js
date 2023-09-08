@@ -42,7 +42,7 @@ const deleteActiveEngagementId = () => {
   localStorage.removeItem('activeEngagementId');
 };
 
-const inviteEngagementUser = async (payload) => {
+const inviteEngagementUsers = async (payload) => {
   const { data } = await request.post(`users/invite`, payload);
 
   return data;
@@ -87,7 +87,7 @@ export {
   getActiveEngagementId,
   getUserEngagementsForOrg,
   deleteActiveEngagementId,
-  inviteEngagementUser,
+  inviteEngagementUsers,
   removeEngagementUser,
   getEngagementData,
   deleteEngagement,

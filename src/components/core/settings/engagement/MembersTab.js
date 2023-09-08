@@ -9,7 +9,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { inviteEngagementUser, removeEngagementUser } from "../../../../api/engagements";
+import { inviteEngagementUsers, removeEngagementUser } from "../../../../api/engagements";
 import HelpIcon from '@mui/icons-material/Help';
 import { MailOutline } from "@mui/icons-material";
 import SendIcon from '@mui/icons-material/Send';
@@ -99,7 +99,7 @@ export default function MembersTab() {
     }
   };
 
-  const handleInviteEngagementUser = async e => {
+  const handleInviteEngagementUsers = async e => {
     e.preventDefault();
 
     if (!inviteeEmail) {
@@ -121,7 +121,7 @@ export default function MembersTab() {
     setIsInviting(true);
 
     try {
-      const { success, message, userId, firstName = '', lastName = '' } = await inviteEngagementUser({
+      const { success, message, userId, firstName = '', lastName = '' } = await inviteEngagementUsers({
         email: lcInviteeEmail,
         engagementId,
         orgId,
@@ -198,7 +198,7 @@ export default function MembersTab() {
             hidden={!isOrgOwner}
             variant="outlined"
             style={{ marginBottom: '1rem', whiteSpace: 'break-spaces' }}
-            onClick={() => openModal('invite-engagement-user')}
+            onClick={() => openModal('invite-engagement-users')}
             startIcon={<PersonAddIcon />}>
             Add collaborators
           </Button>
@@ -333,7 +333,7 @@ export default function MembersTab() {
         <Box
           style={{ padding: '1rem', minWidth: 300, maxWidth: 450 }}
           component="form"
-          onSubmit={handleInviteEngagementUser}>
+          onSubmit={handleInviteEngagementUsers}>
           <Box>
             <TextField
               variant="standard"

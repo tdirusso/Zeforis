@@ -1,27 +1,23 @@
 import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
-import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { deleteOrg } from '../../api/orgs';
 import { Alert, Autocomplete, Box, FormControl, Grow, Paper, TextField, Typography } from '@mui/material';
 import BuildIcon from '@mui/icons-material/Build';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import validator from 'email-validator';
+import { inviteEngagementUsers } from '../../api/engagements';
+import { appConstants } from '../../lib/constants';
 
-const inviteLimit = 3;
+const inviteLimit = appConstants.limits.invites;
 
-export default function InviteEngagementUser(props) {
+export default function InviteEngagementUsers(props) {
 
   const {
     close,
     isOpen,
     openSnackBar,
     org,
-    engagementAdmins,
-    engagementMembers,
     orgUsers,
     engagement,
     user
@@ -29,9 +25,14 @@ export default function InviteEngagementUser(props) {
 
   const userId = user.id;
   const engagementId = engagement.id;
+  const engagementName = engagement.name;
+  const orgId = org.id;
+  const orgName = org.name;
+  const orgLogo = org.logo;
+  const orgColor = org.brandColor;
 
   const [inviteType, setInviteType] = useState(null);
-  const [inviteeEmails, setInviteeEmails] = useState([]);
+  const [inviteeUsers, setInviteeUsers] = useState([]);
   const [animateOptions, setAnimateOptions] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
@@ -59,24 +60,25 @@ export default function InviteEngagementUser(props) {
   const handleClose = () => {
     close();
     setTimeout(() => {
-      setInviteeEmails([]);
+      setInviteeUsers([]);
       setInviteType(null);
       setLoading(false);
+      setAnimateOptions(false);
     }, 500);
   };
 
   const handleEmailChange = (e, newVal) => {
-    const isNewEmail =
+    const isNewOrgUser =
       typeof newVal[newVal.length - 1] !== 'object'
       && typeof newVal[newVal.length - 1] !== 'undefined';
 
-    setInviteeEmails(isNewEmail ? [...inviteeEmails, { email: e.target.value }] : newVal);
+    setInviteeUsers(isNewOrgUser ? [...inviteeUsers, { email: e.target.value.toLowerCase() }] : newVal);
   };
 
   let invalidEmails = [];
   let newEmailCount = 0;
 
-  inviteeEmails.forEach(userObject => {
+  inviteeUsers.forEach(userObject => {
     if (!validator.validate(userObject.email)) {
       invalidEmails.push(userObject.email);
     }
@@ -85,6 +87,83 @@ export default function InviteEngagementUser(props) {
       newEmailCount++;
     }
   });
+
+  const handleInviteUsers = async () => {
+    if (!inviteeUsers.length === 0) {
+      openSnackBar("Please enter at least 1 user to add.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const {
+        success,
+        message,
+        userId,
+        firstName = '',
+        lastName = ''
+      } = await inviteEngagementUsers({
+        usersToInvite: inviteeUsers,
+        engagementId,
+        orgId,
+        engagementName,
+        orgName,
+        inviteType,
+        orgColor,
+        orgLogo
+      });
+
+      if (success) {
+        // const addedUser = {
+        //   id: userId,
+        //   email: lcInviteeEmail,
+        //   firstName,
+        //   lastName
+        // };
+
+        // if (!orgUsersMap[userId]) { // User is new to the org
+        //   const engagementData = { id: engagementId, name: engagementName };
+        //   addedUser.memberOfEngagements = inviteeIsAdmin ? [] : [engagementData];
+        //   addedUser.adminOfEngagements = inviteeIsAdmin ? [engagementData] : [];
+        //   setOrgUsers(members => [...members, addedUser]);
+        // } else { // User already exists in the org
+        //   const existingUser = orgUsersMap[userId];
+        //   const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
+        //   const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
+
+        //   if (inviteeIsAdmin) {
+        //     if (userIsMember) {
+        //       existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
+        //     }
+
+        //     if (!userIsAdmin) {
+        //       existingUser.adminOfEngagements.push({ id: engagementId, name: engagementName });
+        //     }
+        //   } else {
+        //     if (userIsAdmin) {
+        //       existingUser.adminOfEngagements.filter(({ id }) => id !== engagementId);
+        //     }
+
+        //     if (!userIsMember) {
+        //       existingUser.memberOfEngagements.push({ id: engagementId, name: engagementName });
+        //     }
+        //   }
+
+        //   setOrgUsers(Object.values(orgUsersMap));
+        //}
+
+        setLoading(false);
+        openSnackBar('Invitation successfully sent.', 'success');
+      } else {
+        openSnackBar(message, 'error');
+        setLoading(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog
@@ -124,14 +203,22 @@ export default function InviteEngagementUser(props) {
       <Grow in={animateOptions} appear={false}>
         {
           inviteType === 'admin' && user.plan === 'free' ?
-            <Box mb='3rem'>
+            <Box mb='1rem' style={{ display: inviteType ? 'block' : 'none' }}>
               <Alert severity="info">
-                <strong>Note: &nbsp;</strong>Before you start manually creating tasks,
-                there is a tool to bulk import tasks on the
+                <Typography>
+                  You can't invite additional administrators if you are on the <strong>free</strong> plan.
+                </Typography>
+                <Box mt={2}>
+                  <a>
+                    <Button variant='contained'>
+                      Upgrade now
+                    </Button>
+                  </a>
+                </Box>
               </Alert>
             </Box>
             :
-            <Box>
+            <Box display={inviteType ? 'block' : 'none'}>
               <FormControl fullWidth>
                 <Autocomplete
                   freeSolo
@@ -157,7 +244,7 @@ export default function InviteEngagementUser(props) {
                   getOptionLabel={(option) => option.id ? `${option.firstName} ${option.lastName} ${option.email}` : option.email}
                   isOptionEqualToValue={(option, value) => option.email === value.email}
                   onChange={handleEmailChange}
-                  value={inviteeEmails}
+                  value={inviteeUsers}
                   renderInput={(params) => (
                     <TextField
                       helperText={
@@ -186,17 +273,18 @@ export default function InviteEngagementUser(props) {
                 </Typography>
               </Box>
               <Box mt='3rem'>
-                <Button
+                <LoadingButton
+                  onClick={handleInviteUsers}
+                  loading={isLoading}
                   variant='contained'
                   fullWidth
                   size='large'>
                   Add
-                </Button>
+                </LoadingButton>
               </Box>
             </Box>
         }
       </Grow>
-
     </Dialog>
   );
 };

@@ -240,7 +240,7 @@ export default function Home({ setTheme }) {
       return;
     } else {
       return (
-        <Box className="flex-centered" style={{ height: '100%' }}>
+        <Box className="flex-centered" style={{ height: '100vh' }}>
           <ChooseOrgScreen
             open={true}
             setOpen={() => { }}
@@ -254,7 +254,7 @@ export default function Home({ setTheme }) {
 
   if (engagements.length === 0) {
     return (
-      <Box className="flex-centered" style={{ height: '100%' }}>
+      <Box className="flex-centered" style={{ height: '100vh' }}>
         {
           isOrgOwner ?
             <CreateEngagementDialog
@@ -280,7 +280,7 @@ export default function Home({ setTheme }) {
 
   if (!engagement) {
     return (
-      <Box className="flex-centered" style={{ height: '100%' }}>
+      <Box className="flex-centered" style={{ height: '100vh' }}>
         <ChooseEngagementDialog
           engagements={engagements}
           org={org}
