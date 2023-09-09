@@ -78,7 +78,7 @@ export default function MembersTab() {
 
       if (success) {
         if (willBeRemovedFromOrg) {
-          setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== user.id));
+          setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== userToRemove.id));
         } else {
           const theUser = orgUsersMap[userToRemove.id];
           theUser.memberOfEngagements = theUser.memberOfEngagements.filter(engagement => engagement.id !== engagementId);

@@ -22,6 +22,7 @@ import themeConfig from "../../theme";
 import { resendVerificationLink } from "../../api/users";
 import Watermark from "../../components/core/Watermark";
 import { isMobile } from "../../lib/constants";
+import { setActiveEngagementId } from "../../api/engagements";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
@@ -46,6 +47,7 @@ export default function LoginPage({ setTheme }) {
   } = useSnackbar();
 
   const customPageParam = searchParams.get('cp');
+  const engagementIdParam = searchParams.get('engagementId');
   let needsCustomPage = false;
   let orgId;
 
@@ -73,6 +75,9 @@ export default function LoginPage({ setTheme }) {
 
         if (result.token) {
           if (needsCustomPage && customPageData) {
+            if (engagementIdParam) {
+              setActiveEngagementId(engagementIdParam);
+            }
             setActiveOrgId(orgId);
           }
           window.location.href = '/home/dashboard';
@@ -90,8 +95,9 @@ export default function LoginPage({ setTheme }) {
     }
   };
 
-  const initializeGoogleButton = () => {
+  const tryLoadGoogleButton = () => {
     if (window.google?.accounts) {
+      clearInterval(window.googleButtonInterval);
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
         callback: handleGoogleLogin
@@ -102,18 +108,22 @@ export default function LoginPage({ setTheme }) {
         {
           theme: "outline",
           size: "large",
-          width: isSmallScreen ? 300 : 325
+          width: isSmallScreen ? 300 : 325,
+          text: 'continue_with'
         }
       );
+
+      return true;
     }
+
+    return false;
   };
 
   useEffect(() => {
     if (!needsCustomPage) {
-      if (document.readyState === 'complete') {
-        initializeGoogleButton();
-      } else {
-        window.onload = initializeGoogleButton;
+      const ableToLoadButton = tryLoadGoogleButton();
+      if (!ableToLoadButton) {
+        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
       }
     } else {
       fetchCustomPageData();
@@ -147,7 +157,10 @@ export default function LoginPage({ setTheme }) {
 
   useEffect(() => {
     if (doneFetchingCustomPage) {
-      initializeGoogleButton();
+      const ableToLoadButton = tryLoadGoogleButton();
+      if (!ableToLoadButton) {
+        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+      }
     }
   }, [doneFetchingCustomPage]);
 

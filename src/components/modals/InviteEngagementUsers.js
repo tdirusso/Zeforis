@@ -1,5 +1,5 @@
 import Dialog from '@mui/material/Dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Autocomplete, Box, FormControl, Grow, Paper, TextField, Typography } from '@mui/material';
@@ -20,7 +20,9 @@ export default function InviteEngagementUsers(props) {
     org,
     orgUsers,
     engagement,
-    user
+    user,
+    orgUsersMap,
+    setOrgUsers
   } = props;
 
   const userId = user.id;
@@ -87,10 +89,15 @@ export default function InviteEngagementUsers(props) {
       newEmailCount++;
     }
   });
-
+  
   const handleInviteUsers = async () => {
-    if (!inviteeUsers.length === 0) {
+    if (!inviteeUsers.length) {
       openSnackBar("Please enter at least 1 user to add.");
+      return;
+    }
+
+    if (inviteeUsers.some(({ email }) => email === user.email)) {
+      openSnackBar(`You cannot invite yourself (${user.email}) to an engagement.`);
       return;
     }
 
@@ -100,9 +107,7 @@ export default function InviteEngagementUsers(props) {
       const {
         success,
         message,
-        userId,
-        firstName = '',
-        lastName = ''
+        invitedUsers
       } = await inviteEngagementUsers({
         usersToInvite: inviteeUsers,
         engagementId,
@@ -115,46 +120,50 @@ export default function InviteEngagementUsers(props) {
       });
 
       if (success) {
-        // const addedUser = {
-        //   id: userId,
-        //   email: lcInviteeEmail,
-        //   firstName,
-        //   lastName
-        // };
+        const engagementData = { id: engagementId, name: engagementName };
+        invitedUsers.forEach(invitedUser => {
 
-        // if (!orgUsersMap[userId]) { // User is new to the org
-        //   const engagementData = { id: engagementId, name: engagementName };
-        //   addedUser.memberOfEngagements = inviteeIsAdmin ? [] : [engagementData];
-        //   addedUser.adminOfEngagements = inviteeIsAdmin ? [engagementData] : [];
-        //   setOrgUsers(members => [...members, addedUser]);
-        // } else { // User already exists in the org
-        //   const existingUser = orgUsersMap[userId];
-        //   const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
-        //   const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
+          if (invitedUser.isNew || !orgUsersMap[invitedUser.id]) {
+            //a completely new user was created for this email, and thus, is new to the org, or was not part of the org
+            orgUsersMap[invitedUser.id] = {
+              id: invitedUser.id,
+              email: invitedUser.email,
+              firstName: invitedUser.firstName || '',
+              lastName: invitedUser.lastName || '',
+              memberOfEngagements: inviteType === 'member' ? [engagementData] : [],
+              adminOfEngagements: inviteType === 'admin' ? [engagementData] : []
+            };
+          } else {
+            //user is already a part of this org
+            const existingUser = orgUsersMap[invitedUser.id];
+            const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
+            const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
 
-        //   if (inviteeIsAdmin) {
-        //     if (userIsMember) {
-        //       existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
-        //     }
 
-        //     if (!userIsAdmin) {
-        //       existingUser.adminOfEngagements.push({ id: engagementId, name: engagementName });
-        //     }
-        //   } else {
-        //     if (userIsAdmin) {
-        //       existingUser.adminOfEngagements.filter(({ id }) => id !== engagementId);
-        //     }
+            if (inviteType === 'admin') {
+              if (userIsMember) {
+                existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
+              }
 
-        //     if (!userIsMember) {
-        //       existingUser.memberOfEngagements.push({ id: engagementId, name: engagementName });
-        //     }
-        //   }
+              if (!userIsAdmin) {
+                existingUser.adminOfEngagements.push({ id: engagementId, name: engagementName });
+              }
+            } else {
+              if (userIsAdmin) {
+                existingUser.adminOfEngagements.filter(({ id }) => id !== engagementId);
+              }
 
-        //   setOrgUsers(Object.values(orgUsersMap));
-        //}
+              if (!userIsMember) {
+                existingUser.memberOfEngagements.push({ id: engagementId, name: engagementName });
+              }
+            }
+          }
+        });
 
+        setOrgUsers(Object.values(orgUsersMap));
         setLoading(false);
         openSnackBar('Invitation successfully sent.', 'success');
+        handleClose();
       } else {
         openSnackBar(message, 'error');
         setLoading(false);
@@ -173,13 +182,14 @@ export default function InviteEngagementUsers(props) {
       className='modal invite-dialog'>
       <Box textAlign='center' component="h2" mb='2rem' fontWeight={300}>Add Collaborators</Box>
       <Box className='invite-types' mb='3rem'>
-        <Paper className={`invite-type ${inviteType === 'client' ? 'selected' : ''}`}>
+        <Paper className={`invite-type ${inviteType === 'member' ? 'selected' : ''}`}>
           <Box fontSize='3rem' mb='1rem'>
             <AccountCircleIcon fontSize='3rem' htmlColor='#b9b9b9' />
           </Box>
           <Box component='h3' mb='2rem'>Client</Box>
           <Button
-            onClick={() => handleInviteTypeChange('client')}
+            disabled={isLoading}
+            onClick={() => handleInviteTypeChange('member')}
             size='large'
             variant='contained'
             fullWidth>
@@ -192,6 +202,7 @@ export default function InviteEngagementUsers(props) {
           </Box>
           <Box component='h3' mb='2rem'>Administrator</Box>
           <Button
+            disabled={isLoading}
             onClick={() => handleInviteTypeChange('admin')}
             size='large'
             variant='contained'
@@ -204,16 +215,18 @@ export default function InviteEngagementUsers(props) {
         {
           inviteType === 'admin' && user.plan === 'free' ?
             <Box mb='1rem' style={{ display: inviteType ? 'block' : 'none' }}>
-              <Alert severity="info">
-                <Typography>
-                  You can't invite additional administrators if you are on the <strong>free</strong> plan.
-                </Typography>
-                <Box mt={2}>
-                  <a>
-                    <Button variant='contained'>
-                      Upgrade now
-                    </Button>
-                  </a>
+              <Alert severity="info" >
+                <Box className='flex-centered' style={{ justifyContent: 'space-between' }}>
+                  <Typography flexBasis='66%'>
+                    You can't invite additional administrators if you are on the <strong>free</strong> plan.
+                  </Typography>
+                  <Box>
+                    <a>
+                      <Button variant='contained'>
+                        Upgrade now
+                      </Button>
+                    </a>
+                  </Box>
                 </Box>
               </Alert>
             </Box>

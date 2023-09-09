@@ -60,26 +60,33 @@ module.exports = async (req, res, next) => {
     return res.json({ message: `New emails to invite cannot exceed ${appConstants.limits.invites} - found ${countNewEmails}.` });
   }
 
+  if (!allEmailsArray.length) {
+    return res.json({ message: 'Did not find any valid emails to invite.' });
+  }
+
   const connection = await pool.getConnection();
 
   try {
 
     await connection.beginTransaction();
 
-    const [existingUsers] = await connection.query(
-      'SELECT id, email, is_verified FROM users WHERE email IN (?) AND id != ?',
+    const [allExistingUsers] = await connection.query(
+      'SELECT id, email, is_verified, first_name, last_name FROM users WHERE email IN (?) AND id != ?',
       [allEmailsArray, updaterUserId]
     );
 
-    const allEmailsToUserIdMap = {};
-    const existingUsersEmails = existingUsers.map(({ id, email, is_verified }) => {
-      allEmailsToUserIdMap[email] = {
-        id,
+    const allEmailsToUserMap = {};
+    const existingUsersEmails = allExistingUsers.map(user => {
+      allEmailsToUserMap[user.email] = {
+        id: user.id,
         isNew: false,
-        isVerified: is_verified
+        isVerified: user.is_verified,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email
       };
 
-      return email;
+      return user.email;
     });
 
     const newEmails = allEmailsArray.filter(email => !existingUsersEmails.includes(email));
@@ -92,24 +99,29 @@ module.exports = async (req, res, next) => {
 
       let insertId = newUsersResult.insertId;
 
-      newEmails.forEach(email => allEmailsToUserIdMap[email] = {
+      newEmails.forEach(email => allEmailsToUserMap[email] = {
         id: insertId++,
-        isNew: true
+        isNew: true,
+        firstName: '',
+        lastName: '',
+        email
       });
     }
 
     const invitationEmails = [];
 
     const insertEngagementUsersValues = allEmailsArray.map(email => {
-      const userDetails = allEmailsToUserIdMap[email];
+      const userDetails = allEmailsToUserMap[email];
       const userId = userDetails.id;
-      const needsInvitationEmail = userDetails.isNew || !userDetails.isVerified;
+      const needsInvitationCode = userDetails.isNew || !userDetails.isVerified;
 
-      const invitationCode = needsInvitationEmail ? uuidv4().substring(0, 16) : null;
+      const invitationCode = needsInvitationCode ? uuidv4().substring(0, 16) : null;
       const role = inviteType === 'admin' ? 'admin' : 'member';
 
-      const qs = `engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}`;
-      const invitationUrl = `${process.env.REACT_APP_APP_DOMAIN}/accept-invitation?${qs}`;
+      const invitationUrl =
+        needsInvitationCode ?
+          `${process.env.REACT_APP_APP_DOMAIN}/accept-invitation?engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}` :
+          `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${Buffer.from(`orgId=${orgId}`).toString('base64')}&engagementId=${engagementId}`;
 
       invitationEmails.push({
         to: email,
@@ -133,8 +145,6 @@ module.exports = async (req, res, next) => {
       ];
     });
 
-    console.log(insertEngagementUsersValues);
-
     await connection.query(
       `INSERT INTO engagement_users (engagement_id, user_id, role, invitation_code) 
         VALUES ?
@@ -144,97 +154,15 @@ module.exports = async (req, res, next) => {
 
     await connection.commit();
 
-    console.log('Will send these emails:', invitationEmails);
+    await emailService.sendMultipleEmailsFromTemplate(invitationEmails);
 
     connection.release();
 
-    return res.json({ success: true });
+    return res.json({ 
+      success: true,
+      invitedUsers: Object.values(allEmailsToUserMap)
+     });
 
-    //await connection.beginTransaction();
-
-
-
-
-
-
-
-
-
-
-
-    // const lcEmail = email.toLowerCase();
-
-    // const [userResult] = await pool.query(
-    //   'SELECT id, first_name, last_name, email FROM users WHERE email = ?',
-    //   [lcEmail]);
-
-    // const user = userResult[0];
-    // const role = isAdmin ? 'admin' : 'member';
-
-    // const invitationCode = uuidv4().substring(0, 16);
-
-    // if (user) {
-    //   const [memberExistsResult] = await pool.query(
-    //     'SELECT 1 FROM engagement_users WHERE engagement_id = ? AND user_id = ?',
-    //     [engagementId, user.id]
-    //   );
-
-    //   if (memberExistsResult.length) {
-    //     return res.json({
-    //       message: 'User is already part of this engagement.'
-    //     });
-    //   }
-
-    //   await pool.query(
-    //     'INSERT INTO engagement_users (engagement_id, user_id, role, invitation_code) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE role = ?, invitation_code = ?',
-    //     [engagementId, user.id, role, invitationCode, role, invitationCode]
-    //   );
-
-    //   await sendInvitationEmail({
-    //     email: lcEmail,
-    //     engagementId,
-    //     userId: user.id,
-    //     orgName,
-    //     engagementName,
-    //     orgColor,
-    //     orgLogo,
-    //     invitationCode,
-    //     orgId
-    //   });
-
-    //   return res.json({
-    //     success: true,
-    //     userId: user.id,
-    //     firstName: user.first_name,
-    //     lastName: user.last_name
-    //   });
-    // } else {
-    //   const newUserResult = await pool.query(
-    //     'INSERT INTO users (email) VALUES (?)',
-    //     [lcEmail]
-    //   );
-
-    //   const newUserId = newUserResult[0].insertId;
-
-    //   await pool.query(
-    //     'INSERT INTO engagement_users (engagement_id, user_id, role, invitation_code) VALUES (?,?,?,?)',
-    //     [engagementId, newUserId, role, invitationCode]
-    //   );
-
-    //   await sendInvitationEmail({
-    //     email: lcEmail,
-    //     engagementId,
-    //     userId: newUserId,
-    //     orgName,
-    //     engagementName,
-    //     orgColor,
-    //     orgLogo,
-    //     invitationCode,
-    //     orgId
-    //   });
-
-    //   return res.json({ success: true, userId: newUserId });
-    // }
   } catch (error) {
     await connection.rollback();
     connection.release();

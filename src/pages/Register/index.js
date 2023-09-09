@@ -58,8 +58,9 @@ export default function RegisterPage() {
     }
   };
 
-  const initializeGoogleButton = () => {
+  const tryLoadGoogleButton = () => {
     if (window.google?.accounts) {
+      clearInterval(window.googleButtonInterval);
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
         callback: handleGoogleRegistration
@@ -71,10 +72,14 @@ export default function RegisterPage() {
           theme: "outline",
           size: "large",
           width: isSmallScreen ? 300 : 325,
-          text: 'signup_with'
+          text: 'continue_with'
         }
       );
+
+      return true;
     }
+
+    return false;
   };
 
   const handleRegistration = e => {
@@ -110,10 +115,9 @@ export default function RegisterPage() {
   };
 
   useEffect(() => {
-    if (document.readyState === 'complete') {
-      initializeGoogleButton();
-    } else {
-      window.onload = initializeGoogleButton;
+    const ableToLoadButton = tryLoadGoogleButton();
+    if (!ableToLoadButton) {
+      window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
     }
   }, []);
 

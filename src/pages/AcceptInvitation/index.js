@@ -35,7 +35,7 @@ export default function AcceptInvitationPage() {
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${orgId}`)}`;
 
   const [fetchingInvitation, setFetchingInvitation] = useState(false);
-  const [userNeedsPassword, setUserNeedsPassword] = useState(true);
+  const [userNeedsPassword, setUserNeedsPassword] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -85,8 +85,9 @@ export default function AcceptInvitationPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (userNeedsPassword) {
+  const tryLoadGoogleButton = () => {
+    if (window.google?.accounts) {
+      clearInterval(window.googleButtonInterval);
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
         callback: handleGoogleRegistration
@@ -101,6 +102,19 @@ export default function AcceptInvitationPage() {
           text: 'continue_with'
         }
       );
+
+      return true;
+    }
+
+    return false;
+  };
+
+  useEffect(() => {
+    if (userNeedsPassword) {
+      const ableToLoadButton = tryLoadGoogleButton();
+      if (!ableToLoadButton) {
+        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+      }
     }
   }, [userNeedsPassword]);
 
