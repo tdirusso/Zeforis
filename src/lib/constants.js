@@ -7,10 +7,10 @@ const statuses = [
   { name: 'Blocked', color: '#ff0000' },
 ];
 
-const appConstants = {
-  limits: {
-    invites: 20
-  }
+const appLimits = {
+  invites: 20,
+  freePlanTasks: 200,
+  freePlanEngagements: 2
 };
 
 const isMobile = Boolean(
@@ -26,5 +26,5 @@ const isMobile = Boolean(
 export {
   statuses,
   isMobile,
-  appConstants
+  appLimits
 };

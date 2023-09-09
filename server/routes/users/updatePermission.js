@@ -13,6 +13,14 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const updaterUserId = req.userId;
+
+  if (userId === updaterUserId) {
+    return res.json({
+      message: 'You cannot update your own permissions.'
+    });
+  }
+
   try {
     const newRole = isAdmin ? 'admin' : 'member';
 

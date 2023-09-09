@@ -2,7 +2,7 @@ const emailService = require('../../../email');
 const validator = require("email-validator");
 const { pool } = require('../../../database');
 const { v4: uuidv4 } = require('uuid');
-const { appConstants, isDev } = require('../../../config');
+const { appLimits, isDev } = require('../../../config');
 
 module.exports = async (req, res, next) => {
   const {
@@ -56,8 +56,8 @@ module.exports = async (req, res, next) => {
     return res.json({ message: `Missing or invalid emails for the following objects:  ${JSON.stringify(invalidOrMissingEmails)}` });
   }
 
-  if (countNewEmails > appConstants.limits.invites) {
-    return res.json({ message: `New emails to invite cannot exceed ${appConstants.limits.invites} - found ${countNewEmails}.` });
+  if (countNewEmails > appLimits.invites) {
+    return res.json({ message: `New emails to invite cannot exceed ${appLimits.invites} - found ${countNewEmails}.` });
   }
 
   if (!allEmailsArray.length) {
@@ -158,10 +158,10 @@ module.exports = async (req, res, next) => {
 
     connection.release();
 
-    return res.json({ 
+    return res.json({
       success: true,
       invitedUsers: Object.values(allEmailsToUserMap)
-     });
+    });
 
   } catch (error) {
     await connection.rollback();

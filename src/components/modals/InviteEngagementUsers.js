@@ -1,5 +1,5 @@
 import Dialog from '@mui/material/Dialog';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Autocomplete, Box, FormControl, Grow, Paper, TextField, Typography } from '@mui/material';
@@ -7,9 +7,9 @@ import BuildIcon from '@mui/icons-material/Build';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import validator from 'email-validator';
 import { inviteEngagementUsers } from '../../api/engagements';
-import { appConstants } from '../../lib/constants';
+import { appLimits } from '../../lib/constants';
 
-const inviteLimit = appConstants.limits.invites;
+const inviteLimit = appLimits.invites;
 
 export default function InviteEngagementUsers(props) {
 
@@ -89,7 +89,7 @@ export default function InviteEngagementUsers(props) {
       newEmailCount++;
     }
   });
-  
+
   const handleInviteUsers = async () => {
     if (!inviteeUsers.length) {
       openSnackBar("Please enter at least 1 user to add.");
@@ -263,9 +263,6 @@ export default function InviteEngagementUsers(props) {
                       helperText={
                         <>
                           Select existing users from {org.name} or add new email addresses.
-                          <br></br>
-                          Only new email addresses will be sent an invitation email link to join.
-                          Existing users from {org.name} will recieve an in-app notification.
                         </>
                       }
                       {...params}

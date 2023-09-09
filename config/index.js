@@ -1,12 +1,10 @@
 const isDev = process.env.NODE_ENV !== 'production';
 
-const appConstants = {
-  limits: {
+const appLimits = {
     invites: 20
-  }
 };
 
 module.exports = {
   isDev,
-  appConstants
+  appLimits
 };
