@@ -13,6 +13,8 @@ const appLimits = {
   freePlanEngagements: 2
 };
 
+const pricePerAdminMonthly = 7.50;
+
 const isMobile = Boolean(
   navigator.userAgent.match(/Android/i)
   || navigator.userAgent.match(/webOS/i)
@@ -26,5 +28,6 @@ const isMobile = Boolean(
 export {
   statuses,
   isMobile,
-  appLimits
+  appLimits,
+  pricePerAdminMonthly
 };

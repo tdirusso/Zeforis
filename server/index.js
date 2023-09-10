@@ -54,6 +54,7 @@ const batchUpdateAccess = require('./routes/users/batchUpdateAccess');
 const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
 const slackbotStats = require('./routes/slackbot/stats');
 const logFrontendError = require('./routes/logs/logFrontendError');
+const stripe_createSubscription = require('./routes/stripe/createSubscription');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -137,6 +138,8 @@ const boot = async () => {
   app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
   app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
+
+  app.post('/api/stripe/subscriptions', authenicatedUserRateLimit, checkOrgOwnerMW, stripe_createSubscription);
 
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
