@@ -1,18 +1,23 @@
-import { Alert, Box, Divider, Paper, Slider, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, Paper, Slider, TextField, Typography } from "@mui/material";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { PaymentElement } from '@stripe/react-stripe-js';
 import { useOutletContext } from "react-router-dom";
-import { appLimits, pricePerAdminMonthly } from "../../../../lib/constants";
+import { appLimits, pricePerAdminMonthly, stripeCustomerPortalUrl } from "../../../../lib/constants";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
 import { createSubscription } from "../../../../api/stripe";
 import { useStripe, useElements } from '@stripe/react-stripe-js';
 import ConfettiExplosion from "react-confetti-explosion";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
 
-export default function BillingTab() {
+export default function BillingTab({ isPostPaymentSuccess }) {
   const {
     tasks,
     engagements,
@@ -166,59 +171,73 @@ export default function BillingTab() {
 };
 
 function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
+  const [subscriptionFoundModalOpen, setSubscriptionFoundModalOpen] = useState(false);
+
+  const {
+    user
+  } = useOutletContext();
 
   const stripe = useStripe();
   const elements = useElements();
 
   const handlePurchase = async () => {
-    // if (numAdmins <= 0 || numAdmins >= 10000) {
-    //   openSnackBar('Number of administrators must be between 1 and 10,000.');
-    //   return;
-    // }
 
-    // const { error } = await elements.submit();
+    // window.location.href = `${process.env.REACT_APP_APP_DOMAIN}/home/settings?paymentSuccess=true`;
+    // return;
+    if (numAdmins <= 0 || numAdmins >= 10000) {
+      openSnackBar('Number of administrators must be between 1 and 10,000.');
+      return;
+    }
 
-    // if (error) {
-    //   if (error.type !== 'validation_error') {
-    //     openSnackBar(error.message);
-    //   }
-    //   return;
-    // }
+    const { error } = await elements.submit();
 
-    // setLoading(true);
+    if (error) {
+      if (error.type !== 'validation_error') {
+        openSnackBar(error.message);
+      }
+      return;
+    }
 
-    // try {
-    //   const {
-    //     clientSecret,
-    //     message
-    //   } = await createSubscription({
-    //     orgId: org.id,
-    //     numAdmins
-    //   });
+    setLoading(true);
 
-    //   if (clientSecret) {
-    //     const { error } = await stripe.confirmPayment({
-    //       elements,
-    //       clientSecret,
-    //       confirmParams: {
-    //         return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings?paymentSuccess=true`,
-    //       },
-    //       redirect: 'always'
-    //     });
+    try {
+      const {
+        clientSecret,
+        message,
+        hasSubscription
+      } = await createSubscription({
+        orgId: org.id,
+        numAdmins
+      });
 
-    //     if (error) {
+      if (clientSecret) {
+        const { error } = await stripe.confirmPayment({
+          elements,
+          clientSecret,
+          confirmParams: {
+            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings?paymentSuccess=true`,
+          },
+          redirect: 'always'
+        });
 
-    //     } else {
-    //       console.log('completed!');
-    //     }
-    //   } else {
-    //     openSnackBar(message, 'error');
-    //     setLoading(false);
-    //   }
-    // } catch (error) {
-    //   openSnackBar(error.message, 'error');
-    //   setLoading(false);
-    // }
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('completed!');
+        }
+      } else if (hasSubscription) {
+        setSubscriptionFoundModalOpen(true);
+        setLoading(false);
+      }
+
+      else {
+        openSnackBar(message, 'error');
+        setLoading(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setLoading(false);
+    }
   };
 
   return (
@@ -243,7 +262,54 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
       </Box>
       <Box>
         <ConfettiExplosion />
+        <SubscriptionFoundModal
+          subscriptionFoundModalOpen={subscriptionFoundModalOpen}
+          setSubscriptionFoundModalOpen={setSubscriptionFoundModalOpen}
+          email={user.email}
+        />
       </Box>
     </form>
+  );
+}
+
+function SubscriptionFoundModal(props) {
+
+  const {
+    subscriptionFoundModalOpen,
+    setSubscriptionFoundModalOpen,
+    email
+  } = props;
+
+  const handleClose = () => setSubscriptionFoundModalOpen(false);
+
+  const handleOpenCustomerPortal = () => {
+    window.open(stripeCustomerPortalUrl, '_blank');
+    handleClose();
+  };
+
+  return (
+    <Dialog
+      open={subscriptionFoundModalOpen}
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle>
+        Subscription Found
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          You just tried to create a new subscription, but we found an existing subscription tied to your email ({email}).
+          <br></br>
+          <br></br>
+          <Button 
+          variant='contained'
+          size='large' 
+          onClick={handleOpenCustomerPortal}>
+            Manage subscription
+          </Button>
+        </DialogContentText>
+      </DialogContent>
+    </Dialog>
   );
 }

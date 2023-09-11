@@ -4,15 +4,15 @@ import GeneralTab from "./GeneralTab";
 import BillingTab from "./BillingTab";
 import '../../styles/settings.scss';
 
-export default function AccountTab() {
-  const [tabVal, setTabVal] = useState(0);
+export default function AccountTab({ isPostPaymentSuccess }) {
+  const [tabVal, setTabVal] = useState(isPostPaymentSuccess ? 1 : 0);
 
   const getTabContent = () => {
     switch (tabVal) {
       case 0:
         return <GeneralTab />;
       case 1:
-        return <BillingTab />;
+        return <BillingTab isPostPaymentSuccess={isPostPaymentSuccess} />;
       default:
         break;
     }

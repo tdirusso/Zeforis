@@ -10,10 +10,12 @@ const statuses = [
 const appLimits = {
   invites: 20,
   freePlanTasks: 200,
-  freePlanEngagements: 2
+  freePlanEngagements: 1
 };
 
 const pricePerAdminMonthly = 7.50;
+
+const stripeCustomerPortalUrl = 'https://billing.stripe.com/p/login/test_9AQ29haPEen8f7iaEE';
 
 const isMobile = Boolean(
   navigator.userAgent.match(/Android/i)
@@ -29,5 +31,6 @@ export {
   statuses,
   isMobile,
   appLimits,
-  pricePerAdminMonthly
+  pricePerAdminMonthly,
+  stripeCustomerPortalUrl
 };

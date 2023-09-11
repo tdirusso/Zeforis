@@ -57,6 +57,26 @@ module.exports = async (req, res, next) => {
       customer = newCustomer;
     }
 
+    console.log(customer);
+
+    const existingSubscriptions = (await stripe.subscriptions.list({
+      customer: customer.id,
+      limit: 100,
+      expand: ['data.latest_invoice.payment_intent']
+    })).data;
+
+    if (existingSubscriptions.length) {
+      for (const existingSubscription of existingSubscriptions) {
+        if (existingSubscription.status === 'incomplete') {
+          return res.json({
+            clientSecret: existingSubscription.latest_invoice.payment_intent.client_secret
+          });
+        }
+      }
+
+      return res.json({ hasSubscription: true });
+    }
+
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: [{
