@@ -4,7 +4,7 @@ const { isDev } = require('../config');
 class EmailService {
   constructor() {
     if (this.instance) {
-      return this.instance;
+      return this;
     }
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);

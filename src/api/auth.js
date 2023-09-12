@@ -12,7 +12,15 @@ const logout = (logoutPageUrl) => {
 };
 
 const authenticate = async () => {
-  const { data } = await request.post(`users/authenticate`);
+  const updateStaleUser = Boolean(localStorage.getItem('updateStaleUser')) || false;
+
+  if (updateStaleUser) {
+    localStorage.removeItem('updateStaleUser');
+  }
+
+  const { data } = await request.post(`users/authenticate`, {
+    updateStaleUser
+  });
 
   if (!data.user) {
     deleteToken();

@@ -1,51 +1,96 @@
+const { pool } = require('../../database');
 const stripe = require('../../stripe');
+const slackbot = require('../../slackbot');
 
-const endpointSecret = 'whsec_4815f37a4ec6c624bf6eddb7e6ea5be0ecfeccf0b2f6e1f2c5d8519a4c02fa93';
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 module.exports = async (req, res, next) => {
-  console.log(req.rawBody)
+
   let event = req.body;
-  // Only verify the event if you have an endpoint secret defined.
-  // Otherwise use the basic event deserialized with JSON.parse
-  if (endpointSecret) {
-    // Get the signature sent by Stripe
-    const signature = req.headers['stripe-signature'];
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        signature,
-        endpointSecret
-      );
-    } catch (err) {
-      console.log(`⚠️  Webhook signature verification failed.`, err.message);
-      return res.sendStatus(400);
+
+  const signature = req.headers['stripe-signature'];
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      webhookSecret
+    );
+  } catch (error) {
+    console.log(`⚠️  Webhook signature verification failed.`, error.message);
+    return res.sendStatus(400);
+  }
+
+  try {
+    switch (event.type) {
+      case 'payment_intent.succeeded': {
+        const { customer, amount_received } = event.data.object;
+
+        if (customer) {
+          const [userResult] = await pool.query(
+            'SELECT id, email FROM users WHERE stripe_customerId = ?',
+            [customer]
+          );
+
+          const user = userResult[0];
+
+          if (user) {
+            await pool.query('UPDATE users SET stripe_subscription_status = "active", plan = "pro" WHERE id = ?', [user.id]);
+
+            await slackbot.post({
+              channel: slackbot.channels.events,
+              message: `*New Subscription* 🤑\n*Amount:*  ${(amount_received / 100).toLocaleString('en', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}\n*Email:*  ${user.email}`
+            });
+          }
+        }
+
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const { customer, plan } = event.data.object;
+
+        if (customer) {
+          const [userResult] = await pool.query(
+            'SELECT id, email FROM users WHERE stripe_customerId = ?',
+            [customer]
+          );
+
+          const user = userResult[0];
+
+          if (user) {
+            await pool.query('UPDATE users SET stripe_subscription_status = "canceled", plan = "free" WHERE id = ?', [user.id]);
+
+            await slackbot.post({
+              channel: slackbot.channels.events,
+              message: `*Subscription Canceled* 😢\n*Amount:*  -${(plan.amount / 100).toLocaleString('en', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}\n*Email:*  ${user.email}`
+            });
+          }
+        }
+
+        break;
+      }
+      case 'customer.subscription.updated': {
+        console.log(event)
+        break;
+      }
+      default:
+        // Unexpected event type
+        console.log(`Unhandled event type ${event.type}.`);
     }
+
+    return res.send();
+  } catch (error) {
+    next(error);
+    return res.sendStatus(400);
   }
-
-  // Handle the event
-  switch (event.type) {
-    case 'payment_intent.succeeded':
-      console.log(event)
-      const paymentIntent = event.data.object;
-      console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
-      // Then define and call a method to handle the successful payment intent.
-      // handlePaymentIntentSucceeded(paymentIntent);
-      break;
-    case 'payment_method.attached':
-      const paymentMethod = event.data.object;
-      // Then define and call a method to handle the successful attachment of a PaymentMethod.
-      // handlePaymentMethodAttached(paymentMethod);
-      break;
-    default:
-      // Unexpected event type
-      console.log(`Unhandled event type ${event.type}.`);
-  }
-
-  // Return a 200 response to acknowledge receipt of the event
-  res.send();
-
 };
-
-// app.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
-
-// });

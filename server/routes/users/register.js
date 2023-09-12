@@ -3,7 +3,7 @@ const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 const { OAuth2Client } = require('google-auth-library');
-const { slackbotClient } = require('../../../slackbot');
+const slackbot = require('../../../slackbot');
 
 const { pool } = require('../../../database');
 
@@ -61,9 +61,10 @@ module.exports = async (req, res, next) => {
           'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
           [payload.given_name, payload.family_name, googleEmail]);
 
-        await slackbotClient.chat.postMessage({
-          text: `*New Zeforis User*\n${googleEmail}`,
-          channel: slackEventsChannelId
+
+        await slackbot.post({
+          channel: slackbot.channels.events,
+          message: `*New User*\n${googleEmail}`
         });
 
         return res.json({ success: true });
@@ -91,9 +92,10 @@ module.exports = async (req, res, next) => {
 
       await sendVerifyEmail(userId, verificationCode, lcEmail);
 
-      await slackbotClient.chat.postMessage({
-        text: `*New Zeforis User*\n${lcEmail}`,
-        channel: slackEventsChannelId
+
+      await slackbot.post({
+        channel: slackbot.channels.events,
+        message: `*New User*\n${lcEmail}`
       });
 
       return res.json({ success: true });

@@ -22,6 +22,10 @@ export default function Settings() {
   const qsTab = queryParams.get('tab');
   const isPaymentSuccess = queryParams.get('isPaymentSuccess');
 
+  if (isPaymentSuccess) {
+    localStorage.setItem('updateStaleUser', 'true');
+  }
+
   const initialTabValue = isPaymentSuccess ? 2 : (Number(qsTab) || 0);
   const [tabVal, setTabVal] = useState(initialTabValue);
 

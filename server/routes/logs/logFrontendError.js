@@ -1,5 +1,5 @@
 const { pool } = require('../../../database');
-const { slackbotClient } = require('../../../slackbot');
+const slackbot = require('../../../slackbot');
 const { isDev } = require('../../../config');
 
 module.exports = async (req, res, next) => {
@@ -17,12 +17,11 @@ module.exports = async (req, res, next) => {
         'INSERT INTO app_logs (type, data) VALUES ("frontend-error", ?)',
         [logData]
       );
-
-      await slackbotClient.chat.postMessage({
-        text: `*Zeforis Frontend Error*\n${logData}`,
-        channel: 'C05MNK33N7N'
+      
+      await slackbot.post({
+        channel: slackbot.channels.errors,
+        message: `*Frontend Error*\n${logData}`
       });
-
     }
 
     return res.json({ success: true });

@@ -10,6 +10,10 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const {
+    updateStaleUser
+  } = req.body;
+
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
@@ -17,6 +21,27 @@ module.exports = async (req, res, next) => {
 
     if (authenticatedUser) {
       const userId = authenticatedUser.id;
+
+      let freshUserData = null;
+
+      if (updateStaleUser) {
+        const [userResult] = await pool.query(
+          `
+          SELECT 
+            id,
+            first_name AS firstName,
+            last_name AS lastName,
+            email,
+            date_created AS dateCreated,
+            plan,
+            stripe_subscription_status AS subscriptionStatus
+          FROM users
+          WHERE id = ?`,
+          [userId]
+        );
+
+        freshUserData = userResult[0];
+      }
 
       const [engagementMemberData] = await pool.query(
         `
@@ -91,10 +116,12 @@ module.exports = async (req, res, next) => {
         }
       });
 
+      const userData = freshUserData ? freshUserData : authenticatedUser;
+
       const newToken = jwt.sign(
         {
           user: {
-            ...authenticatedUser,
+            ...userData
           }
         },
         process.env.SECRET_KEY,
@@ -103,7 +130,7 @@ module.exports = async (req, res, next) => {
 
       return res.json({
         user: {
-          ...authenticatedUser,
+          ...userData,
           memberOfOrgs: [...memberOfOrgs.values()],
           adminOfEngagements,
           memberOfEngagements

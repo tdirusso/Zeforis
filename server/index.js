@@ -11,6 +11,7 @@ const path = require('path');
 const fileUpload = require('express-fileupload');
 const { initializeDatabase, pool } = require('../database');
 const emailService = require('../email');
+const slackbot = require('../slackbot');
 
 const login = require('./routes/users/login');
 const authenticate = require('./routes/users/authenticate');
@@ -123,10 +124,10 @@ const unAuthenicatedUserRateLimit = rateLimit({
 const boot = async () => {
   await initializeDatabase();
 
-  app.post('/api/webhooks/stripe', express.raw({type: 'application/json'}), stripeWebhook);
+  app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhook);
 
   app.use(express.json());
-  
+
   app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
   app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
   app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
@@ -206,6 +207,11 @@ const boot = async () => {
           subject: `Zeforis - Uncaught Error`,
           text: logData,
           html: logData
+        });
+
+        await slackbot.post({
+          channel: slackbot.channels.errors,
+          message: `*FATAL Uncaught Server Error*\n${logData}`
         });
       }
     } catch (newError) {

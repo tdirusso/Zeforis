@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../../../database');
 const { OAuth2Client } = require('google-auth-library');
-const { slackbotClient } = require('../../../slackbot');
+const slackbot = require('../../../slackbot');
 
 const slackEventsChannelId = 'C05ML3A3DC3';
 
@@ -185,9 +185,9 @@ async function handleUniversalLogin(req, res) {
         'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
         [payload.given_name, payload.family_name, googleEmail]);
 
-      await slackbotClient.chat.postMessage({
-        text: `*New Zeforis User*\n${googleEmail}`,
-        channel: slackEventsChannelId
+      await slackbot.post({
+        channel: slackbot.channels.events,
+        message: `*New User*\n${googleEmail}`
       });
 
       const newUser = {
@@ -218,7 +218,7 @@ async function handleUniversalLogin(req, res) {
           message: `No password set for ${lcEmail} - try Google or password reset.`
         });
       }
-      
+
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
