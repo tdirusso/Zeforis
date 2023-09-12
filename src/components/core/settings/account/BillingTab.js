@@ -3,21 +3,47 @@ import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { PaymentElement } from '@stripe/react-stripe-js';
 import { useOutletContext } from "react-router-dom";
-import { appLimits, pricePerAdminMonthly, stripeCustomerPortalUrl } from "../../../../lib/constants";
+import { pricePerAdminMonthly, stripeCustomerPortalUrl } from "../../../../lib/constants";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
 import { createSubscription } from "../../../../api/stripe";
 import { useStripe, useElements } from '@stripe/react-stripe-js';
 import ConfettiExplosion from "react-confetti-explosion";
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import AlertTitle from "@mui/material/AlertTitle/AlertTitle";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
 
-export default function BillingTab({ isPostPaymentSuccess }) {
+export default function BillingTab({ isPaymentSuccess }) {
+  const {
+    user
+  } = useOutletContext();
+
+  const { plan } = user;
+
+  const getBillingInfo = () => {
+    if (isPaymentSuccess) {
+      return <PaymentSuccessInfo />;
+    }
+
+    if (plan === 'free') {
+      return <FreePlanInfo />;
+    }
+  };
+
+  return (
+    <Box className="billing-tab">
+      {
+        getBillingInfo()
+      }
+    </Box>
+  );
+};
+
+function FreePlanInfo() {
   const {
     tasks,
     engagements,
@@ -51,18 +77,11 @@ export default function BillingTab({ isPostPaymentSuccess }) {
   };
 
   return (
-    <Box className="billing-tab">
+    <Box>
       <Box className="free-plan-info">
         <Alert severity="warning">
           <Typography>
             You are currently on the Zeforis <strong>FREE</strong> plan.
-          </Typography>
-          <Typography>
-            <strong>Resource Usage</strong>
-            <br></br>
-            {tasks.length} / {appLimits.freePlanTasks} Tasks
-            <br></br>
-            {engagements.length} / {appLimits.freePlanEngagements} Engagements
           </Typography>
         </Alert>
       </Box>
@@ -168,7 +187,7 @@ export default function BillingTab({ isPostPaymentSuccess }) {
       </Box>
     </Box>
   );
-};
+}
 
 function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
   const [subscriptionFoundModalOpen, setSubscriptionFoundModalOpen] = useState(false);
@@ -181,9 +200,6 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
   const elements = useElements();
 
   const handlePurchase = async () => {
-
-    // window.location.href = `${process.env.REACT_APP_APP_DOMAIN}/home/settings?paymentSuccess=true`;
-    // return;
     if (numAdmins <= 0 || numAdmins >= 10000) {
       openSnackBar('Number of administrators must be between 1 and 10,000.');
       return;
@@ -215,15 +231,14 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
           elements,
           clientSecret,
           confirmParams: {
-            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings?paymentSuccess=true`,
+            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings?isPaymentSuccess=true`,
           },
           redirect: 'always'
         });
 
         if (error) {
-          console.log(error);
-        } else {
-          console.log('completed!');
+          openSnackBar(error.message);
+          setLoading(false);
         }
       } else if (hasSubscription) {
         setSubscriptionFoundModalOpen(true);
@@ -261,7 +276,6 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
         </Typography>
       </Box>
       <Box>
-        <ConfettiExplosion />
         <SubscriptionFoundModal
           subscriptionFoundModalOpen={subscriptionFoundModalOpen}
           setSubscriptionFoundModalOpen={setSubscriptionFoundModalOpen}
@@ -273,7 +287,6 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
 }
 
 function SubscriptionFoundModal(props) {
-
   const {
     subscriptionFoundModalOpen,
     setSubscriptionFoundModalOpen,
@@ -290,10 +303,7 @@ function SubscriptionFoundModal(props) {
   return (
     <Dialog
       open={subscriptionFoundModalOpen}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
+      onClose={handleClose}>
       <DialogTitle>
         Subscription Found
       </DialogTitle>
@@ -302,14 +312,49 @@ function SubscriptionFoundModal(props) {
           You just tried to create a new subscription, but we found an existing subscription tied to your email ({email}).
           <br></br>
           <br></br>
-          <Button 
-          variant='contained'
-          size='large' 
-          onClick={handleOpenCustomerPortal}>
+          <Button
+            variant='contained'
+            size='large'
+            onClick={handleOpenCustomerPortal}>
             Manage subscription
           </Button>
         </DialogContentText>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function PaymentSuccessInfo() {
+  return (
+    <Box className='payment-success'>
+      <Alert severity="success">
+        <AlertTitle style={{ fontWeight: '600', fontSize: '1.07rem' }}>Payment Successful</AlertTitle>
+        <Box className='flex-centered'>
+          <ConfettiExplosion
+            zIndex={100}
+            force={1}
+            width={window.innerWidth}
+            duration={3000}
+            particleCount={300}
+          />
+        </Box>
+        <br></br>
+        <Typography>
+          Thank you for signing up for <strong>Zeforis Pro</strong>.
+        </Typography>
+        <br></br>
+        <Typography>
+          Our systems will recieve payment confirmation shortly and provision access.
+          <br></br>
+          You can always come back to this page to check your subscription status & manage your subscription.
+        </Typography>
+        <br></br>
+        <a href='/home/dashboard'>
+          <Button size='large' variant='contained'>
+            Continue to dashboard
+          </Button>
+        </a>
+      </Alert>
+    </Box>
   );
 }

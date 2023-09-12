@@ -20,13 +20,13 @@ export default function Settings() {
 
   const queryParams = new URLSearchParams(search);
   const qsTab = queryParams.get('tab');
-  const isPostPaymentSuccess = queryParams.get('paymentSuccess');
+  const isPaymentSuccess = queryParams.get('isPaymentSuccess');
 
-  const initialTabValue = isPostPaymentSuccess ? 2 : (Number(qsTab) || 0);
+  const initialTabValue = isPaymentSuccess ? 2 : (Number(qsTab) || 0);
   const [tabVal, setTabVal] = useState(initialTabValue);
 
   useEffect(() => {
-    if (!isPostPaymentSuccess) {
+    if (!isPaymentSuccess) {
       const newQsTab = queryParams.get('tab');
       if ((Number(newQsTab) || 0) !== tabVal) {
         setTabVal(Number(newQsTab));
@@ -41,7 +41,7 @@ export default function Settings() {
       case 1:
         return <OrgTab />;
       case 2:
-        return <AccountTab isPostPaymentSuccess={isPostPaymentSuccess} />;
+        return <AccountTab isPaymentSuccess={isPaymentSuccess} />;
       default:
         break;
     }

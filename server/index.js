@@ -63,6 +63,8 @@ const checkAuthMW = require('./middlewares/checkAuth');
 const errorHandlerMW = require('./middlewares/errorHandler');
 const checkSlackSignature = require('./middlewares/checkSlackSignature');
 
+const stripeWebhook = require('./webhooks/stripe');
+
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -78,7 +80,6 @@ if (isDev) {
 }
 
 app.use(express.static(path.join(__dirname + '/../', 'build')));
-app.use(express.json());
 app.use(express.urlencoded({
   extended: true,
   verify: (req, _, buf) => {
@@ -122,6 +123,10 @@ const unAuthenicatedUserRateLimit = rateLimit({
 const boot = async () => {
   await initializeDatabase();
 
+  app.post('/api/webhooks/stripe', express.raw({type: 'application/json'}), stripeWebhook);
+
+  app.use(express.json());
+  
   app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
   app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
   app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);

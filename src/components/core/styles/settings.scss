@@ -37,22 +37,15 @@ body.dark {
 
 .billing-tab {
   .free-plan-info {
-
-    .MuiAlert-message {
-      display: flex;
-      align-items: center;
-      flex-grow: 1;
-      gap: 5rem;
-    }
-
-    .MuiAlert-icon {
-      align-items: center;
+    .MuiAlert-root {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
     }
   }
 
   .payment-content {
     display: flex;
-    margin-top: 3rem;
+    margin-top: 4rem;
     gap: 3rem;
     justify-content: space-evenly;
 
@@ -79,6 +72,12 @@ body.dark {
           padding: 8px 22px;
         }
       }
+    }
+  }
+
+  .payment-success {
+    .MuiAlert-root {
+      justify-content: start !important;
     }
   }
 }

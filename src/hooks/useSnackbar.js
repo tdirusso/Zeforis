@@ -9,7 +9,7 @@ export default function useSnackbar() {
     if (isOpen === true) {
       setTimeout(() => {
         setOpen(false);
-      }, 3000);
+      }, 4000);
     }
   }, [isOpen]);
 

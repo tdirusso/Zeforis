@@ -57,8 +57,6 @@ module.exports = async (req, res, next) => {
       customer = newCustomer;
     }
 
-    console.log(customer);
-
     const existingSubscriptions = (await stripe.subscriptions.list({
       customer: customer.id,
       limit: 100,
