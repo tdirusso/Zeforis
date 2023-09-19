@@ -1,6 +1,7 @@
 const { pool } = require('../../database');
 const stripe = require('../../stripe');
 const slackbot = require('../../slackbot');
+const cache = require('../../cache');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -37,6 +38,16 @@ module.exports = async (req, res, next) => {
           if (user) {
             await pool.query('UPDATE users SET stripe_subscription_status = "canceled", plan = "free" WHERE id = ?', [user.id]);
 
+            const cachedUser = cache.get(`user-${user.id}`);
+
+            if (cachedUser) {
+              cache.set(`user-${user.id}`, {
+                ...cachedUser,
+                subscriptionStatus: 'canceled',
+                plan: 'free'
+              });
+            }
+
             await slackbot.post({
               channel: slackbot.channels.events,
               message: `*Subscription Canceled* 😢\n*Amount:*  -${(plan.amount / 100).toLocaleString('en', {
@@ -64,6 +75,15 @@ module.exports = async (req, res, next) => {
           if (user) {
             await pool.query('UPDATE users SET stripe_subscription_status = "past_due" WHERE id = ?', [user.id]);
 
+            const cachedUser = cache.get(`user-${user.id}`);
+
+            if (cachedUser) {
+              cache.set(`user-${user.id}`, {
+                ...cachedUser,
+                subscriptionStatus: 'past_due'
+              });
+            }
+
             await slackbot.post({
               channel: slackbot.channels.events,
               message: `*Subscription Past Due* 😧\n*Email:*  ${user.email}`
@@ -86,6 +106,16 @@ module.exports = async (req, res, next) => {
 
             if (user) {
               await pool.query('UPDATE users SET stripe_subscription_status = "active", plan = "pro" WHERE id = ?', [user.id]);
+
+              const cachedUser = cache.get(`user-${user.id}`);
+
+              if (cachedUser) {
+                cache.set(`user-${user.id}`, {
+                  ...cachedUser,
+                  subscriptionStatus: 'active',
+                  plan: 'pro'
+                });
+              }
 
               await slackbot.post({
                 channel: slackbot.channels.events,

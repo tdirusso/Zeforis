@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 const { pool } = require('../../../database');
 const { OAuth2Client } = require('google-auth-library');
 const slackbot = require('../../../slackbot');
-
-const slackEventsChannelId = 'C05ML3A3DC3';
+const cache = require('../../../cache');
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
@@ -25,16 +24,13 @@ module.exports = async (req, res, next) => {
 };
 
 const createToken = user => {
+
+  cache.set(`user-${user.id}`, user);
+
   return jwt.sign(
     {
       user: {
-        id: user.id,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        email: user.email,
-        dateCreated: user.date_created,
-        plan: user.plan,
-        subscriptionStatus: user.stripe_subscription_status
+        ...(delete user.password && delete user.is_verified && user)
       }
     },
     process.env.SECRET_KEY,
@@ -67,13 +63,22 @@ async function handleCustomPageLogin(req, res) {
 
     const [userResult] = await pool.query(
       `
-        SELECT id, is_verified, first_name, last_name, email, date_created, plan, stripe_subscription_status FROM users WHERE email = ? AND EXISTS
-        (
-          SELECT 1 FROM engagement_users 
-          JOIN engagements ON engagements.id = engagement_users.engagement_id
-          JOIN users ON users.id = engagement_users.user_id
-          WHERE engagements.org_id = ? and users.email = ?
-        )
+        SELECT 
+          id, 
+          is_verified,
+          first_name as firstName, 
+          last_name as lastName, 
+          email, 
+          date_created as dateCreated,
+          plan, 
+          stripe_subscription_status as subscriptionStatus
+          FROM users WHERE email = ? AND EXISTS
+          (
+            SELECT 1 FROM engagement_users 
+            JOIN engagements ON engagements.id = engagement_users.engagement_id
+            JOIN users ON users.id = engagement_users.user_id
+            WHERE engagements.org_id = ? and users.email = ?
+          )
         `,
       [googleEmail, orgId, googleEmail]
     );
@@ -98,13 +103,23 @@ async function handleCustomPageLogin(req, res) {
 
     const [userResult] = await pool.query(
       `
-        SELECT password, id, is_verified, first_name, last_name, email, date_created, plan, stripe_subscription_status FROM users WHERE email = ? AND EXISTS
-        (
-          SELECT 1 FROM engagement_users 
-          JOIN engagements ON engagements.id = engagement_users.engagement_id
-          JOIN users ON users.id = engagement_users.user_id
-          WHERE engagements.org_id = ? and users.email = ?
-        )
+        SELECT 
+          password, 
+          id,
+          is_verified, 
+          first_name as firstName, 
+          last_name as lastName, 
+          email, 
+          date_created as dateCreated, 
+          plan, 
+          stripe_subscription_status as subscriptionStatus
+          FROM users WHERE email = ? AND EXISTS
+          (
+            SELECT 1 FROM engagement_users 
+            JOIN engagements ON engagements.id = engagement_users.engagement_id
+            JOIN users ON users.id = engagement_users.user_id
+            WHERE engagements.org_id = ? and users.email = ?
+          )
         `,
       [lcEmail, orgId, lcEmail]
     );
@@ -164,7 +179,7 @@ async function handleUniversalLogin(req, res) {
     const googleEmail = payload.email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name, last_name, email, date_created, plan, stripe_subscription_status FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name as firstName, last_name as lastName, email, date_created as dateCreated, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
       [googleEmail]
     );
 
@@ -193,9 +208,10 @@ async function handleUniversalLogin(req, res) {
       const newUser = {
         id: createUserResult[0].insertId,
         email: googleEmail,
-        first_name: payload.given_name,
-        last_name: payload.family_name,
-        date_created: new Date().toISOString(),
+        firstName: payload.given_name,
+        lastName: payload.family_name,
+        dateCreated: new Date().toISOString(),
+        plan: 'free'
       };
 
       const token = createToken(newUser);
@@ -206,7 +222,7 @@ async function handleUniversalLogin(req, res) {
     const lcEmail = email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name, last_name, email, date_created, password, plan, stripe_subscription_status FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name as firstName, last_name as lastName, email, date_created as dateCreated, password, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
       [lcEmail]
     );
 
