@@ -11,9 +11,6 @@ import useSnackbar from "../../hooks/useSnackbar";
 import { updatePassword, getInvitationData, register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, CircularProgress, Divider, useMediaQuery } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { AccountCircle } from "@mui/icons-material";
 import { setActiveOrgId } from "../../api/orgs";
 import { setActiveEngagementId } from "../../api/engagements";
 
@@ -266,13 +263,6 @@ export default function AcceptInvitationPage() {
                   fullWidth
                   placeholder="First name"
                   variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle htmlColor="#cbcbcb" />
-                      </InputAdornment>
-                    )
-                  }}
                   inputRef={firstName}
                   disabled={isLoading}
                 />
@@ -282,13 +272,6 @@ export default function AcceptInvitationPage() {
                   fullWidth
                   placeholder="Last name"
                   variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle htmlColor="#cbcbcb" />
-                      </InputAdornment>
-                    )
-                  }}
                   inputRef={lastName}
                   disabled={isLoading}
                 />
@@ -298,13 +281,6 @@ export default function AcceptInvitationPage() {
                 variant="outlined"
                 style={{ marginBottom: '2rem' }}
                 type="password"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <VpnKeyIcon htmlColor="#cbcbcb" />
-                    </InputAdornment>
-                  )
-                }}
                 inputRef={password}
                 disabled={isLoading}
               />

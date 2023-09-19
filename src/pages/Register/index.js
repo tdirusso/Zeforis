@@ -11,10 +11,6 @@ import useSnackbar from "../../hooks/useSnackbar";
 import { register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, Divider, useMediaQuery } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 export default function RegisterPage() {
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
@@ -152,13 +148,6 @@ export default function RegisterPage() {
             inputRef={firstName}
             disabled={isLoading}
             autoComplete="off"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
           <TextField
             placeholder="Last name"
@@ -166,13 +155,6 @@ export default function RegisterPage() {
             inputRef={lastName}
             disabled={isLoading}
             autoComplete="off"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
 
           <TextField
@@ -181,13 +163,6 @@ export default function RegisterPage() {
             type="email"
             inputRef={email}
             disabled={isLoading}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MailOutlineIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
           <TextField
             placeholder="Password"
@@ -195,13 +170,6 @@ export default function RegisterPage() {
             type="password"
             inputRef={password}
             disabled={isLoading}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <VpnKeyIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
           <LoadingButton
             loading={isLoading}

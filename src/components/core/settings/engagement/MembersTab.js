@@ -2,7 +2,6 @@ import { Box, FormControlLabel, FormGroup, InputAdornment, Switch, TextField, Ty
 import { Divider, Button, Chip, Tooltip, Menu } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -198,8 +197,7 @@ export default function MembersTab() {
             hidden={!isOrgOwner}
             variant="outlined"
             style={{ marginBottom: '1rem', whiteSpace: 'break-spaces' }}
-            onClick={() => openModal('invite-engagement-users')}
-            startIcon={<PersonAddIcon />}>
+            onClick={() => openModal('invite-engagement-users')}>
             Add collaborators
           </Button>
         </Box>

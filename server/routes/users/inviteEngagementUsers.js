@@ -56,8 +56,8 @@ module.exports = async (req, res, next) => {
     return res.json({ message: `Missing or invalid emails for the following objects:  ${JSON.stringify(invalidOrMissingEmails)}` });
   }
 
-  if (countNewEmails > appLimits.invites) {
-    return res.json({ message: `New emails to invite cannot exceed ${appLimits.invites} - found ${countNewEmails}.` });
+  if (countNewEmails > appLimits.simultaneousEmailInvites) {
+    return res.json({ message: `New emails to invite cannot exceed ${appLimits.simultaneousEmailInvites} - found ${countNewEmails}.` });
   }
 
   if (!allEmailsArray.length) {

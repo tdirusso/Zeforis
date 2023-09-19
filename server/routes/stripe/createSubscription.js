@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
 
   if (!userObject || !ownedOrg) {
     return res.json({
-      message: 'Missing customer email or org data.'
+      message: 'Missing user or org data.'
     });
   }
 
@@ -32,6 +32,29 @@ module.exports = async (req, res, next) => {
   }
 
   try {
+
+
+    const [orgAdminsCount] = await pool.query(
+      ` 
+      SELECT DISTINCT COUNT(DISTINCT(user_id)) AS adminCount FROM
+      (
+        SELECT
+        users.id as user_id
+        FROM engagement_users
+        LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
+        LEFT JOIN users ON engagement_users.user_id = users.id
+        LEFT JOIN orgs ON orgs.id = engagements.org_id
+        WHERE engagements.org_id = ? AND role = 'admin' AND user_id != ?
+      ) as T1`,
+      [ownedOrg.id, userObject.id]
+    );
+
+    if (numAdmins <= orgAdminsCount.adminCount) {
+      return res.json({
+        message: `Number of admins must be >= ${orgAdminsCount.adminCount}.  Received ${numAdmins}.`
+      });
+    }
+
     let customer = null;
 
     const customers = await stripe.customers.list({

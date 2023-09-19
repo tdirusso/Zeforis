@@ -38,8 +38,7 @@ body.dark {
 .billing-tab {
   .free-plan-info {
     .MuiAlert-root {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
+      justify-content: start !important;
     }
   }
 

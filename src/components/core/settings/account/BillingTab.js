@@ -22,7 +22,10 @@ export default function BillingTab({ isPaymentSuccess }) {
     user
   } = useOutletContext();
 
-  const { plan } = user;
+  const {
+    plan,
+    subscriptionStatus
+  } = user;
 
   const getBillingInfo = () => {
     if (isPaymentSuccess) {
@@ -30,7 +33,9 @@ export default function BillingTab({ isPaymentSuccess }) {
     }
 
     if (plan === 'free') {
-      return <FreePlanInfo />;
+      return <FreePlanInfo status={subscriptionStatus} />;
+    } else if (plan === 'pro') {
+      return <ProPlanInfo status={subscriptionStatus} />;
     }
   };
 
@@ -43,15 +48,51 @@ export default function BillingTab({ isPaymentSuccess }) {
   );
 };
 
-function FreePlanInfo() {
+function ProPlanInfo({ status }) {
+  return (
+    <Box>
+      <Box component="h3">
+        Your Plan
+      </Box>
+      <Divider className="my2" />
+      <Typography fontSize='1.25rem' fontWeight={300}>
+        Zeforis Pro &nbsp;🎉
+      </Typography>
+      <Typography mt={1}>
+        {
+          status === 'past_due' ?
+            `You are currently subscribed to Zeforis Pro, but your subscription is past due.  
+            Click the button below to update your subscription details to continue using Zeforis Pro, or your subscription will soon be canceled.
+          `
+            :
+            'You are currently subscribed to Zeforis Pro.  You can click the button below to manage your subscription.'
+        }
+      </Typography>
+      <Box mt={3}>
+        <a href={stripeCustomerPortalUrl}>
+          <Button variant="contained" size="large">
+            Manage subscription
+          </Button>
+        </a>
+      </Box>
+    </Box>
+  );
+}
+
+function FreePlanInfo({ status }) {
   const {
-    tasks,
-    engagements,
     org,
+    orgUsers,
     openSnackBar
   } = useOutletContext();
 
-  const [numAdmins, setNumAdmins] = useState(1);
+  let numOrgAdmins = 0;
+
+  orgUsers.forEach(({ adminOfEngagements }) =>
+    adminOfEngagements.length > 0 ? numOrgAdmins++ : null
+  );
+
+  const [numAdmins, setNumAdmins] = useState(numOrgAdmins);
   const [isLoading, setLoading] = useState(false);
 
   var styles = window.getComputedStyle(document.body);
@@ -71,17 +112,33 @@ function FreePlanInfo() {
 
   const handleManualAdminCountChange = e => {
     const newVal = Number(e.target.value);
-    if (newVal >= e.target.min && newVal <= e.target.max) {
+    if (newVal >= numOrgAdmins && newVal <= e.target.max) {
       setNumAdmins(newVal);
     }
   };
 
   return (
     <Box>
-      <Box className="free-plan-info">
-        <Alert severity="warning">
+      <Box component="h3">
+        Your Plan
+      </Box>
+      <Divider className="my2" />
+      <Typography fontSize='1.25rem' fontWeight={300}>
+        Zeforis Starter (Free) &nbsp;🙂
+      </Typography>
+      <Typography mt={1}>
+        You are currently using the free version of Zeforis.
+        <br></br>
+        If you would like to upgrade to Zeforis Pro to take advantage of additional administrators, as well as unlimited engagements and tasks, please complete the payment form below.
+      </Typography>
+      <Box className="free-plan-info" mt={4} hidden={status !== 'canceled'}>
+        <Alert severity="info">
+          <AlertTitle>
+            <strong>Info</strong>
+          </AlertTitle>
           <Typography>
-            You are currently on the Zeforis <strong>FREE</strong> plan.
+            It looks like your subscription is in a <strong>canceled</strong> status.
+            To re-activate Zeforis Pro, you must create a new subscription and pay for, at least, the number of administrators in {org.name}, which is <strong>{numOrgAdmins}</strong>.
           </Typography>
         </Alert>
       </Box>
@@ -109,9 +166,9 @@ function FreePlanInfo() {
               disabled={isLoading}
               defaultValue={1}
               valueLabelDisplay="auto"
-              min={1}
+              min={0}
               max={20}
-              onChange={(_, val) => setNumAdmins(val)}
+              onChange={(_, val) => val >= numOrgAdmins ? setNumAdmins(val) : null}
               value={numAdmins}
             />
             <Box className="flex-ac" justifyContent='space-between'>
@@ -121,7 +178,7 @@ function FreePlanInfo() {
               <TextField
                 disabled={isLoading}
                 inputProps={{
-                  min: '1',
+                  min: numOrgAdmins,
                   max: '10000',
                   style: {
                     textAlign: 'center'
@@ -156,7 +213,7 @@ function FreePlanInfo() {
             </Box>
             <Box mt={1}>
               <Typography variant="caption" color='#6d6e78'>
-                Upgrading to Zeforis Pro means you and every additional administrator with have <strong>unlimited resources</strong> inside of the platform.
+                Upgrading to Zeforis Pro means you and your administrators with have <strong>unlimited resources</strong> inside of the platform.
               </Typography>
             </Box>
             <Divider className="my4" />
@@ -340,11 +397,11 @@ function PaymentSuccessInfo() {
         </Box>
         <br></br>
         <Typography>
-          Thank you for signing up for <strong>Zeforis Pro</strong>.
+          Thank you for signing up for <strong>Zeforis Pro</strong>!
         </Typography>
         <br></br>
         <Typography>
-          Our systems will recieve payment confirmation shortly and provision access.
+          Our systems will soon recieve payment confirmation and provision you with full access.
           <br></br>
           You can always come back to this page to check your subscription status & manage your subscription.
         </Typography>

@@ -12,9 +12,6 @@ import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import '../styles.scss';
 import { Button, CircularProgress, Divider, createTheme, useMediaQuery } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
@@ -294,13 +291,6 @@ export default function LoginPage({ setTheme }) {
             placeholder="Email"
             variant="outlined"
             type="email"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MailOutlineIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
             inputRef={email}
             disabled={isLoading}
             autoFocus={!isMobile}
@@ -310,13 +300,6 @@ export default function LoginPage({ setTheme }) {
             variant="outlined"
             type="password"
             helperText={<a tabIndex={1} href="password-reset">Forgot password?</a>}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <VpnKeyIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
             inputRef={password}
             disabled={isLoading}
           />

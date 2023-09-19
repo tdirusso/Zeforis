@@ -9,9 +9,6 @@ import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import InputAdornment from '@mui/material/InputAdornment';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { sendPasswordResetLink, updatePassword } from "../../api/users";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -118,13 +115,6 @@ function PasswordResetStep1({ openSnackBar }) {
           style={{ marginBottom: '2rem' }}
           type="email"
           onChange={e => setEmail(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <MailOutlineIcon htmlColor="#cbcbcb" />
-              </InputAdornment>
-            )
-          }}
           disabled={isSendingResetLink}
           autoFocus={!isMobile}
         />
@@ -197,13 +187,6 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
           placeholder="New password"
           variant="outlined"
           type="password"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <VpnKeyIcon htmlColor="#cbcbcb" />
-              </InputAdornment>
-            )
-          }}
           style={{ marginBottom: '2rem' }}
           disabled={isResettingPassword}
           autoFocus={!isMobile}

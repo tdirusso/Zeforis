@@ -9,7 +9,7 @@ import validator from 'email-validator';
 import { inviteEngagementUsers } from '../../api/engagements';
 import { appLimits } from '../../lib/constants';
 
-const inviteLimit = appLimits.invites;
+const inviteLimit = appLimits.simultaneousEmailInvites;
 
 export default function InviteEngagementUsers(props) {
 
@@ -221,7 +221,7 @@ export default function InviteEngagementUsers(props) {
                     You can't invite additional administrators if you are on the <strong>free</strong> plan.
                   </Typography>
                   <Box>
-                    <a>
+                    <a href='#0'>
                       <Button variant='contained'>
                         Upgrade now
                       </Button>

@@ -48,7 +48,6 @@ module.exports = async (req, res, next) => {
             });
           }
         }
-
         break;
       }
       case 'customer.subscription.updated': {
@@ -71,7 +70,6 @@ module.exports = async (req, res, next) => {
             });
           }
         }
-
         break;
       }
       case 'invoice.paid':
@@ -100,7 +98,6 @@ module.exports = async (req, res, next) => {
               });
             }
           }
-
           break;
         }
       default:
