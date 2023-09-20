@@ -23,6 +23,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { updateTheme } from "../../lib/utils";
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import LockIcon from '@mui/icons-material/Lock';
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -166,6 +167,7 @@ export default function Header(props) {
               PaperProps={{
                 style: {
                   width: '20ch',
+                  overflow: 'visible'
                 }
               }}>
               <MenuItem onClick={openCreateTaskDrawer}>
@@ -189,9 +191,14 @@ export default function Header(props) {
                 </ListItemText>
               </MenuItem>
               <Divider hidden={!isOrgOwner} />
-              <MenuItem onClick={openCreateEngagementDialog} hidden={!isOrgOwner}>
+              <MenuItem
+                disabled={user.plan === 'free'}
+                onClick={openCreateEngagementDialog}
+                hidden={!isOrgOwner}>
                 <ListItemIcon>
-                  <AccountBoxIcon />
+                  {
+                    user.plan === 'free' ? <LockIcon /> : <AccountBoxIcon />
+                  }
                 </ListItemIcon>
                 <ListItemText>
                   <Typography>
@@ -199,6 +206,16 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
+              <Paper style={{
+                padding: '0px',
+                position: 'absolute',
+                left: '20px',
+                bottom: '-27px'
+              }}>
+                <Box>
+                  <Button size="small" variant="contained">Upgrade now</Button>
+                </Box>
+              </Paper>
             </Menu>
           </Box>
 

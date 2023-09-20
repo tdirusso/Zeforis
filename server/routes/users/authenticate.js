@@ -21,8 +21,6 @@ module.exports = async (req, res, next) => {
 
       let userObect = cache.get(`user-${userId}`);
 
-      console.log('cached user', userObect)
-
       if (!userObect) {
         const [userResult] = await pool.query(
           'SELECT plan, stripe_subscription_status AS subscriptionStatus FROM users WHERE id = ?',
@@ -113,7 +111,7 @@ module.exports = async (req, res, next) => {
           }
         },
         process.env.SECRET_KEY,
-        { expiresIn: 3600 }
+        { expiresIn: 36000 }
       );
 
       return res.json({

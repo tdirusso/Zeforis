@@ -19,7 +19,7 @@ const theme = {
     },
     MuiTooltip: {
       defaultProps: {
-        arrow: true,
+        arrow: false,
       }
     },
     MuiMenu: {

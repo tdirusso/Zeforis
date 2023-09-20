@@ -23,6 +23,9 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 import CreateOrgPage from './pages/CreateOrg';
 import { ErrorBoundary } from './components/core/ErrorBoundary';
+import EngagementTab from './components/core/settings/engagement';
+import OrgTab from './components/core/settings/org';
+import AccountTab from './components/core/settings/account';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -47,7 +50,12 @@ function App() {
               <Route path="folders" element={<FoldersPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="tools" element={<ToolsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
+              <Route path="settings" element={<SettingsPage />}>
+                <Route path="engagement" element={<EngagementTab />} />
+                <Route path="organization" element={<OrgTab />} />
+                <Route path="account" element={<AccountTab />} />
+                <Route path="*" element={<Navigate to="engagement" />} />
+              </Route>
             </Route>
 
             <Route path="*" element={<Navigate to="login" />} />

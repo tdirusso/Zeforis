@@ -288,7 +288,7 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
           elements,
           clientSecret,
           confirmParams: {
-            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings?isPaymentSuccess=true`,
+            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings/account?isPaymentSuccess=true`,
           },
           redirect: 'always'
         });

@@ -4,7 +4,9 @@ import GeneralTab from "./GeneralTab";
 import BillingTab from "./BillingTab";
 import '../../styles/settings.scss';
 
-export default function AccountTab({ isPaymentSuccess }) {
+export default function AccountTab() {
+  const isPaymentSuccess = window.location.search.includes('isPaymentSuccess');
+
   const [tabVal, setTabVal] = useState(isPaymentSuccess ? 1 : 0);
 
   const getTabContent = () => {
