@@ -2,9 +2,10 @@ const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {
-    name,
-    engagementId
+    name
   } = req.body;
+
+  const { engagementId } = req;
 
   if (!engagementId || !name) {
     return res.json({

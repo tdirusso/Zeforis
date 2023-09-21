@@ -33,6 +33,14 @@ const commonQueries = {
     );
 
     return taskCountResult[0].taskCount;
+  },
+  getOrgOwnerPlan: async (con, orgId) => {
+    const [orgOwnerPlanResult] = await con.query(
+      'SELECT users.plan FROM orgs LEFT JOIN users ON orgs.owner_id = users.id WHERE orgs.id = ?',
+      [orgId]
+    );
+
+    return orgOwnerPlanResult[0].plan;
   }
 };
 

@@ -30,14 +30,21 @@ module.exports = async (req, res, next) => {
 
     let cachedOrgData = cache.get(`org-${userObject.orgId}`);
     let orgTaskCount = cachedOrgData?.taskCount;
+    let orgOwnerPlan = cachedOrgData?.ownerPlan;
 
-    if (userObject.plan === 'free') {
+    if (orgOwnerPlan === undefined) {
+      orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, userObject.orgId);
+      cachedOrgData = { ...cachedOrgData, ownerPlan: orgOwnerPlan };
+    }
+
+    if (orgOwnerPlan === 'free') {
       if (orgTaskCount === undefined) {
         orgTaskCount = await commonQueries.getOrgTaskCount(connection, userObject.orgId);
+        cachedOrgData = { ...cachedOrgData, taskCount: orgTaskCount };
       }
 
       if (orgTaskCount >= appLimits.freePlanTasks) {
-        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount });
+        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData });
         return res.json({
           message: `Task limit of ${appLimits.freePlanTasks} has been reached.  Upgrade now for unlimited tasks.`
         });
@@ -89,7 +96,9 @@ module.exports = async (req, res, next) => {
 
     connection.release();
 
-    cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount + 1 });
+    if (userObject.plan === 'free') {
+      cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount + 1 });
+    }
 
     return res.json({
       success: true,

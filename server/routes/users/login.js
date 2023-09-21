@@ -60,7 +60,6 @@ async function handleCustomPageLogin(req, res) {
           first_name as firstName, 
           last_name as lastName, 
           email, 
-          date_created as dateCreated,
           plan, 
           stripe_subscription_status as subscriptionStatus
           FROM users WHERE email = ? AND EXISTS
@@ -101,7 +100,6 @@ async function handleCustomPageLogin(req, res) {
           first_name as firstName, 
           last_name as lastName, 
           email, 
-          date_created as dateCreated, 
           plan, 
           stripe_subscription_status as subscriptionStatus
           FROM users WHERE email = ? AND EXISTS
@@ -170,7 +168,7 @@ async function handleUniversalLogin(req, res) {
     const googleEmail = payload.email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name as firstName, last_name as lastName, email, date_created as dateCreated, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name as firstName, last_name as lastName, email, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
       [googleEmail]
     );
 
@@ -201,7 +199,6 @@ async function handleUniversalLogin(req, res) {
         email: googleEmail,
         firstName: payload.given_name,
         lastName: payload.family_name,
-        dateCreated: new Date().toISOString(),
         plan: 'free'
       };
 
@@ -213,7 +210,7 @@ async function handleUniversalLogin(req, res) {
     const lcEmail = email.toLowerCase();
 
     const [userResult] = await pool.query(
-      'SELECT id, is_verified, first_name as firstName, last_name as lastName, email, date_created as dateCreated, password, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
+      'SELECT id, is_verified, first_name as firstName, last_name as lastName, email, password, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
       [lcEmail]
     );
 

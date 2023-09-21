@@ -2,11 +2,11 @@ const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {
-    name,
-    orgId
+    name
   } = req.body;
 
-  const { userId } = req;
+  const { userId, userObject } = req;
+  const orgId = req.ownedOrg.id;
 
   if (!name) {
     return res.json({
@@ -17,6 +17,11 @@ module.exports = async (req, res, next) => {
   const connection = await pool.getConnection();
 
   try {
+
+    if (userObject.plan === 'free') {
+      return res.json({ message: 'Upgrade to Zeforis Pro to create multiple engagements.' });
+    }
+
     const newEngagement = await connection.query(
       'INSERT INTO engagements (name, org_id) VALUES (?,?)',
       [name, orgId]

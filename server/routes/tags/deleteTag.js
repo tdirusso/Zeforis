@@ -2,11 +2,10 @@ const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {
-    tagId,
-    engagementId
+    tagId
   } = req.body;
 
-  if (!tagId || !engagementId) {
+  if (!tagId) {
     return res.json({
       message: 'Missing tag removal parameters.'
     });

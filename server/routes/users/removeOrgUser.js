@@ -2,14 +2,20 @@ const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {
-    userId,
-    orgId
+    userId
   } = req.body;
+
+  const orgId = req.ownedOrg.id;
+  const updaterUserId = req.userId;
 
   if (!userId || !orgId) {
     return res.json({
       message: 'Missing user deletion parameters.'
     });
+  }
+
+  if (updaterUserId === userId) {
+    return res.json({ message: 'You cannot remove yourself.' });
   }
 
   try {

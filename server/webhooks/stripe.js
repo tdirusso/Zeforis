@@ -40,13 +40,18 @@ module.exports = async (req, res, next) => {
 
             const cachedUser = cache.get(`user-${user.id}`);
 
-            if (cachedUser) {
-              cache.set(`user-${user.id}`, {
-                ...cachedUser,
-                subscriptionStatus: 'canceled',
-                plan: 'free'
-              });
-            }
+            cache.set(`user-${user.id}`, {
+              ...cachedUser,
+              subscriptionStatus: 'canceled',
+              plan: 'free'
+            });
+
+            const [ownedOrgs] = await pool.query('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
+
+            ownedOrgs.forEach(({ id }) => {
+              let cachedOrgData = cache.get(`org-${id}`);
+              cache.set(`org-${id}`, { ...cachedOrgData, ownerPlan: 'free' });
+            });
 
             await slackbot.post({
               channel: slackbot.channels.events,
@@ -109,13 +114,18 @@ module.exports = async (req, res, next) => {
 
               const cachedUser = cache.get(`user-${user.id}`);
 
-              if (cachedUser) {
-                cache.set(`user-${user.id}`, {
-                  ...cachedUser,
-                  subscriptionStatus: 'active',
-                  plan: 'pro'
-                });
-              }
+              cache.set(`user-${user.id}`, {
+                ...cachedUser,
+                subscriptionStatus: 'active',
+                plan: 'pro'
+              });
+
+              const [ownedOrgs] = await pool.query('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
+
+              ownedOrgs.forEach(({ id }) => {
+                let cachedOrgData = cache.get(`org-${id}`);
+                cache.set(`org-${id}`, { ...cachedOrgData, ownerPlan: 'pro' });
+              });
 
               await slackbot.post({
                 channel: slackbot.channels.events,

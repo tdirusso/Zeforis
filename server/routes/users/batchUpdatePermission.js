@@ -3,7 +3,6 @@ const { pool } = require('../../../database');
 module.exports = async (req, res, next) => {
   const {
     userId,
-    orgId,
     isAdmin = false
   } = req.body;
 
@@ -13,6 +12,7 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const orgId = req.ownedOrg.id;
   const updaterUserId = req.userId;
 
   if (userId === updaterUserId) {

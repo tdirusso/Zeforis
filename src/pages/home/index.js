@@ -7,9 +7,9 @@ import { Box, Grid } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { getActiveEngagementId, getEngagementData, getUserEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
+import { deleteActiveEngagementId, getActiveEngagementId, getEngagementData, getUserEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
 import CreateEngagementDialog from "../../components/dialogs/CreateEngagementDialog";
-import { getActiveOrgId, setActiveOrgId } from "../../api/orgs";
+import { deleteActiveOrgId, getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
 import themeConfig from "../../theme";
 import Header from "../../components/core/Header";
@@ -151,11 +151,18 @@ export default function Home({ setTheme }) {
         setReadyToRender(true);
       }
     }
+    
 
     async function fetchEngagementData(engagementId, orgId) {
       const result = await getEngagementData(engagementId, orgId);
 
       if (!result.engagement) {
+        if (result.message === 'Unauthorized') {
+          // deleteActiveEngagementId();
+          // deleteActiveOrgId();
+          // return window.location.replace('/login');
+        }
+
         openSnackBar(result.message || 'Something went wrong...');
         return;
       }

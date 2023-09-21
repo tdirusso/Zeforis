@@ -1,14 +1,17 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const cache = require('../../../cache');
+const { appLimits } = require('../../../config');
 
 module.exports = async (req, res, next) => {
   const {
-    engagementId,
     importRows = []
   } = req.body;
 
+  const { engagementId } = req;
   const creatorUserId = req.userId;
+  const userObject = req.userObject;
 
-  if (!engagementId || !importRows.length === 0) {
+  if (!engagementId || importRows.length === 0) {
     return res.json({
       message: 'Missing import parameters.'
     });
@@ -19,6 +22,39 @@ module.exports = async (req, res, next) => {
   await connection.beginTransaction();
 
   try {
+
+    let cachedOrgData = cache.get(`org-${userObject.orgId}`);
+    let orgTaskCount = cachedOrgData?.taskCount;
+    let orgOwnerPlan = cachedOrgData?.ownerPlan;
+
+    if (orgOwnerPlan === undefined) {
+      orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, userObject.orgId);
+      cachedOrgData = { ...cachedOrgData, ownerPlan: orgOwnerPlan };
+    }
+
+    if (orgOwnerPlan === 'free') {
+      if (orgTaskCount === undefined) {
+        orgTaskCount = await commonQueries.getOrgTaskCount(connection, userObject.orgId);
+        cachedOrgData = { ...cachedOrgData, taskCount: orgTaskCount };
+      }
+
+      if (orgTaskCount >= appLimits.freePlanTasks) {
+        await connection.rollback();
+        connection.release();
+        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData });
+        return res.json({
+          message: `Task limit of ${appLimits.freePlanTasks} has been reached.  Upgrade now for unlimited tasks.`
+        });
+      } else if (orgTaskCount + importRows.length > appLimits.freePlanTasks) {
+        await connection.rollback();
+        connection.release();
+        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData });
+        return res.json({
+          message: `Cannot import - task limit of ${appLimits.freePlanTasks} will be exceeded.  Upgrade now for unlimited tasks.`
+        });
+      }
+    }
+
     const [existingFolders] = await connection.query(
       `SELECT id, name FROM folders WHERE engagement_id = ?`,
       [engagementId]
@@ -139,6 +175,10 @@ module.exports = async (req, res, next) => {
         `INSERT INTO task_tags (task_id, tag_id) VALUES ?`,
         [taskTagsInsertVals]
       );
+    }
+
+    if (userObject.plan === 'free') {
+      cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount + taskInsertVals.length });
     }
 
     await connection.commit();

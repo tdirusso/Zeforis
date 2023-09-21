@@ -2,7 +2,6 @@ const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {
-    engagementId,
     name,
     title = '',
     body = '',
@@ -10,6 +9,8 @@ module.exports = async (req, res, next) => {
     backgroundColor = '#ffffff',
     textColor = '#000000'
   } = req.body;
+
+  const { engagementId } = req;
 
   if (!name) {
     return res.json({

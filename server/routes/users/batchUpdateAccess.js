@@ -3,9 +3,10 @@ const { pool } = require('../../../database');
 module.exports = async (req, res, next) => {
   const {
     userId,
-    orgId,
     hasAccess = false
   } = req.body;
+
+  const orgId = req.ownedOrg.id;
 
   if (!userId) {
     return res.json({

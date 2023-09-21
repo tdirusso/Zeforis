@@ -14,6 +14,7 @@ module.exports = async (req, res, next) => {
 
     if (userId) {
       req.userId = userId;
+      req.userObject = decoded.user;
       return next();
     }
 

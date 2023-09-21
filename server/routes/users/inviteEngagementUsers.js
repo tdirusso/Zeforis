@@ -8,7 +8,6 @@ module.exports = async (req, res, next) => {
   const {
     usersToInvite = [],
     engagementId,
-    orgId,
     engagementName,
     orgName,
     inviteType = 'member',
@@ -17,6 +16,7 @@ module.exports = async (req, res, next) => {
   } = req.body;
 
   const updaterUserId = req.userId;
+  const orgId = req.ownedOrg.id;
 
   if (!engagementId || !orgId) {
     return res.json({

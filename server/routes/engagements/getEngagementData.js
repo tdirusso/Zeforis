@@ -1,14 +1,14 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
 const { createJWT } = require('../../../lib/utils');
+const cache = require('../../../cache');
 
 module.exports = async (req, res, next) => {
 
-  const {
-    engagementId,
-    orgId
-  } = req.query;
+  const { userObject, engagementId, orgId } = req;
 
-  const { userObject } = req;
+  if (!orgId) {
+    return res.json({ message: 'No orgId provided.' });
+  }
 
   if (!engagementId) {
     return res.json({ message: 'No engagementId provided.' });
@@ -18,37 +18,11 @@ module.exports = async (req, res, next) => {
 
   try {
 
-    const [folders] = await connection.query(
-      'SELECT * FROM folders WHERE engagement_id = ? ORDER BY folders.name',
-      [engagementId]
-    );
+    const [engagementDataResult] = await pool.query('CALL getEngagementData(?,?)', [engagementId, orgId]);
 
-    const [tags] = await connection.query(
-      'SELECT * FROM tags WHERE engagement_id = ? ORDER BY tags.name',
-      [engagementId]
-    );
+    const [folders, tags, orgUsers, widgets] = engagementDataResult;
 
     const orgUsersMap = new Map();
-
-    const [orgUsers] = await connection.query(
-      `
-          SELECT 
-            users.id as user_id,
-            users.first_name, 
-            users.last_name,
-            users.email,
-            engagements.id as engagement_id,
-            engagements.name as engagement_name,
-            engagement_users.role
-          FROM engagement_users
-          LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
-          LEFT JOIN users ON engagement_users.user_id = users.id
-          LEFT JOIN orgs ON orgs.id = engagements.org_id
-          WHERE engagements.org_id = ?
-          ORDER BY users.first_name
-        `,
-      [orgId]
-    );
 
     orgUsers.forEach(row => {
       const {
@@ -125,24 +99,6 @@ module.exports = async (req, res, next) => {
       [foldersIds]
     );
 
-    const [widgets] = await connection.query(
-      `
-        SELECT
-        id,
-        engagement_id AS engagementId,
-        name,
-        title,
-        body,
-        background_color AS backgroundColor,
-        text_color AS textColor,
-        is_enabled AS isEnabled
-        FROM widgets
-        WHERE engagement_id = ?
-        ORDER BY widgets.name
-      `,
-      [engagementId]
-    );
-
     connection.release();
 
     const engagementData = {
@@ -152,6 +108,14 @@ module.exports = async (req, res, next) => {
       widgets,
       orgUsers: [...orgUsersMap.values()]
     };
+
+    let cachedOrgData = cache.get(`org-${orgId}`);
+    let orgOwnerPlan = cachedOrgData?.ownerPlan;
+
+    if (orgOwnerPlan === undefined) {
+      orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+      cache.set(`org-${orgId}`, { ...cachedOrgData, ownerPlan: orgOwnerPlan });
+    }
 
     return res.json({
       engagement: engagementData,
