@@ -10,7 +10,9 @@ export default function OrgTab() {
     isOrgOwner
   } = useOutletContext();
 
-  const [tabVal, setTabVal] = useState(0);
+  const showMembersTab = window.location.search.includes('members');
+
+  const [tabVal, setTabVal] = useState(showMembersTab ? 1 : 0);
 
   const getTabContent = () => {
     switch (tabVal) {

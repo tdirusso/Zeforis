@@ -6,8 +6,9 @@ import '../../styles/settings.scss';
 
 export default function AccountTab() {
   const isPaymentSuccess = window.location.search.includes('isPaymentSuccess');
+  const isUpgrading = window.location.search.includes('upgrade');
 
-  const [tabVal, setTabVal] = useState(isPaymentSuccess ? 1 : 0);
+  const [tabVal, setTabVal] = useState(isPaymentSuccess || isUpgrading ? 1 : 0);
 
   const getTabContent = () => {
     switch (tabVal) {

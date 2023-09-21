@@ -25,7 +25,7 @@ module.exports = async (req, res, next) => {
   try {
     switch (event.type) {
       case 'customer.subscription.deleted': {
-        const { customer, plan } = event.data.object;
+        const { customer, plan, quantity } = event.data.object;
 
         if (customer) {
           const [userResult] = await pool.query(
@@ -50,7 +50,7 @@ module.exports = async (req, res, next) => {
 
             await slackbot.post({
               channel: slackbot.channels.events,
-              message: `*Subscription Canceled* 😢\n*Amount:*  -${(plan.amount / 100).toLocaleString('en', {
+              message: `*Subscription Canceled* 😢\n*Amount:*  -${((plan.amount * quantity) / 100).toLocaleString('en', {
                 style: 'currency',
                 currency: 'USD',
                 minimumFractionDigits: 2,

@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FolderIcon from '@mui/icons-material/Folder';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import './styles/Header.scss';
@@ -213,7 +213,9 @@ export default function Header(props) {
                 bottom: '-27px'
               }}>
                 <Box>
-                  <Button size="small" variant="contained">Upgrade now</Button>
+                  <Link to='settings/account?upgrade' onClick={handleMenuClose}>
+                    <Button size="small" variant="contained">Upgrade now</Button>
+                  </Link>
                 </Box>
               </Paper>
             </Menu>

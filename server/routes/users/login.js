@@ -1,9 +1,8 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const { pool } = require('../../../database');
 const { OAuth2Client } = require('google-auth-library');
 const slackbot = require('../../../slackbot');
-const cache = require('../../../cache');
+const { createJWT } = require('../../../lib/utils');
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
@@ -23,19 +22,11 @@ module.exports = async (req, res, next) => {
   }
 };
 
-const createToken = user => {
+const getJWT = user => {
+  delete user.password;
+  delete user.is_verified;
 
-  cache.set(`user-${user.id}`, user);
-
-  return jwt.sign(
-    {
-      user: {
-        ...(delete user.password && delete user.is_verified && user)
-      }
-    },
-    process.env.SECRET_KEY,
-    { expiresIn: 36000 }
-  );
+  return createJWT(user);
 };
 
 async function handleCustomPageLogin(req, res) {
@@ -93,7 +84,7 @@ async function handleCustomPageLogin(req, res) {
         );
       }
 
-      const token = createToken(user);
+      const token = getJWT(user);
       return res.json({ token });
     } else {
       return res.json({ message: 'You are not a member of this organization.' });
@@ -142,7 +133,7 @@ async function handleCustomPageLogin(req, res) {
             message: 'Please verify your email address.'
           });
         }
-        const token = createToken(user);
+        const token = getJWT(user);
         return res.json({ token });
       }
 
@@ -193,7 +184,7 @@ async function handleUniversalLogin(req, res) {
         );
       }
 
-      const token = createToken(user);
+      const token = getJWT(user);
       return res.json({ token });
     } else {
       const createUserResult = await pool.query(
@@ -214,7 +205,7 @@ async function handleUniversalLogin(req, res) {
         plan: 'free'
       };
 
-      const token = createToken(newUser);
+      const token = getJWT(newUser);
 
       return res.json({ token });
     }
@@ -245,7 +236,7 @@ async function handleUniversalLogin(req, res) {
           });
         }
 
-        const token = createToken(user);
+        const token = getJWT(user);
         return res.json({ token });
       }
 

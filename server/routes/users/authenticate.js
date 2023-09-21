@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { pool } = require('../../../database');
 const cache = require('../../../cache');
+const { createJWT } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
@@ -28,7 +29,6 @@ module.exports = async (req, res, next) => {
         );
 
         userObect = { ...authenticatedUser, ...userResult[0] };
-        cache.set(`user-${userId}`, userObect);
       }
 
       const [engagementMemberData] = await pool.query(
@@ -104,16 +104,6 @@ module.exports = async (req, res, next) => {
         }
       });
 
-      const newToken = jwt.sign(
-        {
-          user: {
-            ...userObect
-          }
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: 36000 }
-      );
-
       return res.json({
         user: {
           ...userObect,
@@ -121,7 +111,7 @@ module.exports = async (req, res, next) => {
           adminOfEngagements,
           memberOfEngagements
         },
-        token: newToken
+        token: createJWT({ ...userObect })
       });
     }
 

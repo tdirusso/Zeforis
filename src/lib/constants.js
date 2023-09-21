@@ -8,7 +8,7 @@ const statuses = [
 ];
 
 const appLimits = {
-  invites: 20,
+  simultaneousEmailInvites: 20,
   freePlanTasks: 200,
   freePlanEngagements: 1
 };

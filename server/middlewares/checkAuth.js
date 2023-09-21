@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
       return next();
     }
 
-    return res.json({ message: 'User does not exist.' });
+    return res.json({ message: 'Invalid token.' });
   } catch (error) {
     next(error);
   }

@@ -8,6 +8,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import validator from 'email-validator';
 import { inviteEngagementUsers } from '../../api/engagements';
 import { appLimits } from '../../lib/constants';
+import { Link } from 'react-router-dom';
 
 const inviteLimit = appLimits.simultaneousEmailInvites;
 
@@ -221,11 +222,11 @@ export default function InviteEngagementUsers(props) {
                     You can't invite additional administrators if you are on the <strong>free</strong> plan.
                   </Typography>
                   <Box>
-                    <a href='#0'>
+                    <Link to='settings/account?upgrade' onClick={handleClose}>
                       <Button variant='contained'>
                         Upgrade now
                       </Button>
-                    </a>
+                    </Link>
                   </Box>
                 </Box>
               </Alert>

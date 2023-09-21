@@ -19,7 +19,25 @@ const initializeDatabase = async () => {
   }
 };
 
+const commonQueries = {
+  getOrgTaskCount: async (con, orgId) => {
+    const [taskCountResult] = await con.query(
+      ` 
+        SELECT COUNT(DISTINCT tasks.id) AS taskCount
+        FROM tasks
+        LEFT JOIN folders ON folders.id = tasks.folder_id
+        LEFT JOIN engagements ON engagements.id = folders.engagement_id
+        WHERE engagements.org_id = ?
+      `,
+      [orgId]
+    );
+
+    return taskCountResult[0].taskCount;
+  }
+};
+
 module.exports = {
   pool,
-  initializeDatabase
+  initializeDatabase,
+  commonQueries
 };

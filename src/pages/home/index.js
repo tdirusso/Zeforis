@@ -155,16 +155,16 @@ export default function Home({ setTheme }) {
     async function fetchEngagementData(engagementId, orgId) {
       const result = await getEngagementData(engagementId, orgId);
 
-      if (!result.tasks) {
+      if (!result.engagement) {
         openSnackBar(result.message || 'Something went wrong...');
         return;
       }
 
-      setTasks(result.tasks);
-      setFolders(result.folders);
-      setTags(result.tags);
-      setOrgUsers(result.orgUsers);
-      setWidgets(result.widgets);
+      setTasks(result.engagement.tasks);
+      setFolders(result.engagement.folders);
+      setTags(result.engagement.tags);
+      setOrgUsers(result.engagement.orgUsers);
+      setWidgets(result.engagement.widgets);
       setDataFetched(true);
     }
   }, [triedOrgAndEngagement]);

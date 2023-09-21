@@ -2,7 +2,7 @@ import { Alert, Box, Button, Divider, Paper, Slider, TextField, Typography } fro
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { PaymentElement } from '@stripe/react-stripe-js';
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { pricePerAdminMonthly, stripeCustomerPortalUrl } from "../../../../lib/constants";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
@@ -137,9 +137,13 @@ function FreePlanInfo({ status }) {
             <strong>Info</strong>
           </AlertTitle>
           <Typography>
-            It looks like your subscription is in a <strong>canceled</strong> status.
+            It looks like your subscription has been <strong>canceled</strong>.
             To re-activate Zeforis Pro, you must create a new subscription and pay for, at least, the number of administrators in {org.name}, which is <strong>{numOrgAdmins}</strong>.
           </Typography>
+          <Typography mt={1}>
+            <Link to="../organization?members">Click here</Link> if you need to manage the number of admins in {org.name}.
+          </Typography>
+
         </Alert>
       </Box>
       <Box className="payment-content">

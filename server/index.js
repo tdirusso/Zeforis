@@ -56,6 +56,8 @@ const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
 const slackbotStats = require('./routes/slackbot/stats');
 const logFrontendError = require('./routes/logs/logFrontendError');
 const stripe_createSubscription = require('./routes/stripe/createSubscription');
+const dumpCache = require('./routes/cache/dumpCache');
+const clearCache = require('./routes/cache/clearCache');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -176,6 +178,9 @@ const boot = async () => {
   app.post('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, createWidget);
   app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
   app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
+
+  app.get('/api/cache', dumpCache);
+  app.delete('/api/cache', clearCache);
 
   app.post('/api/slackbot/stats', checkSlackSignature, slackbotStats);
 

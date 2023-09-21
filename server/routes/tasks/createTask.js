@@ -1,4 +1,6 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const cache = require('../../../cache');
+const { appLimits } = require('../../../config');
 
 module.exports = async (req, res, next) => {
   const {
@@ -14,6 +16,7 @@ module.exports = async (req, res, next) => {
   } = req.body;
 
   const creatorUserId = req.userId;
+  const userObject = req.userObject;
 
   if (!name || !folderId || !creatorUserId) {
     return res.json({
@@ -21,8 +24,27 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const connection = await pool.getConnection();
+
   try {
-    const newTask = await pool.query(
+
+    let cachedOrgData = cache.get(`org-${userObject.orgId}`);
+    let orgTaskCount = cachedOrgData?.taskCount;
+
+    if (userObject.plan === 'free') {
+      if (orgTaskCount === undefined) {
+        orgTaskCount = await commonQueries.getOrgTaskCount(connection, userObject.orgId);
+      }
+
+      if (orgTaskCount >= appLimits.freePlanTasks) {
+        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount });
+        return res.json({
+          message: `Task limit of ${appLimits.freePlanTasks} has been reached.  Upgrade now for unlimited tasks.`
+        });
+      }
+    }
+
+    const newTask = await connection.query(
       `INSERT INTO tasks 
         (
           name,
@@ -46,7 +68,7 @@ module.exports = async (req, res, next) => {
     if (tags.length) {
       const insertValues = tags.map(tag => [tag.id, newTaskId]);
 
-      await pool.query(
+      await connection.query(
         'INSERT INTO task_tags (tag_id, task_id) VALUES ?',
         [insertValues]
       );
@@ -65,11 +87,16 @@ module.exports = async (req, res, next) => {
       dueDate
     };
 
+    connection.release();
+
+    cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount + 1 });
+
     return res.json({
       success: true,
       task: taskObject
     });
   } catch (error) {
+    connection.release();
     next(error);
   }
 };

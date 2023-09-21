@@ -31,6 +31,7 @@ module.exports = async (req, res, next) => {
 
       if (doesEngagementAdminExistResult.length) {
         req.userId = userId;
+        req.userObject = decoded.user;
         return next();
       } else {
         return res.json({ message: 'Unauthorized.' });
