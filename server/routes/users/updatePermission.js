@@ -7,6 +7,12 @@ module.exports = async (req, res, next) => {
     isAdmin = false
   } = req.body;
 
+  const { userObject } = req;
+
+  if (isAdmin && userObject.plan === 'free') {
+    return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
+  }
+
   if (!userId || !engagementId) {
     return res.json({
       message: 'Missing permissions parameters.'

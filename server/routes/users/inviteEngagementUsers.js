@@ -17,6 +17,11 @@ module.exports = async (req, res, next) => {
 
   const updaterUserId = req.userId;
   const orgId = req.ownedOrg.id;
+  const { userObject } = req;
+
+  if (userObject.plan === 'free' && inviteType === 'admin') {
+    return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
+  }
 
   if (!engagementId || !orgId) {
     return res.json({
@@ -30,8 +35,8 @@ module.exports = async (req, res, next) => {
     });
   }
 
-  if (usersToInvite.length >= 500) {
-    return res.json({ message: 'Too many users to invite (must be less than 500).' });
+  if (usersToInvite.length >= 100) {
+    return res.json({ message: 'Too many users to invite (must be less than 100).' });
   }
 
   const invalidOrMissingEmails = [];
