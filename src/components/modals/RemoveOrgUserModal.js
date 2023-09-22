@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { removeUser } from '../../api/engagements';
+import { DialogTitle, Typography } from '@mui/material';
 
 export default function RemoveOrgUserModal(props) {
   const {
@@ -61,23 +62,23 @@ export default function RemoveOrgUserModal(props) {
   return (
     <div>
       <Dialog open={isOpen} onClose={close} className='modal'>
-        <DialogContent >
-          <DialogContentText style={{ marginBottom: '2rem' }}>
+        <DialogTitle>
+          Remove User
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>
-            <br></br>
-            <br></br>
+          </Typography>
+          <Typography mt={1} mb={3}>
             Proceeding will remove them from all engagements within {orgName} and unassign all tasks that are currently assigned to them.
-          </DialogContentText>
+          </Typography>
           <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
-              fullWidth
               disabled={isLoading}
-              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
             <LoadingButton
-              fullWidth
               variant='contained'
               onClick={handleRemoveOrgUser}
               required

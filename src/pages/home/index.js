@@ -24,7 +24,7 @@ import Dialogs from "../../components/dialogs";
 import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
 import './styles.scss';
 import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
-import useOnloadNotification from "../../hooks/useOnloadNotification";
+import useNotification from "../../hooks/useNotification";
 
 export default function Home({ setTheme }) {
   let activeOrgId = getActiveOrgId();
@@ -84,7 +84,7 @@ export default function Home({ setTheme }) {
     closeDialog
   } = useDialog();
 
-  useOnloadNotification({ user, openModal });
+  useNotification({ user, openModal, isOrgOwner });
 
   useEffect(() => {
     if (user) {

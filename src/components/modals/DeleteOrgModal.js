@@ -1,11 +1,11 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteOrg } from '../../api/orgs';
+import { DialogTitle, Typography } from '@mui/material';
 
 export default function DeleteOrgModal(props) {
 
@@ -44,24 +44,24 @@ export default function DeleteOrgModal(props) {
   return (
     <div>
       <Dialog open={isOpen} onClose={close} className='modal'>
+        <DialogTitle>
+          Delete Organization
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <Typography>
             Are you sure you want to <strong>permanently delete {org.name}?</strong>
-            <br></br>
-            <br></br>
+          </Typography>
+          <Typography mt={1} mb={3}>
             If you proceed, all data for this organization will be permanently deleted.
-          </DialogContentText>
-          <DialogActions style={{ marginTop: '2rem', padding: 0 }} className='wrap-on-small'>
+          </Typography>
+          <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
               disabled={isLoading}
-              fullWidth
-              variant='outlined'
               onClick={close}>
               Cancel
             </Button>
             <LoadingButton
               variant='contained'
-              fullWidth
               onClick={handleDeleteOrg}
               required
               loading={isLoading}

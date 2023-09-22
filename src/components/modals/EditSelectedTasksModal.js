@@ -1,12 +1,11 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { batchUpdateTasks } from '../../api/tasks';
-import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip, ListItemIcon, ListItemText, Box, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip, ListItemIcon, ListItemText, Box, RadioGroup, FormControlLabel, Radio, DialogTitle, Typography } from '@mui/material';
 import { statuses } from '../../lib/constants';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -293,10 +292,13 @@ export default function EditSelectedTasksModal(props) {
           maxWidth: '750px',
         }
       }}>
+      <DialogTitle>
+        Edit Tasks
+      </DialogTitle>
       <DialogContent>
-        <DialogContentText style={{ marginBottom: '1.5rem' }}>
+        <Typography mb={2}>
           Please choose the action and corresponding value to apply to <strong>{taskIds.length}</strong> selected tasks.
-        </DialogContentText>
+        </Typography>
 
         <Grid container rowSpacing={2} columnSpacing={2}>
           <Grid item xs={12} md={6}>
@@ -359,8 +361,6 @@ export default function EditSelectedTasksModal(props) {
 
         <DialogActions style={{ padding: 0, marginTop: '2rem' }} className='wrap-on-small'>
           <Button
-            fullWidth
-            variant="outlined"
             disabled={isLoading}
             onClick={handleClose}>
             Cancel
@@ -369,7 +369,6 @@ export default function EditSelectedTasksModal(props) {
             variant='contained'
             onClick={handleBatchUpdate}
             required
-            fullWidth
             loading={isLoading}>
             Apply Changes
           </LoadingButton>

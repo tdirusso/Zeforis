@@ -57,7 +57,7 @@ export default function FoldersPage() {
 
   return (
     <>
-      <Grid item xs textAlign='center'>
+      <Grid item xs>
         <Button
           style={{ marginBottom: '0.5rem' }}
           hidden={!isAdmin}
@@ -67,9 +67,8 @@ export default function FoldersPage() {
         </Button>
       </Grid>
       <Grid item xs={12}>
-        <Divider textAlign="center">
+        <Divider textAlign="left">
           <Chip
-            color="primary"
             icon={<StarIcon style={{ color: '#fffd00' }} />}
             label="Key Folders"
           />
@@ -77,7 +76,7 @@ export default function FoldersPage() {
       </Grid>
 
       <Grid item xs={12}>
-        <Box className="flex-centered" gap={3} flexWrap='wrap'>
+        <Box className="flex-ac" gap={3} flexWrap='wrap'>
           {
             keyFolders.length === 0 ? <Grid item xs={12}>
               <Typography>No key folders.</Typography>
@@ -93,13 +92,13 @@ export default function FoldersPage() {
       </Grid>
 
       <Grid item xs={12}>
-        <Divider textAlign="center">
-          <Chip label="Other Folders" color="primary" />
+        <Divider textAlign="left">
+          <Chip label="Other Folders" />
         </Divider>
       </Grid>
 
       <Grid item xs={12}>
-        <Box className="flex-centered" gap={3} flexWrap='wrap'>
+        <Box className="flex-ac" gap={3} flexWrap='wrap'>
           {
             otherFolders.length === 0 ? <Grid item xs={12}>
               <Typography>No other folders.</Typography>

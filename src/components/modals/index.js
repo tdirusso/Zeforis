@@ -8,6 +8,7 @@ import SearchModal from "./SearchModal";
 import './styles.scss';
 import EditSelectedTasksModal from "./EditSelectedTasksModal";
 import InviteEngagementUsers from "./InviteEngagementUsers";
+import SubscriptionPastDueModal from "./SubscriptionPastDueModal";
 
 export default function Modals(props) {
   const {
@@ -69,6 +70,11 @@ export default function Modals(props) {
         isOpen={modalToOpen === 'invite-engagement-users'}
         close={closeModal}
         {...props}
+      />
+
+      <SubscriptionPastDueModal
+        isOpen={modalToOpen === 'subscription-past-due'}
+        close={closeModal}
       />
     </>
   );

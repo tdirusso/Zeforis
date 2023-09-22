@@ -192,28 +192,26 @@ export default function InviteEngagementUsers(props) {
       <Box textAlign='center' component="h2" mb='2rem' fontWeight={300}>Add Collaborators</Box>
       <Box className='invite-types' mb='3rem'>
         <Paper className={`invite-type ${inviteType === 'member' ? 'selected' : ''}`}>
-          <Box fontSize='3rem' mb='1rem'>
+          <Box fontSize='3rem'>
             <AccountCircleIcon fontSize='3rem' htmlColor='#b9b9b9' />
           </Box>
           <Box component='h3' mb='2rem'>Client</Box>
           <Button
             disabled={isLoading}
             onClick={() => handleInviteTypeChange('member')}
-            size='large'
             variant='contained'
             fullWidth>
             Select
           </Button>
         </Paper>
         <Paper className={`invite-type ${inviteType === 'admin' ? 'selected' : ''}`}>
-          <Box fontSize='3rem' mb='1rem'>
+          <Box fontSize='3rem'>
             <BuildIcon fontSize='3rem' htmlColor='#b9b9b9' />
           </Box>
           <Box component='h3' mb='2rem'>Administrator</Box>
           <Button
             disabled={isLoading}
             onClick={() => handleInviteTypeChange('admin')}
-            size='large'
             variant='contained'
             fullWidth>
             Select

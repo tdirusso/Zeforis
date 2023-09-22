@@ -69,7 +69,7 @@ function ProPlanInfo({ status }) {
         }
       </Typography>
       <Box mt={3}>
-        <a href={stripeCustomerPortalUrl}>
+        <a href={stripeCustomerPortalUrl} target="_blank" rel="noreferrer">
           <Button variant="contained" size="large">
             Manage subscription
           </Button>
