@@ -206,14 +206,16 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
-              <Paper style={{
-                padding: '0px',
-                position: 'absolute',
-                left: '20px',
-                bottom: '-27px'
-              }}>
+              <Paper
+                hidden={user.plan !== 'free'}
+                style={{
+                  padding: '0px',
+                  position: 'absolute',
+                  left: '20px',
+                  bottom: '-27px'
+                }}>
                 <Box>
-                  <Link to='settings/account?upgrade' onClick={handleMenuClose}>
+                  <Link to='settings/account?plan' onClick={handleMenuClose}>
                     <Button size="small" variant="contained">Upgrade now</Button>
                   </Link>
                 </Box>
@@ -318,7 +320,7 @@ export default function Header(props) {
 
               <Box textAlign='center'>
                 <ToggleButtonGroup
-                  style={{ width: '200px' }}
+                  style={{ width: '90%' }}
                   size="small"
                   onChange={handleThemeChange}
                   exclusive

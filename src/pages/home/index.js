@@ -24,6 +24,7 @@ import Dialogs from "../../components/dialogs";
 import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
 import './styles.scss';
 import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
+import useOnloadNotification from "../../hooks/useOnloadNotification";
 
 export default function Home({ setTheme }) {
   let activeOrgId = getActiveOrgId();
@@ -82,6 +83,8 @@ export default function Home({ setTheme }) {
     openDialog,
     closeDialog
   } = useDialog();
+
+  useOnloadNotification({ user, openModal });
 
   useEffect(() => {
     if (user) {
@@ -151,16 +154,15 @@ export default function Home({ setTheme }) {
         setReadyToRender(true);
       }
     }
-    
 
     async function fetchEngagementData(engagementId, orgId) {
       const result = await getEngagementData(engagementId, orgId);
 
       if (!result.engagement) {
         if (result.message === 'Unauthorized') {
-          // deleteActiveEngagementId();
-          // deleteActiveOrgId();
-          // return window.location.replace('/login');
+          deleteActiveEngagementId();
+          deleteActiveOrgId();
+          return window.location.reload();
         }
 
         openSnackBar(result.message || 'Something went wrong...');

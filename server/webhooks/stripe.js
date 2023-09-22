@@ -22,6 +22,8 @@ module.exports = async (req, res, next) => {
     return res.sendStatus(400);
   }
 
+  console.log(event)
+
   try {
     switch (event.type) {
       case 'customer.subscription.deleted': {

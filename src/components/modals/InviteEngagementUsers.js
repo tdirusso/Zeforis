@@ -230,7 +230,7 @@ export default function InviteEngagementUsers(props) {
                     You can't invite additional administrators if you are on the <strong>free</strong> plan.
                   </Typography>
                   <Box>
-                    <Link to='settings/account?upgrade' onClick={handleClose}>
+                    <Link to='settings/account?plan' onClick={handleClose}>
                       <Button variant='contained'>
                         Upgrade now
                       </Button>
