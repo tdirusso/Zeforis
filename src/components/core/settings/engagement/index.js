@@ -1,7 +1,7 @@
 import { Grid, Paper, Tabs, Tab, Box } from "@mui/material";
 import React, { useState } from "react";
 import GeneralTab from "./GeneralTab";
-import MembersTab from "./MembersTab";
+import UsersTab from "./UsersTab";
 import TagsTab from "./TagsTab";
 
 export default function EngagementTab() {
@@ -13,7 +13,7 @@ export default function EngagementTab() {
       case 0:
         return <GeneralTab />;
       case 1:
-        return <MembersTab />;
+        return <UsersTab />;
       case 2:
         return <TagsTab />;
       default:

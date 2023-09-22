@@ -21,7 +21,7 @@ const inviteUserAdminTooltip = <>
   Non-admins will have view-only access (best for members that belong to the engagement).
 </>;
 
-export default function MembersTab() {
+export default function UsersTab() {
 
   const {
     engagement,
@@ -201,57 +201,7 @@ export default function MembersTab() {
             Add collaborators
           </Button>
         </Box>
-        <Box>
-          <Divider textAlign="left">
-            <Chip label="Members" />
-          </Divider>
-          <List dense>
-            {
-              engagementMembers.length === 0 ?
-                <ListItem>
-                  <ListItemText>
-                    No engagement members.
-                  </ListItemText>
-                </ListItem> : ''
-            }
-            {
-              engagementMembers.map((member, index) => {
-                const isYou = member.id === user.id;
 
-                let primaryText = <span>{member.firstName} {member.lastName}</span>;
-
-                if (isYou) {
-                  primaryText = <span>
-                    {member.firstName} {member.lastName}
-                    <span style={{ color: '#bababa' }}>{` (you)`}</span>
-                  </span>;
-                }
-                return (
-
-                  <React.Fragment key={member.id}>
-                    <ListItem
-                      secondaryAction={
-                        isOrgOwner ?
-                          <Tooltip title="Remove Member">
-                            <IconButton
-                              edge="end"
-                              onClick={e => openRemoveEngagementUserConfirmatiom(e, member)}>
-                              <CloseIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip> : null
-                      }>
-                      <ListItemText
-                        primary={primaryText}
-                        secondary={member.email}
-                      />
-                    </ListItem>
-                    {index !== engagementMembers.length - 1 ? <Divider /> : null}
-                  </React.Fragment>
-                );
-              })
-            }
-          </List>
-        </Box>
 
         <Box>
           <Divider textAlign="left">
@@ -299,6 +249,58 @@ export default function MembersTab() {
                       />
                     </ListItem>
                     {index !== engagementAdmins.length - 1 ? <Divider /> : null}
+                  </React.Fragment>
+                );
+              })
+            }
+          </List>
+        </Box>
+
+        <Box>
+          <Divider textAlign="left">
+            <Chip label="Members" />
+          </Divider>
+          <List dense>
+            {
+              engagementMembers.length === 0 ?
+                <ListItem>
+                  <ListItemText>
+                    No engagement members.
+                  </ListItemText>
+                </ListItem> : ''
+            }
+            {
+              engagementMembers.map((member, index) => {
+                const isYou = member.id === user.id;
+
+                let primaryText = <span>{member.firstName} {member.lastName}</span>;
+
+                if (isYou) {
+                  primaryText = <span>
+                    {member.firstName} {member.lastName}
+                    <span style={{ color: '#bababa' }}>{` (you)`}</span>
+                  </span>;
+                }
+                return (
+
+                  <React.Fragment key={member.id}>
+                    <ListItem
+                      secondaryAction={
+                        isOrgOwner ?
+                          <Tooltip title="Remove Member">
+                            <IconButton
+                              edge="end"
+                              onClick={e => openRemoveEngagementUserConfirmatiom(e, member)}>
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip> : null
+                      }>
+                      <ListItemText
+                        primary={primaryText}
+                        secondary={member.email}
+                      />
+                    </ListItem>
+                    {index !== engagementMembers.length - 1 ? <Divider /> : null}
                   </React.Fragment>
                 );
               })

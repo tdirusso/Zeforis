@@ -55,6 +55,11 @@ function ProPlanInfo({ status }) {
         Your Plan
       </Box>
       <Divider className="my2" />
+      <Box mb={3} maxWidth={400} hidden={status !== 'past_due'}>
+        <Alert severity="warning" style={{ justifyContent: 'start' }}>
+          Your subscription is past due.
+        </Alert>
+      </Box>
       <Typography fontSize='1.25rem' fontWeight={300}>
         Zeforis Pro &nbsp;🎉
       </Typography>
