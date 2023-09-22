@@ -9,6 +9,7 @@ import {
   IconButton,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -24,6 +25,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 export default function GettingStartedDrawer(props) {
   const {
@@ -45,6 +47,13 @@ export default function GettingStartedDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
+      <Paper className='p0' style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
+        <Tooltip title="Close">
+          <IconButton onClick={close}>
+            <KeyboardDoubleArrowRightIcon />
+          </IconButton>
+        </Tooltip>
+      </Paper>
       <DialogContent>
         <Box
           mb={3}
@@ -232,7 +241,6 @@ function MemberGettingStartedDrawer(props) {
     </>
   );
 }
-
 
 
 

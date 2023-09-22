@@ -1,5 +1,5 @@
 import Dialog from '@mui/material/Dialog';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Autocomplete, Box, FormControl, Grow, Paper, TextField, Typography } from '@mui/material';
@@ -39,6 +39,8 @@ export default function InviteEngagementUsers(props) {
   const [animateOptions, setAnimateOptions] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
+  const emailRef = useRef();
+
   const allowedToInvite = orgUsers.filter(orgUser => {
     return (
       orgUser.id !== userId
@@ -51,11 +53,17 @@ export default function InviteEngagementUsers(props) {
     if (!inviteType) {
       setInviteType(type);
       setAnimateOptions(true);
+      setTimeout(() => {
+        emailRef.current.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
     } else {
       setAnimateOptions(false);
       setTimeout(() => {
         setInviteType(type);
         setAnimateOptions(true);
+        setTimeout(() => {
+          emailRef.current.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
       }, 150);
     }
   };
@@ -261,6 +269,7 @@ export default function InviteEngagementUsers(props) {
                   value={inviteeUsers}
                   renderInput={(params) => (
                     <TextField
+                      inputRef={emailRef}
                       helperText={
                         <>
                           Select existing users from {org.name} or add new email addresses.

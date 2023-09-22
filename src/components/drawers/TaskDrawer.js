@@ -16,7 +16,8 @@ import {
   FormControlLabel,
   Checkbox,
   Tooltip,
-  Grid
+  Grid,
+  Paper
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -39,6 +40,7 @@ import { updateTask } from '../../api/tasks';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { deleteTasks } from '../../api/tasks';
 import { LoadingButton } from '@mui/lab';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 const defaultTask = {
   task_id: null,
@@ -371,6 +373,13 @@ export default function TaskDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
+      <Paper className='p0' style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
+        <Tooltip title="Close">
+          <IconButton onClick={handleClose}>
+            <KeyboardDoubleArrowRightIcon />
+          </IconButton>
+        </Tooltip>
+      </Paper>
       <DialogContent style={{ paddingTop: '15px' }}>
         <Grid container rowSpacing={0} columnSpacing={1.5}>
           <Grid item xs={12} mb={2}>

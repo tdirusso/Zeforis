@@ -17,10 +17,12 @@
 
 .getting-started-drawer .drawer {
   width: 475px;
+  overflow: visible;
 }
 
 .task-drawer .drawer {
   width: 550px;
+  overflow: visible;
 }
 
 @media screen and (max-width: 550px) {
