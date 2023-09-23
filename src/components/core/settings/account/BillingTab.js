@@ -139,7 +139,7 @@ function FreePlanInfo({ status }) {
       <Box className="free-plan-info" mt={4} hidden={status !== 'canceled'}>
         <Alert severity="info">
           <AlertTitle>
-            <strong>Info</strong>
+            <strong>Your subscription</strong>
           </AlertTitle>
           <Typography>
             It looks like your subscription has been <strong>canceled</strong>.

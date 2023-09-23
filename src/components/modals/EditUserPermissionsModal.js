@@ -1,6 +1,5 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery, DialogTitle } from '@mui/material';
 import { updateAccess, updatePermission, batchUpdateAccess, batchUpdatePermission } from '../../api/users';

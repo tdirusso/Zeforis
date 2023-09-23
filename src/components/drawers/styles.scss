@@ -8,6 +8,28 @@
   .MuiInput-underline:before {
     border-bottom: none !important;
   }
+
+  .close-btn-mobile {
+    display: none;
+    margin-bottom: 1rem;
+  }
+
+  .close-btn, .save-btn {
+    position: absolute;
+    left: -20px;
+  }
+
+  .close-btn {
+    top: 44vh;
+  }
+
+  .save-btn {
+    top: 50vh;
+  }
+
+  .task-content {
+    margin-top: 1.5rem;
+  }
 }
 
 .drawer {
@@ -28,5 +50,9 @@
 @media screen and (max-width: 550px) {
   .drawer {
     width: 100% !important;
+
+    .close-btn-mobile {
+      display: block;
+    }
   }
 }

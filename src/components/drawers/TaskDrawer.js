@@ -296,7 +296,6 @@ export default function TaskDrawer(props) {
       });
 
       if (success) {
-        openSnackBar('Task successfully updated.', 'success');
         const now = new Date().toISOString();
 
         const newTaskObject = {
@@ -325,6 +324,8 @@ export default function TaskDrawer(props) {
         tasksMap[task.task_id] = newTaskObject;
         setTask(newTaskObject);
         setTasks(Object.values(tasksMap));
+        openSnackBar('Task successfully updated.', 'success');
+
       } else {
         openSnackBar(message, 'error');
       }
@@ -644,6 +645,7 @@ export default function TaskDrawer(props) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
+                    helperText='"&#x23CE;" to create new tags'
                     variant='standard'
                     placeholder={selectedTags.length === 0 ? 'Add tags' : ''}
                     InputProps={{

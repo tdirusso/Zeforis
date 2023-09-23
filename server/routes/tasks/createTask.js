@@ -6,13 +6,13 @@ module.exports = async (req, res, next) => {
   const {
     name,
     description = '',
-    status,
+    status = 'New',
     folderId,
-    linkUrl,
+    linkUrl = '',
     assignedToId = null,
     tags = [],
     isKeyTask = false,
-    dueDate = null
+    dateDue = null
   } = req.body;
 
   const creatorUserId = req.userId;
@@ -67,7 +67,7 @@ module.exports = async (req, res, next) => {
         ) 
         VALUES
         (?,?,?,?,?,?,?,?,?,?)`,
-      [name, description, status || 'New', folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
+      [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dateDue, creatorUserId]
     );
 
     const newTaskId = newTask[0].insertId;
@@ -91,7 +91,7 @@ module.exports = async (req, res, next) => {
       assignedToId,
       tags,
       isKeyTask,
-      dueDate
+      dateDue
     };
 
     connection.release();
