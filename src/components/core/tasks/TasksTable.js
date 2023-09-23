@@ -7,7 +7,6 @@ import {
   Box,
   Button,
   TablePagination,
-  Typography,
   Tooltip,
   FormGroup,
   FormControlLabel,
@@ -162,17 +161,13 @@ export default function TasksTable({ tasks }) {
             height={40}>
             <FormGroup>
               <FormControlLabel
+                style={{ marginLeft: '5px' }}
                 fontSize="small"
                 control={<Switch
                   size="small"
                   onChange={handleEditModeChange}
                 />}
-                label={
-                  <Typography
-                    variant="body2">
-                    Edit
-                  </Typography>
-                }
+                label="Edit"
               />
             </FormGroup>
             <Button

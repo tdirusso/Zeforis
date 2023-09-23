@@ -206,12 +206,10 @@ export default function WidgetsTab() {
       <Grid item xs={12} md={9} className="widget-preview">
         <Paper style={{ display: selectedWidget ? 'flex' : 'none' }} className="widget-preview-container">
           <Box flexBasis={'50%'} py={2} px={2}>
-            <Box mb={2}>
-              <FormGroup>
+            <Box mb={3}>
+              <FormGroup >
                 <FormControlLabel
                   className="mx0"
-                  style={{ justifyContent: 'flex-end' }}
-                  labelPlacement="start"
                   control={<Switch
                     disabled={loading}
                     checked={isEnabled}

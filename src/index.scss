@@ -215,6 +215,12 @@ h6 {
   font-weight: 400 !important;
 }
 
+.MuiFormControlLabel-root {
+  .MuiSwitch-root {
+    margin-right: 10px;
+  }
+}
+
 @media screen and (max-width: 550px) {
   .wrap-on-small {
     flex-wrap: wrap;

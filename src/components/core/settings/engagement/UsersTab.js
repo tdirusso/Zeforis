@@ -1,4 +1,4 @@
-import { Box, FormControlLabel, FormGroup, InputAdornment, Switch, TextField, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Divider, Button, Chip, Tooltip, Menu } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
@@ -8,18 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { inviteEngagementUsers, removeEngagementUser } from "../../../../api/engagements";
-import HelpIcon from '@mui/icons-material/Help';
-import { MailOutline } from "@mui/icons-material";
-import SendIcon from '@mui/icons-material/Send';
-import { isMobile } from "../../../../lib/constants";
-
-const inviteUserAdminTooltip = <>
-  Administrators can edit tasks, folders and engagement settings (best for contributors).
-  <br></br>
-  <br></br>
-  Non-admins will have view-only access (best for members that belong to the engagement).
-</>;
+import { removeEngagementUser } from "../../../../api/engagements";
 
 export default function UsersTab() {
 
@@ -37,22 +26,12 @@ export default function UsersTab() {
   } = useOutletContext();
 
   const engagementId = engagement.id;
-  const orgId = org.id;
-  const engagementName = engagement.name;
-  const orgName = org.name;
-  const orgColor = org.brandColor;
-  const orgLogo = org.logo;
 
   const [userToRemove, setUserToRemove] = useState(null);
   const [isRemovingUser, setRemovingUser] = useState(false);
   const [removeUserMenuAnchor, setRemoveUserMenuAnchor] = useState(null);
-  const [inviteUserMenuAnchor, setInviteUserMenuAnchor] = useState(null);
-  const [isInvitingUser, setIsInviting] = useState(false);
-  const [inviteeEmail, setInviteeEmail] = useState('');
-  const [inviteeIsAdmin, setInviteeIsAdmin] = useState(0);
 
   const removeUserMenuOpen = Boolean(removeUserMenuAnchor);
-  const inviteUserMenuOpen = Boolean(inviteUserMenuAnchor);
 
   const openRemoveEngagementUserConfirmatiom = (e, userObject) => {
     setRemoveUserMenuAnchor(e.currentTarget);
@@ -98,96 +77,6 @@ export default function UsersTab() {
     }
   };
 
-  const handleInviteEngagementUsers = async e => {
-    e.preventDefault();
-
-    if (!inviteeEmail) {
-      openSnackBar("Please enter the user's email address.");
-      return;
-    }
-
-    const lcInviteeEmail = inviteeEmail.toLowerCase();
-
-    const engagementUserExists = [...engagementAdmins, ...engagementMembers].some(
-      eUser => eUser.email.toLowerCase() === lcInviteeEmail
-    );
-
-    if (engagementUserExists) {
-      openSnackBar('User is already part of this engagement.');
-      return;
-    }
-
-    setIsInviting(true);
-
-    try {
-      const { success, message, userId, firstName = '', lastName = '' } = await inviteEngagementUsers({
-        email: lcInviteeEmail,
-        engagementId,
-        orgId,
-        engagementName,
-        orgName,
-        isAdmin: inviteeIsAdmin,
-        orgColor,
-        orgLogo
-      });
-
-      if (success) {
-        const addedUser = {
-          id: userId,
-          email: lcInviteeEmail,
-          firstName,
-          lastName
-        };
-
-        if (!orgUsersMap[userId]) { // User is new to the org
-          const engagementData = { id: engagementId, name: engagementName };
-          addedUser.memberOfEngagements = inviteeIsAdmin ? [] : [engagementData];
-          addedUser.adminOfEngagements = inviteeIsAdmin ? [engagementData] : [];
-          setOrgUsers(members => [...members, addedUser]);
-        } else { // User already exists in the org
-          const existingUser = orgUsersMap[userId];
-          const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
-          const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
-
-          if (inviteeIsAdmin) {
-            if (userIsMember) {
-              existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
-            }
-
-            if (!userIsAdmin) {
-              existingUser.adminOfEngagements.push({ id: engagementId, name: engagementName });
-            }
-          } else {
-            if (userIsAdmin) {
-              existingUser.adminOfEngagements.filter(({ id }) => id !== engagementId);
-            }
-
-            if (!userIsMember) {
-              existingUser.memberOfEngagements.push({ id: engagementId, name: engagementName });
-            }
-          }
-
-          setOrgUsers(Object.values(orgUsersMap));
-        }
-
-        setIsInviting(false);
-        handleInviteUserMenuClose();
-        openSnackBar('Invitation successfully sent.', 'success');
-      } else {
-        openSnackBar(message, 'error');
-        setIsInviting(false);
-      }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setIsInviting(false);
-    }
-  };
-
-  const handleInviteUserMenuClose = () => {
-    setInviteUserMenuAnchor(null);
-    setInviteeEmail('');
-  };
-
   return (
     <>
       <Box mt={3} component="h4">Collaborators in {engagement.name}</Box>
@@ -201,7 +90,6 @@ export default function UsersTab() {
             Add collaborators
           </Button>
         </Box>
-
 
         <Box>
           <Divider textAlign="left">
@@ -323,76 +211,6 @@ export default function UsersTab() {
             onClick={() => handleRemoveEngagementUser()}>
             Remove
           </LoadingButton>
-        </Box>
-      </Menu>
-
-      <Menu
-        anchorEl={inviteUserMenuAnchor}
-        open={inviteUserMenuOpen}
-        onClose={handleInviteUserMenuClose}>
-        <Box
-          style={{ padding: '1rem', minWidth: 300, maxWidth: 450 }}
-          component="form"
-          onSubmit={handleInviteEngagementUsers}>
-          <Box>
-            <TextField
-              variant="standard"
-              helperText="Email address"
-              size="small"
-              placeholder="user@gmail.com"
-              fullWidth
-              autoFocus={!isMobile}
-              disabled={isInvitingUser}
-              value={inviteeEmail}
-              onChange={e => setInviteeEmail(e.target.value)}
-              type="email"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailOutline htmlColor="#cbcbcb" fontSize="small" />
-                  </InputAdornment>
-                )
-              }}>
-            </TextField>
-          </Box>
-          <Box mb={2} mt={0.5}>
-            <FormGroup>
-              <FormControlLabel
-                control={<Switch
-                  size="small"
-                  disabled={isInvitingUser}
-                  value={inviteeIsAdmin}
-                  onChange={(_, val) => setInviteeIsAdmin(val)}
-                />}
-                label={<Typography variant='body2' display="flex" alignItems="center">
-                  Administrator
-                  <Tooltip title={inviteUserAdminTooltip} placement="top">
-                    <HelpIcon
-                      fontSize="small"
-                      style={{ marginLeft: '5px', cursor: 'default' }}
-                      htmlColor="#c7c7c7"
-                    />
-                  </Tooltip>
-                </Typography>}
-              />
-            </FormGroup>
-          </Box>
-          <Typography variant="body2" mb={2}>
-            Once the invitation is sent, you can edit this user's permissions
-            for other engagements from the Organizations tab &rarr; Users.
-          </Typography>
-          <Box py={1} display="flex">
-            <LoadingButton
-              startIcon={<SendIcon />}
-              disabled={isInvitingUser}
-              variant='contained'
-              size="small"
-              fullWidth
-              type="submit"
-              loading={isInvitingUser}>
-              Send invitation
-            </LoadingButton>
-          </Box>
         </Box>
       </Menu>
     </>

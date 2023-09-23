@@ -198,6 +198,7 @@ export default function TasksFilter(props) {
               <Grid item xs={12} md={4}></Grid>
               <Grid item xs={12}>
                 <FormControlLabel
+                  style={{ marginLeft: '0' }}
                   control={<Switch
                     checked={filterKeyTasks}
                     onChange={(_, val) => setFilterKeyTasks(val)}

@@ -54,7 +54,7 @@ export default function InviteEngagementUsers(props) {
       setInviteType(type);
       setAnimateOptions(true);
       setTimeout(() => {
-        emailRef.current.scrollIntoView({ behavior: 'smooth' });
+        emailRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
     } else {
       setAnimateOptions(false);
@@ -62,7 +62,7 @@ export default function InviteEngagementUsers(props) {
         setInviteType(type);
         setAnimateOptions(true);
         setTimeout(() => {
-          emailRef.current.scrollIntoView({ behavior: 'smooth' });
+          emailRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 300);
       }, 150);
     }
