@@ -41,6 +41,20 @@ const commonQueries = {
     );
 
     return orgOwnerPlanResult[0].plan;
+  },
+  getOrgAdminCount: async (con, orgId) => {
+    const [orgAdminCountResult] = await con.query(
+      ` 
+      SELECT COUNT(DISTINCT user_id) AS adminCount
+      FROM engagement_users
+      LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
+      LEFT JOIN orgs ON orgs.id = engagements.org_id
+      WHERE engagements.org_id = ? AND role = 'admin'
+      `,
+      [orgId]
+    );
+
+    return orgAdminCountResult[0].adminCount;
   }
 };
 

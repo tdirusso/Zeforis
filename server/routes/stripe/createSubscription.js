@@ -1,5 +1,5 @@
 const stripe = require('../../../stripe');
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
 const { stripeSubscriptionPriceId } = require('../../../config');
 
 module.exports = async (req, res, next) => {
@@ -32,23 +32,11 @@ module.exports = async (req, res, next) => {
   }
 
   try {
+    const orgAdminsCount = await commonQueries.getOrgAdminCount(pool, ownedOrg.id);
 
-
-    const [orgAdminsCount] = await pool.query(
-      ` 
-        SELECT COUNT(DISTINCT users.id) AS adminCount
-        FROM engagement_users
-        LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
-        LEFT JOIN users ON engagement_users.user_id = users.id
-        LEFT JOIN orgs ON orgs.id = engagements.org_id
-        WHERE engagements.org_id = ? AND role = 'admin' AND users.id != ?
-      `,
-      [ownedOrg.id, userObject.id]
-    );
-
-    if (numAdmins <= orgAdminsCount[0].adminCount) {
+    if (numAdmins < orgAdminsCount) {
       return res.json({
-        message: `Number of admins must be >= ${orgAdminsCount.adminCount}.  Received ${numAdmins}.`
+        message: `Number of admins must be >= ${orgAdminsCount}.  Received ${numAdmins}.`
       });
     }
 
@@ -103,7 +91,8 @@ module.exports = async (req, res, next) => {
       }],
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent']
+      expand: ['latest_invoice.payment_intent'],
+      proration_behavior: 'none'
     });
 
     return res.json({

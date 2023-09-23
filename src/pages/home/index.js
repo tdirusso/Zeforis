@@ -88,7 +88,6 @@ export default function Home({ setTheme }) {
 
   useEffect(() => {
     if (user) {
-
       let activeOrg = null;
 
       if (user.memberOfOrgs.length === 1) {

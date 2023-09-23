@@ -1,4 +1,5 @@
 const { pool } = require('../../../database');
+const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -41,6 +42,10 @@ module.exports = async (req, res, next) => {
       'UPDATE engagement_users SET role = ? WHERE engagement_id IN (?) AND user_id = ?',
       [newRole, allOrgEngagementsResult.map(({ id }) => id), userId]
     );
+
+    if (isAdmin) {
+      const { success, message } = await updateStripeSubscription(connection, userObject.id);
+    }
 
     connection.release();
 

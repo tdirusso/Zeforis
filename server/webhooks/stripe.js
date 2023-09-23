@@ -38,14 +38,6 @@ module.exports = async (req, res, next) => {
           if (user) {
             await pool.query('UPDATE users SET stripe_subscription_status = "canceled", plan = "free" WHERE id = ?', [user.id]);
 
-            const cachedUser = cache.get(`user-${user.id}`);
-
-            cache.set(`user-${user.id}`, {
-              ...cachedUser,
-              subscriptionStatus: 'canceled',
-              plan: 'free'
-            });
-
             const [ownedOrgs] = await pool.query('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
 
             ownedOrgs.forEach(({ id }) => {
@@ -80,15 +72,6 @@ module.exports = async (req, res, next) => {
           if (user) {
             await pool.query('UPDATE users SET stripe_subscription_status = "past_due" WHERE id = ?', [user.id]);
 
-            const cachedUser = cache.get(`user-${user.id}`);
-
-            if (cachedUser) {
-              cache.set(`user-${user.id}`, {
-                ...cachedUser,
-                subscriptionStatus: 'past_due'
-              });
-            }
-
             await slackbot.post({
               channel: slackbot.channels.events,
               message: `*Subscription Past Due* 😧\n*Email:*  ${user.email}`
@@ -111,14 +94,6 @@ module.exports = async (req, res, next) => {
 
             if (user) {
               await pool.query('UPDATE users SET stripe_subscription_status = "active", plan = "pro" WHERE id = ?', [user.id]);
-
-              const cachedUser = cache.get(`user-${user.id}`);
-
-              cache.set(`user-${user.id}`, {
-                ...cachedUser,
-                subscriptionStatus: 'active',
-                plan: 'pro'
-              });
 
               const [ownedOrgs] = await pool.query('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
 

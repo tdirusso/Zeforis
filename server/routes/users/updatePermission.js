@@ -1,4 +1,5 @@
 const { pool } = require('../../../database');
+const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -7,7 +8,7 @@ module.exports = async (req, res, next) => {
     isAdmin = false
   } = req.body;
 
-  const { userObject } = req;
+  const { userObject, ownedOrg } = req;
 
   if (isAdmin && userObject.plan === 'free') {
     return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
@@ -27,16 +28,32 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+
   try {
     const newRole = isAdmin ? 'admin' : 'member';
 
-    await pool.query(
+    await connection.query(
       'UPDATE engagement_users SET role = ? WHERE engagement_id = ? AND user_id = ?',
       [newRole, engagementId, userId]
     );
 
+    const { success, message } = await updateStripeSubscription(connection, userObject.id, ownedOrg.id);
+
+    if (!success) {
+      await connection.rollback();
+      connection.release();
+      return res.json({ message });
+    }
+
+    await connection.commit();
+    connection.release();
+
     return res.json({ success: true });
   } catch (error) {
+    await connection.rollback();
+    connection.release();
     next(error);
   }
 };
