@@ -10,6 +10,7 @@ module.exports = async (req, res, next) => {
   const { engagementId } = req;
   const creatorUserId = req.userId;
   const userObject = req.userObject;
+  const { orgId } = userObject;
 
   if (!engagementId || importRows.length === 0) {
     return res.json({
@@ -22,33 +23,22 @@ module.exports = async (req, res, next) => {
   await connection.beginTransaction();
 
   try {
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
-    let cachedOrgData = cache.get(`org-${userObject.orgId}`);
-    let orgTaskCount = cachedOrgData?.taskCount;
-    let orgOwnerPlan = cachedOrgData?.ownerPlan;
-
-    if (orgOwnerPlan === undefined) {
-      orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, userObject.orgId);
-      cachedOrgData = { ...cachedOrgData, ownerPlan: orgOwnerPlan };
-    }
+    let orgTaskCount = null;
 
     if (orgOwnerPlan === 'free') {
-      if (orgTaskCount === undefined) {
-        orgTaskCount = await commonQueries.getOrgTaskCount(connection, userObject.orgId);
-        cachedOrgData = { ...cachedOrgData, taskCount: orgTaskCount };
-      }
+      orgTaskCount = await commonQueries.getOrgTaskCount(connection, orgId);
 
       if (orgTaskCount >= appLimits.freePlanTasks) {
         await connection.rollback();
         connection.release();
-        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData });
         return res.json({
           message: `Task limit of ${appLimits.freePlanTasks} has been reached.  Upgrade now for unlimited tasks.`
         });
       } else if (orgTaskCount + importRows.length > appLimits.freePlanTasks) {
         await connection.rollback();
         connection.release();
-        cache.set(`org-${userObject.orgId}`, { ...cachedOrgData });
         return res.json({
           message: `Cannot import - task limit of ${appLimits.freePlanTasks} will be exceeded.  Upgrade now for unlimited tasks.`
         });
@@ -177,8 +167,8 @@ module.exports = async (req, res, next) => {
       );
     }
 
-    if (userObject.plan === 'free') {
-      cache.set(`org-${userObject.orgId}`, { ...cachedOrgData, taskCount: orgTaskCount + taskInsertVals.length });
+    if (orgOwnerPlan === 'free') {
+      cache.set(`org-${orgId}`, { ...cache.get(`org-${orgId}`), taskCount: orgTaskCount + taskInsertVals.length });
     }
 
     await connection.commit();

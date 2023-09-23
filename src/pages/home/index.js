@@ -49,6 +49,7 @@ export default function Home({ setTheme }) {
   const [isOrgOwner, setIsOrgOwner] = useState(false);
   const [engagementMembers, setEngagementMembers] = useState([]);
   const [engagementAdmins, setEngagementAdmins] = useState([]);
+  const [orgOwnerPlan, setOrgOwnerPlan] = useState(null);
   const [triedOrgAndEngagement, setTriedOrgAndEngagement] = useState(false);
 
   const {
@@ -158,20 +159,19 @@ export default function Home({ setTheme }) {
       const result = await getEngagementData(engagementId, orgId);
 
       if (!result.engagement) {
-        if (result.message === 'Unauthorized') {
-          deleteActiveEngagementId();
-          deleteActiveOrgId();
+        deleteActiveEngagementId();
+        deleteActiveOrgId();
+        openSnackBar(result.message);
+        setTimeout(() => {
           return window.location.reload();
-        }
-
-        openSnackBar(result.message || 'Something went wrong...');
-        return;
+        }, 1000);
       }
 
       setTasks(result.engagement.tasks);
       setFolders(result.engagement.folders);
       setTags(result.engagement.tags);
-      setOrgUsers(result.engagement.orgUsers);
+      setOrgUsers(result.engagement.metadata.orgUsers);
+      setOrgOwnerPlan(result.engagement.metadata.orgOwnerPlan);
       setWidgets(result.engagement.widgets);
       setDataFetched(true);
     }
@@ -318,6 +318,7 @@ export default function Home({ setTheme }) {
     widgets,
     setTheme,
     isOrgOwner,
+    orgOwnerPlan,
     setTags,
     setEngagement,
     setOrg,

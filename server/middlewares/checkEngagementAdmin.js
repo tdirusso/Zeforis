@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
-    return res.json({ message: 'Unauthorized.' });
+    return res.json({ message: 'Missing authentication token.' });
   }
 
   let { engagementId } = req.body;
@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
   }
 
   if (!engagementId) {
-    return res.json({ message: 'Unauthorized.' });
+    return res.json({ message: 'No engagementId provided.' });
   }
 
   let { orgId } = req.body;
@@ -44,7 +44,7 @@ module.exports = async (req, res, next) => {
         const orgIdForEngagement = orgIdForEngagementResult[0].org_id;
 
         if (orgIdForEngagement !== Number(orgId)) {
-          return res.json({ message: 'Unauthorized' });
+          return res.json({ message: 'Engagement and org mismatch.' });
         }
       }
 
@@ -54,7 +54,7 @@ module.exports = async (req, res, next) => {
         req.engagementId = engagementId;
         return next();
       } else {
-        return res.json({ message: 'Unauthorized.' });
+        return res.json({ message: 'Only administrators in this engagement can perform this operation.' });
       }
     }
   } catch (error) {

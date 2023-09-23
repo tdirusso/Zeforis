@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const cache = require('../cache');
 
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
@@ -20,30 +21,47 @@ const initializeDatabase = async () => {
 };
 
 const commonQueries = {
-  getOrgTaskCount: async (con, orgId) => {
-    const [taskCountResult] = await con.query(
-      ` 
-        SELECT COUNT(DISTINCT tasks.id) AS taskCount
-        FROM tasks
-        LEFT JOIN folders ON folders.id = tasks.folder_id
-        LEFT JOIN engagements ON engagements.id = folders.engagement_id
-        WHERE engagements.org_id = ?
-      `,
-      [orgId]
-    );
+  getOrgTaskCount: async (connection, orgId) => {
+    let cachedOrgData = cache.get(`org-${orgId}`);
+    let orgTaskCount = cachedOrgData?.taskCount;
 
-    return taskCountResult[0].taskCount;
-  },
-  getOrgOwnerPlan: async (con, orgId) => {
-    const [orgOwnerPlanResult] = await con.query(
-      'SELECT users.plan FROM orgs LEFT JOIN users ON orgs.owner_id = users.id WHERE orgs.id = ?',
-      [orgId]
-    );
+    if (!orgTaskCount) {
+      const [taskCountResult] = await connection.query(
+        ` 
+          SELECT COUNT(DISTINCT tasks.id) AS taskCount
+          FROM tasks
+          LEFT JOIN folders ON folders.id = tasks.folder_id
+          LEFT JOIN engagements ON engagements.id = folders.engagement_id
+          WHERE engagements.org_id = ?
+        `,
+        [orgId]
+      );
 
-    return orgOwnerPlanResult[0].plan;
+      orgTaskCount = taskCountResult[0].taskCount;
+      cache.set(`org-${orgId}`, { ...cachedOrgData, taskCount: orgTaskCount });
+    }
+
+    return orgTaskCount;
   },
-  getOrgAdminCount: async (con, orgId) => {
-    const [orgAdminCountResult] = await con.query(
+  getOrgOwnerPlan: async (connection, orgId) => {
+    let cachedOrgData = cache.get(`org-${orgId}`);
+    let orgOwnerPlan = cachedOrgData?.ownerPlan;
+
+    if (orgOwnerPlan === undefined) {
+      const [planResult] = await connection.query(
+        'SELECT users.plan FROM orgs LEFT JOIN users ON orgs.owner_id = users.id WHERE orgs.id = ?',
+        [orgId]
+      );
+
+      orgOwnerPlan = planResult[0].plan;
+
+      cache.set(`org-${orgId}`, { ...cachedOrgData, ownerPlan: orgOwnerPlan });
+    }
+
+    return orgOwnerPlan;
+  },
+  getOrgAdminCount: async (connection, orgId) => {
+    const [orgAdminCountResult] = await connection.query(
       ` 
       SELECT COUNT(DISTINCT user_id) AS adminCount
       FROM engagement_users

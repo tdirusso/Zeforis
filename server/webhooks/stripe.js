@@ -42,7 +42,9 @@ module.exports = async (req, res, next) => {
 
             ownedOrgs.forEach(({ id }) => {
               let cachedOrgData = cache.get(`org-${id}`);
-              cache.set(`org-${id}`, { ...cachedOrgData, ownerPlan: 'free' });
+              if (cachedOrgData) {
+                cache.set(`org-${id}`, { ...cachedOrgData, ownerPlan: 'free' });
+              }
             });
 
             await slackbot.post({
@@ -99,7 +101,9 @@ module.exports = async (req, res, next) => {
 
               ownedOrgs.forEach(({ id }) => {
                 let cachedOrgData = cache.get(`org-${id}`);
-                cache.set(`org-${id}`, { ...cachedOrgData, ownerPlan: 'pro' });
+                if (cachedOrgData) {
+                  cache.set(`org-${id}`, { ...cachedOrgData, ownerPlan: 'pro' });
+                }
               });
 
               await slackbot.post({

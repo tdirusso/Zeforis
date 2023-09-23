@@ -1,6 +1,5 @@
 const { pool, commonQueries } = require('../../../database');
 const { createJWT } = require('../../../lib/utils');
-const cache = require('../../../cache');
 
 module.exports = async (req, res, next) => {
 
@@ -99,6 +98,8 @@ module.exports = async (req, res, next) => {
       [foldersIds]
     );
 
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+
     connection.release();
 
     const engagementData = {
@@ -106,16 +107,11 @@ module.exports = async (req, res, next) => {
       tasks,
       tags,
       widgets,
-      orgUsers: [...orgUsersMap.values()]
+      metadata: {
+        orgUsers: [...orgUsersMap.values()],
+        orgOwnerPlan
+      }
     };
-
-    let cachedOrgData = cache.get(`org-${orgId}`);
-    let orgOwnerPlan = cachedOrgData?.ownerPlan;
-
-    if (orgOwnerPlan === undefined) {
-      orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
-      cache.set(`org-${orgId}`, { ...cachedOrgData, ownerPlan: orgOwnerPlan });
-    }
 
     return res.json({
       engagement: engagementData,

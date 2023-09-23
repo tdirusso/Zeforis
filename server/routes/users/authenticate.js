@@ -7,7 +7,7 @@ module.exports = async (req, res, next) => {
 
   if (!token) {
     return res.json({
-      message: 'Unauthorized.'
+      message: 'Missing authentication token.'
     });
   }
 
@@ -83,7 +83,7 @@ module.exports = async (req, res, next) => {
       });
     }
 
-    return res.json({ message: 'Unauthenticated.' });
+    return res.json({ message: 'Invalid authentication token.' });
 
   } catch (error) {
     next(error);

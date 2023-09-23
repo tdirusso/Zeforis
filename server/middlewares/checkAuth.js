@@ -4,7 +4,7 @@ module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
-    return res.json({ message: 'Unauthorized.' });
+    return res.json({ message: 'Missing authentication token.' });
   }
 
   try {

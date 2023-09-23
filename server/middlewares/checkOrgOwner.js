@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
-    return res.json({ message: 'Unauthorized.' });
+    return res.json({ message: 'No authentication token provided.' });
   }
 
   let { orgId } = req.body;
@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
   }
 
   if (!orgId) {
-    return res.json({ message: 'Unauthorized.' });
+    return res.json({ message: 'No orgId provided.' });
   }
 
   try {
@@ -39,7 +39,7 @@ module.exports = async (req, res, next) => {
       };
       return next();
     } else {
-      return res.json({ message: 'Unauthorized' });
+      return res.json({ message: 'Only the org owner can perform this operation.' });
     }
   } catch (error) {
     next(error);
