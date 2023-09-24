@@ -25,6 +25,19 @@ module.exports = async (req, res, next) => {
   await connection.beginTransaction();
 
   try {
+
+    await connection.query(
+      `
+        UPDATE tasks 
+        SET assigned_to_id = NULL
+        WHERE assigned_to_id = ? AND folder_id IN 
+          (
+            SELECT id FROM folders WHERE engagement_id = ?
+          )
+      `,
+      [userId, engagementId]
+    );
+
     await connection.query(
       'DELETE FROM engagement_users WHERE engagement_id = ? AND user_id = ?',
       [engagementId, userId]

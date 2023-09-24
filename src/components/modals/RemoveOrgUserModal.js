@@ -14,7 +14,9 @@ export default function RemoveOrgUserModal(props) {
     org,
     setOrgUsers,
     openSnackBar,
-    userToRemove
+    userToRemove,
+    tasks,
+    setTasks
   } = props;
 
   const orgId = org.id;
@@ -37,11 +39,17 @@ export default function RemoveOrgUserModal(props) {
       const resultMessage = result.message;
 
       if (success) {
-        setTimeout(() => {
-          openSnackBar('Successully removed.', 'success');
-        }, 250);
-
         setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== userToRemove.id));
+
+        const tasksClone = [...tasks];
+        tasksClone.forEach(task => {
+          if (task.assigned_to_id && task.assigned_to_id === userToRemove.id) {
+            task.assigned_to_id = null;
+          }
+        });
+        setTasks(tasksClone);
+        
+        openSnackBar('Successully removed.', 'success');
         handleClose();
       } else {
         openSnackBar(resultMessage, 'error');

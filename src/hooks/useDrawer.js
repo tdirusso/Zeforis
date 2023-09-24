@@ -11,6 +11,7 @@ export default function useDrawer() {
       localStorage.removeItem('gsDrawerToReopen');
     }
 
+    console.log(props);
     setDrawerProps(props);
     setDrawerToOpen(drawerType);
   };
@@ -22,6 +23,7 @@ export default function useDrawer() {
       localStorage.removeItem('gsDrawerToReopen');
     } else {
       setDrawerToOpen('');
+      setDrawerProps({});
     }
   };
 

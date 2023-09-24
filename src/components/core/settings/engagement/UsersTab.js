@@ -22,7 +22,9 @@ export default function UsersTab() {
     orgUsersMap,
     org,
     isOrgOwner,
-    openModal
+    openModal,
+    tasks,
+    setTasks
   } = useOutletContext();
 
   const engagementId = engagement.id;
@@ -63,6 +65,14 @@ export default function UsersTab() {
           theUser.adminOfEngagements = theUser.adminOfEngagements.filter(engagement => engagement.id !== engagementId);
           setOrgUsers(Object.values(orgUsersMap));
         }
+
+        const tasksClone = [...tasks];
+        tasksClone.forEach(task => {
+          if (task.assigned_to_id && task.assigned_to_id === userToRemove.id) {
+            task.assigned_to_id = null;
+          }
+        });
+        setTasks(tasksClone);
 
         setRemoveUserMenuAnchor(null);
         setRemovingUser(false);
