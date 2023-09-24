@@ -339,9 +339,14 @@ export default function GeneralTab() {
           Danger Zone
         </Box>
         <Box>
-          <Typography variant="body2">
-            Once you delete an organization, there is no going back - all folders, tasks, tags, etc. will be permanently deleted.  Please be certain.
-          </Typography>
+          {
+            isOrgOwner ?
+              <Typography variant="body2">
+                Once you delete an organization, there is no going back - all folders, tasks, tags, etc. will be permanently deleted.  Please be certain.
+              </Typography>
+              :
+              null
+          }
           <Button
             startIcon={isOrgOwner ? null : <LogoutIcon />}
             onClick={

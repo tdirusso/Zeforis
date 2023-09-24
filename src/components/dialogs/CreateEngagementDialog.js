@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import { Box, Button, CircularProgress, Dialog, Divider, Fade, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createEngagement, deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import CloseIcon from '@mui/icons-material/Close';
@@ -76,7 +76,7 @@ export default function CreateEngagementDialog(props) {
           if (!close) {
             localStorage.setItem('openGettingStarted', 'true');
           }
-          
+
           setTimeout(() => {
             window.location.href = '/home/dashboard';
           }, 500);
@@ -133,49 +133,41 @@ export default function CreateEngagementDialog(props) {
             variant='contained'>
             Change org
           </Button>
-          <Grow appear in timeout={{ enter: 500 }}>
-            {pageIcon}
-          </Grow>
-          <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '125ms' }}>
-            <Box>
-              <Box component="h2" mb={1} mt={2}>
-                Create an Engagement
-              </Box>
-              <Divider className='my3' />
-              <Typography>
-                An engagement is a project with one of your customers/clients.
-              </Typography>
-              <Typography mt={1}>
-                The engagement name should be the company name for the customer you're engaging with, or just a simple project name.
-              </Typography>
+          {pageIcon}
+          <Box>
+            <Box component="h2" mb={1} mt={2}>
+              Create an Engagement
             </Box>
-          </Fade>
-          <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '200ms' }}>
-            <form onSubmit={handleCreateEngagement}>
-              <Box className='my3'>
-                <TextField
-                  placeholder="Engagement Name"
-                  fullWidth
-                  autoFocus={!isMobile}
-                  disabled={isLoading}
-                  inputRef={name}>
-                </TextField>
-              </Box>
-              <LoadingButton
-                variant='contained'
+            <Divider className='my3' />
+            <Typography>
+              An engagement is a project with one of your customers/clients.
+            </Typography>
+            <Typography mt={1}>
+              The engagement name should be the company name for the customer you're engaging with, or just a simple project name.
+            </Typography>
+          </Box>
+          <form onSubmit={handleCreateEngagement}>
+            <Box className='my3'>
+              <TextField
+                placeholder="Engagement Name"
                 fullWidth
-                size='large'
-                type='submit'
-                loading={isLoading}>
-                Create Engagement
-              </LoadingButton>
-            </form>
-          </Fade>
-          <Grow appear in>
-            <Box>
-              <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+                autoFocus={!isMobile}
+                disabled={isLoading}
+                inputRef={name}>
+              </TextField>
             </Box>
-          </Grow>
+            <LoadingButton
+              variant='contained'
+              fullWidth
+              size='large'
+              type='submit'
+              loading={isLoading}>
+              Create Engagement
+            </LoadingButton>
+          </form>
+          <Box>
+            <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+          </Box>
         </Box>
       </Box>
 

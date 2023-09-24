@@ -3,10 +3,15 @@ import React, { useState } from "react";
 import GeneralTab from "./GeneralTab";
 import UsersTab from "./UsersTab";
 import TagsTab from "./TagsTab";
+import { useOutletContext } from "react-router-dom";
 
 export default function EngagementTab() {
 
   const [tabVal, setTabVal] = useState(0);
+
+  const {
+    isAdmin
+  } = useOutletContext();
 
   const getTabContent = () => {
     switch (tabVal) {
@@ -33,7 +38,7 @@ export default function EngagementTab() {
           scrollButtons="auto">
           <Tab label="General" />
           <Tab label="Collaborators" />
-          <Tab label="Tags" />
+          <Tab label="Tags" hidden={!isAdmin} />
         </Tabs>
         <Box p='2rem'>
           {

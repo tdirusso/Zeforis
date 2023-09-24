@@ -207,7 +207,7 @@ export default function Header(props) {
                 </ListItemText>
               </MenuItem>
               <Paper
-                hidden={user.plan !== 'free'}
+                hidden={(user.plan !== 'free' && isOrgOwner) || !isOrgOwner}
                 style={{
                   padding: '0px',
                   position: 'absolute',

@@ -1,6 +1,6 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Divider, Button, Chip, Tooltip, Menu } from "@mui/material";
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -81,16 +81,17 @@ export default function UsersTab() {
     <>
       <Box mt={3} component="h4">Collaborators in {engagement.name}</Box>
       <Box mt={3}>
-        <Box>
+        <Box className="flex-ac" mb='2rem' hidden={!isOrgOwner}>
           <Button
-            hidden={!isOrgOwner}
             variant="outlined"
-            style={{ marginBottom: '1rem', whiteSpace: 'break-spaces' }}
+            style={{ whiteSpace: 'break-spaces' }}
             onClick={() => openModal('invite-engagement-users')}>
             Add collaborators
           </Button>
+          <Typography variant="body2" ml={3} hidden={engagementAdmins.length + engagementMembers.length === 1}>
+            <Link to="../organization?members">Manage permissions &rarr;</Link>
+          </Typography>
         </Box>
-
         <Box>
           <Divider textAlign="left">
             <Chip label="Administrators" />

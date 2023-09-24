@@ -112,7 +112,7 @@ module.exports = async (req, res, next) => {
               } else if (prevQuantity > quantity) {
                 await slackbot.post({
                   channel: slackbot.channels.events,
-                  message: `*Subscription Updated - ${prevQuantity - quantity} Administrators Removed* 🤑\n*Amount:*  ${(prevQuantity * pricePerAdminMonthly).toLocaleString('en', {
+                  message: `*Subscription Updated - ${prevQuantity - quantity} Administrators Removed* 😢\n*Amount:*  ${(prevQuantity * pricePerAdminMonthly).toLocaleString('en', {
                     style: 'currency',
                     currency: 'USD',
                     minimumFractionDigits: 2,
