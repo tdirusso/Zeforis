@@ -1,4 +1,5 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -23,6 +24,8 @@ module.exports = async (req, res, next) => {
   }
 
   const connection = await pool.getConnection();
+
+  await connection.beginTransaction();
 
   try {
     const [allOrgEngagementsResult] = await connection.query(
@@ -57,10 +60,26 @@ module.exports = async (req, res, next) => {
       );
     }
 
-    connection.release();
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
+    if (orgOwnerPlan !== 'free') {
+      const { success, message } = await updateStripeSubscription(connection, updaterUserId, orgId);
+
+      if (!success) {
+        await connection.rollback();
+
+        connection.release();
+        return res.json({ message });
+      }
+    }
+
+    await connection.commit();
+
+    connection.release();
     return res.json({ success: true });
   } catch (error) {
+    await connection.rollback();
+
     connection.release();
     next(error);
   }

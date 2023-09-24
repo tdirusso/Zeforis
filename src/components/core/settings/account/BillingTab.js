@@ -63,16 +63,22 @@ function ProPlanInfo({ status }) {
       <Typography fontSize='1.25rem' fontWeight={300}>
         Zeforis Pro &nbsp;🎉
       </Typography>
-      <Typography mt={1}>
+      <Box mt={1}>
         {
           status === 'past_due' ?
-            `You are currently subscribed to Zeforis Pro, but your subscription is past due.  
-            Click the button below to update your subscription details to continue using Zeforis Pro, or your subscription will soon be canceled.
-          `
+            <Typography>
+              You are currently subscribed to Zeforis Pro, but your subscription is past due.
+              <br></br>
+              Click the button below to update your subscription details to continue using Zeforis Pro, or your subscription will soon be canceled.
+            </Typography>
             :
-            'You are currently subscribed to Zeforis Pro.  You can click the button below to manage your subscription.'
+            <Typography>
+              You are currently subscribed to Zeforis Pro.
+              <br></br>
+              You can click the button below to manage your subscription.
+            </Typography>
         }
-      </Typography>
+      </Box>
       <Box mt={3}>
         <a href={stripeCustomerPortalUrl} target="_blank" rel="noreferrer">
           <Button variant="contained" size="large">

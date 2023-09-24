@@ -149,7 +149,7 @@ const theme = {
     MuiSwitch: {
       styleOverrides: {
         root: {
-          width: 40,
+          width: 35,
           height: 20,
           padding: 0,
           '& .MuiSwitch-switchBase': {
@@ -157,7 +157,7 @@ const theme = {
             margin: 2,
             transitionDuration: '300ms',
             '&.Mui-checked': {
-              transform: 'translateX(19px)',
+              transform: 'translateX(14px)',
               color: '#fff',
               '& + .MuiSwitch-track': {
                 backgroundColor: 'var(--colors-primary)',

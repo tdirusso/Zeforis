@@ -2,6 +2,7 @@ const { pool } = require('../../database');
 const stripe = require('../../stripe');
 const slackbot = require('../../slackbot');
 const cache = require('../../cache');
+const { pricePerAdminMonthly } = require('../../config');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -61,7 +62,8 @@ module.exports = async (req, res, next) => {
         break;
       }
       case 'customer.subscription.updated': {
-        const { customer, status } = event.data.object;
+        const { customer, status, quantity } = event.data.object;
+        const { previous_attributes } = event.data;
 
         if (status === 'past_due' && customer) {
           const [userResult] = await pool.query(
@@ -79,7 +81,54 @@ module.exports = async (req, res, next) => {
               message: `*Subscription Past Due* 😧\n*Email:*  ${user.email}`
             });
           }
+        } else if (previous_attributes && previous_attributes.quantity) {
+          const prevQuantity = previous_attributes.quantity;
+
+          if (prevQuantity !== quantity) {
+
+            const [userResult] = await pool.query(
+              'SELECT email FROM users WHERE stripe_customerId = ?',
+              [customer]
+            );
+
+            const user = userResult[0];
+
+            if (user) {
+              if (prevQuantity < quantity) {
+                await slackbot.post({
+                  channel: slackbot.channels.events,
+                  message: `*Subscription Updated - ${quantity - prevQuantity} Administrators Added* 🤑\n*Amount:*  ${(prevQuantity * pricePerAdminMonthly).toLocaleString('en', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} ---> ${(quantity * pricePerAdminMonthly).toLocaleString('en', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}\n*Email:*  ${user.email}`
+                });
+              } else if (prevQuantity > quantity) {
+                await slackbot.post({
+                  channel: slackbot.channels.events,
+                  message: `*Subscription Updated - ${prevQuantity - quantity} Administrators Removed* 🤑\n*Amount:*  ${(prevQuantity * pricePerAdminMonthly).toLocaleString('en', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} ---> ${(quantity * pricePerAdminMonthly).toLocaleString('en', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}\n*Email:*  ${user.email}`
+                });
+              }
+            }
+          }
         }
+
         break;
       }
       case 'invoice.paid':

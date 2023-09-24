@@ -1,8 +1,9 @@
 const emailService = require('../../../email');
 const validator = require("email-validator");
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
 const { v4: uuidv4 } = require('uuid');
 const { appLimits, isDev } = require('../../../config');
+const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -17,11 +18,6 @@ module.exports = async (req, res, next) => {
 
   const updaterUserId = req.userId;
   const orgId = req.ownedOrg.id;
-  const { userObject } = req;
-
-  if (userObject.plan === 'free' && inviteType === 'admin') {
-    return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
-  }
 
   if (!engagementId || !orgId) {
     return res.json({
@@ -71,9 +67,14 @@ module.exports = async (req, res, next) => {
 
   const connection = await pool.getConnection();
 
-  try {
+  await connection.beginTransaction();
 
-    await connection.beginTransaction();
+  try {
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+
+    if (orgOwnerPlan === 'free' && inviteType === 'admin') {
+      return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
+    }
 
     const [allExistingUsers] = await connection.query(
       'SELECT id, email, is_verified, first_name, last_name FROM users WHERE email IN (?) AND id != ?',
@@ -157,9 +158,20 @@ module.exports = async (req, res, next) => {
       [insertEngagementUsersValues]
     );
 
-    await connection.commit();
+    if (inviteType === 'admin') {
+      const { success, message } = await updateStripeSubscription(connection, updaterUserId, orgId);
+
+      if (!success) {
+        await connection.rollback();
+  
+        connection.release();
+        return res.json({ message });
+      }
+    }
 
     await emailService.sendMultipleEmailsFromTemplate(invitationEmails);
+
+    await connection.commit();
 
     connection.release();
 
@@ -170,6 +182,7 @@ module.exports = async (req, res, next) => {
 
   } catch (error) {
     await connection.rollback();
+
     connection.release();
     next(error);
   }

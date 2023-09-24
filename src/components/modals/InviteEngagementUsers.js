@@ -195,7 +195,7 @@ export default function InviteEngagementUsers(props) {
           <Box fontSize='3rem'>
             <AccountCircleIcon fontSize='3rem' htmlColor='#b9b9b9' />
           </Box>
-          <Box component='h3' mb='2rem'>Client</Box>
+          <Box component='h3' mb='2rem'>Clients</Box>
           <Button
             disabled={isLoading}
             onClick={() => handleInviteTypeChange('member')}
@@ -208,7 +208,7 @@ export default function InviteEngagementUsers(props) {
           <Box fontSize='3rem'>
             <BuildIcon fontSize='3rem' htmlColor='#b9b9b9' />
           </Box>
-          <Box component='h3' mb='2rem'>Administrator</Box>
+          <Box component='h3' mb='2rem'>Administrators</Box>
           <Button
             disabled={isLoading}
             onClick={() => handleInviteTypeChange('admin')}
