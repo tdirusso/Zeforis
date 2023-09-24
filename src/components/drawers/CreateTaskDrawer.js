@@ -330,7 +330,6 @@ export default function CreateTaskDrawer(props) {
               placeholder='https://'
               variant="standard"
               inputRef={linkUrl}
-              multiline
               InputProps={{
                 startAdornment:
                   <InputAdornment position='start' style={{ transform: 'rotate(-45deg)' }}>

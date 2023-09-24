@@ -17,7 +17,8 @@ import {
   Checkbox,
   Tooltip,
   Grid,
-  Paper
+  Paper,
+  CircularProgress
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -41,6 +42,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { deleteTasks } from '../../api/tasks';
 import { LoadingButton } from '@mui/lab';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import CheckIcon from '@mui/icons-material/Check';
 
 const defaultTask = {
   task_id: null,
@@ -100,8 +102,9 @@ export default function TaskDrawer(props) {
   const [dateDue, setDateDue] = useState(null);
   const [isKeyTask, setIsKeyTask] = useState(false);
   const [status, setStatus] = useState(null);
-  const [needsUpdating, setNeedsUpdating] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState([]);
 
   const descriptionTextarea = useRef();
 
@@ -162,6 +165,7 @@ export default function TaskDrawer(props) {
     close();
     setTimeout(() => {
       descriptionTextarea.current.style.height = 'auto';
+      setFormErrors([]);
     }, 500);
   };
 
@@ -179,105 +183,51 @@ export default function TaskDrawer(props) {
         const newTag = result.tag;
         setTags(tags => [...tags, newTag]);
         setSelectedTags(tags => [...tags, newTag]);
-        setNeedsUpdating(true);
       } else {
         openSnackBar(result.message, 'error');
       }
     }
   };
 
-  const handleNameChange = () => {
-    if (!name) {
-      openSnackBar('Please enter a task name.');
-      return;
-    } else if (name !== task.task_name) {
-      setNeedsUpdating(true);
-    }
-  };
-
-  const handleDescriptionChange = () => {
-    if (description !== task.description) {
-      setNeedsUpdating(true);
-    }
-  };
-
-  const handleLinkChange = () => {
-    if (linkUrl !== task.link_url) {
-      setNeedsUpdating(true);
-    }
-  };
-
   const handleStatusChange = status => {
     setStatus(status);
     setStatusMenuAnchor(null);
-    setNeedsUpdating(true);
   };
 
   const handleIsKeyChange = (_, val) => {
     setIsKeyTask(val);
-    setNeedsUpdating(true);
-  };
-
-  const handleAssignedToChange = () => {
-    const assignedToId = assignedTo?.id || null;
-
-    if (!assignedToId && task.assigned_to_id) {
-      setNeedsUpdating(true);
-    } else if (assignedToId !== task.assigned_to_id) {
-      setNeedsUpdating(true);
-    }
-  };
-
-  const handleDateDueChange = (eventOrVal) => {
-    if (eventOrVal.type === 'blur') {
-      if (dateDue !== task.date_due) {
-        const newDate = new Date(dateDue);
-        if (!isNaN(newDate.getTime())) {
-          setNeedsUpdating(true);
-        } else {
-          openSnackBar('Invalid due date format.');
-        }
-      }
-    } else {
-      setDateDue(eventOrVal);
-      setNeedsUpdating(true);
-    }
-  };
-
-  const handleFolderChange = () => {
-    if (!folder) {
-      openSnackBar('Please choose a folder for the task.');
-      return;
-    } else if (folder.id !== task.folder_id) {
-      setNeedsUpdating(true);
-    }
   };
 
   const handleTagsChange = (_, newTagsArray) => {
     setSelectedTags(newTagsArray);
-    setNeedsUpdating(true);
   };
-
-  useEffect(() => {
-    if (needsUpdating) {
-      handleUpdateTask();
-      setNeedsUpdating(false);
-    }
-  }, [needsUpdating]);
 
   const handleUpdateTask = async () => {
     const folderId = folder?.id;
-    const assignedToId = assignedTo?.id;
+    const assignedToId = assignedTo?.id || null;
+
+    const errors = [];
 
     if (!name) {
-      openSnackBar('Please enter a name for the task.');
-      return;
+      errors.push('name');
     }
 
     if (!folderId) {
-      openSnackBar('Please choose a folder for the task.');
+      errors.push('folder');
+    }
+
+    if (errors.length) {
+      setFormErrors(errors);
+      openSnackBar('Task name and folder are required.');
       return;
     }
+
+    if (dateDue && !dateDue.isValid()) {
+      openSnackBar('Due date is invalid.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const { message, success } = await updateTask({
@@ -324,12 +274,15 @@ export default function TaskDrawer(props) {
         tasksMap[task.task_id] = newTaskObject;
         setTask(newTaskObject);
         setTasks(Object.values(tasksMap));
+        setLoading(false);
+        handleClose();
         openSnackBar('Task successfully updated.', 'success');
-
       } else {
+        setLoading(false);
         openSnackBar(message, 'error');
       }
     } catch (error) {
+      setLoading(false);
       openSnackBar(error.message, 'error');
     }
   };
@@ -363,6 +316,20 @@ export default function TaskDrawer(props) {
     }
   };
 
+  const handleNameChange = e => {
+    setName(e.target.value);
+    if (e.target.value && formErrors.includes('name')) {
+      setFormErrors(prev => prev.filter(er => er !== 'name'));
+    }
+  };
+
+  const handleFolderChange = (_, newVal) => {
+    setFolder(newVal);
+    if (newVal && formErrors.includes('folder')) {
+      setFormErrors(prev => prev.filter(er => er !== 'folder'));
+    }
+  };
+
   return (
     <Drawer
       className='task-drawer'
@@ -381,6 +348,24 @@ export default function TaskDrawer(props) {
           </IconButton>
         </Tooltip>
       </Paper>
+      <Paper className='p0 close-btn' hidden={!isAdmin}>
+        <Tooltip title="Cancel" placement='top'>
+          <IconButton onClick={handleClose} disabled={isLoading}>
+            <CloseIcon color={isLoading ? '' : 'error'} />
+          </IconButton>
+        </Tooltip>
+      </Paper>
+      <Paper className='p0 save-btn' hidden={!isAdmin}>
+        <Tooltip title="Save">
+          <IconButton onClick={handleUpdateTask}>
+            {
+              isLoading ?
+                <CircularProgress size='20px' /> :
+                <CheckIcon htmlColor='#00c975' />
+            }
+          </IconButton>
+        </Tooltip>
+      </Paper>
       <DialogContent style={{ paddingTop: '15px' }}>
         <Grid container rowSpacing={0} columnSpacing={1.5}>
           <Grid item xs={12} mb={2}>
@@ -393,7 +378,7 @@ export default function TaskDrawer(props) {
               </Tooltip>
               <Tooltip title='Delete task' hidden={!isAdmin}>
                 <IconButton
-
+                  disabled={isLoading}
                   onClick={e => setDeleteMenuAnchor(e.currentTarget)}>
                   <DeleteOutlineIcon htmlColor="red" />
                 </IconButton>
@@ -417,18 +402,17 @@ export default function TaskDrawer(props) {
           </Grid>
         </Grid>
 
-
-
         <Box>
           <Box>
             <TextField
+              disabled={isLoading}
               fullWidth
               placeholder='Task name'
               variant="standard"
               value={name}
               multiline
-              onBlur={handleNameChange}
-              onChange={e => setName(e.target.value)}
+              onChange={handleNameChange}
+              error={formErrors.includes('name')}
               inputProps={{
                 style: { fontSize: '1.25rem' }
               }}
@@ -439,6 +423,7 @@ export default function TaskDrawer(props) {
         </Box>
         <Box display="flex" alignItems="center" mt={2.5}>
           <Chip
+            disabled={isLoading}
             label={status}
             deleteIcon={<MoreVertIcon />}
             onClick={isAdmin ? e => setStatusMenuAnchor(e.currentTarget) : () => { }}
@@ -472,7 +457,7 @@ export default function TaskDrawer(props) {
           <FormControlLabel
             componentsProps={{ typography: { fontWeight: '300' } }}
             control={<Checkbox
-              disabled={!isAdmin}
+              disabled={!isAdmin || isLoading}
               icon={<StarBorderIcon />}
               checkedIcon={<StarIcon htmlColor='gold' />}
               checked={isKeyTask}
@@ -484,6 +469,7 @@ export default function TaskDrawer(props) {
         <Divider style={{ marginTop: '2rem' }} />
         <Box my={3}>
           <TextField
+            disabled={isLoading}
             fullWidth
             placeholder='Description'
             variant="standard"
@@ -491,7 +477,6 @@ export default function TaskDrawer(props) {
             multiline
             inputRef={descriptionTextarea}
             inputProps={{ style: { resize: 'vertical' } }}
-            onBlur={handleDescriptionChange}
             onChange={e => setDescription(e.target.value)}
             InputProps={{ readOnly: !isAdmin }}
             className={!isAdmin ? 'readonly-textfield' : ''}
@@ -501,12 +486,11 @@ export default function TaskDrawer(props) {
         <Box my={4}>
           <Box my={2}>
             <TextField
+              disabled={isLoading}
               fullWidth
               placeholder='https://'
               variant="standard"
               value={linkUrl}
-              multiline
-              onBlur={handleLinkChange}
               onChange={e => setLinkUrl(e.target.value)}
               className={!isAdmin ? 'readonly-textfield' : ''}
               InputProps={{
@@ -520,7 +504,7 @@ export default function TaskDrawer(props) {
           </Box>
           <Box>
             <Button
-              disabled={!Boolean(task.link_url)}
+              disabled={!Boolean(task.link_url) || isLoading}
               style={{ marginRight: '0.75rem' }}
               onClick={() => window.open(task.link_url, '_blank')}
               endIcon={<OpenInNewIcon />}
@@ -529,7 +513,7 @@ export default function TaskDrawer(props) {
             </Button>
             <Button
               onClick={handleCopyLink}
-              disabled={!Boolean(task.link_url)}
+              disabled={!Boolean(task.link_url) || isLoading}
               startIcon={<ContentCopyIcon />}>
               {copyButtonText}
             </Button>
@@ -540,17 +524,18 @@ export default function TaskDrawer(props) {
           <Box my={2}>
             <FormControl fullWidth>
               <Autocomplete
+                disabled={isLoading}
                 readOnly={!isAdmin}
                 options={folders}
                 getOptionLabel={(option) => option.name || ''}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={folder}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                onChange={(_, val) => setFolder(val)}
-                onBlur={handleFolderChange}
+                onChange={handleFolderChange}
                 renderInput={(params) => (
                   <TextField
                     placeholder='Folder'
+                    error={formErrors.includes('folder')}
                     {...params}
                     InputProps={{
                       ...params.InputProps,
@@ -569,13 +554,13 @@ export default function TaskDrawer(props) {
           <Box my={2}>
             <FormControl fullWidth>
               <Autocomplete
+                disabled={isLoading}
                 readOnly={!isAdmin}
                 options={membersAndAdmins}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 groupBy={(option) => option.role}
-                onBlur={handleAssignedToChange}
                 onChange={(_, val) => setAssignedTo(val)}
                 value={assignedTo}
                 renderInput={(params) => (
@@ -599,6 +584,7 @@ export default function TaskDrawer(props) {
           <Box my={2}>
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DatePicker
+                disabled={isLoading}
                 readOnly={!isAdmin}
                 format="MM/DD/YYYY"
                 value={dateDue}
@@ -608,11 +594,10 @@ export default function TaskDrawer(props) {
                   }
                 }}
                 onChange={value => setDateDue(value)}
-                onAccept={handleDateDueChange}
+                onAccept={value => setDateDue(value)}
                 renderInput={(params) => <TextField
                   {...params}
                   fullWidth
-                  onBlur={handleDateDueChange}
                   helperText='Date due'
                 />}
               ></DatePicker>
@@ -625,6 +610,7 @@ export default function TaskDrawer(props) {
           <Box>
             <FormControl fullWidth>
               <Autocomplete
+                disabled={isLoading}
                 readOnly={!isAdmin}
                 multiple
                 value={selectedTags}
