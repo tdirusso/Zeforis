@@ -14,7 +14,9 @@
     margin-bottom: 1rem;
   }
 
-  .close-btn, .save-btn {
+  .close-btn,
+  .save-btn,
+  .minimize-btn {
     position: absolute;
     left: -20px;
   }
@@ -23,7 +25,8 @@
     top: 44vh;
   }
 
-  .save-btn {
+  .save-btn,
+  .minimize-btn {
     top: 50vh;
   }
 
@@ -53,6 +56,12 @@
 
     .close-btn-mobile {
       display: block;
+    }
+
+    .close-btn,
+    .save-btn,
+    .minimize-btn {
+      display: none;
     }
   }
 }

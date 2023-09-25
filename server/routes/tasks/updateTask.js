@@ -28,17 +28,21 @@ module.exports = async (req, res, next) => {
     const [updatedTaskResult] = await pool.query(
       `
         UPDATE tasks SET 
-            name = ?,
-            description = ?,
-            status = ?,
-            folder_id = ?,
-            link_url = ?,
-            assigned_to_id = ?,
-            is_key_task = ?,
-            date_due = ?,
-            last_updated_by_id = ?,
-            date_completed = ${status === 'Complete' ? 'CURRENT_TIMESTAMP' : 'NULL'}
-         WHERE id = ? 
+          name = ?,
+          description = ?,
+          status = ?,
+          folder_id = ?,
+          link_url = ?,
+          assigned_to_id = ?,
+          is_key_task = ?,
+          date_due = ?,
+          last_updated_by_id = ?,
+          date_completed = 
+            CASE 
+              WHEN date_completed IS NULL AND ? = 'Complete' THEN CURRENT_TIMESTAMP
+              ELSE date_completed
+            END
+        WHERE id = ? 
       `,
       [
         name,
@@ -50,6 +54,7 @@ module.exports = async (req, res, next) => {
         isKeyTask,
         dateDue ? moment(dateDue).format('YYYY-MM-DD HH:mm:ss') : null,
         creatorUserId,
+        status,
         taskId
       ]
     );

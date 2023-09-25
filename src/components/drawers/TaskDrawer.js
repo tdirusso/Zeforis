@@ -18,7 +18,8 @@ import {
   Tooltip,
   Grid,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Typography
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -43,6 +44,7 @@ import { deleteTasks } from '../../api/tasks';
 import { LoadingButton } from '@mui/lab';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import CheckIcon from '@mui/icons-material/Check';
+import moment from 'moment';
 
 const defaultTask = {
   task_id: null,
@@ -247,6 +249,15 @@ export default function TaskDrawer(props) {
 
       if (success) {
         const now = new Date().toISOString();
+        let dateCompletedToSet = null;
+
+        if (status === 'Complete') {
+          if (task.date_completed) {
+            dateCompletedToSet = task.date_completed;
+          } else {
+            dateCompletedToSet = now;
+          }
+        }
 
         const newTaskObject = {
           task_id: task.task_id,
@@ -258,7 +269,7 @@ export default function TaskDrawer(props) {
           folder_id: folderId,
           link_url: linkUrl,
           assigned_to_id: assignedToId,
-          date_completed: status === 'Complete' ? now : null,
+          date_completed: dateCompletedToSet,
           is_key_task: Number(isKeyTask),
           date_due: dateDue ? dateDue.toISOString() : null,
           date_last_updated: now,
@@ -341,7 +352,7 @@ export default function TaskDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
-      <Paper className='p0' style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
+      <Paper className='p0 minimize-btn'>
         <Tooltip title="Close">
           <IconButton onClick={handleClose}>
             <KeyboardDoubleArrowRightIcon />
@@ -466,6 +477,18 @@ export default function TaskDrawer(props) {
             label="Key task"
           />
         </Box>
+        <Box display='inline-block' mt={1}>
+          {
+            task.date_completed ?
+              <Alert severity="success" style={{ justifyContent: 'start' }}>
+                <Typography variant='caption'>
+                  Completed {moment(task.date_completed).format('LLLL')}
+                </Typography>
+              </Alert> :
+              null
+          }
+        </Box>
+
         <Divider style={{ marginTop: '2rem' }} />
         <Box my={3}>
           <TextField
@@ -645,9 +668,13 @@ export default function TaskDrawer(props) {
           </Box>
         </Box>
         <Box my={6}>
-          <Alert severity="info">
-            Last updated by {task.updated_by_first} {task.updated_by_last} on
-            &nbsp;{new Date(task.date_last_updated).toLocaleString()}
+          <Alert severity="info" style={{ justifyContent: 'start' }}>
+            <Typography variant='body2'>
+              Last updated by <strong>{task.updated_by_first} {task.updated_by_last}</strong> on &ndash;
+            </Typography>
+            <Typography variant='body2'>
+              {moment(task.date_last_updated).format('LLLL')}
+            </Typography>
           </Alert>
         </Box>
       </DialogContent>

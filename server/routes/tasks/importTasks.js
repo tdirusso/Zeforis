@@ -131,13 +131,14 @@ module.exports = async (req, res, next) => {
           url,
           Number(isKeyTask),
           creatorUserId,
-          creatorUserId
+          creatorUserId,
+          status === 'Complete' ? 'CURRENT_TIMESTAMP' : null
         ]);
       }
     });
 
     const insertResult = await connection.query(
-      `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id)
+      `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed)
        VALUES ?`,
       [taskInsertVals]
     );
@@ -181,6 +182,7 @@ module.exports = async (req, res, next) => {
 
   } catch (error) {
     await connection.rollback();
+
     connection.release();
     next(error);
   }

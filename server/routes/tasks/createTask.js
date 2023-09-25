@@ -54,10 +54,11 @@ module.exports = async (req, res, next) => {
           created_by_id,
           is_key_task,
           date_due, 
-          last_updated_by_id
+          last_updated_by_id,
+          date_completed
         ) 
         VALUES
-        (?,?,?,?,?,?,?,?,?,?)`,
+        (?,?,?,?,?,?,?,?,?,?, ${status === 'Complete' ? 'CURRENT_TIMESTAMP' : 'NULL'})`,
       [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dateDue, creatorUserId]
     );
 
