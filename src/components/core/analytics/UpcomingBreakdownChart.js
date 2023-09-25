@@ -25,6 +25,7 @@ export default function UpcomingBreakdownChart(props) {
   const options = {
     plotOptions: {
       bar: {
+        borderRadius: 7,
         horizontal: true,
         dataLabels: {
           total: {
@@ -34,7 +35,6 @@ export default function UpcomingBreakdownChart(props) {
               fontWeight: 400
             }
           },
-          position: 'center'
         }
       }
     },
@@ -84,7 +84,6 @@ export default function UpcomingBreakdownChart(props) {
   options.colors = org.brandColor;
 
   useEffect(() => {
-
     if (statusColors && statusCount) {
       apexchart.exec('upcoming-breakdown', 'updateOptions', {
         labels: Object.keys(statusCount),
