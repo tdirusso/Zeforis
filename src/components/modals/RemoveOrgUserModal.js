@@ -4,7 +4,7 @@ import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeUser } from '../../api/engagements';
+import { removeOrgUser } from '../../api/users';
 import { DialogTitle, Typography } from '@mui/material';
 
 export default function RemoveOrgUserModal(props) {
@@ -30,7 +30,7 @@ export default function RemoveOrgUserModal(props) {
     setLoading(true);
 
     try {
-      const result = await removeUser({
+      const result = await removeOrgUser({
         orgId,
         userId
       });
@@ -48,7 +48,7 @@ export default function RemoveOrgUserModal(props) {
           }
         });
         setTasks(tasksClone);
-        
+
         openSnackBar('Successully removed.', 'success');
         handleClose();
       } else {

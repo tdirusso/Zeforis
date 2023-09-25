@@ -48,18 +48,6 @@ const inviteEngagementUsers = async (payload) => {
   return data;
 };
 
-const removeEngagementUser = async (payload) => {
-  const { data } = await request.delete(`users/removeEngagementUser`, { data: payload });
-
-  return data;
-};
-
-const removeUser = async (payload) => {
-  const { data } = await request.delete(`users`, { data: payload });
-
-  return data;
-};
-
 const getEngagementData = async (engagementId, orgId) => {
   const { data } = await request.get(`engagements?engagementId=${engagementId}&orgId=${orgId}`);
 
@@ -71,7 +59,6 @@ const deleteEngagement = async (payload) => {
 
   return data;
 };
-
 
 const leaveEngagement = async (payload) => {
   const { data } = await request.delete(`engagements/leave`, { data: payload });
@@ -88,9 +75,7 @@ export {
   getUserEngagementsForOrg,
   deleteActiveEngagementId,
   inviteEngagementUsers,
-  removeEngagementUser,
   getEngagementData,
   deleteEngagement,
-  removeUser,
   leaveEngagement
 };

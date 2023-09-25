@@ -136,7 +136,7 @@ const boot = async () => {
   app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
   app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUsers);
   app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
-  app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
+  app.delete('/api/users/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
   app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
   app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
   app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);

@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { removeEngagementUser } from "../../../../api/engagements";
+import { removeEngagementUser } from "../../../../api/users";
 
 export default function UsersTab() {
 

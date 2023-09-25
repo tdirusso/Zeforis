@@ -51,7 +51,7 @@ export default function TasksCompletedChart({ series, theme }) {
       enabled: false
     },
     fill: {
-      opacity: 0.9
+      opacity: 0.85
     },
     noData: {
       text: "Loading...",
