@@ -15,7 +15,7 @@ const appLimits = {
 
 const pricePerAdminMonthly = 7.50;
 
-const stripeCustomerPortalUrl = 'https://billing.stripe.com/p/login/test_9AQ29haPEen8f7iaEE';
+const stripeCustomerPortalUrl = process.env.REACT_APP_STRIPE_CUSTOMER_PORTAL_URL;
 
 const isMobile = Boolean(
   navigator.userAgent.match(/Android/i)
