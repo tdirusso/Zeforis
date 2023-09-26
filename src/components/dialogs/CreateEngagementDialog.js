@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, Divider, Fade, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createEngagement, deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import CloseIcon from '@mui/icons-material/Close';
@@ -113,63 +113,65 @@ export default function CreateEngagementDialog(props) {
       onClose={handleClose}
       TransitionComponent={close ? toggleableTransition : fixedTransition}
       fullScreen>
-      <Box className="flex-centered" style={{ height: '100%' }}>
-        <Box textAlign="center" mb={'100px'} maxWidth={600}>
-          <IconButton
-            hidden={!close}
-            size='large'
-            onClick={handleClose}
-            style={{
-              position: 'absolute',
-              left: '100px',
-              top: '30px'
-            }}>
-            <CloseIcon />
-          </IconButton>
-          <Button
-            startIcon={<SwapHorizOutlined />}
-            onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
-            style={{ position: 'absolute', right: '100px', top: '30px' }}
-            variant='contained'>
-            Change org
-          </Button>
-          {pageIcon}
-          <Box>
-            <Box component="h2" mb={1} mt={2}>
-              Create an Engagement
-            </Box>
-            <Divider className='my3' />
-            <Typography>
-              An engagement is a project with one of your customers/clients.
-            </Typography>
-            <Typography mt={1}>
-              The engagement name should be the company name for the customer you're engaging with, or just a simple project name.
-            </Typography>
-          </Box>
-          <form onSubmit={handleCreateEngagement}>
-            <Box className='my3'>
-              <TextField
-                placeholder="Engagement Name"
-                fullWidth
-                autoFocus={!isMobile}
-                disabled={isLoading}
-                inputRef={name}>
-              </TextField>
-            </Box>
-            <LoadingButton
-              variant='contained'
-              fullWidth
+      <Fade appear in timeout={{ enter: 400 }}>
+        <Box className="flex-centered" style={{ height: '100%' }}>
+          <Box textAlign="center" mb={'100px'} maxWidth={600}>
+            <IconButton
+              hidden={!close}
               size='large'
-              type='submit'
-              loading={isLoading}>
-              Create Engagement
-            </LoadingButton>
-          </form>
-          <Box>
-            <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+              onClick={handleClose}
+              style={{
+                position: 'absolute',
+                left: '100px',
+                top: '30px'
+              }}>
+              <CloseIcon />
+            </IconButton>
+            <Button
+              startIcon={<SwapHorizOutlined />}
+              onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
+              style={{ position: 'absolute', right: '100px', top: '30px' }}
+              variant='contained'>
+              Change org
+            </Button>
+            {pageIcon}
+            <Box>
+              <Box component="h2" mb={1} mt={2}>
+                Create an Engagement
+              </Box>
+              <Divider className='my3' />
+              <Typography>
+                An engagement is a project with one of your customers/clients.
+              </Typography>
+              <Typography mt={1}>
+                The engagement name should be the company name for the customer you're engaging with, or just a simple project name.
+              </Typography>
+            </Box>
+            <form onSubmit={handleCreateEngagement}>
+              <Box className='my3'>
+                <TextField
+                  placeholder="Engagement Name"
+                  fullWidth
+                  autoFocus={!isMobile}
+                  disabled={isLoading}
+                  inputRef={name}>
+                </TextField>
+              </Box>
+              <LoadingButton
+                variant='contained'
+                fullWidth
+                size='large'
+                type='submit'
+                loading={isLoading}>
+                Create Engagement
+              </LoadingButton>
+            </form>
+            <Box>
+              <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+            </Box>
           </Box>
         </Box>
-      </Box>
+      </Fade>
 
       <Menu
         PaperProps={{ style: { minWidth: 200 } }}

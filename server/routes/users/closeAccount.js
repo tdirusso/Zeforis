@@ -25,9 +25,9 @@ module.exports = async (req, res, next) => {
       if (subscription) {
         await stripe.subscriptions.cancel(subscription.id, {
           cancellation_details: {
-            comment: 'Canceled due to account closure.',
-            prorate: false
-          }
+            comment: 'Canceled due to account closure.'
+          },
+          prorate: false
         });
       }
     }

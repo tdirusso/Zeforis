@@ -1,5 +1,9 @@
 const isDev = process.env.NODE_ENV !== 'production';
 
+if (isDev) {
+  require('dotenv').config({ path: __dirname + '/../.env.local' });
+}
+
 const appLimits = {
   simultaneousEmailInvites: 20,
   freePlanTasks: 200,
