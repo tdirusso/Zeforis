@@ -275,6 +275,7 @@ export default function InviteEngagementUsers(props) {
                       }
                       {...params}
                       label="Email Addresses"
+                      placeholder='"&#x23CE;" to add new'
                       InputProps={{
                         ...params.InputProps
                       }}
