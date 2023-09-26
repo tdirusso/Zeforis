@@ -29,10 +29,6 @@ export default function Dashboard() {
     }
   }, []);
 
-  const tasksSortedByDate = tasks.sort((a, b) => {
-    return new Date(a.date_due) - new Date(b.date_due);
-  }).filter(t => t.date_due);
-
   const now = new Date();
   let numTasksInProgress = 0;
   let numTasksCompleted = 0;
@@ -58,6 +54,10 @@ export default function Dashboard() {
       keyTasks.push(task);
     }
   });
+
+  const tasksSortedByDate = [...tasks].sort((a, b) => {
+    return new Date(a.date_due) - new Date(b.date_due);
+  }).filter(t => t.date_due);
 
   return (
     <>
