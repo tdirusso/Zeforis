@@ -74,9 +74,10 @@ export default function WidgetsTab() {
       });
 
       if (widget) {
-        openSnackBar('Widget created.', 'success');
         setWidgets([...widgets, widget]);
+        setSelectedWidget(widget);
         setLoading(false);
+        openSnackBar('Widget created.', 'success');
       } else {
         openSnackBar(message, 'error');
         setLoading(false);

@@ -93,7 +93,6 @@ module.exports = async (req, res, next) => {
         LEFT JOIN users as updated_by_user ON tasks.last_updated_by_id = updated_by_user.id
         WHERE tasks.folder_id IN (?)
         GROUP BY tasks.id
-        ORDER BY task_name
       `,
       [foldersIds]
     );
