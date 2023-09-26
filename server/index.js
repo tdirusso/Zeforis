@@ -58,6 +58,7 @@ const logFrontendError = require('./routes/logs/logFrontendError');
 const stripe_createSubscription = require('./routes/stripe/createSubscription');
 const dumpCache = require('./routes/cache/dumpCache');
 const clearCache = require('./routes/cache/clearCache');
+const closeAccount = require('./routes/users/closeAccount');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -146,6 +147,7 @@ const boot = async () => {
   app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
   app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
+  app.delete('/api/users', authenicatedUserRateLimit, checkAuthMW, closeAccount);
 
   app.post('/api/stripe/subscriptions', authenicatedUserRateLimit, checkOrgOwnerMW, stripe_createSubscription);
 

@@ -31,7 +31,7 @@ export default function CreateOrgPage({ setTheme }) {
 
   return (
     <Box bgcolor='white' className="flex-centered" style={{ height: '100vh' }}>
-      <Box textAlign="center" maxWidth={600} p={3}>
+      <Box textAlign="center" maxWidth={600} px={3}>
         {
           step === 1 ?
             <Step1
@@ -227,7 +227,7 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
         <Box component="header" style={{ justifyContent: 'center' }}>
           {pageIcon}
         </Box>
-        <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
+        <Paper style={{ padding: '4rem', paddingTop: '2.5rem', zIndex: 2 }} className="container">
           <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
             Apply your Brand
           </Typography>

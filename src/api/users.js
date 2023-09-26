@@ -63,6 +63,12 @@ const removeOrgUser = async (payload) => {
   return data;
 };
 
+const closeAccount = async () => {
+  const { data } = await request.delete(`users`);
+
+  return data;
+};
+
 export {
   updateProfile,
   updatePermission,
@@ -75,5 +81,6 @@ export {
   batchUpdateAccess,
   batchUpdatePermission,
   removeOrgUser,
-  removeEngagementUser
+  removeEngagementUser,
+  closeAccount
 };

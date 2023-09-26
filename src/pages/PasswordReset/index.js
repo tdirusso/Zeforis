@@ -42,7 +42,7 @@ export default function PasswordResetPage() {
           </Button>
         </a>
       </Box>
-      <Paper className="container">
+      <Paper className="container" style={{ zIndex: 2 }}>
         <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Password Reset
         </Typography>

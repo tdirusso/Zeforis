@@ -205,7 +205,7 @@ export default function AcceptInvitationPage() {
             />
           </Box>
             :
-            <Paper className="container">
+            <Paper className="container" style={{ zIndex: 2 }}>
               <Typography mb={2}>Invitation does not exist or has expired.</Typography>
               <a href='/login'>
                 <Button size="large" variant="contained">
@@ -250,7 +250,7 @@ export default function AcceptInvitationPage() {
           <CircularProgress />
         </Box>
           :
-          <Paper className="container">
+          <Paper className="container" style={{ zIndex: 2 }}>
             <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
             <Box style={{ display: 'flex', justifyContent: 'center' }}>
               <Box id="google-signin" style={{ width: 400 }}></Box>

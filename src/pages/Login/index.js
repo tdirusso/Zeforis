@@ -280,7 +280,7 @@ export default function LoginPage({ setTheme }) {
           </Button>
         </Box>
       </Box>
-      <Paper className="container">
+      <Paper className="container" style={{ zIndex: 2 }}>
         <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>
           Sign in
         </Typography>

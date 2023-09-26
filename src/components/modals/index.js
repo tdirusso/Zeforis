@@ -9,11 +9,13 @@ import './styles.scss';
 import EditSelectedTasksModal from "./EditSelectedTasksModal";
 import InviteEngagementUsers from "./InviteEngagementUsers";
 import SubscriptionPastDueModal from "./SubscriptionPastDueModal";
+import CloseAccountModal from "./CloseAccountModal";
 
 export default function Modals(props) {
   const {
     modalToOpen,
-    closeModal
+    closeModal,
+    openSnackBar
   } = props;
 
   return (
@@ -75,6 +77,12 @@ export default function Modals(props) {
       <SubscriptionPastDueModal
         isOpen={modalToOpen === 'subscription-past-due'}
         close={closeModal}
+      />
+
+      <CloseAccountModal
+        isOpen={modalToOpen === 'close-account'}
+        close={closeModal}
+        openSnackBar={openSnackBar}
       />
     </>
   );

@@ -20,7 +20,8 @@ export default function GeneralTab() {
   const {
     user,
     setUser,
-    openSnackBar
+    openSnackBar,
+    openModal
   } = useOutletContext();
 
   const firstName = useRef();
@@ -175,7 +176,7 @@ export default function GeneralTab() {
       <Box hidden={hasOrg}>
         <Box component="h4" mt='4rem'>Establish Your Own Organization</Box>
         <Box my={3}>
-          <Typography mb={2}>
+          <Typography mb={1}>
             If you'd like to create your own organization and establish a dedicated space for your engagements, team members, and collaborations, click below.
           </Typography>
           <a href="/create-org">
@@ -185,6 +186,17 @@ export default function GeneralTab() {
           </a>
         </Box>
       </Box>
+
+      <Box component="h4" mt='4rem'>Close Your Account</Box>
+      <Typography mt={1} mb={2}>
+        Notice - when you close your account, all data associated with it is immediately deleted and can't be recovered.  Any active subscription will also be canceled.
+      </Typography>
+      <Button
+        onClick={() => openModal('close-account')}
+        color="error"
+        variant="contained">
+        Close account
+      </Button>
       <Menu
         PaperProps={{ style: { maxWidth: 350 } }}
         anchorEl={changePasswordMenuAnchor}
