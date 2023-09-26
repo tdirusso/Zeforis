@@ -138,21 +138,25 @@ function FreePlanInfo({ status }) {
         Zeforis Starter (Free) &nbsp;🙂
       </Typography>
       <Typography mt={1}>
-        You are currently using the free version of Zeforis.
-        <br></br>
-        If you would like to upgrade to Zeforis Pro to take advantage of additional administrators, as well as unlimited engagements and tasks, please complete the payment form below.
+        If you would like to upgrade to Zeforis Pro to take advantage of additional administrators and unlimited engagements and tasks, please complete the payment form below.
       </Typography>
-      <Box className="free-plan-info" mt={4} hidden={status !== 'canceled'}>
-        <Alert severity="info">
-          <AlertTitle>
-            <strong>Your subscription</strong>
-          </AlertTitle>
-          <Typography>
-            It looks like your subscription has been <strong>canceled</strong>.
-            To re-activate Zeforis Pro, you must create a new subscription and pay for, at least, the number of administrators in {org.name}, which is <strong>{numOrgAdmins}</strong>.
-          </Typography>
+      <Box
+        className="free-plan-info"
+        mt={4}>
+        <Alert severity="info" style={{ display: 'inline-flex' }}>
+          {
+            status === 'canceled' ?
+              <Typography>
+                It looks like your subscription has been <strong>canceled</strong>.
+                To re-activate Zeforis Pro, you must create a new subscription and pay for, at least, the number of administrators in {org.name}, which is <strong>{numOrgAdmins}</strong>.
+              </Typography>
+              :
+              <Typography>
+                You must pay for, at least, the number of administrators in {org.name}, which is <strong>{numOrgAdmins}</strong>.
+              </Typography>
+          }
           <Typography mt={1}>
-            <Link to="../organization?members">Click here</Link> if you need to manage the number of admins in {org.name}.
+            <Link to="../organization?members">Click here</Link> if you need to manage the number of admins in {org.name} before subscribing.
           </Typography>
 
         </Alert>
