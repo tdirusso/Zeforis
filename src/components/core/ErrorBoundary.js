@@ -44,50 +44,52 @@ export class ErrorBoundary extends Component {
 function DefaultErrorFallback({ error }) {
   return (
     <Box
+      bgcolor='white'
       padding={2}
       textAlign="center"
-      margin="0 auto"
-      maxWidth={650}
       className="flex-centered"
       height='100vh'
       flexDirection="column">
-      <Box>
-        <ErrorOutlineIcon style={{ fontSize: '5rem' }} color="error" />
+      <Box maxWidth={650} margin="0 auto">
+        <Box>
+          <ErrorOutlineIcon style={{ fontSize: '5rem' }} color="error" />
+        </Box>
+        <Box mt={2}>
+          <Box component="h1">Something went wrong</Box>
+        </Box>
+        <Box mt={2}>
+          <Typography fontSize="1.25rem">
+            The issue has been logged for investigation.
+          </Typography>
+        </Box>
+        <Box mt={1}>
+          <Typography fontSize="1.1rem">
+            Click below to either refresh the page or return to the login page.
+            <br></br>
+            If you continue to see this message, please
+            <a
+              href={`mailto:info@zeforis.com?subject=Error using Zeforis Application&body=I encountered the following error: %0D%0A%0D%0A${error.stack}`}> click here </a>
+            to contact us.
+          </Typography>
+        </Box>
+        <Box mt={2.5}>
+          <Button
+            onClick={() => window.location.reload()}
+            size="large"
+            variant="contained">
+            Refresh page
+          </Button>
+        </Box>
+        <Box mt={2}>
+          <Button
+            variant="outlined"
+            onClick={() => window.location.href = '/login'}
+            size="large">
+            Return to login
+          </Button>
+        </Box>
+        <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }}></Watermark>
       </Box>
-      <Box mt={2}>
-        <Box component="h1">Something went wrong</Box>
-      </Box>
-      <Box mt={2}>
-        <Typography fontSize="1.25rem">
-          The issue has been logged for investigation.
-        </Typography>
-      </Box>
-      <Box mt={1}>
-        <Typography fontSize="1.1rem">
-          Click one of the buttons below to either refresh the page or return to the login page.
-          If you continue to see this message, please
-          <a
-            href={`mailto:info@zeforis.com?subject=Error using Zeforis Application&body=I encountered the following error: %0D%0A%0D%0A${error.stack}`}> click here </a>
-          to contact us.
-        </Typography>
-      </Box>
-      <Box mt={2.5}>
-        <Button
-          onClick={() => window.location.reload()}
-          size="large"
-          variant="contained">
-          Refresh page
-        </Button>
-      </Box>
-      <Box mt={2}>
-        <Button
-          variant="outlined"
-          onClick={() => window.location.href = '/login'}
-          size="large">
-          Return to login
-        </Button>
-      </Box>
-      <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }}></Watermark>
     </Box>
   );
 }

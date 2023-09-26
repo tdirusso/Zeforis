@@ -26,6 +26,7 @@ import TasksFilter from "./TasksFilter";
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -136,8 +137,6 @@ export default function TasksTable({ tasks }) {
         filterKeyTasks={filterKeyTasks}
         filterStatus={filterStatus}
         filterFolder={filterFolder}
-        setSortBy={setSortBy}
-        sortBy={sortBy}
         filterName={filterName}
         filterAssignedTo={filterAssignedTo}
         filterTags={filterTags}
@@ -215,10 +214,41 @@ export default function TasksTable({ tasks }) {
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
-                <TableCell style={{ width: '350px' }}>Name</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Folder</TableCell>
-                <TableCell>Due</TableCell>
+                <TableCell style={{ width: '350px' }} onClick={() => setSortBy('name')}>
+                  <Box className="flex-ac">
+                    Name <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </TableCell>
+                <TableCell onClick={() => setSortBy('status')}>
+                  <Box className="flex-ac">
+                    Status <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </TableCell>
+                <TableCell onClick={() => setSortBy('folder')}>
+                  <Box className="flex-ac">
+                    Folder <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </TableCell>
+                <TableCell onClick={() => setSortBy('dateDue')}>
+                  <Box className="flex-ac">
+                    Due <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box></TableCell>
                 <TableCell style={{ width: '175px' }}>Tags</TableCell>
                 <TableCell style={{ width: '30px' }}></TableCell>
               </TableRow>

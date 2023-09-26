@@ -248,14 +248,12 @@ export default function Home({ setTheme }) {
       return;
     } else {
       return (
-        <Box className="flex-centered" style={{ height: '100vh' }}>
-          <ChooseOrgScreen
-            open={true}
-            setOpen={() => { }}
-            orgs={user.memberOfOrgs}
-            user={user}
-          />
-        </Box>
+        <ChooseOrgScreen
+          open={true}
+          setOpen={() => { }}
+          orgs={user.memberOfOrgs}
+          user={user}
+        />
       );
     }
   }

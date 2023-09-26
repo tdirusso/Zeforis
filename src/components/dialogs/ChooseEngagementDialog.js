@@ -147,10 +147,7 @@ export default function ChooseEngagementDialog(props) {
                 Change org
               </Button>
             </Box>
-            <Box className='m0a' style={{ width: '85%' }}>
-              <Divider className='my3' />
-            </Box>
-            <Box m='0 auto' width={300}>
+            <Box m='0 auto' width={300} mt={4} mb={3}>
               <TextField
                 variant='standard'
                 size='small'
