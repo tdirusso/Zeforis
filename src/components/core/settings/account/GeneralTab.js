@@ -27,6 +27,8 @@ export default function GeneralTab() {
   const lastName = useRef();
   const email = useRef();
 
+  const hasOrg = user.memberOfOrgs.some(org => org.ownerId === user.id);
+
   const handleProfileUpdate = async () => {
     const firstNameVal = firstName.current.value;
     const lastNameVal = lastName.current.value;
@@ -97,7 +99,7 @@ export default function GeneralTab() {
   return (
     <>
       <Box component="h4" mt='1rem'>Personal</Box>
-      <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+      <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }} mt={3}>
         <Box maxWidth={450} flex={1} minWidth={250}>
           <TextField
             fullWidth
@@ -170,7 +172,19 @@ export default function GeneralTab() {
           </Button>
         </Box>
       </Box>
-
+      <Box hidden={hasOrg}>
+        <Box component="h4" mt='4rem'>Establish Your Own Organization</Box>
+        <Box my={3}>
+          <Typography mb={2}>
+            If you'd like to create your own organization and establish a dedicated space for your engagements, team members, and collaborations, click below.
+          </Typography>
+          <a href="/create-org">
+            <Button variant="contained">
+              Create an organization
+            </Button>
+          </a>
+        </Box>
+      </Box>
       <Menu
         PaperProps={{ style: { maxWidth: 350 } }}
         anchorEl={changePasswordMenuAnchor}

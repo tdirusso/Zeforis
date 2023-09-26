@@ -32,7 +32,7 @@ export default function OrgTab() {
           <Tab label="General" />
           <Tab hidden={!isOrgOwner} label="Manage Members" />
         </Tabs>
-        <Box p={2}>
+        <Box p='2rem'>
           {
             getTabContent()
           }
