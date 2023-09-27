@@ -17,7 +17,9 @@ import AlertTitle from "@mui/material/AlertTitle/AlertTitle";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
 
-export default function BillingTab({ isPaymentSuccess }) {
+export default function Billing() {
+  const isPaymentSuccess = window.location.search.includes('isPaymentSuccess');
+
   const {
     user
   } = useOutletContext();
@@ -130,11 +132,10 @@ function FreePlanInfo({ status }) {
 
   return (
     <Box>
-      <Box component="h3">
+      <Box component="h4">
         Your Plan
       </Box>
-      <Divider className="my2" />
-      <Typography fontSize='1.25rem' fontWeight={300}>
+      <Typography fontSize='1.25rem' fontWeight={300} mt={3}>
         Zeforis Starter (Free) &nbsp;🙂
       </Typography>
       <Typography mt={1}>
@@ -156,7 +157,7 @@ function FreePlanInfo({ status }) {
               </Typography>
           }
           <Typography mt={1}>
-            <Link to="../organization?members">Click here</Link> if you need to manage the number of admins in {org.name} before subscribing.
+            <Link to="../../organization/members">Click here</Link> if you need to manage the number of admins in {org.name} before subscribing.
           </Typography>
 
         </Alert>
@@ -307,7 +308,7 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
           elements,
           clientSecret,
           confirmParams: {
-            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings/account?isPaymentSuccess=true`,
+            return_url: `${process.env.REACT_APP_APP_DOMAIN}/home/settings/account/billing?isPaymentSuccess=true`,
           },
           redirect: 'always'
         });

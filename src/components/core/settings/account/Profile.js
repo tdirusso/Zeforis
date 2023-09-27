@@ -10,7 +10,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import LockResetRoundedIcon from '@mui/icons-material/LockResetRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
-export default function GeneralTab() {
+export default function Profile() {
   const [isUpdatingName, setUpdatingName] = useState(false);
   const [isSendingResetLink, setSendingResetLink] = useState(false);
   const [changePasswordMenuAnchor, setChangePasswordMenuAnchor] = useState(null);
@@ -99,7 +99,7 @@ export default function GeneralTab() {
 
   return (
     <>
-      <Box component="h4" mt='1rem'>Personal</Box>
+      <Box component="h4">Personal</Box>
       <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }} mt={3}>
         <Box maxWidth={450} flex={1} minWidth={250}>
           <TextField

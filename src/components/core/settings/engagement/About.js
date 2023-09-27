@@ -6,7 +6,7 @@ import { useOutletContext } from "react-router";
 import { deleteActiveEngagementId, leaveEngagement, updateEngagement } from "../../../../api/engagements";
 import LogoutIcon from '@mui/icons-material/Logout';
 
-export default function GeneralTab() {
+export default function About() {
   const {
     engagement,
     openDialog,
@@ -85,7 +85,7 @@ export default function GeneralTab() {
 
   return (
     <>
-      <Box mt={4}>
+      <Box>
         <TextField
           fullWidth
           value={engagementName}

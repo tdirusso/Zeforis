@@ -391,7 +391,7 @@ function AdminGettingStartedDrawer(props) {
         (Settings &rarr; Engagement &rarr; Members).
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/settings" component="a">Go to engagement settings &rarr;</Link>
+        <Link to="/home/settings/engagement/collaborators" component="a">Go to engagement settings &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From this page, click the
@@ -431,7 +431,7 @@ function AdminGettingStartedDrawer(props) {
         These customizations can be done from Settings &rarr; Organization &rarr; Branding.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/settings/organization" component="a">Go to branding settings &rarr;</Link>
+        <Link to="/home/settings/organization/about" component="a">Go to branding settings &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         The "Custom Login Page" feature provides your customers with a custom login experience by incorporating your branding into the login page, delivering a professional touch while

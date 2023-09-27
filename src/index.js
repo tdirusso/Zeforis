@@ -13,7 +13,7 @@ import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
 import AcceptInvitationPage from './pages/AcceptInvitation';
 import DashboardPage from './pages/Home/Dashboard';
-import SettingsPage from './pages/Home/Settings';
+import SettingsPage, { SettingsSection } from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders';
 import TasksPage from './pages/Home/Tasks';
 import ToolsPage from './pages/Home/Tools';
@@ -23,9 +23,13 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 import CreateOrgPage from './pages/CreateOrg';
 import { ErrorBoundary } from './components/core/ErrorBoundary';
-import EngagementTab from './components/core/settings/engagement';
-import OrgTab from './components/core/settings/org';
-import AccountTab from './components/core/settings/account';
+import Collaborators from './components/core/settings/engagement/Collaborators';
+import Tags from './components/core/settings/engagement/Tags';
+import About from './components/core/settings/engagement/About';
+import AboutOrg from './components/core/settings/org/About';
+import Members from './components/core/settings/org/Members';
+import Profile from './components/core/settings/account/Profile';
+import Billing from './components/core/settings/account/Billing';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -50,12 +54,24 @@ function App() {
               <Route path="folders" element={<FoldersPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="tools" element={<ToolsPage />} />
+
               <Route path="settings" element={<SettingsPage />}>
-                <Route path="engagement" element={<EngagementTab />} />
-                <Route path="organization" element={<OrgTab />} />
-                <Route path="account" element={<AccountTab />} />
-                <Route path="*" element={<Navigate to="engagement" />} />
+                <Route path="engagement" element={<SettingsSection />}>
+                  <Route path="collaborators" element={<Collaborators />} />
+                  <Route path="tags" element={<Tags />} />
+                  <Route path="about" element={<About />} />
+                </Route>
+                <Route path="organization" element={<SettingsSection />}>
+                  <Route path="members" element={<Members />} />
+                  <Route path="about" element={<AboutOrg />} />
+                </Route>
+                <Route path="account" element={<SettingsSection />}>
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="billing" element={<Billing />} />
+                </Route>
+                <Route path="*" element={<Navigate to="engagement/collaborators" />} />
               </Route>
+
             </Route>
 
             <Route path="*" element={<Navigate to="login" />} />

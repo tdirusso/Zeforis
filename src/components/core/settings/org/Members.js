@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import React from "react";
 
-export default function UsersTab() {
+export default function Members() {
 
   const {
     user,
@@ -40,7 +40,7 @@ export default function UsersTab() {
 
   return (
     <>
-      <Box mt={4}>
+      <Box>
         <Box component="h4" ml={1.75} mb={1}>
           All members of {org.name}
         </Box>

@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
 import { removeEngagementUser } from "../../../../api/users";
 
-export default function UsersTab() {
+export default function Collaborators() {
 
   const {
     engagement,
@@ -89,7 +89,7 @@ export default function UsersTab() {
 
   return (
     <>
-      <Box mt={3} component="h4">Collaborators in {engagement.name}</Box>
+      <Box component="h4">Collaborators in {engagement.name}</Box>
       <Box mt={3}>
         <Box className="flex-ac" mb='2rem' hidden={!isOrgOwner}>
           <Button
@@ -99,7 +99,7 @@ export default function UsersTab() {
             Add collaborators
           </Button>
           <Typography variant="body2" ml={3} hidden={engagementAdmins.length + engagementMembers.length === 1}>
-            <Link to="../organization?members">Manage permissions &rarr;</Link>
+            <Link to="../../organization/members">Manage permissions &rarr;</Link>
           </Typography>
         </Box>
         <Box>

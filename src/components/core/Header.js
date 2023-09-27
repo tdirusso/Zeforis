@@ -65,7 +65,7 @@ export default function Header(props) {
 
   const openSettings = () => {
     setAnchorEl(null);
-    navigate('/home/settings');
+    navigate('/home/settings/engagement/collaborators');
   };
 
   const openChangeOrgOrEngagement = () => {
@@ -215,7 +215,7 @@ export default function Header(props) {
                   bottom: '-27px'
                 }}>
                 <Box>
-                  <Link to='settings/account?plan' onClick={handleMenuClose}>
+                  <Link to='settings/account/billing' onClick={handleMenuClose}>
                     <Button size="small" variant="contained">Upgrade now</Button>
                   </Link>
                 </Box>

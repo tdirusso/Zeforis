@@ -14,7 +14,7 @@ import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { deleteActiveEngagementId } from "../../../../api/engagements";
 
-export default function GeneralTab() {
+export default function About() {
   const {
     openDialog,
     openSnackBar,
@@ -175,7 +175,7 @@ export default function GeneralTab() {
 
   return (
     <>
-      <Box mt={4}>
+      <Box>
         <TextField
           fullWidth
           value={orgName}

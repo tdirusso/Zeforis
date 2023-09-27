@@ -6,7 +6,7 @@ import { LoadingButton } from "@mui/lab";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { isMobile } from "../../../../lib/constants";
 
-export default function TagsTab() {
+export default function Tags() {
 
   const {
     engagement,
@@ -163,7 +163,7 @@ export default function TagsTab() {
 
   return (
     <>
-      <Box mt={3} component="h4">{engagement.name} Tags</Box>
+      <Box component="h4">{engagement.name} Tags</Box>
       <Box mt={3}>
         <Box mb={3}>
           <Chip
