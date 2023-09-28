@@ -480,7 +480,7 @@ export default function TaskDrawer(props) {
         <Box display='inline-block' mt={1}>
           {
             task.date_completed ?
-              <Alert severity="success" style={{ justifyContent: 'start' }}>
+              <Alert severity="success">
                 <Typography variant='caption'>
                   Completed {moment(task.date_completed).format('LLLL')}
                 </Typography>
@@ -668,7 +668,7 @@ export default function TaskDrawer(props) {
           </Box>
         </Box>
         <Box my={6}>
-          <Alert severity="info" style={{ justifyContent: 'start' }}>
+          <Alert severity="info">
             <Typography variant='body2'>
               Last updated by <strong>{task.updated_by_first} {task.updated_by_last}</strong> on &ndash;
             </Typography>

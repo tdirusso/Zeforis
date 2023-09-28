@@ -18,6 +18,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import CheckIcon from '@mui/icons-material/Check';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateTaskDrawer(props) {
   const {
@@ -40,6 +41,8 @@ export default function CreateTaskDrawer(props) {
   const name = useRef();
   const description = useRef();
   const linkUrl = useRef();
+
+  const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -100,7 +103,7 @@ export default function CreateTaskDrawer(props) {
     setLoading(true);
 
     try {
-      const { message, task } = await createTask({
+      const { message, task, uiProps } = await createTask({
         name: nameVal,
         linkUrl: linkVal,
         description: descriptionVal,
@@ -142,7 +145,17 @@ export default function CreateTaskDrawer(props) {
         openSnackBar('Task created.', 'success');
         handleClose();
       } else {
-        openSnackBar(message, 'error');
+        if (uiProps && uiProps.alertType === 'upgrade') {
+          openSnackBar(message, 'error', {
+            actionName: 'Upgrade Now',
+            actionHandler: () => {
+              handleClose();
+              navigate('settings/account/billing');
+            }
+          });
+        } else {
+          openSnackBar(message, 'error');
+        }
         setLoading(false);
       }
     } catch (error) {

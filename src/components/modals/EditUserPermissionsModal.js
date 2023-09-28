@@ -11,6 +11,7 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import HelpIcon from '@mui/icons-material/Help';
 import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate } from 'react-router-dom';
 
 export default function EditUserPermissionsModal(props) {
   const {
@@ -23,6 +24,8 @@ export default function EditUserPermissionsModal(props) {
     openSnackBar,
     org
   } = props;
+
+  const navigate = useNavigate();
 
   const isSmallScreen = useMediaQuery('(max-width: 800px)');
 
@@ -49,7 +52,7 @@ export default function EditUserPermissionsModal(props) {
     const engagementName = engagementObject.name;
 
     try {
-      const { success, message } = await updatePermission({
+      const { success, message, uiProps } = await updatePermission({
         isAdmin,
         engagementId,
         userId: user.id,
@@ -75,7 +78,17 @@ export default function EditUserPermissionsModal(props) {
         setLoading(false);
         openSnackBar('Permission updated.', 'success');
       } else {
-        openSnackBar(message, 'error');
+        if (uiProps && uiProps.alertType === 'upgrade') {
+          openSnackBar(message, 'error', {
+            actionName: 'Upgrade now',
+            actionHandler: () => {
+              handleClose();
+              navigate('settings/account/billing');
+            }
+          });
+        } else {
+          openSnackBar(message, 'error');
+        }
         setLoading(false);
       }
     } catch (error) {
@@ -123,7 +136,10 @@ export default function EditUserPermissionsModal(props) {
   };
 
   const handleClose = () => {
+    setBulkAccessMenu(false);
+    setBulkAdminMenu(false);
     close();
+
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -178,7 +194,7 @@ export default function EditUserPermissionsModal(props) {
     }
 
     try {
-      const { success, message } = await batchUpdatePermission({
+      const { success, message, uiProps } = await batchUpdatePermission({
         isAdmin,
         userId: user.id,
         orgId: org.id
@@ -199,7 +215,17 @@ export default function EditUserPermissionsModal(props) {
         setBulkAdminMenu(null);
         openSnackBar('Permissions updated.', 'success');
       } else {
-        openSnackBar(message, 'error');
+        if (uiProps && uiProps.alertType === 'upgrade') {
+          openSnackBar(message, 'error', {
+            actionName: 'Upgrade now',
+            actionHandler: () => {
+              handleClose();
+              navigate('settings/account/billing');
+            }
+          });
+        } else {
+          openSnackBar(message, 'error');
+        }
         setEnablingAdmin(false);
         setDisablingAdmin(false);
       }

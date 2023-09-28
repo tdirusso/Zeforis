@@ -29,7 +29,12 @@ module.exports = async (req, res, next) => {
     const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
     if (isAdmin && orgOwnerPlan === 'free') {
-      return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
+      return res.json({
+        message: 'Cannot add more administrators.',
+        uiProps: {
+          alertType: 'upgrade'
+        }
+      });
     }
 
     const [allOrgEngagementsResult] = await connection.query(

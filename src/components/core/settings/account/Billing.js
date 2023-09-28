@@ -58,7 +58,7 @@ function ProPlanInfo({ status }) {
       </Box>
       <Divider className="my2" />
       <Box mb={3} maxWidth={400} hidden={status !== 'past_due'}>
-        <Alert severity="warning" style={{ justifyContent: 'start' }}>
+        <Alert severity="warning">
           Your subscription is past due.
         </Alert>
       </Box>

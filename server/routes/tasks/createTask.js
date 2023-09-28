@@ -37,7 +37,10 @@ module.exports = async (req, res, next) => {
 
       if (orgTaskCount >= appLimits.freePlanTasks) {
         return res.json({
-          message: `Task limit of ${appLimits.freePlanTasks} has been reached.  Upgrade now for unlimited tasks.`
+          message: `Task limit of ${appLimits.freePlanTasks} has been reached.`,
+          uiProps: {
+            alertType: 'upgrade'
+          }
         });
       }
     }

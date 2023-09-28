@@ -56,7 +56,8 @@ export default function Home({ setTheme }) {
     isOpen,
     openSnackBar,
     type,
-    message
+    message,
+    snackBarProps
   } = useSnackbar();
 
   const {
@@ -395,6 +396,7 @@ export default function Home({ setTheme }) {
         isOpen={isOpen}
         type={type}
         message={message}
+        snackBarProps={snackBarProps}
       />
     </Box>
   );

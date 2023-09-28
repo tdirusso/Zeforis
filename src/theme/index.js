@@ -10,13 +10,6 @@ const theme = {
     fontFamily: 'Inter',
   },
   components: {
-    MuiAlert: {
-      styleOverrides: {
-        root: {
-          justifyContent: 'center',
-        }
-      }
-    },
     MuiTooltip: {
       defaultProps: {
         arrow: false,

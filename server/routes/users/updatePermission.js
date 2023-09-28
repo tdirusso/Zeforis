@@ -11,7 +11,12 @@ module.exports = async (req, res, next) => {
   const { userObject, ownedOrg } = req;
 
   if (isAdmin && userObject.plan === 'free') {
-    return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
+    return res.json({
+      message: 'Cannot add more administrators.',
+      uiProps: {
+        alertType: 'upgrade'
+      }
+    });
   }
 
   if (!userId || !engagementId) {
