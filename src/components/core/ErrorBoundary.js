@@ -5,7 +5,6 @@ import Watermark from "./Watermark";
 import { logFrontendError } from "../../api/logs";
 
 export class ErrorBoundary extends Component {
-
   constructor(props) {
     super(props);
     this.state = {

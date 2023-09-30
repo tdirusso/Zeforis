@@ -120,7 +120,7 @@ export default function TaskDrawer(props) {
       setName(taskProp.task_name);
       setDescription(taskProp.description);
       setLinkUrl(taskProp.link_url);
-      setDateDue(taskProp.date_due ? new Date(taskProp.date_due) : null);
+      setDateDue(taskProp.date_due ? moment(taskProp.date_due) : null);
       setIsKeyTask(Boolean(taskProp.is_key_task));
       setFolder(foldersMap[taskProp.folder_id] || null);
       setStatus(taskProp.status);
