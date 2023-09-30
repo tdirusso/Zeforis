@@ -18,7 +18,7 @@ const theme = {
     MuiMenu: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
           padding: '0 !important'
         }
       },
@@ -30,7 +30,7 @@ const theme = {
     MuiAutocomplete: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
           padding: '0 !important'
         }
       }
@@ -38,7 +38,7 @@ const theme = {
     MuiPickersPopper: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
           padding: '0 !important'
         }
       }
@@ -46,7 +46,7 @@ const theme = {
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px',
           borderRadius: '24px',
           padding: '24px'
         }

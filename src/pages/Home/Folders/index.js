@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
-import './styles.css';
+import './styles.scss';
 import FolderIcon from '@mui/icons-material/Folder';
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
