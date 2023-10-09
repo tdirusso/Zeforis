@@ -99,7 +99,7 @@ module.exports = async (req, res, next) => {
 
     if (newEmails.length) {
       const [newUsersResult] = await connection.query(
-        'INSERT INTO users (email) VALUES (?)',
+        'INSERT INTO users (email) VALUES ?',
         [newEmails]
       );
 
@@ -163,7 +163,7 @@ module.exports = async (req, res, next) => {
 
       if (!success) {
         await connection.rollback();
-  
+
         connection.release();
         return res.json({ message });
       }
