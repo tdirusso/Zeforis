@@ -5,7 +5,7 @@ const slackbot = require('../../slackbot');
 const { isDev } = require('../../config');
 
 module.exports = async (error, __, res, _) => {
-  if (!(error instanceof TokenExpiredError || error.message?.contains('Range Not Satisfiable'))) {
+  if (!(error instanceof TokenExpiredError || error.message?.includes('Range Not Satisfiable'))) {
     console.error('Application error:  ', error);
 
     if (!isDev) {
