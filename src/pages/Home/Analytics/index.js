@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import TasksCompletedChart from "../../../components/core/analytics/TasksCompletedChart";
 import StatusBreakdownChart from "../../../components/core/analytics/StatusBreakdownChart";
 import UpcomingBreakdownChart from "../../../components/core/analytics/UpcomingBreakdownChart";
+import TaskStats from "../../../components/core/dashboard/TaskStats";
 
 const statusColors = statuses.map(({ color }) => color);
 
@@ -49,6 +50,11 @@ export default function AnalyticsPage() {
   let completed2WeeksAgo = 0;
   let completed1WeeksAgo = 0;
   let completedThisWeek = 0;
+
+  let numTasksInProgress = 0;
+  let numTasksCompleted = 0;
+  let numTasksPastDue = 0;
+
   const statusCount = {};
 
   useEffect(() => {
@@ -64,7 +70,21 @@ export default function AnalyticsPage() {
       };
     });
 
+    const now = new Date();
+
     tasks.forEach(task => {
+      const dateDue = task.date_due ? new Date(task.date_due) : null;
+
+      if (task.status === 'In Progress') {
+        numTasksInProgress++;
+      } else if (task.status === 'Complete') {
+        console.log('yes', numTasksCompleted);
+        numTasksCompleted++;
+      }
+
+      if (dateDue && (dateDue < now && task.status !== 'Complete')) {
+        numTasksPastDue++;
+      }
       statusCount[task.status].total++;
       if (task.status === 'Complete' && task.date_completed) {
         const dateCompleted = moment(task.date_completed);
@@ -115,6 +135,10 @@ export default function AnalyticsPage() {
 
   return (
     <>
+      <TaskStats
+        numComplete={numTasksCompleted}
+        numPastDue={numTasksPastDue}
+        numInProgress={numTasksInProgress} />
       <AnalyticsCharts
         analyticsData={analyticsData}
       />
@@ -140,6 +164,7 @@ function AnalyticsCharts(props) {
 
   return (
     <>
+
       <Grid item xs={12} md={6}>
         <Paper>
           <Box

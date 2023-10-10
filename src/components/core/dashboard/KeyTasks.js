@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip, useMediaQuery, useTheme, Divider } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -17,14 +17,13 @@ export default function KeyTasks({ tasks }) {
         <Box
           display="flex"
           alignItems="center"
-          mb={1}
+          //  mb={0.5}
           justifyContent="space-between">
           <Box
             component="h5"
             display="flex"
             alignItems="center">
             <StarIcon
-              fontSize="small"
               htmlColor="gold"
               style={{ marginRight: '5px' }}
             />
@@ -36,6 +35,7 @@ export default function KeyTasks({ tasks }) {
             View All
           </Button>
         </Box>
+        <Divider style={{ margin: '3px 6px 8px 6px' }} />
         {
           tasksLength > 0 ?
             <KeyTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
@@ -84,11 +84,9 @@ function KeyTaskRow({ task, buttonColor }) {
       display="flex"
       alignItems="center"
       gap={1}
-      mb={0.25}
       px={1}
-      py={0.5}
-      minHeight={50}
-      borderRadius='8px'
+      py={0.4}
+      borderRadius='6px'
       key={task.task_id}
       onClick={() => openDrawer('task', { taskProp: task })}
       justifyContent="space-between">
@@ -108,7 +106,7 @@ function KeyTaskRow({ task, buttonColor }) {
           task.link_url ?
             <Tooltip title="Open Link">
               <IconButton
-              component="div"
+                component="div"
                 disabled={!task.link_url}
                 onClick={e => {
                   e.stopPropagation();

@@ -61,14 +61,14 @@ export default function Dashboard() {
 
   return (
     <>
-      <KeyTasks tasks={keyTasks.slice(0, 5)} />
-      <UpcomingTasks tasks={tasksSortedByDate.slice(0, 5)} />
+      <KeyTasks tasks={keyTasks.slice(0, 10)} />
+      <UpcomingTasks tasks={tasksSortedByDate.slice(0, 8)} />
       <CustomWidgets widgets={widgets} />
-      <TaskStats
+      {/* <TaskStats
         numComplete={numTasksCompleted}
         numPastDue={numTasksPastDue}
         numInProgress={numTasksInProgress}
-      />
+      /> */}
       {
         keyFolders.length > 0 ?
           <KeyFolders folders={keyFolders} /> :
