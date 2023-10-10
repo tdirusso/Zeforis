@@ -31,6 +31,10 @@
 }
 
 .action-menu {
+  .MuiList-root {
+    padding: 6px 0;
+  }
+
   .MuiMenuItem-root {
     padding: 2px 15px;
   }

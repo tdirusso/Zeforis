@@ -10,6 +10,7 @@ import EditSelectedTasksModal from "./EditSelectedTasksModal";
 import InviteEngagementUsers from "./InviteEngagementUsers";
 import SubscriptionPastDueModal from "./SubscriptionPastDueModal";
 import CloseAccountModal from "./CloseAccountModal";
+import UpgradeModal from "./UpgradeModal";
 
 export default function Modals(props) {
   const {
@@ -83,6 +84,11 @@ export default function Modals(props) {
         isOpen={modalToOpen === 'close-account'}
         close={closeModal}
         openSnackBar={openSnackBar}
+      />
+
+      <UpgradeModal
+        isOpen={modalToOpen === 'upgrade'}
+        close={closeModal}
       />
     </>
   );

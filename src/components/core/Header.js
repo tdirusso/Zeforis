@@ -2,13 +2,10 @@ import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip, Divider, Tog
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from "react";
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import FolderIcon from '@mui/icons-material/Folder';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import './styles/Header.scss';
@@ -17,13 +14,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { logout } from "../../api/auth";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { SwapHorizOutlined } from "@mui/icons-material";
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import HelpIcon from '@mui/icons-material/Help';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { updateTheme } from "../../lib/utils";
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import LockIcon from '@mui/icons-material/Lock';
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -32,7 +27,6 @@ export default function Header(props) {
   const navigate = useNavigate();
 
   const {
-    isAdmin,
     user,
     org,
     engagement,
@@ -41,11 +35,9 @@ export default function Header(props) {
     toggleSideNav,
     isSideNavOpen,
     openDialog,
-    setTheme,
-    isOrgOwner
+    setTheme
   } = props;
 
-  const actionsMenuOpen = Boolean(anchorEl?.className.includes('actions-menu'));
   const orgMenuOpen = Boolean(anchorEl?.className.includes('org-menu'));
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
@@ -58,11 +50,6 @@ export default function Header(props) {
     setAnchorEl(null);
   };
 
-  const openCreateTaskDrawer = () => {
-    setAnchorEl(null);
-    openDrawer('create-task');
-  };
-
   const openSettings = () => {
     setAnchorEl(null);
     navigate('/home/settings/engagement/collaborators');
@@ -73,19 +60,9 @@ export default function Header(props) {
     openDialog('choose-engagement');
   };
 
-  const openCreateFolderDrawer = () => {
-    setAnchorEl(null);
-    openDrawer('folder');
-  };
-
   const openSearch = () => {
     setAnchorEl(null);
     openModal('search');
-  };
-
-  const openCreateEngagementDialog = () => {
-    setAnchorEl(null);
-    openDialog('create-engagement');
   };
 
   const openGettingStartedDrawer = () => {
@@ -147,78 +124,6 @@ export default function Header(props) {
               </IconButton>
             </Tooltip>
           </Box>
-          <Box hidden={!isAdmin} mr={2}>
-            <Tooltip title="Actions">
-                <IconButton
-                  className="actions-menu"
-                  size="large"
-                  onClick={handleMenuClick}>
-                  <MoreVertIcon />
-                </IconButton>
-            </Tooltip>
-            <Menu
-              anchorEl={anchorEl}
-              open={actionsMenuOpen}
-              onClose={handleMenuClose}
-              PaperProps={{
-                style: {
-                  width: '20ch',
-                  overflow: 'visible'
-                }
-              }}>
-              <MenuItem onClick={openCreateTaskDrawer}>
-                <ListItemIcon>
-                  <AddTaskIcon />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography>
-                    New Task
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
-              <MenuItem onClick={openCreateFolderDrawer}>
-                <ListItemIcon>
-                  <FolderIcon />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography>
-                    New Folder
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
-              <Divider hidden={!isOrgOwner} />
-              <MenuItem
-                disabled={user.plan === 'free'}
-                onClick={openCreateEngagementDialog}
-                hidden={!isOrgOwner}>
-                <ListItemIcon>
-                  {
-                    user.plan === 'free' ? <LockIcon /> : <AccountBoxIcon />
-                  }
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography>
-                    New Engagement
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
-              <Paper
-                hidden={(user.plan !== 'free' && isOrgOwner) || !isOrgOwner}
-                style={{
-                  padding: '0px',
-                  position: 'absolute',
-                  left: '20px',
-                  bottom: '-27px'
-                }}>
-                <Box>
-                  <Link to='settings/account/billing' onClick={handleMenuClose}>
-                    <Button size="small" variant="contained">Upgrade now</Button>
-                  </Link>
-                </Box>
-              </Paper>
-            </Menu>
-          </Box>
-
           <Box>
             <Tooltip title="Settings">
               <Paper style={{ padding: 0, borderRadius: '24px' }}>

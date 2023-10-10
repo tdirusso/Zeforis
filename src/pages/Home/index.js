@@ -388,7 +388,17 @@ export default function Home({ setTheme }) {
               closeDialog={closeDialog}
             />
 
-            <ActionCenter openDrawer={openDrawer} />
+            {
+              isAdmin ?
+                <ActionCenter
+                  openDialog={openDialog}
+                  openDrawer={openDrawer}
+                  isOrgOwner={isOrgOwner}
+                  openModal={openModal}
+                  user={user}
+                /> :
+                null
+            }
 
             <Outlet context={context} />
           </Grid>

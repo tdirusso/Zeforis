@@ -1,4 +1,4 @@
-import { Box, Button, Grow, IconButton, Menu, Paper, Tooltip } from "@mui/material";
+import { Box, Button, Divider, Grow, IconButton, Menu, Paper, Tooltip } from "@mui/material";
 import './styles.scss';
 import AddIcon from '@mui/icons-material/Add';
 import { useState } from "react";
@@ -10,13 +10,47 @@ import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 
 export default function ActionCenter(props) {
   const {
-    openDrawer
+    openDrawer,
+    openDialog,
+    openModal,
+    user,
+    isOrgOwner
   } = props;
 
   const actions = {
+    newEngagement:
+      <Grow in key="newEngagement">
+        <Paper
+          style={{
+            background: '#5f48ea',
+            padding: 0,
+            borderRadius: '8px'
+          }}
+          className="pinned-btn">
+          <IconButton
+            sx={{
+              '&::after': {
+                content: '"+"',
+                color: 'white',
+                position: 'absolute',
+                bottom: '-3px',
+                right: '2px'
+              }
+            }}
+            style={{ borderRadius: '8px' }}
+            onClick={() => user.plan === 'free' ? openModal('upgrade') : openDialog('create-engagement')}
+            size="small">
+            <ArticleOutlinedIcon
+              fontSize="small"
+              htmlColor="white"
+            />
+          </IconButton>
+        </Paper>
+      </Grow>,
     newFolder:
       <Grow in key="newFolder">
         <Paper
@@ -65,13 +99,28 @@ export default function ActionCenter(props) {
         setPinnedActions={setPinnedActions}
         pinnedActions={pinnedActions}
         openDrawer={openDrawer}
+        openDialog={openDialog}
+        openModal={openModal}
+        isOrgOwner={isOrgOwner}
+        user={user}
       />
     </Box>
   );
 };
 
 
-function ActionMenu({ pinnedActions, setPinnedActions, openDrawer }) {
+function ActionMenu(props) {
+
+  const {
+    pinnedActions,
+    setPinnedActions,
+    openDrawer,
+    openDialog,
+    isOrgOwner,
+    openModal,
+    user
+  } = props;
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -106,8 +155,19 @@ function ActionMenu({ pinnedActions, setPinnedActions, openDrawer }) {
     openDrawer('create-task');
   };
 
+  const handleNewEngagement = () => {
+    setAnchorEl(null);
+    if (user.plan === 'free') {
+      openModal('upgrade');
+    } else {
+      openDialog('create-engagement');
+
+    }
+  };
+
   const newTaskPinned = pinnedActions.includes('newTask');
   const newFolderPinned = pinnedActions.includes('newFolder');
+  const newEngagementPinned = pinnedActions.includes('newEngagement');
 
   return (
     <>
@@ -135,20 +195,42 @@ function ActionMenu({ pinnedActions, setPinnedActions, openDrawer }) {
           horizontal: 'center'
         }}
         transformOrigin={{
-          vertical: 100,
+          vertical: isOrgOwner ? 130 : 95,
           horizontal: 'center'
         }}
         PaperProps={{
           style: {
-            width: 200,
-            borderRadius: 8
+            width: 225,
+            borderRadius: 8,
           },
           className: 'action-menu'
         }}>
 
+        {
+          isOrgOwner ?
+            <Box>
+              <MenuItem onClick={handleNewEngagement}>
+                <ListItemIcon>
+                  <ArticleOutlinedIcon fontSize="small" htmlColor="#5f48ea" />
+                </ListItemIcon>
+                <ListItemText>New engagement</ListItemText>
+                <Tooltip title={newEngagementPinned ? 'Unpin' : 'Pin'} placement="left">
+                  <IconButton
+                    size="small"
+                    onClick={e => newEngagementPinned ? handleUnpinAction('newEngagement', e) : handlePinAction('newEngagement', e)}>
+                    {newEngagementPinned ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
+                  </IconButton>
+                </Tooltip>
+              </MenuItem>
+              <Divider style={{ margin: '2px 0' }} />
+            </Box>
+            :
+            null
+        }
+
         <MenuItem onClick={handleNewFolder}>
           <ListItemIcon>
-            <FolderOutlinedIcon fontSize="small" htmlColor="#9988ff" />
+            <FolderOutlinedIcon fontSize="small" htmlColor="#f5c644" />
           </ListItemIcon>
           <ListItemText>New folder</ListItemText>
           <Tooltip title={newFolderPinned ? 'Unpin' : 'Pin'} placement="left">
