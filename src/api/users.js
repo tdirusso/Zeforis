@@ -51,6 +51,24 @@ const resendVerificationLink = async (payload) => {
   return data;
 };
 
+const removeEngagementUser = async (payload) => {
+  const { data } = await request.delete(`users/removeEngagementUser`, { data: payload });
+
+  return data;
+};
+
+const removeOrgUser = async (payload) => {
+  const { data } = await request.delete(`users/removeOrgUser`, { data: payload });
+
+  return data;
+};
+
+const closeAccount = async () => {
+  const { data } = await request.delete(`users`);
+
+  return data;
+};
+
 export {
   updateProfile,
   updatePermission,
@@ -61,5 +79,8 @@ export {
   sendPasswordResetLink,
   resendVerificationLink,
   batchUpdateAccess,
-  batchUpdatePermission
+  batchUpdatePermission,
+  removeOrgUser,
+  removeEngagementUser,
+  closeAccount
 };

@@ -22,6 +22,7 @@ export default function useDrawer() {
       localStorage.removeItem('gsDrawerToReopen');
     } else {
       setDrawerToOpen('');
+      setDrawerProps({});
     }
   };
 

@@ -1,13 +1,11 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteTasks } from '../../api/tasks';
-import { useNavigate } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { DialogTitle, Typography } from '@mui/material';
 
 export default function DeleteTasksModal(props) {
 
@@ -15,7 +13,6 @@ export default function DeleteTasksModal(props) {
     isOpen,
     close,
     taskIds = [],
-    exitPath,
     setSelectedTasks,
     setTasks,
     engagement,
@@ -24,8 +21,6 @@ export default function DeleteTasksModal(props) {
   } = props;
 
   const engagementId = engagement.id;
-
-  const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
 
@@ -44,34 +39,15 @@ export default function DeleteTasksModal(props) {
       if (success) {
         const deletedLength = taskIds.length;
 
-        if (exitPath) {
+        setTimeout(() => {
           openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
+        }, 250);
 
-          setTimeout(() => {
-            navigate(exitPath);
+        taskIds.forEach(id => delete tasksMap[id]);
 
-            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
-          }, 1000);
-        } else if (window.location.pathname.includes('/home/task/')) {
-          openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
-
-          setTimeout(() => {
-            navigate('/home/dashboard');
-            setTasks(tasks => tasks.filter(task => !taskIds.includes(task.task_id)));
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
-          }, 250);
-
-          taskIds.forEach(id => delete tasksMap[id]);
-
-          setTasks(Object.values(tasksMap));
-          if (setSelectedTasks) {
-            setSelectedTasks([]);
-          }
-          handleClose();
-        }
+        setTasks(Object.values(tasksMap));
+        setSelectedTasks([]);
+        handleClose();
       } else {
         openSnackBar(resultMessage, 'error');
         setLoading(false);
@@ -91,16 +67,17 @@ export default function DeleteTasksModal(props) {
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose} className='modal'>
+        <DialogTitle>
+          Delete Tasks
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText style={{ marginBottom: '2rem' }}>
+          <Typography mb={3}>
             Are you sure you want to <strong>permanently delete</strong> {taskIds.length} tasks?
-          </DialogContentText>
+          </Typography>
           <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
               disabled={isLoading}
-              fullWidth
-              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
@@ -108,9 +85,7 @@ export default function DeleteTasksModal(props) {
               variant='contained'
               onClick={handleDeleteTasks}
               required
-              fullWidth
               loading={isLoading}
-              startIcon={<DeleteIcon />}
               color="error">
               Yes, Delete
             </LoadingButton>

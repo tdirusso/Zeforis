@@ -6,11 +6,16 @@ import EditUserPermissionsModal from "./EditUserPermissionsModal";
 import RemoveOrgUserModal from "./RemoveOrgUserModal";
 import SearchModal from "./SearchModal";
 import './styles.scss';
+import EditSelectedTasksModal from "./EditSelectedTasksModal";
+import InviteEngagementUsers from "./InviteEngagementUsers";
+import SubscriptionPastDueModal from "./SubscriptionPastDueModal";
+import CloseAccountModal from "./CloseAccountModal";
 
 export default function Modals(props) {
   const {
     modalToOpen,
-    closeModal
+    closeModal,
+    openSnackBar
   } = props;
 
   return (
@@ -55,6 +60,29 @@ export default function Modals(props) {
         isOpen={modalToOpen === 'remove-user'}
         close={closeModal}
         {...props}
+      />
+
+      <EditSelectedTasksModal
+        isOpen={modalToOpen === 'edit-tasks'}
+        close={closeModal}
+        {...props}
+      />
+
+      <InviteEngagementUsers
+        isOpen={modalToOpen === 'invite-engagement-users'}
+        close={closeModal}
+        {...props}
+      />
+
+      <SubscriptionPastDueModal
+        isOpen={modalToOpen === 'subscription-past-due'}
+        close={closeModal}
+      />
+
+      <CloseAccountModal
+        isOpen={modalToOpen === 'close-account'}
+        close={closeModal}
+        openSnackBar={openSnackBar}
       />
     </>
   );

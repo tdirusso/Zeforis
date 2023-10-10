@@ -14,9 +14,11 @@ export default function CustomWidgets({ widgets }) {
     setExpanded(!expanded);
   };
 
+  const enabledWidgets = widgets.filter(({ isEnabled }) => isEnabled);
+
   return (
     <>
-      <Grid item xs={12} hidden={widgets.length === 0}>
+      <Grid item xs={12} hidden={enabledWidgets.length === 0}>
         <Divider textAlign="left">
           <Tooltip title={expanded ? 'Hide Widgets' : 'Show Widgets'}>
             <IconButton
@@ -36,7 +38,7 @@ export default function CustomWidgets({ widgets }) {
         <Collapse in={expanded}>
           <Grid container spacing={3}>
             {
-              widgets.filter(({ isEnabled }) => isEnabled).map((widget, index) => {
+              enabledWidgets.map((widget, index) => {
                 return (
                   <Grid item xs={12} md={4} key={widget.id}>
                     <Grow
@@ -79,7 +81,7 @@ export default function CustomWidgets({ widgets }) {
       <Grid
         item
         xs={12}
-        display={expanded && widgets.length > 0 ? 'block' : 'none'}>
+        display={expanded && enabledWidgets.length > 0 ? 'block' : 'none'}>
         <Divider />
       </Grid >
     </>

@@ -69,6 +69,7 @@ export default function SearchModal(props) {
   return (
     <div>
       <Dialog
+        className='modal'
         PaperProps={{
           className: 'search-dialog'
         }}

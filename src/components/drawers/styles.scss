@@ -8,6 +8,31 @@
   .MuiInput-underline:before {
     border-bottom: none !important;
   }
+
+  .close-btn-mobile {
+    display: none;
+    margin-bottom: 1rem;
+  }
+
+  .close-btn,
+  .save-btn,
+  .minimize-btn {
+    position: absolute;
+    left: -20px;
+  }
+
+  .close-btn {
+    top: 44vh;
+  }
+
+  .save-btn,
+  .minimize-btn {
+    top: 50vh;
+  }
+
+  .task-content {
+    margin-top: 1.5rem;
+  }
 }
 
 .drawer {
@@ -17,14 +42,26 @@
 
 .getting-started-drawer .drawer {
   width: 475px;
+  overflow: visible;
 }
 
 .task-drawer .drawer {
   width: 550px;
+  overflow: visible;
 }
 
 @media screen and (max-width: 550px) {
   .drawer {
     width: 100% !important;
+
+    .close-btn-mobile {
+      display: block;
+    }
+
+    .close-btn,
+    .save-btn,
+    .minimize-btn {
+      display: none;
+    }
   }
 }

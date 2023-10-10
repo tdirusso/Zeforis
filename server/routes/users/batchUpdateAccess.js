@@ -1,11 +1,13 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
     userId,
-    orgId,
     hasAccess = false
   } = req.body;
+
+  const orgId = req.ownedOrg.id;
 
   if (!userId) {
     return res.json({
@@ -13,7 +15,17 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const updaterUserId = req.userId;
+
+  if (userId === updaterUserId) {
+    return res.json({
+      message: 'You cannot update your own access.'
+    });
+  }
+
   const connection = await pool.getConnection();
+
+  await connection.beginTransaction();
 
   try {
     const [allOrgEngagementsResult] = await connection.query(
@@ -48,10 +60,26 @@ module.exports = async (req, res, next) => {
       );
     }
 
-    connection.release();
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
+    if (orgOwnerPlan !== 'free') {
+      const { success, message } = await updateStripeSubscription(connection, updaterUserId, orgId);
+
+      if (!success) {
+        await connection.rollback();
+
+        connection.release();
+        return res.json({ message });
+      }
+    }
+
+    await connection.commit();
+
+    connection.release();
     return res.json({ success: true });
   } catch (error) {
+    await connection.rollback();
+
     connection.release();
     next(error);
   }

@@ -11,11 +11,8 @@ import useSnackbar from "../../hooks/useSnackbar";
 import { updatePassword, getInvitationData, register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, CircularProgress, Divider, useMediaQuery } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { AccountCircle } from "@mui/icons-material";
 import { setActiveOrgId } from "../../api/orgs";
-import { isMobile } from "../../lib/constants";
+import { setActiveEngagementId } from "../../api/engagements";
 
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
@@ -34,7 +31,7 @@ export default function AcceptInvitationPage() {
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${orgId}`)}`;
 
-  const [fetchingInvitation, setFetchingInvitation] = useState(true);
+  const [fetchingInvitation, setFetchingInvitation] = useState(false);
   const [userNeedsPassword, setUserNeedsPassword] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
@@ -66,6 +63,7 @@ export default function AcceptInvitationPage() {
           if (!Boolean(invitation.userNeedsPassword)) {
             openSnackBar('Invitation accepted.', 'success');
             setActiveOrgId(orgId);
+            setActiveEngagementId(engagementId);
             localStorage.setItem('openGettingStarted', 'true');
             setTimeout(() => {
               window.location.href = customLoginPageUrl;
@@ -84,8 +82,9 @@ export default function AcceptInvitationPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (userNeedsPassword) {
+  const tryLoadGoogleButton = () => {
+    if (window.google?.accounts) {
+      clearInterval(window.googleButtonInterval);
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
         callback: handleGoogleRegistration
@@ -100,6 +99,19 @@ export default function AcceptInvitationPage() {
           text: 'continue_with'
         }
       );
+
+      return true;
+    }
+
+    return false;
+  };
+
+  useEffect(() => {
+    if (userNeedsPassword) {
+      const ableToLoadButton = tryLoadGoogleButton();
+      if (!ableToLoadButton) {
+        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+      }
     }
   }, [userNeedsPassword]);
 
@@ -177,12 +189,11 @@ export default function AcceptInvitationPage() {
   if (userNeedsPassword === null) {
     return (
       <div className="info-page flex-centered">
-        <header>
+        <header style={{ position: 'absolute' }}>
           <Box component="a" href="https://www.zeforis.com" target="_blank">
-            <img src={zeforisLogo} alt="Zeforis" className="header-logo"/>
+            <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
           </Box>
         </header>
-
         {
           fetchingInvitation ? <Box>
             <Typography mb={2}>Fetching invitation...</Typography>
@@ -194,8 +205,14 @@ export default function AcceptInvitationPage() {
             />
           </Box>
             :
-            <Paper className="container">
-              <Typography>Invitation does not exist or has expired.</Typography>
+            <Paper className="container" style={{ zIndex: 2 }}>
+              <Typography mb={2}>Invitation does not exist or has expired.</Typography>
+              <a href='/login'>
+                <Button size="large" variant="contained">
+                  Return to Homepage
+                </Button>
+              </a>
+
               <Snackbar
                 isOpen={isOpen}
                 type={type}
@@ -210,7 +227,7 @@ export default function AcceptInvitationPage() {
 
   return (
     <div className="info-page flex-centered">
-      <header>
+      <header style={{ position: 'fixed' }}>
         <Box component="a" href="https://www.zeforis.com" target="_blank">
           <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
@@ -233,37 +250,28 @@ export default function AcceptInvitationPage() {
           <CircularProgress />
         </Box>
           :
-          <Paper className="container">
+          <Paper className="container" style={{ zIndex: 2 }}>
             <Typography variant="h6" style={{ marginBottom: '1.5rem' }}>Complete Account Registration</Typography>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              <Box id="google-signin" style={{ width: 400 }}></Box>
+            </Box>
+            <Divider className="my4"></Divider>
+
             <form onSubmit={handleUpdatePassword}>
-              <Box style={{ marginBottom: '1.5rem' }}>
+              <Box mb={2}>
                 <TextField
-                  style={{ marginBottom: '0.5rem' }}
                   fullWidth
                   placeholder="First name"
                   variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle htmlColor="#cbcbcb" />
-                      </InputAdornment>
-                    )
-                  }}
                   inputRef={firstName}
                   disabled={isLoading}
-                  autoFocus={!isMobile}
                 />
+              </Box>
+              <Box mb={2}>
                 <TextField
                   fullWidth
                   placeholder="Last name"
                   variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle htmlColor="#cbcbcb" />
-                      </InputAdornment>
-                    )
-                  }}
                   inputRef={lastName}
                   disabled={isLoading}
                 />
@@ -273,13 +281,6 @@ export default function AcceptInvitationPage() {
                 variant="outlined"
                 style={{ marginBottom: '2rem' }}
                 type="password"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <VpnKeyIcon htmlColor="#cbcbcb" />
-                    </InputAdornment>
-                  )
-                }}
                 inputRef={password}
                 disabled={isLoading}
               />
@@ -293,10 +294,6 @@ export default function AcceptInvitationPage() {
                 type="submit">
                 Complete Registration
               </LoadingButton>
-              <Divider className="my4">Or</Divider>
-              <Box style={{ display: 'flex', justifyContent: 'center' }}>
-                <Box id="google-signin" style={{ width: 400 }}></Box>
-              </Box>
             </form>
           </Paper>
       }

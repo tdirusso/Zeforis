@@ -1,4 +1,5 @@
 const { pool } = require('../../../database');
+const { createJWT } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -7,6 +8,7 @@ module.exports = async (req, res, next) => {
   } = req.body;
 
   const updaterUserId = req.userId;
+  const { userObject } = req;
 
   if (!firstName || !lastName) {
     return res.json({
@@ -25,7 +27,10 @@ module.exports = async (req, res, next) => {
     );
 
     if (updateResult.affectedRows) {
-      return res.json({ success: true });
+      return res.json({
+        success: true,
+        token: createJWT({ ...userObject })
+      });
     }
 
     return res.json({ message: 'Invalid user.' });

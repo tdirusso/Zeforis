@@ -1,12 +1,11 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { deleteFolder } from '../../api/folders';
+import { DialogTitle, Typography } from '@mui/material';
 
 export default function DeleteFolderModal(props) {
 
@@ -62,17 +61,20 @@ export default function DeleteFolderModal(props) {
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose} className='modal'>
+        <DialogTitle>
+          Delete Folder
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText style={{ marginBottom: '2rem' }}>
+          <Typography>
             Are you sure you want to <strong>permanently delete {folder?.name}</strong>?
+          </Typography>
+          <Typography mt={1} mb={3}>
             All tasks in this folder will be deleted.
-          </DialogContentText>
+          </Typography>
           <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
               disabled={isLoading}
-              fullWidth
-              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
@@ -80,9 +82,7 @@ export default function DeleteFolderModal(props) {
               variant='contained'
               onClick={handleDeleteFolder}
               required
-              fullWidth
               loading={isLoading}
-              startIcon={<DeleteIcon />}
               color="error">
               Yes, Delete
             </LoadingButton>

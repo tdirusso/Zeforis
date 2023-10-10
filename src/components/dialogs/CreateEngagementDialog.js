@@ -76,7 +76,7 @@ export default function CreateEngagementDialog(props) {
           if (!close) {
             localStorage.setItem('openGettingStarted', 'true');
           }
-          
+
           setTimeout(() => {
             window.location.href = '/home/dashboard';
           }, 500);
@@ -113,30 +113,28 @@ export default function CreateEngagementDialog(props) {
       onClose={handleClose}
       TransitionComponent={close ? toggleableTransition : fixedTransition}
       fullScreen>
-      <Box className="flex-centered" style={{ height: '100%' }}>
-        <Box textAlign="center" mb={'100px'} maxWidth={600}>
-          <IconButton
-            hidden={!close}
-            size='large'
-            onClick={handleClose}
-            style={{
-              position: 'absolute',
-              left: '100px',
-              top: '30px'
-            }}>
-            <CloseIcon />
-          </IconButton>
-          <Button
-            startIcon={<SwapHorizOutlined />}
-            onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
-            style={{ position: 'absolute', right: '100px', top: '30px' }}
-            variant='contained'>
-            Change org
-          </Button>
-          <Grow appear in timeout={{ enter: 500 }}>
+      <Fade appear in timeout={{ enter: 400 }}>
+        <Box className="flex-centered" style={{ height: '100%' }}>
+          <Box textAlign="center" mb={'100px'} maxWidth={600}>
+            <IconButton
+              hidden={!close}
+              size='large'
+              onClick={handleClose}
+              style={{
+                position: 'absolute',
+                left: '100px',
+                top: '30px'
+              }}>
+              <CloseIcon />
+            </IconButton>
+            <Button
+              startIcon={<SwapHorizOutlined />}
+              onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
+              style={{ position: 'absolute', right: '100px', top: '30px' }}
+              variant='contained'>
+              Change org
+            </Button>
             {pageIcon}
-          </Grow>
-          <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '125ms' }}>
             <Box>
               <Box component="h2" mb={1} mt={2}>
                 Create an Engagement
@@ -149,8 +147,6 @@ export default function CreateEngagementDialog(props) {
                 The engagement name should be the company name for the customer you're engaging with, or just a simple project name.
               </Typography>
             </Box>
-          </Fade>
-          <Fade appear in timeout={{ enter: 300 }} style={{ transitionDelay: '200ms' }}>
             <form onSubmit={handleCreateEngagement}>
               <Box className='my3'>
                 <TextField
@@ -170,14 +166,12 @@ export default function CreateEngagementDialog(props) {
                 Create Engagement
               </LoadingButton>
             </form>
-          </Fade>
-          <Grow appear in>
             <Box>
               <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
             </Box>
-          </Grow>
+          </Box>
         </Box>
-      </Box>
+      </Fade>
 
       <Menu
         PaperProps={{ style: { minWidth: 200 } }}

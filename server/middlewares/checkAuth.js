@@ -4,7 +4,7 @@ module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
-    return res.json({ message: 'Unauthorized.' });
+    return res.json({ message: 'Missing authentication token.' });
   }
 
   try {
@@ -14,10 +14,11 @@ module.exports = async (req, res, next) => {
 
     if (userId) {
       req.userId = userId;
+      req.userObject = decoded.user;
       return next();
     }
 
-    return res.json({ message: 'User does not exist.' });
+    return res.json({ message: 'Invalid token.' });
   } catch (error) {
     next(error);
   }

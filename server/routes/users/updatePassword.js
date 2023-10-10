@@ -49,7 +49,6 @@ async function handleCompleteRegistration(req, res, connection) {
     return res.json({ message: 'Missing registration parameters.' });
   }
 
-
   const [userResult] = await connection.query('SELECT id, password FROM users WHERE id = ?', [userId]);
 
   const user = userResult[0];

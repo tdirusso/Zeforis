@@ -1,4 +1,4 @@
-const isDev = require('../config');
+const { isDev } = require('../config');
 
 if (isDev) {
   require('dotenv').config({ path: __dirname + '/../.env.local' });
@@ -11,6 +11,7 @@ const path = require('path');
 const fileUpload = require('express-fileupload');
 const { initializeDatabase, pool } = require('../database');
 const emailService = require('../email');
+const slackbot = require('../slackbot');
 
 const login = require('./routes/users/login');
 const authenticate = require('./routes/users/authenticate');
@@ -20,7 +21,7 @@ const createFolder = require('./routes/folders/createFolder');
 const updateEngagement = require('./routes/engagements/updateEngagement');
 const register = require('./routes/users/register');
 const verify = require('./routes/users/verify');
-const inviteEngagementUser = require('./routes/users/inviteEngagementUser');
+const inviteEngagementUsers = require('./routes/users/inviteEngagementUsers');
 const removeEngagementUser = require('./routes/users/removeEngagementUser');
 const updateProfile = require('./routes/users/updateProfile');
 const updateFolder = require('./routes/folders/updateFolder');
@@ -54,6 +55,10 @@ const batchUpdateAccess = require('./routes/users/batchUpdateAccess');
 const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
 const slackbotStats = require('./routes/slackbot/stats');
 const logFrontendError = require('./routes/logs/logFrontendError');
+const stripe_createSubscription = require('./routes/stripe/createSubscription');
+const dumpCache = require('./routes/cache/dumpCache');
+const clearCache = require('./routes/cache/clearCache');
+const closeAccount = require('./routes/users/closeAccount');
 
 const checkEngagementAdminMW = require('./middlewares/checkEngagementAdmin');
 const checkEngagementMemberMW = require('./middlewares/checkEngagementMember');
@@ -62,8 +67,12 @@ const checkAuthMW = require('./middlewares/checkAuth');
 const errorHandlerMW = require('./middlewares/errorHandler');
 const checkSlackSignature = require('./middlewares/checkSlackSignature');
 
+const stripeWebhook = require('./webhooks/stripe');
+
 const app = express();
 const port = process.env.PORT || 8080;
+
+app.set('trust proxy', 1);
 
 if (isDev) {
   const cors = require('cors');
@@ -75,7 +84,6 @@ if (isDev) {
 }
 
 app.use(express.static(path.join(__dirname + '/../', 'build')));
-app.use(express.json());
 app.use(express.urlencoded({
   extended: true,
   verify: (req, _, buf) => {
@@ -84,6 +92,17 @@ app.use(express.urlencoded({
 }));
 app.use(cookieParser());
 app.use(fileUpload({}));
+
+const forceSSL = (req, res, next) => {
+
+  if (!req.secure && req.get('x-forwarded-proto') !== 'https' && !isDev) {
+    return res.redirect(301, 'https://' + req.get('host') + req.url);
+  }
+
+  next();
+};
+
+app.use(forceSSL);
 
 const authenicatedUserRateLimit = rateLimit({
   windowMs: 60000, // 1 minute
@@ -108,13 +127,17 @@ const unAuthenicatedUserRateLimit = rateLimit({
 const boot = async () => {
   await initializeDatabase();
 
+  app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhook);
+
+  app.use(express.json());
+
   app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
   app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
   app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
   app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
-  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUser);
+  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUsers);
   app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
-  app.delete('/api/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
+  app.delete('/api/users/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
   app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
   app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
   app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
@@ -124,6 +147,9 @@ const boot = async () => {
   app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
   app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
+  app.delete('/api/users', authenicatedUserRateLimit, checkAuthMW, closeAccount);
+
+  app.post('/api/stripe/subscriptions', authenicatedUserRateLimit, checkOrgOwnerMW, stripe_createSubscription);
 
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
@@ -155,13 +181,18 @@ const boot = async () => {
   app.patch('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, updatedWidget);
   app.delete('/api/widgets', authenicatedUserRateLimit, checkEngagementAdminMW, deleteWidget);
 
+  app.get('/api/cache', dumpCache);
+  app.delete('/api/cache', clearCache);
+
   app.post('/api/slackbot/stats', checkSlackSignature, slackbotStats);
 
   app.post('/api/logs/logFrontendError', logFrontendError);
 
   app.use(errorHandlerMW);
 
-  app.get('*', (_, res) => res.sendFile(path.join(__dirname + '/../', 'build', 'index.html')));
+  app.get('*', forceSSL, (_, res) => {
+    return res.sendFile(path.join(__dirname + '/../', 'build', 'index.html'));
+  });
 
   app.listen(port, () => console.log('App is running'));
 
@@ -177,12 +208,17 @@ const boot = async () => {
           [logData]
         );
 
-        await emailService.sendMail({
-          from: 'Zeforis',
-          to: process.env.MAILER_SUPPORT_EMAIL,
+        await emailService.sendEmail({
+          from: emailService.senders.info,
+          to: emailService.senders.error,
           subject: `Zeforis - Uncaught Error`,
           text: logData,
           html: logData
+        });
+
+        await slackbot.post({
+          channel: slackbot.channels.errors,
+          message: `*FATAL Uncaught Server Error*\n${logData}`
         });
       }
     } catch (newError) {

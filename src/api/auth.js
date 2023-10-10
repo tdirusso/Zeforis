@@ -6,16 +6,9 @@ const login = async (payload) => {
   return data;
 };
 
-const logout = (email, logoutPageUrl) => {
+const logout = (logoutPageUrl) => {
   deleteToken();
-
-  window.google.accounts.id.revoke(email, () => {
-    window.location.href = logoutPageUrl;
-  });
-
-  setTimeout(() => {
-    window.location.href = logoutPageUrl;
-  }, 1000);
+  window.location.href = logoutPageUrl;
 };
 
 const authenticate = async () => {

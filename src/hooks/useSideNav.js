@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 export default function useSideNav() {
-  const [isSideNavOpen, setSideNavOpen] = useState(localStorage.getItem('sideNavOpen') === 'true');
+  const initialState = localStorage.getItem('sideNavOpen');
+  const [isSideNavOpen, setSideNavOpen] = useState(initialState === 'true' || !initialState);
 
   const toggleSideNav = () => {
     localStorage.setItem('sideNavOpen', !isSideNavOpen);

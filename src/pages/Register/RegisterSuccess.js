@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import approveMailGif from '../../assets/approve-mail.gif';
 
 export default function RegisterSuccess() {
   return (
@@ -8,10 +8,10 @@ export default function RegisterSuccess() {
         Thank you for registering.
       </Typography>
       <br></br>
-      <Typography variant="body1" style={{ marginBottom: '1.5rem' }}>
+      <Typography variant="body1" >
         Please click on the confirmation link sent to your email address.
       </Typography>
-      <CheckCircleOutlineIcon color="primary" fontSize="large" />
+      <img src={approveMailGif} height={150} alt='' />
     </Box>
   );
 };

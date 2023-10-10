@@ -9,7 +9,10 @@
     "@mui/lab": "^5.0.0-alpha.110",
     "@mui/material": "^5.10.16",
     "@mui/x-date-pickers": "^5.0.12",
+    "@sendgrid/mail": "^7.7.0",
     "@slack/web-api": "^6.9.0",
+    "@stripe/react-stripe-js": "^2.1.2",
+    "@stripe/stripe-js": "^2.1.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -18,6 +21,7 @@
     "axios": "^1.2.0",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
     "email-validator": "^2.0.4",
@@ -26,13 +30,14 @@
     "express-rate-limit": "^6.9.0",
     "google-auth-library": "^8.9.0",
     "jsonwebtoken": "^8.5.1",
+    "lru-cache": "^10.0.1",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
-    "nodemailer": "^6.8.0",
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.0",
     "react-color": "^2.19.3",
+    "react-confetti-explosion": "^2.1.2",
     "react-csv": "^2.2.2",
     "react-dom": "^18.2.0",
     "react-papaparse": "^4.1.0",
@@ -40,6 +45,7 @@
     "react-scripts": "5.0.1",
     "sass": "^1.64.2",
     "sharp": "^0.31.2",
+    "stripe": "^13.4.0",
     "uuid": "^9.0.0"
   },
   "scripts": {
@@ -69,7 +75,6 @@
     ]
   },
   "devDependencies": {
-    "cors": "^2.8.5",
     "nodemon": "^2.0.20"
   }
 }

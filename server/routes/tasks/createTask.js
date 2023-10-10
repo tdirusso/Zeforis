@@ -1,4 +1,6 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const cache = require('../../../cache');
+const { appLimits } = require('../../../config');
 
 module.exports = async (req, res, next) => {
   const {
@@ -6,14 +8,16 @@ module.exports = async (req, res, next) => {
     description = '',
     status = 'New',
     folderId,
-    linkUrl,
+    linkUrl = '',
     assignedToId = null,
     tags = [],
     isKeyTask = false,
-    dueDate = null
+    dateDue = null
   } = req.body;
 
   const creatorUserId = req.userId;
+  const userObject = req.userObject;
+  const { orgId } = userObject;
 
   if (!name || !folderId || !creatorUserId) {
     return res.json({
@@ -21,8 +25,27 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  const connection = await pool.getConnection();
+
   try {
-    const newTask = await pool.query(
+    let orgTaskCount = null;
+
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+
+    if (orgOwnerPlan === 'free') {
+      orgTaskCount = await commonQueries.getOrgTaskCount(connection, orgId);
+
+      if (orgTaskCount >= appLimits.freePlanTasks) {
+        return res.json({
+          message: `Task limit of ${appLimits.freePlanTasks} has been reached.`,
+          uiProps: {
+            alertType: 'upgrade'
+          }
+        });
+      }
+    }
+
+    const newTask = await connection.query(
       `INSERT INTO tasks 
         (
           name,
@@ -34,11 +57,12 @@ module.exports = async (req, res, next) => {
           created_by_id,
           is_key_task,
           date_due, 
-          last_updated_by_id
+          last_updated_by_id,
+          date_completed
         ) 
         VALUES
-        (?,?,?,?,?,?,?,?,?,?)`,
-      [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dueDate, creatorUserId]
+        (?,?,?,?,?,?,?,?,?,?, ${status === 'Complete' ? 'CURRENT_TIMESTAMP' : 'NULL'})`,
+      [name, description, status, folderId, linkUrl, assignedToId, creatorUserId, isKeyTask, dateDue, creatorUserId]
     );
 
     const newTaskId = newTask[0].insertId;
@@ -46,7 +70,7 @@ module.exports = async (req, res, next) => {
     if (tags.length) {
       const insertValues = tags.map(tag => [tag.id, newTaskId]);
 
-      await pool.query(
+      await connection.query(
         'INSERT INTO task_tags (tag_id, task_id) VALUES ?',
         [insertValues]
       );
@@ -62,14 +86,21 @@ module.exports = async (req, res, next) => {
       assignedToId,
       tags,
       isKeyTask,
-      dueDate
+      dateDue
     };
+
+    connection.release();
+
+    if (orgOwnerPlan === 'free') {
+      cache.set(`org-${orgId}`, { ...cache.get(`org-${orgId}`), taskCount: orgTaskCount + 1 });
+    }
 
     return res.json({
       success: true,
       task: taskObject
     });
   } catch (error) {
+    connection.release();
     next(error);
   }
 };

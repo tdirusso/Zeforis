@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import { forwardRef, useEffect, useState } from 'react';
-import { Box, Button, CircularProgress, Dialog, Divider, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Typography, Zoom } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import './styles.scss';
@@ -147,10 +147,7 @@ export default function ChooseEngagementDialog(props) {
                 Change org
               </Button>
             </Box>
-            <Box className='m0a' style={{ width: '85%' }}>
-              <Divider className='my3' />
-            </Box>
-            <Box m='0 auto' width={300}>
+            <Box m='0 auto' width={300} mt={4} mb={3}>
               <TextField
                 variant='standard'
                 size='small'

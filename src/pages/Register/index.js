@@ -11,11 +11,6 @@ import useSnackbar from "../../hooks/useSnackbar";
 import { register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, Divider, useMediaQuery } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { isMobile } from "../../lib/constants";
 
 export default function RegisterPage() {
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
@@ -59,21 +54,28 @@ export default function RegisterPage() {
     }
   };
 
-  const initializeGoogleButton = () => {
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-      callback: handleGoogleRegistration
-    });
+  const tryLoadGoogleButton = () => {
+    if (window.google?.accounts) {
+      clearInterval(window.googleButtonInterval);
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        callback: handleGoogleRegistration
+      });
 
-    window.google.accounts.id.renderButton(
-      document.getElementById('google-signin'),
-      {
-        theme: "outline",
-        size: "large",
-        width: isSmallScreen ? 300 : 325,
-        text: 'signup_with'
-      }
-    );
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin'),
+        {
+          theme: "outline",
+          size: "large",
+          width: isSmallScreen ? 300 : 325,
+          text: 'continue_with'
+        }
+      );
+
+      return true;
+    }
+
+    return false;
   };
 
   const handleRegistration = e => {
@@ -109,10 +111,9 @@ export default function RegisterPage() {
   };
 
   useEffect(() => {
-    if (document.readyState === 'complete') {
-      initializeGoogleButton();
-    } else {
-      window.onload = initializeGoogleButton;
+    const ableToLoadButton = tryLoadGoogleButton();
+    if (!ableToLoadButton) {
+      window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
     }
   }, []);
 
@@ -135,24 +136,18 @@ export default function RegisterPage() {
           </Button>
         </Box>
       </Box>
-      <Paper className="container">
+      <Paper className="container" style={{ zIndex: 2 }}>
         <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>Sign Up</Typography>
-        <form onSubmit={handleRegistration}>
+        <Box id="google-signin"></Box>
+        <Divider className="my4" />
+
+        <Box component='form' onSubmit={handleRegistration} display='flex' flexDirection='column' gap='1rem'>
           <TextField
             placeholder="First name"
             variant="outlined"
             inputRef={firstName}
             disabled={isLoading}
             autoComplete="off"
-            style={{ marginBottom: '1rem' }}
-            autoFocus={!isMobile}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
           <TextField
             placeholder="Last name"
@@ -160,45 +155,21 @@ export default function RegisterPage() {
             inputRef={lastName}
             disabled={isLoading}
             autoComplete="off"
-            style={{ marginBottom: '2.5rem' }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
 
           <TextField
             placeholder="Email"
             variant="outlined"
-            style={{ marginBottom: '1rem' }}
             type="email"
             inputRef={email}
             disabled={isLoading}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MailOutlineIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
           <TextField
             placeholder="Password"
             variant="outlined"
             type="password"
-            style={{ marginBottom: '2.5rem' }}
             inputRef={password}
             disabled={isLoading}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <VpnKeyIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
           />
           <LoadingButton
             loading={isLoading}
@@ -207,12 +178,10 @@ export default function RegisterPage() {
             variant="contained"
             type="submit"
             size="large"
-            style={{ marginBottom: '2rem' }}>
+            style={{ marginTop: '1rem' }}>
             Create Account
           </LoadingButton>
-        </form>
-        <Divider style={{ marginBottom: '2rem' }} />
-        <Box id="google-signin"></Box>
+        </Box>
       </Paper>
       <Box className="circle"></Box>
       <Snackbar

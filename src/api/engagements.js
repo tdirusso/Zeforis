@@ -20,7 +20,7 @@ const getActiveEngagementId = () => {
   return Number(localStorage.getItem('activeEngagementId'));
 };
 
-const getUserEngagementListForOrg = (user, activeOrgId) => {
+const getUserEngagementsForOrg = (user, activeOrgId) => {
   const result = [];
 
   user.adminOfEngagements.forEach(engagement => {
@@ -42,20 +42,8 @@ const deleteActiveEngagementId = () => {
   localStorage.removeItem('activeEngagementId');
 };
 
-const inviteEngagementUser = async (payload) => {
+const inviteEngagementUsers = async (payload) => {
   const { data } = await request.post(`users/invite`, payload);
-
-  return data;
-};
-
-const removeEngagementUser = async (payload) => {
-  const { data } = await request.delete(`users/removeEngagementUser`, { data: payload });
-
-  return data;
-};
-
-const removeUser = async (payload) => {
-  const { data } = await request.delete(`users`, { data: payload });
 
   return data;
 };
@@ -72,7 +60,6 @@ const deleteEngagement = async (payload) => {
   return data;
 };
 
-
 const leaveEngagement = async (payload) => {
   const { data } = await request.delete(`engagements/leave`, { data: payload });
 
@@ -85,12 +72,10 @@ export {
   updateEngagement,
   setActiveEngagementId,
   getActiveEngagementId,
-  getUserEngagementListForOrg,
+  getUserEngagementsForOrg,
   deleteActiveEngagementId,
-  inviteEngagementUser,
-  removeEngagementUser,
+  inviteEngagementUsers,
   getEngagementData,
   deleteEngagement,
-  removeUser,
   leaveEngagement
 };

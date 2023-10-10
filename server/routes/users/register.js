@@ -1,12 +1,9 @@
 const bcrypt = require('bcrypt');
-const ejs = require('ejs');
-const fs = require('fs');
-const path = require('path');
 const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 const { OAuth2Client } = require('google-auth-library');
-const { slackbotClient } = require('../../../slackbot');
+const slackbot = require('../../../slackbot');
 
 const { pool } = require('../../../database');
 
@@ -64,9 +61,10 @@ module.exports = async (req, res, next) => {
           'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
           [payload.given_name, payload.family_name, googleEmail]);
 
-        await slackbotClient.chat.postMessage({
-          text: `*New Zeforis User*\n${googleEmail}`,
-          channel: slackEventsChannelId
+
+        await slackbot.post({
+          channel: slackbot.channels.events,
+          message: `*New User*\n${googleEmail}`
         });
 
         return res.json({ success: true });
@@ -94,9 +92,10 @@ module.exports = async (req, res, next) => {
 
       await sendVerifyEmail(userId, verificationCode, lcEmail);
 
-      await slackbotClient.chat.postMessage({
-        text: `*New Zeforis User*\n${lcEmail}`,
-        channel: slackEventsChannelId
+
+      await slackbot.post({
+        channel: slackbot.channels.events,
+        message: `*New User*\n${lcEmail}`
       });
 
       return res.json({ success: true });
@@ -111,18 +110,12 @@ async function sendVerifyEmail(userId, verificationCode, email) {
 
   const verificationUrl = `${process.env.REACT_APP_API_DOMAIN}/api/users/verify?${qs}`;
 
-  const ejsData = {
-    verificationUrl
-  };
-
-  const templatePath = path.resolve(__dirname, '../../../email/templates/verifyEmail.ejs');
-  const template = ejs.render(fs.readFileSync(templatePath, 'utf-8'), ejsData);
-
-  await emailService.sendMail({
-    from: 'Zeforis',
+  await emailService.sendEmailFromTemplate({
     to: email,
-    subject: `Zeforis - Verify your Email`,
-    text: template,
-    html: template
+    from: emailService.senders.info,
+    templateId: emailService.templates.emailVerification,
+    templateData: {
+      verificationUrl
+    }
   });
 }

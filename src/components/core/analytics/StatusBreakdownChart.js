@@ -2,6 +2,7 @@
 import Chart from "react-apexcharts";
 import { useEffect } from "react";
 import apexchart from "apexcharts";
+import '../styles/analytics.scss';
 
 export default function StatusBreakdownChart(props) {
 
@@ -73,6 +74,7 @@ export default function StatusBreakdownChart(props) {
 
   return (
     <Chart
+      className='status-pie-chart'
       options={options}
       series={options.series}
       type="pie"

@@ -8,11 +8,11 @@ module.exports = async (req, res, next) => {
   const {
     name,
     brandColor = '#3365f6',
-    orgId,
     isLogoChanged = false
   } = req.body;
 
   const logoFile = req.files?.logoFile;
+  const orgId = req.ownedOrg.id;
 
   if (!orgId) {
     return res.json({

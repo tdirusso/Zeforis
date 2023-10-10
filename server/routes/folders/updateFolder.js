@@ -4,9 +4,10 @@ module.exports = async (req, res, next) => {
   const {
     name,
     isKeyFolder,
-    folderId,
-    engagementId
+    folderId
   } = req.body;
+
+  const { engagementId } = req;
 
   if (!name || !folderId) {
     return res.json({

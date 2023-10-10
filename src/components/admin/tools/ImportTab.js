@@ -65,7 +65,7 @@ export default function ImportTab() {
       }
 
       const tagsToCreate = [];
-      const foldersToCreate = [];
+      const foldersToCreate = new Set();
       const importRows = [];
 
       data.forEach((row, index) => {
@@ -91,7 +91,7 @@ export default function ImportTab() {
 
         if (folder && createNewFolders) {
           if (!folderNames.has(folder)) {
-            foldersToCreate.push(folder);
+            foldersToCreate.add(folder);
           }
         } else if (folder && !folderNames.has(folder)) {
           errors.push(`Row ${index + 2} contains invalid folder: "${folder}".`);
@@ -386,7 +386,7 @@ function ImportData({ importData }) {
       <Box>
         <ul>
           <li style={{ color: '#4caf50' }}><b>{importRows.length} tasks</b> will be imported</li>
-          <li style={{ color: '#4caf50' }}><b>{foldersToCreate.length} folders</b> will be created</li>
+          <li style={{ color: '#4caf50' }}><b>{foldersToCreate.size} folders</b> will be created</li>
           <li style={{ color: '#4caf50' }}><b>{tagsToCreate.length} tags</b> will be created</li>
         </ul>
       </Box>

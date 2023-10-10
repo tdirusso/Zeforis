@@ -1,4 +1,5 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -7,17 +8,24 @@ module.exports = async (req, res, next) => {
     hasAccess = false
   } = req.body;
 
+  const updaterUserId = req.userId;
+  const orgId = req.ownedOrg.id;
+
   if (!userId || !engagementId) {
     return res.json({
       message: 'Missing permissions parameters.'
     });
   }
 
+  const connection = await pool.getConnection();
+
+  await connection.beginTransaction();
+
   try {
     if (hasAccess) {
-      await pool.query('INSERT INTO engagement_users (engagement_id, user_id, role) VALUES (?,?,?)', [engagementId, userId, 'member']);
+      await connection.query('INSERT INTO engagement_users (engagement_id, user_id, role) VALUES (?,?,?)', [engagementId, userId, 'member']);
     } else {
-      await pool.query(
+      await connection.query(
         `
           UPDATE tasks 
           SET assigned_to_id = NULL
@@ -29,11 +37,30 @@ module.exports = async (req, res, next) => {
         [userId, engagementId]
       );
 
-      await pool.query('DELETE FROM engagement_users WHERE engagement_id = ? AND user_id = ?', [engagementId, userId]);
+      await connection.query('DELETE FROM engagement_users WHERE engagement_id = ? AND user_id = ?', [engagementId, userId]);
+
+      const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+
+      if (orgOwnerPlan !== 'free') {
+        const { success, message } = await updateStripeSubscription(connection, updaterUserId, orgId);
+
+        if (!success) {
+          await connection.rollback();
+
+          connection.release();
+          return res.json({ message });
+        }
+      }
     }
+
+    await connection.commit();
+    connection.release();
 
     return res.json({ success: true });
   } catch (error) {
+    await connection.rollback();
+
+    connection.release();
     next(error);
   }
 };

@@ -23,4 +23,14 @@
     padding: 0;
     border-radius: 50%;
   }
+
+  .engagement-title {
+    padding: 0 8px;
+    flex-grow: 1;
+    margin-left: 2rem;
+
+    @media screen and (max-width: 500px) {
+      display: none;
+    }
+  }
 }

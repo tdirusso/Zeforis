@@ -1,11 +1,11 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { removeUser } from '../../api/engagements';
+import { removeOrgUser } from '../../api/users';
+import { DialogTitle, Typography } from '@mui/material';
 
 export default function RemoveOrgUserModal(props) {
   const {
@@ -14,7 +14,9 @@ export default function RemoveOrgUserModal(props) {
     org,
     setOrgUsers,
     openSnackBar,
-    userToRemove
+    userToRemove,
+    tasks,
+    setTasks
   } = props;
 
   const orgId = org.id;
@@ -28,7 +30,7 @@ export default function RemoveOrgUserModal(props) {
     setLoading(true);
 
     try {
-      const result = await removeUser({
+      const result = await removeOrgUser({
         orgId,
         userId
       });
@@ -37,11 +39,17 @@ export default function RemoveOrgUserModal(props) {
       const resultMessage = result.message;
 
       if (success) {
-        setTimeout(() => {
-          openSnackBar('Successully removed.', 'success');
-        }, 250);
-
         setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== userToRemove.id));
+
+        const tasksClone = [...tasks];
+        tasksClone.forEach(task => {
+          if (task.assigned_to_id && task.assigned_to_id === userToRemove.id) {
+            task.assigned_to_id = null;
+          }
+        });
+        setTasks(tasksClone);
+
+        openSnackBar('Successully removed.', 'success');
         handleClose();
       } else {
         openSnackBar(resultMessage, 'error');
@@ -60,24 +68,24 @@ export default function RemoveOrgUserModal(props) {
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={close}>
-        <DialogContent >
-          <DialogContentText style={{ marginBottom: '2rem' }}>
+      <Dialog open={isOpen} onClose={close} className='modal'>
+        <DialogTitle>
+          Remove User
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
             Are you sure you want to remove <strong>{name}</strong> from <strong>{orgName}?</strong>
-            <br></br>
-            <br></br>
+          </Typography>
+          <Typography mt={1} mb={3}>
             Proceeding will remove them from all engagements within {orgName} and unassign all tasks that are currently assigned to them.
-          </DialogContentText>
+          </Typography>
           <DialogActions style={{ padding: 0 }} className='wrap-on-small'>
             <Button
-              fullWidth
               disabled={isLoading}
-              variant='outlined'
               onClick={handleClose}>
               Cancel
             </Button>
             <LoadingButton
-              fullWidth
               variant='contained'
               onClick={handleRemoveOrgUser}
               required

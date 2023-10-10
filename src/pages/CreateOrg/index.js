@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import { Box, Button, Divider, Fade, Grow, Paper, TextField, Typography, createTheme } from '@mui/material';
+import { Box, Button, Divider, Fade, Paper, TextField, Typography, createTheme } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../../components/core/Snackbar';
-import createOrgIcon from '../../assets/create-org-icon.png';
+import rocketGif from '../../assets/rocket.gif';
 import { createOrg, setActiveOrgId, updateOrg } from '../../api/orgs';
 import useSnackbar from '../../hooks/useSnackbar';
 import { hexToRgb } from '../../lib/utils';
@@ -30,8 +30,8 @@ export default function CreateOrgPage({ setTheme }) {
   }
 
   return (
-    <Box className="flex-centered" style={{ height: '100%' }}>
-      <Box textAlign="center" maxWidth={600} p={3}>
+    <Box bgcolor='white' className="flex-centered" style={{ height: '100vh' }}>
+      <Box textAlign="center" maxWidth={600} px={3}>
         {
           step === 1 ?
             <Step1
@@ -94,27 +94,23 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
   };
 
   return (
-    <Box textAlign="center" mb={'100px'} maxWidth={600}>
-      <Grow appear in timeout={{ enter: 500 }}>
-        <Box mb={2}>
-          <img src={createOrgIcon} alt="" width={125} />
+    <Fade appear in timeout={{ enter: 400 }}>
+      <Box textAlign="center" mb={'100px'} maxWidth={600}>
+        <Box mb={1}>
+          <img src={rocketGif} alt="" width={100} />
         </Box>
-      </Grow>
-      <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '150ms' }}>
         <Box>
           <Box component="h2" mb={1}>
             Create an Organization
           </Box>
           <Divider className='my3' />
           <Typography>
-            Let's start by creating your own organization.
+            Let's start by creating your organization.
           </Typography>
           <Typography mt={1}>
             This should be your organization/company name.  When you create and manage engagements, they will be a part of your organization.
           </Typography>
         </Box>
-      </Fade>
-      <Fade appear in timeout={{ enter: 400 }} style={{ transitionDelay: '220ms' }}>
         <form onSubmit={handleCreateOrg}>
           <Box className='my3'>
             <TextField
@@ -135,13 +131,11 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
             Create Organization
           </LoadingButton>
         </form>
-      </Fade>
-      <Grow appear in>
         <Box>
           <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
         </Box>
-      </Grow>
-    </Box>
+      </Box>
+    </Fade>
   );
 }
 
@@ -228,78 +222,78 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   }
 
   return (
-    <Box className="info-page flex-centered">
-      <Box component="header">
-        {pageIcon}
-      </Box>
-      <Paper style={{ padding: '4rem', paddingTop: '2.5rem' }} className="container">
-        <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
-          Apply your Brand
-        </Typography>
-        <Box my={2} display='flex' alignItems='center'>
-          <Box>
-            <TwitterPicker
-              width='100%'
-              triangle="hide"
-              color={brandColor}
-              onChange={handleColorChange}
-            />
+    <Fade appear in timeout={{ enter: 400 }}>
+      <Box className="info-page flex-centered">
+        <Box component="header" style={{ justifyContent: 'center' }}>
+          {pageIcon}
+        </Box>
+        <Paper style={{ padding: '4rem', paddingTop: '2.5rem', zIndex: 2 }} className="container">
+          <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
+            Apply your Brand
+          </Typography>
+          <Box my={2} display='flex' alignItems='center'>
+            <Box>
+              <TwitterPicker
+                width='100%'
+                triangle="hide"
+                color={brandColor}
+                onChange={handleColorChange}
+              />
+            </Box>
           </Box>
-        </Box>
 
-        <Box className='flex-ac my4' style={{ justifyContent: 'space-evenly' }}>
-          <Button
-            startIcon={<ImageOutlinedIcon />}
-            variant='outlined'
-            component='label'
-            style={{ ...colorTransitionStyle, marginRight: '0.5rem' }}
-            disabled={isUpdatingBranding}>
-            Upload Logo
-            <input
-              hidden
-              accept="image/png,image/jpeg"
-              type="file"
-              onChange={handleLogoChange}
+          <Box className='flex-ac my4' style={{ justifyContent: 'space-evenly' }}>
+            <Button
+              startIcon={<ImageOutlinedIcon />}
+              variant='outlined'
+              component='label'
+              style={{ ...colorTransitionStyle, marginRight: '0.5rem' }}
+              disabled={isUpdatingBranding}>
+              Upload Logo
+              <input
+                hidden
+                accept="image/png,image/jpeg"
+                type="file"
+                onChange={handleLogoChange}
+                disabled={isUpdatingBranding}
+                ref={fileInput}
+              />
+            </Button>
+            <Button
+              style={{
+                ...colorTransitionStyle,
+                display: logoSrc ? 'block' : 'none'
+              }}
               disabled={isUpdatingBranding}
-              ref={fileInput}
-            />
-          </Button>
-          <Button
-            style={{
-              ...colorTransitionStyle,
-              display: logoSrc ? 'block' : 'none'
-            }}
-            disabled={isUpdatingBranding}
-            onClick={handleLogoClear}>
-            Clear Logo
-          </Button>
+              onClick={handleLogoClear}>
+              Clear Logo
+            </Button>
+          </Box>
+          <Divider className='my4' />
+          <Box>
+            <LoadingButton
+              style={colorTransitionStyle}
+              onClick={handleUpdateOrgBranding}
+              loading={isUpdatingBranding}
+              fullWidth
+              variant="contained">
+              Apply brand
+            </LoadingButton>
+          </Box>
+        </Paper>
+        <Box
+          component="a"
+          style={colorTransitionStyle}
+          href='/home/dashboard'
+          fontSize={14}
+          mt={1}>
+          Skip
         </Box>
-        <Divider className='my4' />
-        <Box>
-          <LoadingButton
-            style={colorTransitionStyle}
-            onClick={handleUpdateOrgBranding}
-            loading={isUpdatingBranding}
-            fullWidth
-            variant="contained">
-            Apply brand
-          </LoadingButton>
-        </Box>
-      </Paper>
-      <Box
-        component="a"
-        style={colorTransitionStyle}
-        href='/home/dashboard'
-        fontSize={14}
-        mt={1}>
-        Skip
-      </Box>
-      <Box style={colorTransitionStyle} className="circle"></Box>
-      <Grow appear in>
+        <Box style={colorTransitionStyle} className="circle"></Box>
         <Box>
           <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
         </Box>
-      </Grow>
-    </Box>
+      </Box>
+    </Fade>
   );
 }

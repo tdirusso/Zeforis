@@ -9,6 +9,7 @@ import {
   IconButton,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -24,6 +25,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 export default function GettingStartedDrawer(props) {
   const {
@@ -45,6 +47,13 @@ export default function GettingStartedDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
+      <Paper className='p0' style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
+        <Tooltip title="Close">
+          <IconButton onClick={close}>
+            <KeyboardDoubleArrowRightIcon />
+          </IconButton>
+        </Tooltip>
+      </Paper>
       <DialogContent>
         <Box
           mb={3}
@@ -237,7 +246,6 @@ function MemberGettingStartedDrawer(props) {
 
 
 
-
 function AdminGettingStartedDrawer(props) {
   const {
     close,
@@ -383,7 +391,7 @@ function AdminGettingStartedDrawer(props) {
         (Settings &rarr; Engagement &rarr; Members).
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/settings" component="a">Go to engagement settings &rarr;</Link>
+        <Link to="/home/settings/engagement/collaborators" component="a">Go to engagement settings &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From this page, click the
@@ -423,7 +431,7 @@ function AdminGettingStartedDrawer(props) {
         These customizations can be done from Settings &rarr; Organization &rarr; Branding.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/settings?tab=1" component="a">Go to branding settings &rarr;</Link>
+        <Link to="/home/settings/organization/about" component="a">Go to branding settings &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         The "Custom Login Page" feature provides your customers with a custom login experience by incorporating your branding into the login page, delivering a professional touch while

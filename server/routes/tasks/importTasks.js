@@ -1,14 +1,18 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
+const cache = require('../../../cache');
+const { appLimits } = require('../../../config');
 
 module.exports = async (req, res, next) => {
   const {
-    engagementId,
     importRows = []
   } = req.body;
 
+  const { engagementId } = req;
   const creatorUserId = req.userId;
+  const userObject = req.userObject;
+  const { orgId } = userObject;
 
-  if (!engagementId || !importRows.length === 0) {
+  if (!engagementId || importRows.length === 0) {
     return res.json({
       message: 'Missing import parameters.'
     });
@@ -19,6 +23,28 @@ module.exports = async (req, res, next) => {
   await connection.beginTransaction();
 
   try {
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+
+    let orgTaskCount = null;
+
+    if (orgOwnerPlan === 'free') {
+      orgTaskCount = await commonQueries.getOrgTaskCount(connection, orgId);
+
+      if (orgTaskCount >= appLimits.freePlanTasks) {
+        await connection.rollback();
+        connection.release();
+        return res.json({
+          message: `Task limit of ${appLimits.freePlanTasks} has been reached.  Upgrade now for unlimited tasks.`
+        });
+      } else if (orgTaskCount + importRows.length > appLimits.freePlanTasks) {
+        await connection.rollback();
+        connection.release();
+        return res.json({
+          message: `Cannot import - task limit of ${appLimits.freePlanTasks} will be exceeded.  Upgrade now for unlimited tasks.`
+        });
+      }
+    }
+
     const [existingFolders] = await connection.query(
       `SELECT id, name FROM folders WHERE engagement_id = ?`,
       [engagementId]
@@ -90,7 +116,7 @@ module.exports = async (req, res, next) => {
       const {
         name,
         description = '',
-        status = 'New',
+        status,
         folder,
         url = '',
         isKeyTask = false
@@ -100,18 +126,19 @@ module.exports = async (req, res, next) => {
         taskInsertVals.push([
           name,
           description,
-          status,
+          status || 'New',
           folderNameToIdMap[folder],
           url,
           Number(isKeyTask),
           creatorUserId,
-          creatorUserId
+          creatorUserId,
+          status === 'Complete' ? 'CURRENT_TIMESTAMP' : null
         ]);
       }
     });
 
     const insertResult = await connection.query(
-      `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id)
+      `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed)
        VALUES ?`,
       [taskInsertVals]
     );
@@ -141,6 +168,10 @@ module.exports = async (req, res, next) => {
       );
     }
 
+    if (orgOwnerPlan === 'free') {
+      cache.set(`org-${orgId}`, { ...cache.get(`org-${orgId}`), taskCount: orgTaskCount + taskInsertVals.length });
+    }
+
     await connection.commit();
 
     connection.release();
@@ -151,6 +182,7 @@ module.exports = async (req, res, next) => {
 
   } catch (error) {
     await connection.rollback();
+
     connection.release();
     next(error);
   }

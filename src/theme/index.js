@@ -10,22 +10,15 @@ const theme = {
     fontFamily: 'Inter',
   },
   components: {
-    MuiAlert: {
-      styleOverrides: {
-        root: {
-          justifyContent: 'center',
-        }
-      }
-    },
     MuiTooltip: {
       defaultProps: {
-        arrow: true,
+        arrow: false,
       }
     },
     MuiMenu: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
           padding: '0 !important'
         }
       },
@@ -37,7 +30,7 @@ const theme = {
     MuiAutocomplete: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
           padding: '0 !important'
         }
       }
@@ -45,7 +38,7 @@ const theme = {
     MuiPickersPopper: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
           padding: '0 !important'
         }
       }
@@ -53,7 +46,7 @@ const theme = {
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: 'rgba(204, 207, 242, 0.4) 0px 7px 24px 0px',
+          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px',
           borderRadius: '24px',
           padding: '24px'
         }
@@ -145,6 +138,54 @@ const theme = {
           textTransform: 'none'
         }
       }
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          width: 35,
+          height: 20,
+          padding: 0,
+          '& .MuiSwitch-switchBase': {
+            padding: 0,
+            margin: 2,
+            transitionDuration: '300ms',
+            '&.Mui-checked': {
+              transform: 'translateX(14px)',
+              color: '#fff',
+              '& + .MuiSwitch-track': {
+                backgroundColor: 'var(--colors-primary)',
+                opacity: 1,
+                border: 0,
+              },
+              '&.Mui-disabled + .MuiSwitch-track': {
+                opacity: 0.5,
+              },
+            },
+            '&.Mui-focusVisible .MuiSwitch-thumb': {
+              color: '#33cf4d',
+              border: '6px solid #fff',
+            },
+            '&.Mui-disabled .MuiSwitch-thumb': {
+              color: '#f5f5f5'
+
+            },
+            '&.Mui-disabled + .MuiSwitch-track': {
+              opacity: 0.7
+            },
+          },
+          '& .MuiSwitch-thumb': {
+            boxSizing: 'border-box',
+            width: 16,
+            height: 16,
+          },
+          '& .MuiSwitch-track': {
+            borderRadius: 26 / 2,
+            backgroundColor: '#E9E9EA',
+            opacity: 1,
+            transition: 'background-color 500ms'
+          }
+        }
+      }
     }
   }
 };
@@ -185,6 +226,54 @@ const darkThemeOverrides = {
           boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px',
           borderRadius: '24px',
           padding: '24px'
+        }
+      }
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          width: 40,
+          height: 20,
+          padding: 0,
+          '& .MuiSwitch-switchBase': {
+            padding: 0,
+            margin: 2,
+            transitionDuration: '300ms',
+            '&.Mui-checked': {
+              transform: 'translateX(19px)',
+              color: '#fff',
+              '& + .MuiSwitch-track': {
+                backgroundColor: 'var(--colors-primary)',
+                opacity: 1,
+                border: 0,
+              },
+              '&.Mui-disabled + .MuiSwitch-track': {
+                opacity: 0.5,
+              },
+            },
+            '&.Mui-focusVisible .MuiSwitch-thumb': {
+              color: '#33cf4d',
+              border: '6px solid #fff',
+            },
+            '&.Mui-disabled .MuiSwitch-thumb': {
+              color: '#757575'
+
+            },
+            '&.Mui-disabled + .MuiSwitch-track': {
+              opacity: 0.3
+            },
+          },
+          '& .MuiSwitch-thumb': {
+            boxSizing: 'border-box',
+            width: 16,
+            height: 16,
+          },
+          '& .MuiSwitch-track': {
+            borderRadius: 26 / 2,
+            backgroundColor: '#39393D',
+            opacity: 1,
+            transition: 'background-color 500ms'
+          }
         }
       }
     }

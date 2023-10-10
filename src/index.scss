@@ -8,7 +8,6 @@
 html,
 body,
 #root {
-  height: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
 }
@@ -75,7 +74,7 @@ body.dark {
 }
 
 .m2 {
-  margin: 1rem;
+  margin: 1rem !important;
 }
 
 .m0a {
@@ -153,32 +152,22 @@ h6 {
   color: #273bce;
 }
 
-.MuiChip-root.Next.Up {
-  background-color: #8527ce1a;
-  color: #8527ce;
-}
-
 .MuiChip-root.In.Progress {
   background-color: #ffa5001c;
   color: orange;
 }
 
-.MuiChip-root.Currently.Writing {
-  background-color: #ffc0cb2b;
-  color: pink;
-}
-
-.MuiChip-root.Pending.Approval {
+.MuiChip-root.Blocked {
   background-color: #ff00000f;
   color: red;
 }
 
-.MuiChip-root.Approved {
+.MuiChip-root.Review {
   background-color: #00d0d01c;
   color: #00d0d0;
 }
 
-.MuiChip-root.Ready.to.Implement {
+.MuiChip-root.On.Hold {
   background-color: #a52a2a12;
   color: brown;
 }
@@ -197,9 +186,15 @@ h6 {
   border-bottom-right-radius: 0px !important;
 }
 
+.modal .MuiPaper-root {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important;
+}
+
 .alert {
   width: 100% !important;
   font-weight: 300 !important;
+  display: flex;
+  align-items: center;
 }
 
 .readonly-textfield {
@@ -220,6 +215,12 @@ h6 {
 
 .MuiTab-root {
   font-weight: 400 !important;
+}
+
+.MuiFormControlLabel-root {
+  .MuiSwitch-root {
+    margin-right: 10px;
+  }
 }
 
 @media screen and (max-width: 550px) {

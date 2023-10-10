@@ -28,7 +28,7 @@ export default function ChooseOrgScreen(props) {
   }, [orgId]);
 
   return (
-    <Box>
+    <Box className="flex-centered" style={{ height: '100vh' }}>
       <DialogContent className='m0a' style={{ maxWidth: 1200 }}>
         <Box style={{ marginBottom: '4rem' }}>
           <Box

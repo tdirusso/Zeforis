@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FolderIcon from '@mui/icons-material/Folder';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import './styles/Header.scss';
@@ -22,6 +22,8 @@ import HelpIcon from '@mui/icons-material/Help';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { updateTheme } from "../../lib/utils";
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import LockIcon from '@mui/icons-material/Lock';
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -63,7 +65,7 @@ export default function Header(props) {
 
   const openSettings = () => {
     setAnchorEl(null);
-    navigate('/home/settings');
+    navigate('/home/settings/engagement/collaborators');
   };
 
   const openChangeOrgOrEngagement = () => {
@@ -108,42 +110,55 @@ export default function Header(props) {
       <Box className="header-box">
         <Box>
           <Tooltip title={isSideNavOpen ? 'Close Menu' : 'Open Menu'}>
-            <Paper className="header-button">
-              <IconButton
-                size="large"
-                onClick={toggleSideNav}>
-                <MenuOpenIcon
-                  style={{
-                    transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
-                    transition: 'transform 200ms'
-                  }}
-                />
-              </IconButton>
-            </Paper>
+            <IconButton
+              size="large"
+              onClick={toggleSideNav}>
+              <MenuOpenIcon
+                style={{
+                  transform: isSideNavOpen ? 'rotate(0deg)' : 'rotate(180deg)',
+                  transition: 'transform 200ms'
+                }}
+              />
+            </IconButton>
           </Tooltip>
+        </Box>
+        <Box className="engagement-title">
+          <Box className="flex-ac">
+            <Typography variant='h1' style={{ fontSize: '2rem', fontWeight: 200 }} mr={2}>
+              {engagement.name}
+            </Typography>
+            <Tooltip title="Change Engagement">
+              {/* <Paper className="header-button"> */}
+                <IconButton
+                  onClick={() => openDialog('choose-engagement')}>
+                  <SwapHorizIcon />
+                </IconButton>
+              {/* </Paper> */}
+            </Tooltip>
+          </Box>
         </Box>
         <Box display="flex">
           <Box mr={2}>
             <Tooltip title="Search">
-              <Paper className="header-button">
+              {/* <Paper className="header-button"> */}
                 <IconButton
                   size="large"
                   onClick={openSearch}>
                   <SearchIcon />
                 </IconButton>
-              </Paper>
+              {/* </Paper> */}
             </Tooltip>
           </Box>
           <Box hidden={!isAdmin} mr={2}>
             <Tooltip title="Actions">
-              <Paper className="header-button">
+              {/* <Paper className="header-button"> */}
                 <IconButton
                   className="actions-menu"
                   size="large"
                   onClick={handleMenuClick}>
                   <MoreVertIcon />
                 </IconButton>
-              </Paper>
+              {/* </Paper> */}
             </Tooltip>
             <Menu
               anchorEl={anchorEl}
@@ -152,6 +167,7 @@ export default function Header(props) {
               PaperProps={{
                 style: {
                   width: '20ch',
+                  overflow: 'visible'
                 }
               }}>
               <MenuItem onClick={openCreateTaskDrawer}>
@@ -174,10 +190,15 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
-              <Divider hidden={!isOrgOwner}/>
-              <MenuItem onClick={openCreateEngagementDialog} hidden={!isOrgOwner}>
+              <Divider hidden={!isOrgOwner} />
+              <MenuItem
+                disabled={user.plan === 'free'}
+                onClick={openCreateEngagementDialog}
+                hidden={!isOrgOwner}>
                 <ListItemIcon>
-                  <AccountBoxIcon />
+                  {
+                    user.plan === 'free' ? <LockIcon /> : <AccountBoxIcon />
+                  }
                 </ListItemIcon>
                 <ListItemText>
                   <Typography>
@@ -185,12 +206,26 @@ export default function Header(props) {
                   </Typography>
                 </ListItemText>
               </MenuItem>
+              <Paper
+                hidden={(user.plan !== 'free' && isOrgOwner) || !isOrgOwner}
+                style={{
+                  padding: '0px',
+                  position: 'absolute',
+                  left: '20px',
+                  bottom: '-27px'
+                }}>
+                <Box>
+                  <Link to='settings/account/billing' onClick={handleMenuClose}>
+                    <Button size="small" variant="contained">Upgrade now</Button>
+                  </Link>
+                </Box>
+              </Paper>
             </Menu>
           </Box>
 
           <Box>
             <Tooltip title="Settings">
-              <Paper style={{ padding: 0, borderRadius: '24px' }}>
+              {/* <Paper style={{ padding: 0, borderRadius: '24px' }}> */}
                 <IconButton
                   className="org-menu"
                   style={{ borderRadius: '24px' }}
@@ -201,7 +236,7 @@ export default function Header(props) {
                   </Box>
                   <KeyboardArrowDownRoundedIcon />
                 </IconButton>
-              </Paper>
+              {/* </Paper> */}
             </Tooltip>
 
             <Menu
@@ -285,7 +320,7 @@ export default function Header(props) {
 
               <Box textAlign='center'>
                 <ToggleButtonGroup
-                  style={{ width: '200px' }}
+                  style={{ width: '90%' }}
                   size="small"
                   onChange={handleThemeChange}
                   exclusive
@@ -306,7 +341,7 @@ export default function Header(props) {
 
               <Divider style={{ margin: '8px 0' }} />
 
-              <MenuItem onClick={() => logout(user.email, customLoginPageUrl)} dense>
+              <MenuItem onClick={() => logout(customLoginPageUrl)} dense>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>

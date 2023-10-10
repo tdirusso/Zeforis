@@ -1,9 +1,7 @@
 const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
-  const {
-    orgId
-  } = req.body;
+  const orgId = req.ownedOrg.id;
 
   if (!orgId) {
     return res.json({

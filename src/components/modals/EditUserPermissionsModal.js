@@ -1,8 +1,7 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import { useState } from 'react';
-import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery } from '@mui/material';
+import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery, DialogTitle } from '@mui/material';
 import { updateAccess, updatePermission, batchUpdateAccess, batchUpdatePermission } from '../../api/users';
 import Switch from '@mui/material/Switch';
 import EditIcon from '@mui/icons-material/Edit';
@@ -12,6 +11,7 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import HelpIcon from '@mui/icons-material/Help';
 import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate } from 'react-router-dom';
 
 export default function EditUserPermissionsModal(props) {
   const {
@@ -24,6 +24,8 @@ export default function EditUserPermissionsModal(props) {
     openSnackBar,
     org
   } = props;
+
+  const navigate = useNavigate();
 
   const isSmallScreen = useMediaQuery('(max-width: 800px)');
 
@@ -50,7 +52,7 @@ export default function EditUserPermissionsModal(props) {
     const engagementName = engagementObject.name;
 
     try {
-      const { success, message } = await updatePermission({
+      const { success, message, uiProps } = await updatePermission({
         isAdmin,
         engagementId,
         userId: user.id,
@@ -76,7 +78,17 @@ export default function EditUserPermissionsModal(props) {
         setLoading(false);
         openSnackBar('Permission updated.', 'success');
       } else {
-        openSnackBar(message, 'error');
+        if (uiProps && uiProps.alertType === 'upgrade') {
+          openSnackBar(message, 'error', {
+            actionName: 'Upgrade now',
+            actionHandler: () => {
+              handleClose();
+              navigate('settings/account/billing');
+            }
+          });
+        } else {
+          openSnackBar(message, 'error');
+        }
         setLoading(false);
       }
     } catch (error) {
@@ -124,7 +136,10 @@ export default function EditUserPermissionsModal(props) {
   };
 
   const handleClose = () => {
+    setBulkAccessMenu(false);
+    setBulkAdminMenu(false);
     close();
+
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -179,7 +194,7 @@ export default function EditUserPermissionsModal(props) {
     }
 
     try {
-      const { success, message } = await batchUpdatePermission({
+      const { success, message, uiProps } = await batchUpdatePermission({
         isAdmin,
         userId: user.id,
         orgId: org.id
@@ -200,7 +215,17 @@ export default function EditUserPermissionsModal(props) {
         setBulkAdminMenu(null);
         openSnackBar('Permissions updated.', 'success');
       } else {
-        openSnackBar(message, 'error');
+        if (uiProps && uiProps.alertType === 'upgrade') {
+          openSnackBar(message, 'error', {
+            actionName: 'Upgrade now',
+            actionHandler: () => {
+              handleClose();
+              navigate('settings/account/billing');
+            }
+          });
+        } else {
+          openSnackBar(message, 'error');
+        }
         setEnablingAdmin(false);
         setDisablingAdmin(false);
       }
@@ -214,24 +239,25 @@ export default function EditUserPermissionsModal(props) {
   return (
     <>
       <Dialog
+        className='modal'
         fullScreen={isSmallScreen}
         open={isOpen}
         onClose={handleClose}
         PaperProps={{
           className: 'permissions-dialog'
         }}>
-        <DialogContent className='content'>
-          <Box>
-            <IconButton
-              size="large"
-              onClick={handleClose}>
-              <CloseIcon
-              />
-            </IconButton>
-          </Box>
-          <DialogContentText style={{ marginBottom: '1rem' }} className='flex-ac'>
+        <Box ml={1.5}>
+          <IconButton
+            onClick={handleClose}>
+            <CloseIcon
+            />
+          </IconButton>
+        </Box>
+        <DialogTitle style={{ paddingTop: 0, paddingBottom: 0 }} component={Box}>
+          Edit Permissions
+          <Box className='flex-ac'>
             <Typography>
-              Viewing permissions for&nbsp; <strong>{user?.firstName} {user?.lastName} - {user?.email}.</strong>
+              {user?.firstName} {user?.lastName}  ({user?.email})
             </Typography>
             <CircularProgress
               size={20}
@@ -240,13 +266,10 @@ export default function EditUserPermissionsModal(props) {
                 display: isLoading ? 'inline-block' : 'none'
               }}
             />
-          </DialogContentText>
-          <Typography variant='body2' mt={2}>
-            Removing access entirely will automatically unassign all tasks to this user for the associated engagement.
-          </Typography>
+          </Box>
           <Box
             mb={1}
-            mt={3}
+            mt={1}
             display="flex"
             alignItems="center">
             <Box component="h5" flexBasis="55%" >
@@ -290,6 +313,8 @@ export default function EditUserPermissionsModal(props) {
               </Box>
             </Box>
           </Box>
+        </DialogTitle>
+        <DialogContent className='content'>
           {
             engagements.map(engagement => {
               const isMember = memberOfEngagementIds.includes(engagement.id);

@@ -4,18 +4,20 @@ export default function useSnackbar() {
   const [isOpen, setOpen] = useState(false);
   const [message, setMessage] = useState(null);
   const [type, setType] = useState(null);
+  const [snackBarProps, setSnackBarProps] = useState({});
 
   useEffect(() => {
     if (isOpen === true) {
       setTimeout(() => {
         setOpen(false);
-      }, 3000);
+      }, 4000);
     }
   }, [isOpen]);
 
-  const openSnackBar = (message = 'Something went wrong...', type = 'warning') => {
+  const openSnackBar = (message = 'Something went wrong...', type = 'warning', options = {}) => {
     setMessage(message);
     setType(type);
+    setSnackBarProps(options);
     setOpen(true);
   };
 
@@ -23,6 +25,7 @@ export default function useSnackbar() {
     isOpen,
     message,
     type,
+    snackBarProps,
     openSnackBar
   };
 };

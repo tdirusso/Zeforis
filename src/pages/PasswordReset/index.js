@@ -9,14 +9,12 @@ import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import InputAdornment from '@mui/material/InputAdornment';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { sendPasswordResetLink, updatePassword } from "../../api/users";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { isMobile } from "../../lib/constants";
+import { Button } from "@mui/material";
 
 export default function PasswordResetPage() {
   const { search } = useLocation();
@@ -38,25 +36,26 @@ export default function PasswordResetPage() {
         <Box component="a" href="https://www.zeforis.com" target="_blank">
           <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
         </Box>
-        <Box display="flex" alignItems="center">
-          <Box
-            display="flex"
-            alignItems="center"
-            mr={1.5}
-            component="a"
-            href="/login">
-            <ArrowBackRoundedIcon fontSize="small" /> &nbsp;Back to login
-          </Box>
-        </Box>
+        <a href='/login'>
+          <Button size="large" startIcon={<ArrowBackRoundedIcon />}>
+            Back to login
+          </Button>
+        </a>
       </Box>
-      <Paper className="container">
+      <Paper className="container" style={{ zIndex: 2 }}>
         <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
           Password Reset
         </Typography>
         {
           !email || !resetCode ?
-            <PasswordResetStep1 openSnackBar={openSnackBar} /> :
-            <PasswordResetStep2 openSnackBar={openSnackBar} email={email} resetCode={resetCode} />
+            <PasswordResetStep1
+              openSnackBar={openSnackBar}
+            /> :
+            <PasswordResetStep2
+              openSnackBar={openSnackBar}
+              email={email}
+              resetCode={resetCode}
+            />
         }
       </Paper>
       <Box className="circle"></Box>
@@ -116,13 +115,6 @@ function PasswordResetStep1({ openSnackBar }) {
           style={{ marginBottom: '2rem' }}
           type="email"
           onChange={e => setEmail(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <MailOutlineIcon htmlColor="#cbcbcb" />
-              </InputAdornment>
-            )
-          }}
           disabled={isSendingResetLink}
           autoFocus={!isMobile}
         />
@@ -195,13 +187,6 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
           placeholder="New password"
           variant="outlined"
           type="password"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <VpnKeyIcon htmlColor="#cbcbcb" />
-              </InputAdornment>
-            )
-          }}
           style={{ marginBottom: '2rem' }}
           disabled={isResettingPassword}
           autoFocus={!isMobile}
@@ -220,10 +205,17 @@ function PasswordResetStep2({ openSnackBar, email, resetCode }) {
           Reset password
         </LoadingButton>
       </form>
-      <Typography className="flex-ac" hidden={!passwordReset}>
+      <Typography className="flex-centered" hidden={!passwordReset}>
         <CheckCircleRoundedIcon htmlColor="#4caf50" />
         &nbsp;Password successfully reset.
       </Typography>
+      <Box mt={2}>
+        <Box component='a' href="/login">
+          <Button size="large" variant="contained">
+            Return to login
+          </Button>
+        </Box>
+      </Box>
     </>
   );
 }

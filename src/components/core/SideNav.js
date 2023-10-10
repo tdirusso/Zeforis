@@ -55,6 +55,7 @@ export default function SideNav(props) {
             </Typography>
         }
         <Typography
+          className="engagement-header"
           variant="body1"
           mt={1}>
           {engagement.name}

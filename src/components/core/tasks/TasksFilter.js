@@ -17,10 +17,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import './styles.scss';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import { useOutletContext } from "react-router-dom";
 import Switch from '@mui/material/Switch';
 import StarIcon from '@mui/icons-material/Star';
@@ -41,8 +38,6 @@ export default function TasksFilter(props) {
     filterKeyTasks,
     filterStatus,
     filterFolder,
-    setSortBy,
-    sortBy,
     filterName,
     filterAssignedTo,
     filterTags
@@ -62,7 +57,6 @@ export default function TasksFilter(props) {
     setFilterFolder(null);
     setFilterStatus('all');
     setFilterKeyTasks(false);
-    setSortBy('name');
   };
 
   return (
@@ -198,6 +192,7 @@ export default function TasksFilter(props) {
               <Grid item xs={12} md={4}></Grid>
               <Grid item xs={12}>
                 <FormControlLabel
+                  style={{ marginLeft: '0' }}
                   control={<Switch
                     checked={filterKeyTasks}
                     onChange={(_, val) => setFilterKeyTasks(val)}
@@ -209,37 +204,6 @@ export default function TasksFilter(props) {
                     </Typography>
                   }
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl className="filter-sort-buttons">
-                  <FormLabel>Sort by</FormLabel>
-                  <RadioGroup
-                    row
-                    value={sortBy}
-                    onChange={(_, val) => setSortBy(val)}
-                    name="row-radio-buttons-group">
-                    <FormControlLabel
-                      value="name"
-                      control={<Radio size="small" />}
-                      label="Task Name (default)"
-                    />
-                    <FormControlLabel
-                      value="status"
-                      control={<Radio size="small" />}
-                      label="Status"
-                    />
-                    <FormControlLabel
-                      value="dateDue"
-                      control={<Radio size="small" />}
-                      label="Date Due"
-                    />
-                    <FormControlLabel
-                      value="folder"
-                      control={<Radio size="small" />}
-                      label="Folder"
-                    />
-                  </RadioGroup>
-                </FormControl>
               </Grid>
               <Grid item xs mt={1}>
                 <Button
@@ -254,6 +218,5 @@ export default function TasksFilter(props) {
         </Accordion>
       </Paper>
     </Grid>
-
   );
 };

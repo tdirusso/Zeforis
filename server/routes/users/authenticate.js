@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
 const { pool } = require('../../../database');
+const { createJWT } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
     return res.json({
-      message: 'Unauthorized.'
+      message: 'Missing authentication token.'
     });
   }
 
@@ -18,31 +19,11 @@ module.exports = async (req, res, next) => {
     if (authenticatedUser) {
       const userId = authenticatedUser.id;
 
-      const [engagementMemberData] = await pool.query(
-        `
-          SELECT 
-            engagement_users.engagement_id, 
-            engagement_users.user_id,
-            engagement_users.role,
-            orgs.name AS org_name,
-            orgs.brand_color AS org_brand,
-            orgs.logo_url AS org_logo,
-            orgs.id AS org_id,
-            orgs.owner_id AS org_owner,
-            engagements.name AS engagement_name
-          FROM engagement_users
-          LEFT JOIN engagements ON engagements.id = engagement_users.engagement_id
-          LEFT JOIN orgs ON orgs.id = engagements.org_id
-          WHERE user_id = ?
-          ORDER BY engagement_name
-        `,
-        [userId]
-      );
+      const [userDataResult] = await pool.query('CALL getUserData(?)', [userId]);
 
-      const [ownedOrgsData] = await pool.query(
-        'SELECT id, name, brand_color, logo_url, owner_id FROM orgs WHERE owner_id = ? ORDER BY name',
-        [userId]
-      );
+      const [userPlanData, engagementMemberData, ownedOrgsData] = userDataResult;
+
+      const userObect = { ...authenticatedUser, ...userPlanData[0] };
 
       const memberOfOrgs = new Map();
       const memberOfEngagements = [];
@@ -91,28 +72,18 @@ module.exports = async (req, res, next) => {
         }
       });
 
-      const newToken = jwt.sign(
-        {
-          user: {
-            ...authenticatedUser,
-          }
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: 3600 }
-      );
-
       return res.json({
         user: {
-          ...authenticatedUser,
+          ...userObect,
           memberOfOrgs: [...memberOfOrgs.values()],
           adminOfEngagements,
           memberOfEngagements
         },
-        token: newToken
+        token: createJWT({ ...userObect })
       });
     }
 
-    return res.json({ message: 'Unauthenticated.' });
+    return res.json({ message: 'Invalid authentication token.' });
 
   } catch (error) {
     next(error);

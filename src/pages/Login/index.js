@@ -12,9 +12,6 @@ import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import '../styles.scss';
 import { Button, CircularProgress, Divider, createTheme, useMediaQuery } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
@@ -22,10 +19,11 @@ import themeConfig from "../../theme";
 import { resendVerificationLink } from "../../api/users";
 import Watermark from "../../components/core/Watermark";
 import { isMobile } from "../../lib/constants";
+import { setActiveEngagementId } from "../../api/engagements";
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
-  
+
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
   const searchParams = new URLSearchParams(search);
@@ -46,6 +44,7 @@ export default function LoginPage({ setTheme }) {
   } = useSnackbar();
 
   const customPageParam = searchParams.get('cp');
+  const engagementIdParam = searchParams.get('engagementId');
   let needsCustomPage = false;
   let orgId;
 
@@ -73,6 +72,9 @@ export default function LoginPage({ setTheme }) {
 
         if (result.token) {
           if (needsCustomPage && customPageData) {
+            if (engagementIdParam) {
+              setActiveEngagementId(engagementIdParam);
+            }
             setActiveOrgId(orgId);
           }
           window.location.href = '/home/dashboard';
@@ -90,28 +92,35 @@ export default function LoginPage({ setTheme }) {
     }
   };
 
-  const initializeGoogleButton = () => {
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-      callback: handleGoogleLogin
-    });
+  const tryLoadGoogleButton = () => {
+    if (window.google?.accounts) {
+      clearInterval(window.googleButtonInterval);
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        callback: handleGoogleLogin
+      });
 
-    window.google.accounts.id.renderButton(
-      document.getElementById('google-signin'),
-      {
-        theme: "outline",
-        size: "large",
-        width: isSmallScreen ? 300 : 325
-      }
-    );
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin'),
+        {
+          theme: "outline",
+          size: "large",
+          width: isSmallScreen ? 300 : 325,
+          text: 'continue_with'
+        }
+      );
+
+      return true;
+    }
+
+    return false;
   };
 
   useEffect(() => {
     if (!needsCustomPage) {
-      if (document.readyState === 'complete') {
-        initializeGoogleButton();
-      } else {
-        window.onload = initializeGoogleButton;
+      const ableToLoadButton = tryLoadGoogleButton();
+      if (!ableToLoadButton) {
+        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
       }
     } else {
       fetchCustomPageData();
@@ -145,7 +154,10 @@ export default function LoginPage({ setTheme }) {
 
   useEffect(() => {
     if (doneFetchingCustomPage) {
-      initializeGoogleButton();
+      const ableToLoadButton = tryLoadGoogleButton();
+      if (!ableToLoadButton) {
+        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+      }
     }
   }, [doneFetchingCustomPage]);
 
@@ -268,23 +280,17 @@ export default function LoginPage({ setTheme }) {
           </Button>
         </Box>
       </Box>
-      <Paper className="container">
-        <Typography variant="h5" style={{ marginBottom: '2.5rem' }}>
+      <Paper className="container" style={{ zIndex: 2 }}>
+        <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>
           Sign in
         </Typography>
-        <form onSubmit={handleLogin}>
+        <Box id="google-signin"></Box>
+        <Divider className="my4" />
+        <Box component='form' onSubmit={handleLogin} display='flex' flexDirection='column' gap='1rem'>
           <TextField
             placeholder="Email"
             variant="outlined"
-            style={{ marginBottom: '2rem' }}
             type="email"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MailOutlineIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
             inputRef={email}
             disabled={isLoading}
             autoFocus={!isMobile}
@@ -293,28 +299,17 @@ export default function LoginPage({ setTheme }) {
             placeholder="Password"
             variant="outlined"
             type="password"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <VpnKeyIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              )
-            }}
+            helperText={<a tabIndex={1} href="password-reset">Forgot password?</a>}
             inputRef={password}
             disabled={isLoading}
           />
-          <Box component="span" style={{ textAlign: 'right', marginBottom: '1.75rem' }}>
-            <Box component="a" href="/password-reset" fontSize="small">
-              Forgot password?
-            </Box>
-          </Box>
 
           <LoadingButton
             loading={isLoading}
             disabled={isLoading}
             fullWidth
             size="large"
-            style={{ padding: '0.75rem 0.5rem' }}
+            style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
             variant="contained"
             type="submit">
             Sign in
@@ -322,9 +317,7 @@ export default function LoginPage({ setTheme }) {
           <Box mt={1} hidden={!Boolean(verificationContent)}>
             {verificationContent}
           </Box>
-          <Divider className="my4" />
-          <Box id="google-signin"></Box>
-        </form>
+        </Box>
       </Paper>
       <Box
         hidden={!needsCustomPage}
