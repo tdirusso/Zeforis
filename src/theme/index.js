@@ -1,3 +1,5 @@
+import { Fade } from "@mui/material";
+
 const theme = {
   palette: {
     primary: {
@@ -23,8 +25,9 @@ const theme = {
         }
       },
       defaultProps: {
-        transitionDuration: 150,
-        disableScrollLock: true
+        transitionDuration: 250,
+        disableScrollLock: true,
+        TransitionComponent: Fade
       }
     },
     MuiAutocomplete: {
@@ -47,7 +50,7 @@ const theme = {
       styleOverrides: {
         root: {
           boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px',
-          borderRadius: '24px',
+          borderRadius: '14px',
           padding: '24px'
         }
       }
@@ -62,7 +65,7 @@ const theme = {
           whiteSpace: 'nowrap',
           boxShadow: 'none',
           fontWeight: 400,
-          borderRadius: '12px',
+          borderRadius: '8px',
           transitionDuration: '0s',
           '&:hover': {
             boxShadow: 'none'
@@ -77,7 +80,7 @@ const theme = {
           textTransform: 'none',
           boxShadow: 'none',
           fontWeight: 400,
-          borderRadius: '12px',
+          borderRadius: '8px',
           transitionDuration: '0s',
           '&:hover': {
             boxShadow: 'none'
@@ -101,7 +104,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '12px',
+            borderRadius: '8px',
           }
         }
       }
@@ -124,7 +127,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '12px'
+            borderRadius: '8px'
           }
         }
       }

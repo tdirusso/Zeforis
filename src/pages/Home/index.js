@@ -25,6 +25,7 @@ import ChooseOrgScreen from "../../components/core/ChooseOrgScreen";
 import './styles.scss';
 import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
 import useNotification from "../../hooks/useNotification";
+import ActionCenter from "../../components/admin/ActionCenter";
 
 export default function Home({ setTheme }) {
   let activeOrgId = getActiveOrgId();
@@ -386,6 +387,8 @@ export default function Home({ setTheme }) {
               dialogToOpen={dialogToOpen}
               closeDialog={closeDialog}
             />
+
+            <ActionCenter openDrawer={openDrawer} />
 
             <Outlet context={context} />
           </Grid>

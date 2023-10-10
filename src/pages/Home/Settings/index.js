@@ -57,7 +57,7 @@ export default function Settings() {
             <li>
               <NavLink to="organization/about" draggable={false}>
                 <InfoOutlinedIcon />
-                Details
+                Branding & Details
               </NavLink>
             </li>
           </ul>

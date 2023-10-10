@@ -124,41 +124,37 @@ export default function Header(props) {
         </Box>
         <Box className="engagement-title">
           <Box className="flex-ac">
-            <Typography variant='h1' style={{ fontSize: '2rem', fontWeight: 200 }} mr={2}>
+            <Typography variant='h1' style={{ fontSize: '1.75rem', fontWeight: 200 }} mr={2}>
               {engagement.name}
             </Typography>
             <Tooltip title="Change Engagement">
-              {/* <Paper className="header-button"> */}
+              <Paper className="header-button">
                 <IconButton
                   onClick={() => openDialog('choose-engagement')}>
                   <SwapHorizIcon />
                 </IconButton>
-              {/* </Paper> */}
+              </Paper>
             </Tooltip>
           </Box>
         </Box>
         <Box display="flex">
           <Box mr={2}>
             <Tooltip title="Search">
-              {/* <Paper className="header-button"> */}
-                <IconButton
-                  size="large"
-                  onClick={openSearch}>
-                  <SearchIcon />
-                </IconButton>
-              {/* </Paper> */}
+              <IconButton
+                size="large"
+                onClick={openSearch}>
+                <SearchIcon />
+              </IconButton>
             </Tooltip>
           </Box>
           <Box hidden={!isAdmin} mr={2}>
             <Tooltip title="Actions">
-              {/* <Paper className="header-button"> */}
                 <IconButton
                   className="actions-menu"
                   size="large"
                   onClick={handleMenuClick}>
                   <MoreVertIcon />
                 </IconButton>
-              {/* </Paper> */}
             </Tooltip>
             <Menu
               anchorEl={anchorEl}
@@ -225,7 +221,7 @@ export default function Header(props) {
 
           <Box>
             <Tooltip title="Settings">
-              {/* <Paper style={{ padding: 0, borderRadius: '24px' }}> */}
+              <Paper style={{ padding: 0, borderRadius: '24px' }}>
                 <IconButton
                   className="org-menu"
                   style={{ borderRadius: '24px' }}
@@ -236,7 +232,7 @@ export default function Header(props) {
                   </Box>
                   <KeyboardArrowDownRoundedIcon />
                 </IconButton>
-              {/* </Paper> */}
+              </Paper>
             </Tooltip>
 
             <Menu

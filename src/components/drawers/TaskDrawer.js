@@ -352,21 +352,21 @@ export default function TaskDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
-      <Paper className='p0 minimize-btn'>
+      <Paper className='p0 minimize-btn br50'>
         <Tooltip title="Close">
           <IconButton onClick={handleClose}>
             <KeyboardDoubleArrowRightIcon />
           </IconButton>
         </Tooltip>
       </Paper>
-      <Paper className='p0 close-btn' hidden={!isAdmin}>
+      <Paper className='p0 close-btn br50' hidden={!isAdmin}>
         <Tooltip title="Cancel" placement='top'>
           <IconButton onClick={handleClose} disabled={isLoading}>
             <CloseIcon color={isLoading ? '' : 'error'} />
           </IconButton>
         </Tooltip>
       </Paper>
-      <Paper className='p0 save-btn' hidden={!isAdmin}>
+      <Paper className='p0 save-btn br50' hidden={!isAdmin}>
         <Tooltip title="Save">
           <IconButton onClick={handleUpdateTask}>
             {

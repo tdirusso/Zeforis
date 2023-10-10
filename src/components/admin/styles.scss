@@ -1,0 +1,41 @@
+.action-center {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 999;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  .action-menu-btn {
+    padding: 0;
+    border-radius: 8px;
+
+    & button {
+      border-radius: 8px;
+    }
+
+    svg {
+      font-size: 16px;
+    }
+  }
+
+  .pinned-btn {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+    &:hover {
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+    }
+  }
+}
+
+.action-menu {
+  .MuiMenuItem-root {
+    padding: 2px 15px;
+  }
+
+  .MuiListItemText-root span {
+    font-size: 14px;
+  }
+}

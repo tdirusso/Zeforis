@@ -230,14 +230,14 @@ export default function CreateTaskDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
-      <Paper className='p0 close-btn'>
+      <Paper className='p0 close-btn br50'>
         <Tooltip title="Cancel" placement='top'>
           <IconButton onClick={handleClose} disabled={isLoading}>
             <CloseIcon color={isLoading ? '' : 'error'} />
           </IconButton>
         </Tooltip>
       </Paper>
-      <Paper className='p0 save-btn' >
+      <Paper className='p0 save-btn br50' >
         <Tooltip title="Save">
           <IconButton onClick={handleCreateTask}>
             {
