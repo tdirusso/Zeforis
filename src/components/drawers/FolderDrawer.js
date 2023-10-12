@@ -34,7 +34,7 @@ export default function FolderDrawer(props) {
       }
 
       if (folderProp) {
-        name.current.value = folderProp.name;
+        name.current.value = folderProp.name || '';
         setIsKeyFolder(Boolean(folderProp.is_key_folder));
       }
     }
@@ -149,11 +149,11 @@ export default function FolderDrawer(props) {
                   style={{
                     textAlign: 'center',
                   }}>
-                  {folderProp ? 'Edit Folder' : 'Create New Folder'}
+                  {folderProp?.id ? 'Edit Folder' : 'Create New Folder'}
                 </DialogTitle>
               </Box>
             </Grid>
-            <Box component='form' width="100%" onSubmit={folderProp ? handleUpdateFolder : handleCreateFolder}>
+            <Box component='form' width="100%" onSubmit={folderProp?.id ? handleUpdateFolder : handleCreateFolder}>
               <Grid item xs={12}>
                 <TextField
                   InputProps={{
@@ -182,7 +182,7 @@ export default function FolderDrawer(props) {
                   />}
                   label="Key folder"
                 />
-                <Tooltip title='Key folders provide a method of organization and are automatically displayed on the Dashboard.' placement="top">
+                <Tooltip title='Key folders are displayed on the Dashboard.' placement="top">
                   <HelpIcon
                     fontSize="small"
                     style={{
@@ -201,7 +201,7 @@ export default function FolderDrawer(props) {
                 fullWidth
                 size='large'
                 loading={isLoading}>
-                {folderProp ? 'Update folder' : 'Create folder'}
+                {folderProp?.id ? 'Update folder' : 'Create folder'}
               </LoadingButton>
             </Box>
           </Grid>

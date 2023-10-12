@@ -52,7 +52,7 @@ function NoUpcomingTasksMessage() {
   return (
     <Box mt={2}>
       <Typography variant="body2">
-        There are currently no upcoming tasks.
+        There are no upcoming tasks.
       </Typography>
     </Box>
   );
@@ -106,6 +106,7 @@ function UpcomingTaskRow({ task, buttonColor }) {
       </Box>
       <Box flex={1} textAlign="center" display={isSmallScreen ? 'none' : 'block'}>
         <Chip
+          size="small"
           label={task.status}
           style={{ cursor: 'pointer' }}
           className={task.status} />

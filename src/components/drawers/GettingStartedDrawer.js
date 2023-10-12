@@ -47,7 +47,9 @@ export default function GettingStartedDrawer(props) {
       PaperProps={{
         className: 'drawer'
       }}>
-      <Paper className='p0' style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
+      <Paper
+        className='p0 br50'
+        style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
         <Tooltip title="Close">
           <IconButton onClick={close}>
             <KeyboardDoubleArrowRightIcon />

@@ -338,9 +338,10 @@ export default function CreateTaskDrawer(props) {
         <Box my={4}>
           <Box my={2}>
             <TextField
+              helperText='Resource link'
               disabled={isLoading}
               fullWidth
-              placeholder='https://'
+              placeholder='https://...'
               variant="standard"
               inputRef={linkUrl}
               InputProps={{

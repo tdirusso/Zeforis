@@ -181,6 +181,7 @@ export default function Home({ setTheme }) {
 
   useEffect(() => {
     if (isDataFetched) {
+
       const foldersMapResult = {};
       folders.forEach(folder => {
         foldersMapResult[String(folder.id)] = { ...folder, tasks: [] };

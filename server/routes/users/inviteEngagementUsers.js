@@ -100,7 +100,7 @@ module.exports = async (req, res, next) => {
     if (newEmails.length) {
       const [newUsersResult] = await connection.query(
         'INSERT INTO users (email) VALUES ?',
-        [newEmails]
+        [newEmails.map(email => [email])]
       );
 
       let insertId = newUsersResult.insertId;

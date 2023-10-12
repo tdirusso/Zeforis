@@ -78,7 +78,6 @@ export default function AnalyticsPage() {
       if (task.status === 'In Progress') {
         numTasksInProgress++;
       } else if (task.status === 'Complete') {
-        console.log('yes', numTasksCompleted);
         numTasksCompleted++;
       }
 
@@ -129,16 +128,18 @@ export default function AnalyticsPage() {
       completed2WeeksAgo,
       completed1WeeksAgo,
       completedThisWeek,
-      statusCount
+      statusCount,
+      numTasksInProgress,
+      numTasksCompleted,
+      numTasksPastDue
     });
   }, []);
 
   return (
     <>
       <TaskStats
-        numComplete={numTasksCompleted}
-        numPastDue={numTasksPastDue}
-        numInProgress={numTasksInProgress} />
+        analyticsData={analyticsData}
+      />
       <AnalyticsCharts
         analyticsData={analyticsData}
       />

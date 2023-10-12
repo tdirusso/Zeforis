@@ -16,22 +16,29 @@ export default function CustomWidgets({ widgets }) {
 
   const enabledWidgets = widgets.filter(({ isEnabled }) => isEnabled);
 
+  const showWidgets = enabledWidgets.length > 0;
+
   return (
     <>
-      <Grid item xs={12} hidden={enabledWidgets.length === 0}>
-        <Divider textAlign="left">
-          <Tooltip title={expanded ? 'Hide Widgets' : 'Show Widgets'}>
-            <IconButton
-              size="large"
-              onClick={toggleWidgets}>
-              <ArrowUpwardIcon
-                style={{
-                  transition: 'transform 200ms',
-                  transform: expanded ? 'rotate(0deg)' : 'rotate(180deg)'
-                }}
-              />
-            </IconButton>
-          </Tooltip>
+      <Grid item xs={12}>
+        <Divider textAlign="left" style={{ margin: showWidgets ? '0' : '1rem 0' }}>
+          {
+            showWidgets ?
+              <Tooltip title={expanded ? 'Hide Widgets' : 'Show Widgets'}>
+                <IconButton
+                  size="large"
+                  onClick={toggleWidgets}>
+                  <ArrowUpwardIcon
+                    style={{
+                      transition: 'transform 200ms',
+                      transform: expanded ? 'rotate(0deg)' : 'rotate(180deg)'
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+              :
+              null
+          }
         </Divider>
       </Grid>
       <Grid item xs={12} className="widgets-container">
@@ -81,8 +88,8 @@ export default function CustomWidgets({ widgets }) {
       <Grid
         item
         xs={12}
-        display={expanded && enabledWidgets.length > 0 ? 'block' : 'none'}>
-        <Divider />
+        display={expanded && showWidgets ? 'block' : 'none'}>
+        <Divider style={{ margin: '10px 0 25px 0' }} />
       </Grid >
     </>
   );

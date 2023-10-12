@@ -227,6 +227,62 @@ h6 {
   }
 }
 
+.MuiPaper-root.folder {
+  position: relative;
+  border-top-left-radius: 0;
+
+  &::before {
+    position: absolute;
+    left: 1px;
+    top: -21px;
+    height: 35px;
+    max-width: 135px;
+    width: 100%;
+    background: white;
+    clip-path: polygon(70% 0, 100% 100%, 100% 100%, 0 100%, 0 0);
+    overflow: hidden;
+    border-radius: 14px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    content: "";
+    z-index: -1;
+  }
+}
+
+.MuiPaper-root.folder-small {
+  position: relative;
+  border-radius: 8px;
+  background: #d3d3d3;
+  border-top-left-radius: 0;
+
+  &::before {
+    position: absolute;
+    left: 0px;
+    top: -9px;
+    height: 10px;
+    max-width: 45px;
+    width: 100%;
+    background: #c7c7c7;
+    clip-path: polygon(75% 0, 100% 100%, 100% 100%, 0 100%, 0 0);
+    overflow: hidden;
+    border-radius: 14px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    content: "";
+    z-index: -1;
+    transition: background 250ms;
+  }
+}
+
+body.dark .MuiPaper-root.folder-small {
+  background-color: #272727;
+}
+
+body.dark .MuiPaper-root.folder-small::before,
+body.dark .MuiPaper-root.folder::before {
+  background: #373737;
+}
+
 @media screen and (max-width: 550px) {
   .wrap-on-small {
     flex-wrap: wrap;

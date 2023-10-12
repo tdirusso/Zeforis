@@ -2,8 +2,16 @@ import { Box, Paper, Grid } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import CountUp from 'react-countup';
 
-export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
+export default function TaskStats({ analyticsData }) {
+
+  const {
+    numTasksInProgress = 0,
+    numTasksCompleted = 0,
+    numTasksPastDue = 0
+  } = analyticsData;
+
   return (
     <>
       <Grid item xs={12} md={4}>
@@ -14,7 +22,9 @@ export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
             </Box>
             <Box>
               <Box component="h4" mb={0.5}>Tasks in Progress</Box>
-              <Box component="h2" color="orange">{numInProgress}</Box>
+              <Box component="h2" color="orange">
+                <CountUp end={numTasksInProgress} />
+              </Box>
             </Box>
           </Box>
         </Paper>
@@ -28,7 +38,9 @@ export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
             </Box>
             <Box>
               <Box component="h4" mb={0.5}>Tasks Completed</Box>
-              <Box component="h2" color="#27ce88">{numComplete}</Box>
+              <Box component="h2" color="#27ce88">
+                <CountUp end={numTasksCompleted} />
+              </Box>
             </Box>
           </Box>
         </Paper>
@@ -42,7 +54,9 @@ export default function TaskStats({ numComplete, numInProgress, numPastDue }) {
             </Box>
             <Box>
               <Box component="h4" mb={0.5}>Tasks Past Due</Box>
-              <Box component="h2" color="red">{numPastDue}</Box>
+              <Box component="h2" color="red">
+                <CountUp end={numTasksPastDue} />
+              </Box>
             </Box>
           </Box>
         </Paper>

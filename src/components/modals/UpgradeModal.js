@@ -1,11 +1,7 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import { useState } from 'react';
-import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { LoadingButton } from '@mui/lab';
 import { Box, DialogTitle, Divider, Typography } from '@mui/material';
-import { closeAccount } from '../../api/users';
 import { Link } from 'react-router-dom';
 
 export default function UpgradeModal(props) {

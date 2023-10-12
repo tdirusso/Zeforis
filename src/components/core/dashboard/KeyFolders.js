@@ -1,19 +1,17 @@
 import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, useTheme } from "@mui/material";
-import FolderIcon from '@mui/icons-material/Folder';
-import { useNavigate, useOutletContext } from "react-router-dom";
-import AddTaskIcon from '@mui/icons-material/AddTask';
+import { useNavigate } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-export default function KeyFolders({ folders }) {
-
-  const {
-    openDrawer
-  } = useOutletContext();
+export default function KeyFolders({ folders, isAdmin, openDrawer }) {
 
   const navigate = useNavigate();
 
   const theme = useTheme();
   const taskButtonTextColor = theme.palette.text.primary;
+
+  if (folders.length === 0) {
+    return <NoFoldersMessage isAdmin={isAdmin} openDrawer={openDrawer} />;
+  }
 
   const handleOpenCreateTaskDrawer = folder => {
     openDrawer('create-task', { defaultFolder: folder });
@@ -26,26 +24,22 @@ export default function KeyFolders({ folders }) {
           const taskLength = folder.tasks.length;
 
           return (
-            <Grid item xs={12} md={4} key={folder.id}>
-              <Paper style={{ height: '100%' }}>
+            <Grid item xs={12} md={4} key={folder.id} marginBottom={2}>
+              <Paper style={{ height: '100%' }} className="folder">
                 <Box
                   display="flex"
                   alignItems="center"
-                  mb={1}
                   justifyContent="space-between">
                   <Box
                     component="h5"
                     display="flex"
                     alignItems="center">
-                    <FolderIcon
-                      htmlColor="#cbced4"
-                      style={{ marginRight: '6px' }}
-                    />
                     {folder.name}
                   </Box>
                   <Button
+                    size="small"
                     onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}>
-                    View Folder
+                    View folder
                   </Button>
                 </Box>
                 {
@@ -68,18 +62,34 @@ export default function KeyFolders({ folders }) {
   );
 };
 
+function NoFoldersMessage({ openDrawer, isAdmin }) {
+  return (
+    <Grid item xs={12} md={4}>
+      <Paper className="folder p0">
+        <Button
+          fullWidth
+          hidden={!isAdmin}
+          style={{ padding: '2.5rem 24px' }}
+          onClick={() => openDrawer('folder', { folderProp: { is_key_folder: true } })}>
+          + New folder
+        </Button>
+      </Paper>
+    </Grid>
+  );
+}
+
 function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
   return (
     <Box mt={2}>
       <Typography variant="body2">
-        There are no tasks in this folder.
+        No tasks in this folder.
       </Typography>
       <Button
+        size="small"
         style={{ marginTop: '12px' }}
         variant="outlined"
-        onClick={handleOpenCreateTaskDrawer}
-        startIcon={<AddTaskIcon />}>
-        New Task
+        onClick={handleOpenCreateTaskDrawer}>
+        + Task
       </Button>
     </Box>
   );
@@ -101,10 +111,9 @@ function TaskList({ tasks, openDrawer, buttonColor }) {
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        mb={0.25}
         px={1}
         py={0.5}
-        minHeight={40}
+        minHeight={35}
         gap={0.5}
         borderRadius='8px'
         onClick={() => openDrawer('task', { taskProp: task })}

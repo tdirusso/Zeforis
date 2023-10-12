@@ -50,7 +50,7 @@ function NoKeyTasksMessage() {
   return (
     <Box mt={2}>
       <Typography variant="body2">
-        There are currently no key tasks.
+        There are no key tasks.
       </Typography>
     </Box>
   );
@@ -97,6 +97,7 @@ function KeyTaskRow({ task, buttonColor }) {
       </Typography>
       <Box display={isSmallScreen ? 'none' : 'block'}>
         <Chip
+          size="small"
           label={task.status}
           className={task.status}
         />

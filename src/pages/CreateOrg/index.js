@@ -105,10 +105,10 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
           </Box>
           <Divider className='my3' />
           <Typography>
-            Let's start by creating your organization.
+            This should be your organization/company name.
           </Typography>
           <Typography mt={1}>
-            This should be your organization/company name.  When you create and manage engagements, they will be a part of your organization.
+            When you create and manage engagements, they will be a part of your organization.
           </Typography>
         </Box>
         <form onSubmit={handleCreateOrg}>

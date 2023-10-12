@@ -511,6 +511,7 @@ export default function TaskDrawer(props) {
             <TextField
               disabled={isLoading}
               fullWidth
+              helperText='Resource link'
               placeholder='https://'
               variant="standard"
               value={linkUrl}

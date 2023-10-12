@@ -1,17 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Chip, Grid, Paper, Typography, IconButton, Tooltip, Button } from "@mui/material";
 import './styles.scss';
-import FolderIcon from '@mui/icons-material/Folder';
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import Divider from '@mui/material/Divider';
 import React from 'react';
 import StarIcon from '@mui/icons-material/Star';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+
 
 export default function FoldersPage() {
   const [folderToEdit, setFolderToEdit] = useState(null);
@@ -27,7 +26,7 @@ export default function FoldersPage() {
   } = useOutletContext();
 
   const handleMenuClick = (e, folder) => {
-    e.stopPropagation();
+    e.preventDefault();
     setAnchorEl(e.currentTarget);
     setFolderToEdit(folder);
   };
@@ -76,7 +75,7 @@ export default function FoldersPage() {
       </Grid>
 
       <Grid item xs={12}>
-        <Box className="flex-ac" gap={3} flexWrap='wrap'>
+        <Box display='flex' alignItems='start' gap={2} flexWrap='wrap'>
           {
             keyFolders.length === 0 ? <Grid item xs={12}>
               <Typography>No key folders.</Typography>
@@ -98,10 +97,10 @@ export default function FoldersPage() {
       </Grid>
 
       <Grid item xs={12}>
-        <Box className="flex-ac" gap={3} flexWrap='wrap'>
+        <Box display='flex' alignItems='start' gap={2} flexWrap='wrap'>
           {
             otherFolders.length === 0 ? <Grid item xs={12}>
-              <Typography>No other folders.</Typography>
+              <Typography variant="body2">No other folders.</Typography>
             </Grid> :
               otherFolders.map(folder =>
                 <Folder
@@ -125,22 +124,15 @@ export default function FoldersPage() {
         <MenuItem onClick={handleEditClick}>
           <ListItemText>
             <Typography variant="body2">
-              Edit Folder
+              Edit folder
             </Typography>
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={handleDeleteClick}>
           <ListItemText>
-            <Box display="flex" alignItems="center" ml="-5px">
-              <DeleteOutlineIcon
-                fontSize="small"
-                color="error"
-                style={{ marginRight: '5px' }}
-              />
-              <Typography variant="body2" color="error">
-                Delete Folder
-              </Typography>
-            </Box>
+            <Typography variant="body2" color="error">
+              Delete folder
+            </Typography>
           </ListItemText>
         </MenuItem>
       </Menu>
@@ -150,32 +142,28 @@ export default function FoldersPage() {
 
 
 function Folder({ folder, handleMenuClick }) {
-  const navigate = useNavigate();
   const { isAdmin } = useOutletContext();
 
   let folderName = folder.name;
 
-  if (folderName.length > 30) {
-    folderName = folderName.substring(0, 30) + '...';
+  if (folderName.length > 23) {
+    folderName = folderName.substring(0, 23) + '...';
   }
 
   return (
-    <Box>
+    <Link
+      to={`/home/tasks?folderId=${folder.id}`}
+      className="folder-container">
       <Paper
-        className="folder-item"
-        onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}
-        style={{
-          position: 'relative',
-          width: 180
-        }}>
+        className="folder-item folder-small">
         {
           isAdmin ?
-            <Tooltip title="More Options">
+            <Tooltip title="Edit">
               <IconButton
                 size="small"
                 className="edit-folder-button"
                 onClick={(e) => handleMenuClick(e, folder)}>
-                <MoreVertIcon fontSize="small" />
+                <EditOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip> : null
         }
@@ -185,25 +173,14 @@ function Folder({ folder, handleMenuClick }) {
           alignItems="center"
           textAlign="center"
           justifyContent="center">
-          <FolderIcon
-            htmlColor="#8ca3ba"
-            fontSize="large"
-          />
-          <Box component="h6" mt={1}>
-            <Box display="flex" alignItems="center">
-              {folder.is_key_folder ? <StarIcon
-                fontSize="small"
-                htmlColor="gold"
-              /> : ''}
-              {folderName}
-            </Box>
-          </Box>
-          <Typography
-            variant="caption">
-            {folder.tasks.length} tasks
-          </Typography>
+
         </Box>
       </Paper>
-    </Box>
+      <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
+        <Typography variant="body2">
+          {folderName}
+        </Typography>
+      </Box>
+    </Link>
   );
 }

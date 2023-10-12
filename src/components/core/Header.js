@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Box, Typography, Button, Tooltip, Divider, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { Grid, IconButton, Paper, Box, Typography, Tooltip, Divider, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -13,7 +13,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { logout } from "../../api/auth";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { SwapHorizOutlined } from "@mui/icons-material";
 import HelpIcon from '@mui/icons-material/Help';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -55,11 +54,6 @@ export default function Header(props) {
     navigate('/home/settings/engagement/collaborators');
   };
 
-  const openChangeOrgOrEngagement = () => {
-    setAnchorEl(null);
-    openDialog('choose-engagement');
-  };
-
   const openSearch = () => {
     setAnchorEl(null);
     openModal('search');
@@ -72,14 +66,14 @@ export default function Header(props) {
 
   const handleThemeChange = (_, newThemeMode) => {
     if (newThemeMode) {
-      updateTheme(setTheme, newThemeMode);
       setThemeVal(newThemeMode);
-      setAnchorEl(null);
+      updateTheme(setTheme, newThemeMode);
     }
   };
 
   return (
     <Grid
+      style={{ paddingTop: '15px' }}
       item
       xs={12}
       className="header"
@@ -88,7 +82,6 @@ export default function Header(props) {
         <Box>
           <Tooltip title={isSideNavOpen ? 'Close Menu' : 'Open Menu'}>
             <IconButton
-              size="large"
               onClick={toggleSideNav}>
               <MenuOpenIcon
                 style={{
@@ -101,12 +94,13 @@ export default function Header(props) {
         </Box>
         <Box className="engagement-title">
           <Box className="flex-ac">
-            <Typography variant='h1' style={{ fontSize: '1.75rem', fontWeight: 200 }} mr={2}>
+            <Typography variant='h1' style={{ fontSize: '1.55rem', fontWeight: 200 }} mr={2}>
               {engagement.name}
             </Typography>
             <Tooltip title="Change Engagement">
               <Paper className="header-button">
                 <IconButton
+                  size="small"
                   onClick={() => openDialog('choose-engagement')}>
                   <SwapHorizIcon />
                 </IconButton>
@@ -114,11 +108,10 @@ export default function Header(props) {
             </Tooltip>
           </Box>
         </Box>
-        <Box display="flex">
+        <Box className="flex-ac">
           <Box mr={2}>
             <Tooltip title="Search">
               <IconButton
-                size="large"
                 onClick={openSearch}>
                 <SearchIcon />
               </IconButton>
@@ -130,7 +123,6 @@ export default function Header(props) {
                 <IconButton
                   className="org-menu"
                   style={{ borderRadius: '24px' }}
-                  size="large"
                   onClick={handleMenuClick}>
                   <Box className="org-circle" display="flex">
                     <AccountCircleRoundedIcon />
@@ -169,31 +161,35 @@ export default function Header(props) {
                 mr={2.25}
                 display="flex"
                 flexWrap='wrap'>
-                <Box>
-                  <Box display="flex">
-                    <Typography color="#a5a5a5" mr={1}>
-                      Engagement:
-                    </Typography>
-                    <Typography >
-                      {engagement.name}
-                    </Typography>
+                <Box className="flex-ac">
+                  <Box>
+                    <Box display="flex">
+                      <Typography color="#a5a5a5" mr={1}>
+                        Engagement:
+                      </Typography>
+                      <Typography>
+                        {engagement.name}
+                      </Typography>
+                    </Box>
+                    <Box display="flex">
+                      <Typography color="#a5a5a5" mr={1}>
+                        Org:
+                      </Typography>
+                      <Typography>
+                        {org.name}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box display="flex">
-                    <Typography color="#a5a5a5" mr={1}>
-                      Org:
-                    </Typography>
-                    <Typography>
-                      {org.name}
-                    </Typography>
-                  </Box>
+                  <Tooltip title="Change Engagement">
+                    <Paper className="p0 br50" style={{ marginLeft: '1.5rem' }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => openDialog('choose-engagement')}>
+                        <SwapHorizIcon />
+                      </IconButton>
+                    </Paper>
+                  </Tooltip>
                 </Box>
-                <Button
-                  size="small"
-                  startIcon={<SwapHorizOutlined />}
-                  onClick={openChangeOrgOrEngagement}
-                  variant="outlined">
-                  Change
-                </Button>
               </Box>
               <Divider style={{ margin: '8px 0' }} />
               <MenuItem onClick={openSettings} dense>
@@ -256,7 +252,7 @@ export default function Header(props) {
           </Box>
         </Box>
       </Box>
-      <Divider style={{ marginTop: '1.25rem', marginBottom: '1rem' }} />
+      <Divider style={{ marginTop: '10px' }} />
     </Grid>
   );
 };
