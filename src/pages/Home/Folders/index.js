@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Grow } from "@mui/material";
+import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse } from "@mui/material";
 import './styles.scss';
 import { Link, useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import SearchIcon from '@mui/icons-material/Search';
+import { TransitionGroup } from 'react-transition-group';
 
 export default function FoldersPage() {
   const {
@@ -20,11 +21,6 @@ export default function FoldersPage() {
 
   const [view, setView] = useState('card');
   const [query, setQuery] = useState('');
-  const [shouldAnimate, setShouldAnimate] = useState(false);
-
-  useEffect(() => {
-    setShouldAnimate(true);
-  }, []);
 
   const handleSetView = (_, newView) => {
     if (newView) {
@@ -94,74 +90,55 @@ export default function FoldersPage() {
         <Divider />
       </Grid>
 
-      <Grid item xs={12}>
-        <Box component="h6" className="flex-ac" mb={2}>
-          <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} /> Key Folders
-        </Box>
-        <Box display='flex' alignItems='start' gap={2} flexWrap='wrap'>
-          {
-            keyFolders.length === 0 ?
-              <Grid item xs={12}>
-                <Typography>No key folders.</Typography>
-              </Grid> :
-              keyFolders.map(folder =>
-                <Folder
-                  shouldAnimate={shouldAnimate}
-                  key={folder.id}
-                  folder={folder}
-                />)
-          }
-        </Box>
-      </Grid>
+      <FolderCards folders={keyFolders} title="Key Folders" />
 
       <Grid item xs={12} style={{ paddingTop: '1rem' }}>
         <Divider />
       </Grid>
 
-      <Grid item xs={12}>
-        <Box component="h6" mb={2}>
-          Other Folders
-        </Box>
-        <Box display='flex' alignItems='start' gap={2} flexWrap='wrap'>
-          {
-            otherFolders.length === 0 ?
-              <Grid item xs={12}>
-                <Typography variant="body2">No other folders.</Typography>
-              </Grid> :
-              otherFolders.map(folder =>
-                <Folder
-                  shouldAnimate={shouldAnimate}
-                  key={folder.id}
-                  folder={folder}
-                />)
-          }
-        </Box>
-      </Grid>
+      <FolderCards folders={otherFolders} title="Other Folders" />
     </>
   );
 };
 
-function Folder({ folder, shouldAnimate }) {
-  let folderName = folder.name;
-
-  if (folderName.length > 23) {
-    folderName = folderName.substring(0, 23) + '...';
-  }
-
+function FolderCards({ folders, title }) {
   return (
-    <Grow in appear={shouldAnimate}>
-      <Link
-        to={`/home/tasks?folderId=${folder.id}`}
-        className="folder-container">
-        <Paper
-          className="folder-item folder-small">
-        </Paper>
-        <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
-          <Typography variant="body2">
-            {folderName}
-          </Typography>
-        </Box>
-      </Link>
-    </Grow>
+    <Grid item xs={12}>
+      <Box component="h6" className="flex-ac" mb={1}>
+        {title.includes('Key') ? <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} /> : null}
+        {title}
+      </Box>
+      {folders.length === 0 ? (
+        <Grid item xs={12}>
+          <Typography>No {title.toLowerCase()}.</Typography>
+        </Grid>
+      ) : (
+        <TransitionGroup className="folders-transition-group">
+          {folders.map((folder) => {
+            let folderName = folder.name;
+
+            if (folderName.length > 23) {
+              folderName = folderName.substring(0, 23) + '...';
+            }
+
+            return (
+              <Collapse
+                orientation="horizontal"
+                key={folder.id}
+                className="folder-transitioner">
+                <Link
+                  to={`/home/tasks?folderId=${folder.id}`}
+                  className="folder-container">
+                  <Paper className="folder-item folder-small"></Paper>
+                  <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
+                    <Typography variant="body2">{folderName}</Typography>
+                  </Box>
+                </Link>
+              </Collapse>
+            );
+          })}
+        </TransitionGroup>
+      )}
+    </Grid>
   );
 }

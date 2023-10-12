@@ -1,13 +1,23 @@
 .folder-container {
   text-align: center;
   color: inherit !important;
-  padding: 26px 15px 8px 15px;
-  border-radius: 8px;
-  box-shadow: none;
+}
 
-  &:hover {
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+.folder-transitioner {
+  .MuiCollapse-wrapper {
+    padding: 26px 15px 0px 15px;
+    border-radius: 8px;
+
+    &:hover {
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
   }
+}
+
+.folders-transition-group {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .folder-item {
@@ -15,6 +25,7 @@
   padding: 0 !important;
   position: relative;
   width: 80px;
+  box-shadow: none !important;
 }
 
 body.dark .folder-container:hover {
