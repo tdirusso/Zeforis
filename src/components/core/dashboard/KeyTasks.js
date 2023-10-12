@@ -32,7 +32,7 @@ export default function KeyTasks({ tasks }) {
           <Button
             onClick={() => navigate('/home/tasks?preFilterKeyTasks=true')}
             style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
-            View All
+            View all
           </Button>
         </Box>
         <Divider style={{ margin: '3px 6px 8px 6px' }} />

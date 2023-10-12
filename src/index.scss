@@ -234,12 +234,12 @@ h6 {
   &::before {
     position: absolute;
     left: 1px;
-    top: -21px;
+    top: -23px;
     height: 35px;
-    max-width: 135px;
+    max-width: 165px;
     width: 100%;
     background: white;
-    clip-path: polygon(70% 0, 100% 100%, 100% 100%, 0 100%, 0 0);
+    clip-path: polygon(75% 0, 100% 100%, 100% 100%, 0 100%, 0 0);
     overflow: hidden;
     border-radius: 14px;
     border-bottom-left-radius: 0;
@@ -252,7 +252,7 @@ h6 {
 .MuiPaper-root.folder-small {
   position: relative;
   border-radius: 8px;
-  background: #d3d3d3;
+  background: #f7df92;
   border-top-left-radius: 0;
 
   &::before {
@@ -262,7 +262,7 @@ h6 {
     height: 10px;
     max-width: 45px;
     width: 100%;
-    background: #c7c7c7;
+    background: #f4d172;
     clip-path: polygon(75% 0, 100% 100%, 100% 100%, 0 100%, 0 0);
     overflow: hidden;
     border-radius: 14px;

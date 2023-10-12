@@ -34,7 +34,7 @@ export default function UpcomingTasks({ tasks }) {
           <Button
             onClick={() => navigate('/home/tasks?preSort=dateDue')}
             style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
-            View All
+            View all
           </Button>
         </Box>
         <Divider style={{ margin: '3px 6px 8px 6px' }} />

@@ -24,9 +24,10 @@ export default function KeyFolders({ folders, isAdmin, openDrawer }) {
           const taskLength = folder.tasks.length;
 
           return (
-            <Grid item xs={12} md={4} key={folder.id} marginBottom={2}>
+            <Grid item xs={12} md={4} key={folder.id} marginBottom={3}>
               <Paper style={{ height: '100%' }} className="folder">
                 <Box
+                  gap={2}
                   display="flex"
                   alignItems="center"
                   justifyContent="space-between">
@@ -87,7 +88,6 @@ function NoTasksMessage({ handleOpenCreateTaskDrawer }) {
       <Button
         size="small"
         style={{ marginTop: '12px' }}
-        variant="outlined"
         onClick={handleOpenCreateTaskDrawer}>
         + Task
       </Button>
@@ -111,10 +111,10 @@ function TaskList({ tasks, openDrawer, buttonColor }) {
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        px={1}
-        py={0.5}
+        p={0}
         minHeight={35}
         gap={0.5}
+        px={.5}
         borderRadius='8px'
         onClick={() => openDrawer('task', { taskProp: task })}
         key={task.task_id}>
@@ -124,17 +124,15 @@ function TaskList({ tasks, openDrawer, buttonColor }) {
         {
           task.link_url ?
             <Tooltip title="Open Link">
-              <IconButton
-                component="div"
-                disabled={!task.link_url}
-                onClick={e => {
-                  e.stopPropagation();
-                  window.open(task.link_url, '_blank');
-                }}>
-                <OpenInNewIcon
-                  fontSize="small"
-                />
-              </IconButton>
+              <a href={task.link_url} target="_blank" rel="noreferrer">
+                <IconButton
+                  component="div"
+                  onClick={e => e.stopPropagation()}>
+                  <OpenInNewIcon
+                    fontSize="small"
+                  />
+                </IconButton>
+              </a>
             </Tooltip> : null
         }
       </Box>
