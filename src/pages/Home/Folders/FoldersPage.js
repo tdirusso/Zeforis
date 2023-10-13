@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse } from "@mui/material";
+import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button } from "@mui/material";
 import './styles.scss';
 import { Link, Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
@@ -18,6 +18,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import FolderIcon from '@mui/icons-material/Folder';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import CloseIcon from '@mui/icons-material/Close';
+import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
+import UnfoldLessRoundedIcon from '@mui/icons-material/UnfoldLessRounded';
 
 export default function FoldersPage() {
   const {
@@ -33,7 +36,6 @@ export default function FoldersPage() {
   const [otherFolders, setOtherFolders] = useState([]);
   const [openStates, setOpenStates] = useState({});
 
-
   const handleSetView = (_, newView) => {
     if (newView) {
       localStorage.setItem('folderView', newView);
@@ -41,10 +43,64 @@ export default function FoldersPage() {
     }
   };
 
+  const openAllAncestors = (folderId, statesObj) => {
+    let currentFolder = foldersMap[folderId];
+
+    while (currentFolder && currentFolder.parent_id) {
+      statesObj[currentFolder.parent_id] = true;
+      currentFolder = foldersMap[currentFolder.parent_id];
+    }
+
+    statesObj[currentFolder.id] = true;
+  };
+
+  const openAllChildren = (folderId, statesObj) => {
+    const childrenToOpen = [];
+
+    const findChildren = (parentId) => {
+      folders.forEach((folder) => {
+        if (folder.parent_id === parentId) {
+          childrenToOpen.push(folder.id);
+          findChildren(folder.id);
+        }
+      });
+    };
+
+    findChildren(folderId);
+
+    childrenToOpen.forEach((childId) => {
+      statesObj[childId] = true;
+    });
+
+    if (childrenToOpen.length) {
+      statesObj[folderId] = true;
+    }
+  };
+
+  const handleExpandAll = () => {
+    const tempOpenStates = {};
+
+    const lcQuery = query?.toLowerCase();
+
+    folders.forEach((folder) => {
+      if (lcQuery && folder.name.toLowerCase().includes(lcQuery)) {
+        openAllChildren(folder.id, tempOpenStates);
+      } else {
+        openAllAncestors(folder.id, tempOpenStates);
+      }
+    });
+
+    setOpenStates(tempOpenStates);
+  };
+
+  const handleCollapseAll = () => {
+    setOpenStates({});
+  };
+
   useEffect(() => {
     const tempOpenStates = {};
-    let keyFolders = [];
-    let otherFolders = [];
+    let filteredKeyFolders = [];
+    let filteredOtherFolders = [];
 
     const lcQuery = query?.toLowerCase();
 
@@ -53,47 +109,36 @@ export default function FoldersPage() {
       folders.filter(folder => !lcQuery || folder.name.toLowerCase().includes(lcQuery)))
       .forEach(folder => {
         if (folder.is_key_folder) {
-          keyFolders.push(folder);
+          filteredKeyFolders.push(folder);
         } else if (!folder.parent_id) {
-          otherFolders.push(folder);
+          filteredOtherFolders.push(folder);
         }
       });
-
-    const openAllAncestors = folderId => {
-      let currentFolder = foldersMap[folderId];
-
-      while (currentFolder && currentFolder.parent_id) {
-        tempOpenStates[currentFolder.parent_id] = true;
-        currentFolder = foldersMap[currentFolder.parent_id];
-      }
-    };
 
     if (view === 'list' && lcQuery) {
       folders.forEach((folder) => {
         if (folder.name.toLowerCase().includes(lcQuery)) {
-          openAllAncestors(folder.id);
+          openAllAncestors(folder.id, tempOpenStates);
         }
       });
 
-      keyFolders = keyFolders.filter((folder) => {
+      filteredKeyFolders = filteredKeyFolders.filter((folder) => {
         return (
           tempOpenStates[folder.id]
         );
       });
 
-      otherFolders = otherFolders.filter((folder) => {
+      filteredOtherFolders = filteredOtherFolders.filter((folder) => {
         return (
           tempOpenStates[folder.id]
         );
       });
     }
 
-    setKeyFolders(keyFolders);
-    setOtherFolders(otherFolders);
+    setKeyFolders(filteredKeyFolders);
+    setOtherFolders(filteredOtherFolders);
     setOpenStates(tempOpenStates);
   }, [query]);
-
-  console.log(openStates);
 
   return (
     <>
@@ -134,10 +179,20 @@ export default function FoldersPage() {
               className="readonly-textfield"
               variant="standard"
               size="small"
+              value={query}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <SearchIcon htmlColor="#cbcbcb" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="start">
+                    <Tooltip title='Clear search'>
+                      <IconButton size="small" onClick={() => setQuery('')}>
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </InputAdornment>
                 )
               }}
@@ -158,6 +213,9 @@ export default function FoldersPage() {
             otherFolders={otherFolders}
             openStates={openStates}
             setOpenStates={setOpenStates}
+            query={query.toLowerCase()}
+            handleExpandAll={handleExpandAll}
+            handleCollapseAll={handleCollapseAll}
           />
           :
           <>
@@ -180,7 +238,17 @@ export default function FoldersPage() {
 };
 
 
-function FolderList({ keyFolders, otherFolders, allFolders, openStates, setOpenStates }) {
+function FolderList(props) {
+  const {
+    keyFolders,
+    otherFolders,
+    allFolders,
+    openStates,
+    setOpenStates,
+    query,
+    handleExpandAll,
+    handleCollapseAll
+  } = props;
   const navigate = useNavigate();
 
   const [selectedFolderId, setSelectedFolderId] = useState(null);
@@ -207,7 +275,20 @@ function FolderList({ keyFolders, otherFolders, allFolders, openStates, setOpenS
 
   return (
     <Grid item xs={12}>
+
       <Paper sx={{ px: 0 }}>
+        <ButtonGroup size="small" variant="outlined" style={{ margin: '0 16px' }}>
+          <Button
+            onClick={handleExpandAll}
+            startIcon={<UnfoldMoreRoundedIcon fontSize="small" />}>
+            Expand
+          </Button>
+          <Button
+            onClick={handleCollapseAll}
+            endIcon={<UnfoldLessRoundedIcon fontSize="small" />}>
+            Collapse
+          </Button>
+        </ButtonGroup>
         <List
           className="folders-list"
           dense
@@ -229,6 +310,7 @@ function FolderList({ keyFolders, otherFolders, allFolders, openStates, setOpenS
                   allFolders={allFolders}
                   openStates={openStates}
                   setOpenStates={setOpenStates}
+                  query={query}
                 />
               );
             })
@@ -248,6 +330,7 @@ function FolderList({ keyFolders, otherFolders, allFolders, openStates, setOpenS
                   allFolders={allFolders}
                   openStates={openStates}
                   setOpenStates={setOpenStates}
+                  query={query}
                 />
               );
             })
@@ -258,7 +341,7 @@ function FolderList({ keyFolders, otherFolders, allFolders, openStates, setOpenS
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, depth = 1) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
@@ -270,7 +353,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
         <ListItemButton
           disableRipple
           selected={selectedFolderId === folder.id}
-          sx={{ pl: `${22 * depth}px` }}
+          sx={{ pl: `${(36 * depth)}px` }}
           onClick={() => handleFolderClick(folder.id)}>
 
           <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
@@ -283,18 +366,40 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
             }
             <FolderIcon />
           </ListItemIcon>
-          <ListItemText primary={folder.name} />
+          <ListItemText primary={renderFolderName(query, folder.name)} />
         </ListItemButton>
         {
           hasNestedFolders ?
             <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
-              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, depth)}
+              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, depth)}
             </Collapse> : null
         }
       </div>
     );
   });
 }
+
+function renderFolderName(lcQuery, name) {
+  if (lcQuery) {
+    const regex = new RegExp(`(${lcQuery.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'i');
+    const parts = name.split(regex);
+
+    return (
+      <span>
+        {parts.map((part, index) => (
+          regex.test(part) ? (
+            <span key={index} className='highlighted-text'>{part}</span>
+          ) : (
+            part
+          )
+        ))}
+      </span>
+    );
+  } else {
+    return name;
+  }
+};
+
 
 function FolderListItem(props) {
   const {
@@ -304,7 +409,8 @@ function FolderListItem(props) {
     handleFolderClick,
     allFolders,
     openStates,
-    setOpenStates
+    setOpenStates,
+    query
   } = props;
 
   const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
@@ -314,7 +420,7 @@ function FolderListItem(props) {
       <ListItemButton
         selected={selectedFolderId === id}
         disableRipple
-        sx={{ pl: 4 }}
+        sx={{ pl: '40px' }}
         onClick={() => handleFolderClick(id)}>
         <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
           {
@@ -328,12 +434,12 @@ function FolderListItem(props) {
           }
           <FolderIcon />
         </ListItemIcon>
-        <ListItemText primary={name} />
+        <ListItemText primary={renderFolderName(query, name)} />
       </ListItemButton>
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto" unmountOnExit>
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query)}
           </Collapse>
           : null
       }

@@ -4,6 +4,12 @@
     left: -25px;
     transition: transform 250ms;
   }
+
+  .highlighted-text {
+    text-decoration: underline;
+    font-weight: bold;
+    color: var(--colors-primary);
+  }
 }
 
 .folder-container {
