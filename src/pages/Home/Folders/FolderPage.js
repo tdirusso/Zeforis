@@ -19,6 +19,12 @@ import ListItemText from '@mui/material/ListItemText';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import FolderIcon from '@mui/icons-material/Folder';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 
 export default function FolderPage() {
   const {
@@ -39,6 +45,23 @@ export default function FolderPage() {
 
   const keyFolders = [];
   const otherFolders = [];
+
+  const buildBreadcrumbPath = (folderId) => {
+    const breadcrumb = [];
+
+    const findParentFolder = (folderId) => {
+      const parentFolder = folders.find((f) => f.id === folderId);
+      if (parentFolder) {
+        breadcrumb.unshift(parentFolder);
+        findParentFolder(parentFolder.parent_id);
+      }
+    };
+
+    findParentFolder(folderId);
+    return breadcrumb;
+  };
+
+  const childFolders = folders.filter((f) => f.parent_id === folder.id);
 
   return (
     <>
@@ -79,159 +102,63 @@ export default function FolderPage() {
         <Divider />
       </Grid>
 
+      <Grid item xs={12}>
+        <Breadcrumbs>
+          <Link color="inherit" to={`/home/folders`}>
+            Home
+          </Link>
+          {buildBreadcrumbPath(folder.id).map((crumb) => (
+            <Link key={crumb.id} color="inherit" to={`/home/folders/${crumb.id}`}>
+              {crumb.name}
+            </Link>
+          ))}
+        </Breadcrumbs>
+      </Grid>
 
+      <Grid item xs={12} style={{ paddingTop: '5px' }}>
+        <ChildFolders folders={childFolders} />
+      </Grid>
+
+      {/* <TableContainer>
+        <Table>
+          <TableBody>
+            {folder.tasks.map((task) => (
+              <TableRow key={task.task_id}>
+                <TableCell>{task.task_name}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer> */}
 
     </>
   );
 };
 
-function FolderList({ keyFolders, otherFolders }) {
-  const navigate = useNavigate();
-  const [selectedFolderId, setSelectedFolderId] = useState(null);
-
-  const handleFolderClick = folderId => {
-    if (selectedFolderId === folderId) {
-      navigate(`${folderId}`);
-    } else {
-      setSelectedFolderId(folderId);
-    }
-  };
+function ChildFolders({ folders }) {
 
   return (
-    <Grid item xs={12}>
-      <Paper sx={{ px: 0 }}>
-        <List
-          dense
-          component="nav"
-          subheader={
-            <ListSubheader className="flex-ac">
-              <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} />  Key Folders
-            </ListSubheader>
-          }>
-          {
-            keyFolders.map(folder => {
-              return (
-                <FolderListItem
-                  name={folder.name}
-                  id={folder.id}
-                  key={folder.id}
-                  selectedFolderId={selectedFolderId}
-                  handleFolderClick={handleFolderClick}
-                />
-                // <NestedListItem />
-              );
-            })
+    <Box className="child-folders-container">
+      {
+        folders.map((folder) => {
+          let folderName = folder.name;
+
+          if (folderName.length > 23) {
+            folderName = folderName.substring(0, 23) + '...';
           }
-        </List>
-        {<List
-          dense
-          sx={{ width: '100%' }}
-          component="nav"
-          subheader={
-            <ListSubheader className="flex-ac">
-              Other Folders
-            </ListSubheader>
-          }
-        >
-          <ListItemButton disableRipple>
-            <ListItemIcon>
-              <FolderIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sent mail" />
-          </ListItemButton>
-          <NestedListItem />
-        </List>
-        }
-      </Paper>
-    </Grid>
-  );
-}
 
-function FolderListItem({ name, id, selectedFolderId, handleFolderClick }) {
-
-  return (
-    <ListItemButton
-      selected={selectedFolderId === id}
-      disableRipple
-      sx={{ pl: 4 }}
-      onClick={() => handleFolderClick(id)}>
-      <ListItemIcon>
-        <FolderIcon />
-      </ListItemIcon>
-      <ListItemText primary={name} />
-    </ListItemButton>
-  );
-}
-
-function NestedListItem() {
-  const [open, setOpen] = useState(false);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
-
-  return (
-    <>
-      <ListItemButton onClick={handleClick} sx={{ pl: 4 }}>
-        {open ? <ExpandLess style={{ position: 'absolute', left: '5px', color: '#a4a4a4' }} /> : <ExpandMore style={{ position: 'absolute', left: '5px', color: '#a4a4a4' }} />}
-        <ListItemIcon>
-          <FolderIcon />
-        </ListItemIcon>
-        <ListItemText primary="Inbox" />
-      </ListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding dense>
-          <ListItemButton sx={{ pl: 4 }}>
-            <ListItemIcon>
-              <FolderIcon />
-            </ListItemIcon>
-            <ListItemText primary="Starred" />
-          </ListItemButton>
-        </List>
-      </Collapse>
-    </>
-  );
-}
-
-function FolderCards({ folders, title }) {
-  return (
-    <Grid item xs={12}>
-      <Box component="h6" className="flex-ac" mb={1}>
-        {title.includes('Key') ?
-          <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} /> : null}
-        {title}
-      </Box>
-      {folders.length === 0 ?
-        <Grid item xs={12}>
-          <Typography>No {title.toLowerCase()}.</Typography>
-        </Grid>
-        :
-        <TransitionGroup className="folders-transition-group">
-          {folders.map((folder) => {
-            let folderName = folder.name;
-
-            if (folderName.length > 23) {
-              folderName = folderName.substring(0, 23) + '...';
-            }
-
-            return (
-              <Collapse
-                orientation="horizontal"
-                key={folder.id}
-                className="folder-transitioner">
-                <Link
-                  to={`/home/tasks?folderId=${folder.id}`}
-                  className="folder-container">
-                  <Paper className="folder-item folder-small"></Paper>
-                  <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
-                    <Typography variant="body2">{folderName}</Typography>
-                  </Box>
-                </Link>
-              </Collapse>
-            );
-          })}
-        </TransitionGroup>
+          return (
+            <Link
+              to={`/home/folders/${folder.id}`}
+              className="folder-container">
+              <FolderIcon htmlColor="#f7df92" fontSize="large" />
+              <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
+                <Typography variant="body2">{folderName}</Typography>
+              </Box>
+            </Link>
+          );
+        })
       }
-    </Grid>
+    </Box>
   );
 }

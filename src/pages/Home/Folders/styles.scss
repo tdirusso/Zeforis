@@ -12,12 +12,10 @@
   }
 }
 
-.folder-container {
+.folder-transitioner {
   text-align: center;
   color: inherit !important;
-}
 
-.folder-transitioner {
   .MuiCollapse-wrapper {
     padding: 26px 15px 8px 15px;
     border-radius: 8px;
@@ -28,7 +26,8 @@
   }
 }
 
-.folders-transition-group {
+.folders-transition-group,
+.child-folders-container {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
@@ -40,6 +39,22 @@
   position: relative;
   width: 80px;
   box-shadow: none !important;
+}
+
+.child-folders-container {
+  .folder-item {
+    height: 35px;
+    width: 55px;
+  }
+
+  .folder-container {
+    padding: 26px 15px 8px 15px;
+    border-radius: 8px;
+
+    &:hover {
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+  }
 }
 
 body.dark .folder-container:hover {

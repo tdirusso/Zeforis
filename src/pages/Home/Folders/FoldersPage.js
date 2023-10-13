@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button } from "@mui/material";
+import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress } from "@mui/material";
 import './styles.scss';
-import { Link, Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
 import React, { useEffect, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
@@ -35,6 +35,7 @@ export default function FoldersPage() {
   const [keyFolders, setKeyFolders] = useState([]);
   const [otherFolders, setOtherFolders] = useState([]);
   const [openStates, setOpenStates] = useState({});
+  const [renderReady, setRenderReady] = useState(false);
 
   const handleSetView = (_, newView) => {
     if (newView) {
@@ -138,6 +139,10 @@ export default function FoldersPage() {
     setKeyFolders(filteredKeyFolders);
     setOtherFolders(filteredOtherFolders);
     setOpenStates(tempOpenStates);
+
+    if (!renderReady) {
+      setRenderReady(true);
+    }
   }, [query]);
 
   return (
@@ -206,33 +211,35 @@ export default function FoldersPage() {
         <Divider />
       </Grid>
       {
-        view === 'list' ?
-          <FolderList
-            allFolders={folders}
-            keyFolders={keyFolders}
-            otherFolders={otherFolders}
-            openStates={openStates}
-            setOpenStates={setOpenStates}
-            query={query.toLowerCase()}
-            handleExpandAll={handleExpandAll}
-            handleCollapseAll={handleCollapseAll}
-          />
+        !renderReady ?
+          <CircularProgress size={30} sx={{ mx: 5, my: 4 }} />
           :
-          <>
-            <FolderCards
-              folders={keyFolders}
-              title="Key Folders"
+          view === 'list' ?
+            <FolderList
+              allFolders={folders}
+              keyFolders={keyFolders}
+              otherFolders={otherFolders}
+              openStates={openStates}
+              setOpenStates={setOpenStates}
+              query={query.toLowerCase()}
+              handleExpandAll={handleExpandAll}
+              handleCollapseAll={handleCollapseAll}
             />
-            <Grid item xs={12} style={{ paddingTop: '1rem' }}>
-              <Divider />
-            </Grid>
-            <FolderCards
-              folders={otherFolders}
-              title="Other Folders"
-            />
-          </>
+            :
+            <>
+              <FolderCards
+                folders={keyFolders}
+                title="Key Folders"
+              />
+              <Grid item xs={12} style={{ paddingTop: '1rem' }}>
+                <Divider />
+              </Grid>
+              <FolderCards
+                folders={otherFolders}
+                title="Other Folders"
+              />
+            </>
       }
-      <Outlet />
     </>
   );
 };
@@ -364,7 +371,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
                   className="toggle-icon" />
                 : null
             }
-            <FolderIcon />
+            <FolderIcon htmlColor="#f7df92" />
           </ListItemIcon>
           <ListItemText primary={renderFolderName(query, folder.name)} />
         </ListItemButton>
@@ -432,7 +439,7 @@ function FolderListItem(props) {
                 className="toggle-icon" />
               : null
           }
-          <FolderIcon />
+          <FolderIcon htmlColor="#f7df92" />
         </ListItemIcon>
         <ListItemText primary={renderFolderName(query, name)} />
       </ListItemButton>
@@ -456,12 +463,8 @@ function FolderCards({ folders, title }) {
           <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} /> : null}
         {title}
       </Box>
-      {folders.length === 0 ?
-        <Grid item xs={12}>
-          <Typography>No {title.toLowerCase()}.</Typography>
-        </Grid>
-        :
-        <TransitionGroup className="folders-transition-group">
+      {
+        <TransitionGroup className="folders-transition-group" appear={false}>
           {folders.map((folder) => {
             let folderName = folder.name;
 
@@ -471,17 +474,15 @@ function FolderCards({ folders, title }) {
 
             return (
               <Collapse
+                component={Link}
+                to={`${folder.id}`}
                 orientation="horizontal"
                 key={folder.id}
                 className="folder-transitioner">
-                <Link
-                  to={`/home/tasks?folderId=${folder.id}`}
-                  className="folder-container">
-                  <Paper className="folder-item folder-small"></Paper>
-                  <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
-                    <Typography variant="body2">{folderName}</Typography>
-                  </Box>
-                </Link>
+                <Paper className="folder-item folder-small"></Paper>
+                <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
+                  <Typography variant="body2">{folderName}</Typography>
+                </Box>
               </Collapse>
             );
           })}
