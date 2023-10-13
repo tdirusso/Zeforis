@@ -1,5 +1,9 @@
 .folders-list {
-  .toggle-icon {}
+  .toggle-icon {
+    position: absolute;
+    left: -25px;
+    transition: transform 250ms;
+  }
 }
 
 .folder-container {

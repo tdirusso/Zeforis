@@ -3,7 +3,7 @@ import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Colla
 import './styles.scss';
 import { Link, Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -16,19 +16,23 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import FolderIcon from '@mui/icons-material/Folder';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 
 export default function FoldersPage() {
   const {
     folders,
     isAdmin,
-    openDrawer
+    openDrawer,
+    foldersMap
   } = useOutletContext();
 
   const [view, setView] = useState(localStorage.getItem('folderView') || 'card');
   const [query, setQuery] = useState('');
+  const [keyFolders, setKeyFolders] = useState([]);
+  const [otherFolders, setOtherFolders] = useState([]);
+  const [openStates, setOpenStates] = useState({});
+
 
   const handleSetView = (_, newView) => {
     if (newView) {
@@ -37,11 +41,59 @@ export default function FoldersPage() {
     }
   };
 
-  const keyFolders = [];
-  const otherFolders = [];
+  useEffect(() => {
+    const tempOpenStates = {};
+    let keyFolders = [];
+    let otherFolders = [];
 
-  folders.filter(folder => !query || folder.name.toLowerCase().includes(query.toLowerCase()))
-    .forEach(folder => (folder.is_key_folder ? keyFolders : otherFolders).push(folder));
+    const lcQuery = query?.toLowerCase();
+
+    (view === 'list' ?
+      folders :
+      folders.filter(folder => !lcQuery || folder.name.toLowerCase().includes(lcQuery)))
+      .forEach(folder => {
+        if (folder.is_key_folder) {
+          keyFolders.push(folder);
+        } else if (!folder.parent_id) {
+          otherFolders.push(folder);
+        }
+      });
+
+    const openAllAncestors = folderId => {
+      let currentFolder = foldersMap[folderId];
+
+      while (currentFolder && currentFolder.parent_id) {
+        tempOpenStates[currentFolder.parent_id] = true;
+        currentFolder = foldersMap[currentFolder.parent_id];
+      }
+    };
+
+    if (view === 'list' && lcQuery) {
+      folders.forEach((folder) => {
+        if (folder.name.toLowerCase().includes(lcQuery)) {
+          openAllAncestors(folder.id);
+        }
+      });
+
+      keyFolders = keyFolders.filter((folder) => {
+        return (
+          tempOpenStates[folder.id]
+        );
+      });
+
+      otherFolders = otherFolders.filter((folder) => {
+        return (
+          tempOpenStates[folder.id]
+        );
+      });
+    }
+
+    setKeyFolders(keyFolders);
+    setOtherFolders(otherFolders);
+    setOpenStates(tempOpenStates);
+  }, [query]);
+
+  console.log(openStates);
 
   return (
     <>
@@ -95,7 +147,6 @@ export default function FoldersPage() {
         </Box>
       </Grid>
 
-
       <Grid item xs={12}>
         <Divider />
       </Grid>
@@ -105,14 +156,22 @@ export default function FoldersPage() {
             allFolders={folders}
             keyFolders={keyFolders}
             otherFolders={otherFolders}
+            openStates={openStates}
+            setOpenStates={setOpenStates}
           />
           :
           <>
-            <FolderCards folders={keyFolders} title="Key Folders" />
+            <FolderCards
+              folders={keyFolders}
+              title="Key Folders"
+            />
             <Grid item xs={12} style={{ paddingTop: '1rem' }}>
               <Divider />
             </Grid>
-            <FolderCards folders={otherFolders} title="Other Folders" />
+            <FolderCards
+              folders={otherFolders}
+              title="Other Folders"
+            />
           </>
       }
       <Outlet />
@@ -120,48 +179,12 @@ export default function FoldersPage() {
   );
 };
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, depth = 1) {
-  depth++;
-  const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
-  return nestedFolders.map(folder => {
-    const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
-
-    return (
-      <div key={folder.id}>
-        <ListItemButton
-          sx={{ pl: 4 * depth }}
-          onClick={() => handleFolderClick(folder.id)}>
-          {
-            hasNestedFolders ?
-              (openStates[folder.id] ?
-                <ExpandLess className="toggle-icon" /> :
-                <ExpandMore className="toggle-icon" />)
-              : null
-          }
-          <ListItemIcon>
-            <FolderIcon />
-          </ListItemIcon>
-          <ListItemText primary={folder.name} />
-        </ListItemButton>
-        {
-          hasNestedFolders ?
-            <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
-              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, depth)}
-            </Collapse> : null
-        }
-      </div>
-    );
-  });
-}
-
-
-function FolderList({ keyFolders, otherFolders, allFolders }) {
+function FolderList({ keyFolders, otherFolders, allFolders, openStates, setOpenStates }) {
   const navigate = useNavigate();
 
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [dblClickFlag, setDblClickFlag] = useState(false);
-  const [openStates, setOpenStates] = useState({});
 
   const handleFolderClick = (folderId) => {
     if (selectedFolderId === folderId && dblClickFlag === true) {
@@ -171,6 +194,7 @@ function FolderList({ keyFolders, otherFolders, allFolders }) {
 
     setDblClickFlag(true);
     setSelectedFolderId(folderId);
+
     setOpenStates(prevOpenStates => ({
       ...prevOpenStates,
       [folderId]: !prevOpenStates[folderId],
@@ -214,14 +238,17 @@ function FolderList({ keyFolders, otherFolders, allFolders }) {
           </ListSubheader>
           {
             otherFolders.map(folder => {
-              return (null
-                // <FolderListItem
-                //   name={folder.name}
-                //   id={folder.id}
-                //   key={folder.id}
-                //   selectedFolderId={selectedFolderId}
-                //   handleFolderClick={handleFolderClick}
-                // />
+              return (
+                <FolderListItem
+                  name={folder.name}
+                  id={folder.id}
+                  key={folder.id}
+                  selectedFolderId={selectedFolderId}
+                  handleFolderClick={handleFolderClick}
+                  allFolders={allFolders}
+                  openStates={openStates}
+                  setOpenStates={setOpenStates}
+                />
               );
             })
           }
@@ -231,7 +258,55 @@ function FolderList({ keyFolders, otherFolders, allFolders }) {
   );
 }
 
-function FolderListItem({ name, id, selectedFolderId, handleFolderClick, allFolders, openStates, setOpenStates }) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, depth = 1) {
+  depth++;
+  const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
+
+  return nestedFolders.map(folder => {
+    const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
+
+    return (
+      <div key={folder.id}>
+        <ListItemButton
+          disableRipple
+          selected={selectedFolderId === folder.id}
+          sx={{ pl: `${22 * depth}px` }}
+          onClick={() => handleFolderClick(folder.id)}>
+
+          <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
+            {
+              hasNestedFolders ?
+                <ChevronRightRoundedIcon
+                  style={{ transform: openStates[folder.id] ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                  className="toggle-icon" />
+                : null
+            }
+            <FolderIcon />
+          </ListItemIcon>
+          <ListItemText primary={folder.name} />
+        </ListItemButton>
+        {
+          hasNestedFolders ?
+            <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
+              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, depth)}
+            </Collapse> : null
+        }
+      </div>
+    );
+  });
+}
+
+function FolderListItem(props) {
+  const {
+    name,
+    id,
+    selectedFolderId,
+    handleFolderClick,
+    allFolders,
+    openStates,
+    setOpenStates
+  } = props;
+
   const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
 
   return (
@@ -241,14 +316,16 @@ function FolderListItem({ name, id, selectedFolderId, handleFolderClick, allFold
         disableRipple
         sx={{ pl: 4 }}
         onClick={() => handleFolderClick(id)}>
-        {
-          hasNestedFolders ?
-            (openStates[id] ?
-              <ExpandLess className="toggle-icon" /> :
-              <ExpandMore className="toggle-icon" />)
-            : null
-        }
-        <ListItemIcon>
+        <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
+          {
+            hasNestedFolders ?
+              <ChevronRightRoundedIcon
+                style={{
+                  transform: openStates[id] ? 'rotate(90deg)' : 'rotate(0deg)'
+                }}
+                className="toggle-icon" />
+              : null
+          }
           <FolderIcon />
         </ListItemIcon>
         <ListItemText primary={name} />
@@ -256,7 +333,7 @@ function FolderListItem({ name, id, selectedFolderId, handleFolderClick, allFold
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto" unmountOnExit>
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId)}
           </Collapse>
           : null
       }
