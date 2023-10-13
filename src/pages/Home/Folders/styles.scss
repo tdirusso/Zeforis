@@ -42,17 +42,17 @@
 }
 
 .child-folders-container {
-  .folder-item {
-    height: 35px;
-    width: 55px;
-  }
 
   .folder-container {
-    padding: 26px 15px 8px 15px;
+    padding: 3px;
     border-radius: 8px;
+    width: 85px;
+    text-align: center;
+    color: inherit !important;
 
     &:hover {
-      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+      text-decoration: underline;
+      color: var(--colors-primary) !important;
     }
   }
 }

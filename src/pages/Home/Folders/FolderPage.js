@@ -50,7 +50,8 @@ export default function FolderPage() {
     const breadcrumb = [];
 
     const findParentFolder = (folderId) => {
-      const parentFolder = folders.find((f) => f.id === folderId);
+      //const parentFolder = folders.find((f) => f.id === folderId);
+      const parentFolder = foldersMap[folderId];
       if (parentFolder) {
         breadcrumb.unshift(parentFolder);
         findParentFolder(parentFolder.parent_id);
@@ -65,7 +66,7 @@ export default function FolderPage() {
 
   return (
     <>
-      <Grid item xs className="folders-controls">
+      <Grid item xs className="folders-controls" style={{ paddingTop: 5 }}>
         <Box className="flex-ac">
           <Tooltip title="New folder" placement="bottom-end">
             <Box
@@ -98,38 +99,43 @@ export default function FolderPage() {
       </Grid>
 
 
-      <Grid item xs={12}>
+      <Grid item xs={12} style={{ paddingTop: 5 }}>
         <Divider />
       </Grid>
 
-      <Grid item xs={12}>
-        <Breadcrumbs>
-          <Link color="inherit" to={`/home/folders`}>
-            Home
-          </Link>
-          {buildBreadcrumbPath(folder.id).map((crumb) => (
-            <Link key={crumb.id} color="inherit" to={`/home/folders/${crumb.id}`}>
-              {crumb.name}
+      <Grid item xs={12} style={{ paddingTop: 8 }}>
+        <Box className="flex-ac">
+          <Breadcrumbs>
+            <Link color="inherit" to={`/home/folders`}>
+              Home
             </Link>
-          ))}
-        </Breadcrumbs>
-      </Grid>
-
-      <Grid item xs={12} style={{ paddingTop: '5px' }}>
-        <ChildFolders folders={childFolders} />
-      </Grid>
-
-      {/* <TableContainer>
-        <Table>
-          <TableBody>
-            {folder.tasks.map((task) => (
-              <TableRow key={task.task_id}>
-                <TableCell>{task.task_name}</TableCell>
-              </TableRow>
+            {buildBreadcrumbPath(folder.id).map((crumb) => (
+              <Link key={crumb.id} color="inherit" to={`/home/folders/${crumb.id}`}>
+                {crumb.name}
+              </Link>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
+          </Breadcrumbs>
+          <Divider flexItem orientation="vertical" sx={{ ml: 3, mr: 1, my: 2 }} />
+          <ChildFolders folders={childFolders} />
+
+        </Box>
+      </Grid>
+
+      <Grid item xs={12} style={{ paddingTop: '8px' }}>
+        <Paper>
+          <TableContainer>
+            <Table>
+              <TableBody>
+                {folder.tasks.map((task) => (
+                  <TableRow key={task.task_id}>
+                    <TableCell>{task.task_name}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Grid>
 
     </>
   );
@@ -143,16 +149,17 @@ function ChildFolders({ folders }) {
         folders.map((folder) => {
           let folderName = folder.name;
 
-          if (folderName.length > 23) {
-            folderName = folderName.substring(0, 23) + '...';
+          if (folderName.length > 16) {
+            folderName = folderName.substring(0, 16) + '...';
           }
 
           return (
             <Link
+              key={folder.id}
               to={`/home/folders/${folder.id}`}
               className="folder-container">
               <FolderIcon htmlColor="#f7df92" fontSize="large" />
-              <Box mt={1} maxWidth={80} style={{ overflowWrap: 'break-word' }}>
+              <Box style={{ overflowWrap: 'break-word' }}>
                 <Typography variant="body2">{folderName}</Typography>
               </Box>
             </Link>
