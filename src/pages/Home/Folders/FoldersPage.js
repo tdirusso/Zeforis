@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse } from "@mui/material";
 import './styles.scss';
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
 import React, { useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
@@ -11,6 +11,14 @@ import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { TransitionGroup } from 'react-transition-group';
+import ListSubheader from '@mui/material/ListSubheader';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import FolderIcon from '@mui/icons-material/Folder';
 
 export default function FoldersPage() {
   const {
@@ -19,11 +27,12 @@ export default function FoldersPage() {
     openDrawer
   } = useOutletContext();
 
-  const [view, setView] = useState('card');
+  const [view, setView] = useState(localStorage.getItem('folderView') || 'card');
   const [query, setQuery] = useState('');
 
   const handleSetView = (_, newView) => {
     if (newView) {
+      localStorage.setItem('folderView', newView);
       setView(newView);
     }
   };
@@ -86,33 +95,189 @@ export default function FoldersPage() {
         </Box>
       </Grid>
 
+
       <Grid item xs={12}>
         <Divider />
       </Grid>
-
-      <FolderCards folders={keyFolders} title="Key Folders" />
-
-      <Grid item xs={12} style={{ paddingTop: '1rem' }}>
-        <Divider />
-      </Grid>
-
-      <FolderCards folders={otherFolders} title="Other Folders" />
+      {
+        view === 'list' ?
+          <FolderList
+            allFolders={folders}
+            keyFolders={keyFolders}
+            otherFolders={otherFolders}
+          />
+          :
+          <>
+            <FolderCards folders={keyFolders} title="Key Folders" />
+            <Grid item xs={12} style={{ paddingTop: '1rem' }}>
+              <Divider />
+            </Grid>
+            <FolderCards folders={otherFolders} title="Other Folders" />
+          </>
+      }
+      <Outlet />
     </>
   );
 };
+
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, depth = 1) {
+  depth++;
+  const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
+
+  return nestedFolders.map(folder => {
+    const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
+
+    return (
+      <div key={folder.id}>
+        <ListItemButton
+          sx={{ pl: 4 * depth }}
+          onClick={() => handleFolderClick(folder.id)}>
+          {
+            hasNestedFolders ?
+              (openStates[folder.id] ?
+                <ExpandLess className="toggle-icon" /> :
+                <ExpandMore className="toggle-icon" />)
+              : null
+          }
+          <ListItemIcon>
+            <FolderIcon />
+          </ListItemIcon>
+          <ListItemText primary={folder.name} />
+        </ListItemButton>
+        {
+          hasNestedFolders ?
+            <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
+              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, depth)}
+            </Collapse> : null
+        }
+      </div>
+    );
+  });
+}
+
+
+function FolderList({ keyFolders, otherFolders, allFolders }) {
+  const navigate = useNavigate();
+
+  const [selectedFolderId, setSelectedFolderId] = useState(null);
+  const [dblClickFlag, setDblClickFlag] = useState(false);
+  const [openStates, setOpenStates] = useState({});
+
+  const handleFolderClick = (folderId) => {
+    if (selectedFolderId === folderId && dblClickFlag === true) {
+      navigate(`${folderId}`);
+      return;
+    }
+
+    setDblClickFlag(true);
+    setSelectedFolderId(folderId);
+    setOpenStates(prevOpenStates => ({
+      ...prevOpenStates,
+      [folderId]: !prevOpenStates[folderId],
+    }));
+
+    setTimeout(() => {
+      setDblClickFlag(false);
+    }, 300);
+  };
+
+  return (
+    <Grid item xs={12}>
+      <Paper sx={{ px: 0 }}>
+        <List
+          className="folders-list"
+          dense
+          component="nav"
+          subheader={
+            <ListSubheader className="flex-ac">
+              <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} />  Key Folders
+            </ListSubheader>
+          }>
+          {
+            keyFolders.map(folder => {
+              return (
+                <FolderListItem
+                  name={folder.name}
+                  id={folder.id}
+                  key={folder.id}
+                  selectedFolderId={selectedFolderId}
+                  handleFolderClick={handleFolderClick}
+                  allFolders={allFolders}
+                  openStates={openStates}
+                  setOpenStates={setOpenStates}
+                />
+              );
+            })
+          }
+          <ListSubheader className="flex-ac">
+            Other Folders
+          </ListSubheader>
+          {
+            otherFolders.map(folder => {
+              return (null
+                // <FolderListItem
+                //   name={folder.name}
+                //   id={folder.id}
+                //   key={folder.id}
+                //   selectedFolderId={selectedFolderId}
+                //   handleFolderClick={handleFolderClick}
+                // />
+              );
+            })
+          }
+        </List>
+      </Paper>
+    </Grid>
+  );
+}
+
+function FolderListItem({ name, id, selectedFolderId, handleFolderClick, allFolders, openStates, setOpenStates }) {
+  const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
+
+  return (
+    <>
+      <ListItemButton
+        selected={selectedFolderId === id}
+        disableRipple
+        sx={{ pl: 4 }}
+        onClick={() => handleFolderClick(id)}>
+        {
+          hasNestedFolders ?
+            (openStates[id] ?
+              <ExpandLess className="toggle-icon" /> :
+              <ExpandMore className="toggle-icon" />)
+            : null
+        }
+        <ListItemIcon>
+          <FolderIcon />
+        </ListItemIcon>
+        <ListItemText primary={name} />
+      </ListItemButton>
+      {
+        hasNestedFolders ?
+          <Collapse in={openStates[id]} timeout="auto" unmountOnExit>
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates)}
+          </Collapse>
+          : null
+      }
+    </>
+  );
+}
+
 
 function FolderCards({ folders, title }) {
   return (
     <Grid item xs={12}>
       <Box component="h6" className="flex-ac" mb={1}>
-        {title.includes('Key') ? <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} /> : null}
+        {title.includes('Key') ?
+          <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} /> : null}
         {title}
       </Box>
-      {folders.length === 0 ? (
+      {folders.length === 0 ?
         <Grid item xs={12}>
           <Typography>No {title.toLowerCase()}.</Typography>
         </Grid>
-      ) : (
+        :
         <TransitionGroup className="folders-transition-group">
           {folders.map((folder) => {
             let folderName = folder.name;
@@ -138,7 +303,7 @@ function FolderCards({ folders, title }) {
             );
           })}
         </TransitionGroup>
-      )}
+      }
     </Grid>
   );
 }

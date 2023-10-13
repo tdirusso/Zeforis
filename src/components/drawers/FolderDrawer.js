@@ -19,7 +19,8 @@ export default function FolderDrawer(props) {
     openSnackBar,
     setFolders,
     folderProp,
-    foldersMap
+    foldersMap,
+    parentId
   } = props;
 
   const name = useRef();
@@ -55,7 +56,8 @@ export default function FolderDrawer(props) {
       const { folder, message } = await createFolder({
         name: nameVal,
         engagementId: engagement.id,
-        isKeyFolder
+        isKeyFolder,
+        parentId
       });
 
       if (folder) {
@@ -162,6 +164,7 @@ export default function FolderDrawer(props) {
                         <FolderIcon />
                       </InputAdornment>
                   }}
+                  // helperText={<><DriveFolderUploadOutlinedIcon />Test</>}
                   fullWidth
                   autoFocus={!isMobile}
                   disabled={isLoading}

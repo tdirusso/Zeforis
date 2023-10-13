@@ -1,3 +1,7 @@
+.folders-list {
+  .toggle-icon {}
+}
+
 .folder-container {
   text-align: center;
   color: inherit !important;
@@ -5,7 +9,7 @@
 
 .folder-transitioner {
   .MuiCollapse-wrapper {
-    padding: 26px 15px 0px 15px;
+    padding: 26px 15px 8px 15px;
     border-radius: 8px;
 
     &:hover {
