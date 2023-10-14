@@ -3,7 +3,7 @@ import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconBut
 import './styles.scss';
 import { useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import SearchIcon from '@mui/icons-material/Search';
 import ListSubheader from '@mui/material/ListSubheader';
@@ -35,6 +35,9 @@ export default function FoldersPage() {
   const [openStates, setOpenStates] = useState({});
   const [renderReady, setRenderReady] = useState(false);
   const [viewingFolder, setViewingFolder] = useState(null);
+
+  const prevFolders = useRef(folders);
+  const prevQuery = useRef(query);
 
   const openAllAncestors = (folderId, statesObj) => {
     let currentFolder = foldersMap[folderId];
@@ -91,6 +94,14 @@ export default function FoldersPage() {
   };
 
   useEffect(() => {
+    let foldersUpdated = false;
+
+    if (query === prevQuery.current) {
+      foldersUpdated = JSON.stringify(prevFolders.current) !== JSON.stringify(folders);
+    } else {
+      prevQuery.current = query;
+    }
+
     const tempOpenStates = {};
     let filteredKeyFolders = [];
     let filteredOtherFolders = [];
@@ -128,12 +139,17 @@ export default function FoldersPage() {
 
     setKeyFolders(filteredKeyFolders);
     setOtherFolders(filteredOtherFolders);
-    setOpenStates(tempOpenStates);
+
+    if ((!foldersUpdated && lcQuery)) {
+      setOpenStates(tempOpenStates);
+    } else {
+      prevFolders.current = folders;
+    }
 
     if (!renderReady) {
       setRenderReady(true);
     }
-  }, [query]);
+  }, [query, folders]);
 
   return (
     <>
@@ -354,6 +370,7 @@ function FolderList(props) {
                   openStates={openStates}
                   setOpenStates={setOpenStates}
                   query={query}
+                  viewingFolder={viewingFolder}
                 />
               );
             })
@@ -374,6 +391,7 @@ function FolderList(props) {
                   openStates={openStates}
                   setOpenStates={setOpenStates}
                   query={query}
+                  viewingFolder={viewingFolder}
                 />
               );
             })
@@ -384,9 +402,11 @@ function FolderList(props) {
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, depth = 1) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
+
+  const indent = viewingFolder ? (`${24 * depth}px`) : (`${36 * depth}px`);
 
   return nestedFolders.map(folder => {
     const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
@@ -396,7 +416,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
         <ListItemButton
           disableRipple
           selected={selectedFolderId === folder.id}
-          sx={{ pl: `${(36 * depth)}px` }}
+          sx={{ pl: indent }}
           onClick={() => handleFolderClick(folder.id, hasNestedFolders)}>
           <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
             {
@@ -413,7 +433,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
         {
           hasNestedFolders ?
             <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
-              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, depth)}
+              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, depth)}
             </Collapse> : null
         }
       </div>
@@ -452,7 +472,8 @@ export function FolderListItem(props) {
     allFolders,
     openStates,
     setOpenStates,
-    query
+    query,
+    viewingFolder
   } = props;
 
   const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
@@ -462,7 +483,7 @@ export function FolderListItem(props) {
       <ListItemButton
         selected={selectedFolderId === id}
         disableRipple
-        sx={{ pl: '40px' }}
+        sx={{ pl: viewingFolder ? '32px' : '40px', transition: 'padding 250ms' }}
         onClick={() => handleFolderClick(id, hasNestedFolders)}>
         <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
           {
@@ -481,7 +502,7 @@ export function FolderListItem(props) {
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto" unmountOnExit>
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder)}
           </Collapse>
           : null
       }
