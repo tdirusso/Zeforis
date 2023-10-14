@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper, Typography, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Fade } from "@mui/material";
+import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Fade } from "@mui/material";
 import './styles.scss';
-import { Link, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
 import React, { useEffect, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import SearchIcon from '@mui/icons-material/Search';
-import { TransitionGroup } from 'react-transition-group';
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -16,6 +15,11 @@ import FolderIcon from '@mui/icons-material/Folder';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import CloseIcon from '@mui/icons-material/Close';
 import DoubleArrowRoundedIcon from '@mui/icons-material/DoubleArrowRounded';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 
 export default function FoldersPage() {
   const {
@@ -157,10 +161,9 @@ export default function FoldersPage() {
               setViewingFolder={setViewingFolder}
               foldersMap={foldersMap}
             />
-
             {
               viewingFolder ?
-                <FolderView />
+                <FolderView folder={viewingFolder} />
                 :
                 null
             }
@@ -170,15 +173,25 @@ export default function FoldersPage() {
   );
 };
 
-function FolderView() {
+function FolderView({ folder }) {
   return (
     <Grid item xs={8.5}>
       <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
         <Paper sx={{ px: 0 }}>
-          content
+          <TableContainer>
+            <Table>
+              <TableBody>
+                {folder.tasks.map((task) => (
+                  <TableRow key={task.task_id}>
+                    <TableCell>{task.task_name}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Paper>
       </Fade>
-    </Grid >
+    </Grid>
   );
 }
 
@@ -204,34 +217,39 @@ function FolderList(props) {
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [dblClickFlag, setDblClickFlag] = useState(false);
 
-  const handleFolderClick = (folderId) => {
-    if (selectedFolderId === folderId && dblClickFlag === true) {
-      clearTimeout(window.updateOpenFolderStates);
+  const handleFolderClick = (folderId, hasNestedFolders) => {
+    if (hasNestedFolders) {
+      if (selectedFolderId === folderId && dblClickFlag === true) {
+        clearTimeout(window.updateOpenFolderStates);
+        setViewingFolder(foldersMap[folderId]);
+        return;
+      }
+
+      setDblClickFlag(true);
+      setSelectedFolderId(folderId);
+
+      window.updateOpenFolderStates = setTimeout(() => {
+        setOpenStates(prevOpenStates => ({
+          ...prevOpenStates,
+          [folderId]: !prevOpenStates[folderId],
+        }));
+      }, 200);
+
+      setTimeout(() => {
+        setDblClickFlag(false);
+      }, 200);
+    } else {
+      setSelectedFolderId(folderId);
       setViewingFolder(foldersMap[folderId]);
-      return;
     }
-
-    setDblClickFlag(true);
-    setSelectedFolderId(folderId);
-
-    window.updateOpenFolderStates = setTimeout(() => {
-      setOpenStates(prevOpenStates => ({
-        ...prevOpenStates,
-        [folderId]: !prevOpenStates[folderId],
-      }));
-    }, 200);
-
-    setTimeout(() => {
-      setDblClickFlag(false);
-    }, 200);
   };
 
   const gridWidth = viewingFolder ? 3.5 : 12;
 
   return (
     <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
-      <Paper sx={{ px: 0 }}>
-        <Box className="flex-ac" px={3}>
+      <Paper sx={{ px: 0, py: 1.5 }}>
+        <Box className="flex-ac" px={viewingFolder ? 1.5 : 3} gap={3}>
           <Tooltip title="New folder" placement="bottom-end">
             <Box
               hidden={!isAdmin}
@@ -243,47 +261,76 @@ function FolderList(props) {
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAEy0lEQVR4nO2bz28bRRTHV5T00CNwA/EHwDGi4hZpN8wa1SUgcMsFEIhyKFJFfHGEKpmgiKRuQrNukWshsWvRgJQckKAVTauCeitSULwQBDHubiFcWloJ4fU+IyoGjV2KMEkc79p+a8/7Sl8pUn7I+/3MvDczO1EUEolEIpFIJBKJRCKRSCQSiUQikUikJlVW33jUKyZPeHZyrWKPe56d5J10xR5/i0LfRHwtvdsrJk9W7OTtTofuEYQdhX+x28F7NBM2lxj5vQzfo3L035rfi7LjEYStRv/4PFb43j8zoZickbYxe/b4d9gAPJlXR14xWcEO35N5JjSHUF2b4P76FPfLsxwcg4Obldq+Y/Bqebbmr09/Xf1+an9XAVRLUxS6uw0QAaM0U+Qr6T0dB+CXj6GPNugT++XMzY5BuDvyI/Bg0EeulqZXOwJA1Hyq9dn2IThZXrs6uS88gHUa/RC0FJVmVkID8Mtz6NMZ+tT+1TkID8CdR38Q6FP7jvFXaADYDwF9bgLgEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKEH4YgGDqAS4BQB+FQDMAPwigEoQfBiCYeoBLANBHIdAMwA8CqAThhwEIph7gEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKUP+46hh81Z7khctH+NFzL/GXl57lY2fiXC88Wbf4+pWl5+rfEz9TtN/mvkM9gIcNfuOHYzx36TA/8PFTXLP0tnzwozGe++J1vrGeoSYMbQZ/vTTLjy8f4noh1nbwzRZ/Y+7Ca/z6j407tbQKcrcP//yVFB9biIcOvtlPL+zny19NEADYIviKM88z51/tePD/s8lOD+eHh+hyrvtv+L+VT/DUpy90P/y7Zufi+Xiwf1nCXpFAF0Z+b8NvWDXZxcRiYrf0ADK9KDtbz4Sc1AA+v5JqO7RWahtCgR2UEsCN0ix/5kwcHYBq6bdGFuIPSAfg+PKhQGWj4zOg0Q/ekwrAxnom8CarSwD+GC2MPiwNgNylw4EbZzcA3ClF01IA8J1s/ZwmagA0k/2SWEzsGngAq/Zk8JC6CaA+C9jegQdQuHwksgBGTTbREoDvZn/HDhFC+OjZF0MFHFbblyF9qTUAx1jDDhFCWLw4iSoA1WLftC5BjvEudogQwq2OmjEBaCb7tSWA2jXjEd8xbmMHCQHdav2PCUC1WK0lgEYfMAzsIEFmAHwlP+S7xgXsMEHGEtQEYd53sn9ihwoyNeHNegI42TnfzX7ru0YFO2AY9GVov0u19DfDbJZCBdzCqsVSyqBr1Iw9HlUA2gexx5RBVzqdvke19J+jBkA19Z/EZ1NkkGrp09EDwN5RZNHIh7GHxEuQqAAQ63/V2vegIpM0i+WiAkAz9ZOKbGLvs/vExgcbgGrqN9t6KT9IUs0nnscHEEsoMksz2emgjTO82SlFdiUWE7s0S/+k1+GrFjs78uXIvdjPHwnF8/E94sJsz8I39c8CX84dVA3nh4eCrozaLTs08reRuKsZZHW0g5JzQ/qGu1NpBe1+cV1QbJA6EHxNrPPFsnfHH4DUkNidimOLIGdH4nfE8YJ0O1ylC2oc4LG94t6OOLMXL07ErWZxnFG3pd/STGbf+V5KnGoGPVj7GyCRo+oGQ60BAAAAAElFTkSuQmCC" />
             </Box>
           </Tooltip>
-          <TextField
-            onChange={e => setQuery(e.target.value)}
-            className="readonly-textfield"
-            variant="outlined"
-            size="small"
-            value={query}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon htmlColor="#cbcbcb" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="start">
-                  <Tooltip title='Clear search'>
-                    <IconButton size="small" onClick={() => setQuery('')}>
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              )
-            }}
-            placeholder="Search"
+
+          <ExpandCollapseButtonGroup
+            handleExpandAll={handleExpandAll}
+            handleCollapseAll={handleCollapseAll}
           />
           {
             !viewingFolder ?
-              <ExpandCollapseButtonGroup
-                handleExpandAll={handleExpandAll}
-                handleCollapseAll={handleCollapseAll}
-              /> : null
+              <TextField
+                style={{ transition: 'all 1s' }}
+                onChange={e => setQuery(e.target.value)}
+                variant="standard"
+                size="small"
+                value={query}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="start" style={{ visibility: query ? 'visible' : 'hidden' }}>
+                      <Tooltip title='Clear'>
+                        <IconButton size="small" onClick={() => setQuery('')}>
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
+                }}
+                placeholder="Search"
+              />
+              : null
           }
         </Box>
-        <Box>
-          {
-            viewingFolder ?
-              <ExpandCollapseButtonGroup
-                handleExpandAll={handleExpandAll}
-                handleCollapseAll={handleCollapseAll}
-              /> : null
-          }
-        </Box>
+        {
+          viewingFolder ?
+            <Box p={1} ml={1}>
+              <TextField
+                style={{ transition: 'all 1s' }}
+                onChange={e => setQuery(e.target.value)}
+                variant="standard"
+                size="small"
+                value={query}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Tooltip title='Clear'>
+                        <IconButton size="small" onClick={() => setQuery('')}>
+                          <SearchIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="start" style={{ visibility: query ? 'visible' : 'hidden' }}>
+                      <Tooltip title='Clear'>
+                        <IconButton size="small" onClick={() => setQuery('')}>
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
+                }}
+                placeholder="Search"
+              />
+            </Box> :
+            null
+        }
+
+        <Divider sx={{ mt: 1 }} />
 
         <List
           className="folders-list"
@@ -350,8 +397,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
           disableRipple
           selected={selectedFolderId === folder.id}
           sx={{ pl: `${(36 * depth)}px` }}
-          onClick={() => handleFolderClick(folder.id)}>
-
+          onClick={() => handleFolderClick(folder.id, hasNestedFolders)}>
           <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
             {
               hasNestedFolders ?
@@ -417,7 +463,7 @@ export function FolderListItem(props) {
         selected={selectedFolderId === id}
         disableRipple
         sx={{ pl: '40px' }}
-        onClick={() => handleFolderClick(id)}>
+        onClick={() => handleFolderClick(id, hasNestedFolders)}>
         <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
           {
             hasNestedFolders ?
@@ -445,19 +491,23 @@ export function FolderListItem(props) {
 
 function ExpandCollapseButtonGroup({ handleExpandAll, handleCollapseAll }) {
   return (
-    <ButtonGroup size="small" variant="contained" style={{ margin: '0 16px' }}>
-      <Button
-        size="small"
-        onClick={handleExpandAll}
-        startIcon={<DoubleArrowRoundedIcon fontSize="small" style={{ transform: 'rotate(90deg)' }} />}>
-        Expand
-      </Button>
-      <Button
-        size="small"
-        onClick={handleCollapseAll}
-        endIcon={<DoubleArrowRoundedIcon fontSize="small" style={{ transform: 'rotate(-90deg)' }} />}>
-        Collapse
-      </Button>
+    <ButtonGroup variant="outlined" style={{ marginLeft: -10 }}>
+      <Tooltip title="Expand all">
+        <Button
+          onClick={handleExpandAll}>
+          <DoubleArrowRoundedIcon
+            style={{ transform: 'rotate(90deg)', fontSize: 14 }}
+          />
+        </Button>
+      </Tooltip>
+      <Tooltip title="Collapse all">
+        <Button
+          onClick={handleCollapseAll}>
+          <DoubleArrowRoundedIcon
+            style={{ transform: 'rotate(-90deg)', fontSize: 14 }}
+          />
+        </Button>
+      </Tooltip>
     </ButtonGroup>
   );
 }
