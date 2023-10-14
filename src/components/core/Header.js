@@ -94,7 +94,7 @@ export default function Header(props) {
         </Box>
         <Box className="engagement-title">
           <Box className="flex-ac">
-            <Typography variant='h1' style={{ fontSize: '1.55rem', fontWeight: 200 }} mr={2}>
+            <Typography variant='h1' style={{ fontSize: '1.55rem', fontWeight: 600 }} mr={2}>
               {engagement.name}
             </Typography>
             <Tooltip title="Change Engagement">

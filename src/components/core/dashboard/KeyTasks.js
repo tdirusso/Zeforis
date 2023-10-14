@@ -2,6 +2,7 @@ import { Box, Paper, Typography, Button, Grid, Tooltip, IconButton, Chip, useMed
 import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import './styles.scss';
 
 export default function KeyTasks({ tasks }) {
   const tasksLength = tasks.length;
@@ -17,7 +18,6 @@ export default function KeyTasks({ tasks }) {
         <Box
           display="flex"
           alignItems="center"
-          //  mb={0.5}
           justifyContent="space-between">
           <Box
             component="h5"
@@ -30,17 +30,20 @@ export default function KeyTasks({ tasks }) {
             Key Tasks
           </Box>
           <Button
+            size="small"
             onClick={() => navigate('/home/tasks?preFilterKeyTasks=true')}
             style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View all
           </Button>
         </Box>
         <Divider style={{ margin: '3px 6px 8px 6px' }} />
-        {
-          tasksLength > 0 ?
-            <KeyTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
-            <NoKeyTasksMessage />
-        }
+        <Box className="key-tasks-wrapper app-scrollable">
+          {
+            tasksLength > 0 ?
+              <KeyTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
+              <NoKeyTasksMessage />
+          }
+        </Box>
       </Paper>
     </Grid>
   );

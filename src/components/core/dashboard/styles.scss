@@ -1,3 +1,10 @@
 .widgets-container {
   padding-top: 10px !important;
 }
+
+.key-tasks-wrapper,
+.upcoming-tasks-wrapper {
+  max-height: 425px;
+  overflow: auto;
+  position: relative;
+}

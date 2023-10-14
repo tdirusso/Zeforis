@@ -50,7 +50,6 @@ export default function FolderPage() {
     const breadcrumb = [];
 
     const findParentFolder = (folderId) => {
-      //const parentFolder = folders.find((f) => f.id === folderId);
       const parentFolder = foldersMap[folderId];
       if (parentFolder) {
         breadcrumb.unshift(parentFolder);
@@ -66,19 +65,46 @@ export default function FolderPage() {
 
   return (
     <>
-      <Grid item xs className="folders-controls" style={{ paddingTop: 5 }}>
+
+
+      <Grid item xs={12} style={{ paddingTop: 8 }}>
         <Box className="flex-ac">
+          <Breadcrumbs>
+            <Link color="inherit" to={`/home/folders`}>
+              Home
+            </Link>
+            {buildBreadcrumbPath(folder.id).map((crumb) => (
+              <Link key={crumb.id} color="inherit" to={`/home/folders/${crumb.id}`}>
+                {crumb.name}
+              </Link>
+            ))}
+          </Breadcrumbs>
+          <Divider flexItem orientation="vertical" sx={{ ml: 3, mr: 1, my: 2 }} />
           <Tooltip title="New folder" placement="bottom-end">
             <Box
+              mr={0}
               hidden={!isAdmin}
               className="new-folder-btn"
               onClick={() => openDrawer('folder', { parentId: folder.id })}>
               <img
-                width={60}
+                width={40}
                 alt=""
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAEy0lEQVR4nO2bz28bRRTHV5T00CNwA/EHwDGi4hZpN8wa1SUgcMsFEIhyKFJFfHGEKpmgiKRuQrNukWshsWvRgJQckKAVTauCeitSULwQBDHubiFcWloJ4fU+IyoGjV2KMEkc79p+a8/7Sl8pUn7I+/3MvDczO1EUEolEIpFIJBKJRCKRSCQSiUQikUikJlVW33jUKyZPeHZyrWKPe56d5J10xR5/i0LfRHwtvdsrJk9W7OTtTofuEYQdhX+x28F7NBM2lxj5vQzfo3L035rfi7LjEYStRv/4PFb43j8zoZickbYxe/b4d9gAPJlXR14xWcEO35N5JjSHUF2b4P76FPfLsxwcg4Obldq+Y/Bqebbmr09/Xf1+an9XAVRLUxS6uw0QAaM0U+Qr6T0dB+CXj6GPNugT++XMzY5BuDvyI/Bg0EeulqZXOwJA1Hyq9dn2IThZXrs6uS88gHUa/RC0FJVmVkID8Mtz6NMZ+tT+1TkID8CdR38Q6FP7jvFXaADYDwF9bgLgEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKEH4YgGDqAS4BQB+FQDMAPwigEoQfBiCYeoBLANBHIdAMwA8CqAThhwEIph7gEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKUP+46hh81Z7khctH+NFzL/GXl57lY2fiXC88Wbf4+pWl5+rfEz9TtN/mvkM9gIcNfuOHYzx36TA/8PFTXLP0tnzwozGe++J1vrGeoSYMbQZ/vTTLjy8f4noh1nbwzRZ/Y+7Ca/z6j407tbQKcrcP//yVFB9biIcOvtlPL+zny19NEADYIviKM88z51/tePD/s8lOD+eHh+hyrvtv+L+VT/DUpy90P/y7Zufi+Xiwf1nCXpFAF0Z+b8NvWDXZxcRiYrf0ADK9KDtbz4Sc1AA+v5JqO7RWahtCgR2UEsCN0ix/5kwcHYBq6bdGFuIPSAfg+PKhQGWj4zOg0Q/ekwrAxnom8CarSwD+GC2MPiwNgNylw4EbZzcA3ClF01IA8J1s/ZwmagA0k/2SWEzsGngAq/Zk8JC6CaA+C9jegQdQuHwksgBGTTbREoDvZn/HDhFC+OjZF0MFHFbblyF9qTUAx1jDDhFCWLw4iSoA1WLftC5BjvEudogQwq2OmjEBaCb7tSWA2jXjEd8xbmMHCQHdav2PCUC1WK0lgEYfMAzsIEFmAHwlP+S7xgXsMEHGEtQEYd53sn9ihwoyNeHNegI42TnfzX7ru0YFO2AY9GVov0u19DfDbJZCBdzCqsVSyqBr1Iw9HlUA2gexx5RBVzqdvke19J+jBkA19Z/EZ1NkkGrp09EDwN5RZNHIh7GHxEuQqAAQ63/V2vegIpM0i+WiAkAz9ZOKbGLvs/vExgcbgGrqN9t6KT9IUs0nnscHEEsoMksz2emgjTO82SlFdiUWE7s0S/+k1+GrFjs78uXIvdjPHwnF8/E94sJsz8I39c8CX84dVA3nh4eCrozaLTs08reRuKsZZHW0g5JzQ/qGu1NpBe1+cV1QbJA6EHxNrPPFsnfHH4DUkNidimOLIGdH4nfE8YJ0O1ylC2oc4LG94t6OOLMXL07ErWZxnFG3pd/STGbf+V5KnGoGPVj7GyCRo+oGQ60BAAAAAElFTkSuQmCC" />
             </Box>
           </Tooltip>
+          <Divider flexItem orientation="vertical" sx={{ mx: 1, my: 2 }} />
+          <ChildFolders folders={childFolders} />
+
+        </Box>
+      </Grid>
+
+
+
+      <Grid item xs={12} style={{ paddingTop: 10 }}>
+        <Divider />
+      </Grid>
+      <Grid item xs className="folders-controls" style={{ paddingTop: 5 }}>
+        {/* <Box className="flex-ac">
           <Paper style={{ padding: '4px 2px', borderRadius: '8px' }} className="flex-ac">
             <TextField
               onChange={e => setQuery(e.target.value)}
@@ -95,30 +121,7 @@ export default function FolderPage() {
               placeholder="Search"
             />
           </Paper>
-        </Box>
-      </Grid>
-
-
-      <Grid item xs={12} style={{ paddingTop: 5 }}>
-        <Divider />
-      </Grid>
-
-      <Grid item xs={12} style={{ paddingTop: 8 }}>
-        <Box className="flex-ac">
-          <Breadcrumbs>
-            <Link color="inherit" to={`/home/folders`}>
-              Home
-            </Link>
-            {buildBreadcrumbPath(folder.id).map((crumb) => (
-              <Link key={crumb.id} color="inherit" to={`/home/folders/${crumb.id}`}>
-                {crumb.name}
-              </Link>
-            ))}
-          </Breadcrumbs>
-          <Divider flexItem orientation="vertical" sx={{ ml: 3, mr: 1, my: 2 }} />
-          <ChildFolders folders={childFolders} />
-
-        </Box>
+        </Box> */}
       </Grid>
 
       <Grid item xs={12} style={{ paddingTop: '8px' }}>

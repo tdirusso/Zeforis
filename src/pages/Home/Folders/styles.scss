@@ -73,17 +73,17 @@ body.dark .folder-container:hover {
     border: 0;
     border-radius: 4px !important;
   }
+}
 
-  .new-folder-btn {
-    cursor: pointer;
-    border: 1px dashed transparent;
-    padding: 3px 12px;
-    border-radius: 8px;
-    transition: border 400ms;
-    margin-right: 1rem;
+.new-folder-btn {
+  cursor: pointer;
+  border: 1px dashed transparent;
+  padding: 3px 12px;
+  border-radius: 8px;
+  transition: border 400ms;
+  margin-right: 1rem;
 
-    &:hover {
-      border: 1px dashed #b1b1b1;
-    }
+  &:hover {
+    border: 1px dashed #b1b1b1;
   }
 }

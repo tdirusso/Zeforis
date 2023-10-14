@@ -1,5 +1,8 @@
 import { Fade } from "@mui/material";
 
+const lightBoxShadow = 'rgba(33, 33, 52, 0.1) 0px 1px 4px !important';
+const darkBoxShadow = 'rgba(5, 5, 5, 0.35) 1px 1px 10px  !important';
+
 const theme = {
   palette: {
     primary: {
@@ -20,7 +23,7 @@ const theme = {
     MuiMenu: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
+          boxShadow: lightBoxShadow,
           padding: '0 !important'
         }
       },
@@ -33,7 +36,7 @@ const theme = {
     MuiAutocomplete: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
+          boxShadow: lightBoxShadow,
           padding: '0 !important'
         }
       }
@@ -41,7 +44,7 @@ const theme = {
     MuiPickersPopper: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px !important',
+          boxShadow: lightBoxShadow,
           padding: '0 !important'
         }
       }
@@ -49,8 +52,8 @@ const theme = {
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: 'rgba(0, 0, 0, 0.1) 0px 2px 12px',
-          borderRadius: '14px',
+          boxShadow: lightBoxShadow,
+          borderRadius: '8px',
           padding: '24px'
         }
       }
@@ -65,7 +68,7 @@ const theme = {
           whiteSpace: 'nowrap',
           boxShadow: 'none',
           fontWeight: 400,
-          borderRadius: '8px',
+          borderRadius: '6px',
           transitionDuration: '0s',
           '&:hover': {
             boxShadow: 'none'
@@ -80,7 +83,7 @@ const theme = {
           textTransform: 'none',
           boxShadow: 'none',
           fontWeight: 400,
-          borderRadius: '8px',
+          borderRadius: '6px',
           transitionDuration: '0s',
           '&:hover': {
             boxShadow: 'none'
@@ -104,7 +107,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '8px',
+            borderRadius: '6px',
           }
         }
       }
@@ -127,7 +130,7 @@ const theme = {
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderRadius: '8px'
+            borderRadius: '6px'
           }
         }
       }
@@ -198,7 +201,7 @@ const darkThemeOverrides = {
     MuiMenu: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: darkBoxShadow,
           padding: '0 !important'
         }
       },
@@ -210,7 +213,7 @@ const darkThemeOverrides = {
     MuiAutocomplete: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: darkBoxShadow,
           padding: '0 !important'
         }
       }
@@ -218,7 +221,7 @@ const darkThemeOverrides = {
     MuiPickersPopper: {
       styleOverrides: {
         paper: {
-          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px !important',
+          boxShadow: darkBoxShadow,
           padding: '0 !important'
         }
       }
@@ -226,8 +229,8 @@ const darkThemeOverrides = {
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: 'rgba(0, 0, 0, 0.4) 0px 7px 24px 0px',
-          borderRadius: '24px',
+          boxShadow: darkBoxShadow,
+          borderRadius: '8px',
           padding: '24px'
         }
       }

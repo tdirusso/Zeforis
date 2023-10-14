@@ -130,7 +130,6 @@ h6 {
 
 ::-webkit-scrollbar {
   width: 5px;
-  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -140,10 +139,6 @@ h6 {
 ::-webkit-scrollbar-thumb {
   background: #8da2b799;
   border-radius: 50px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #8da2b799;
 }
 
 .MuiChip-root.Complete {
@@ -281,6 +276,38 @@ body.dark .MuiPaper-root.folder-small {
 body.dark .MuiPaper-root.folder-small::before,
 body.dark .MuiPaper-root.folder::before {
   background: #373737;
+}
+
+.app-scrollable {
+  mask-image: linear-gradient(to bottom, black calc(100% - 15px), transparent 100%);
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: white;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #e3e3e3;
+    border-radius: 50px;
+  }
+}
+
+body.dark .app-scrollable {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #101418;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 50px;
+  }
 }
 
 @media screen and (max-width: 550px) {

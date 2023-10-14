@@ -32,17 +32,20 @@ export default function UpcomingTasks({ tasks }) {
             Upcoming Tasks
           </Box>
           <Button
+            size="small"
             onClick={() => navigate('/home/tasks?preSort=dateDue')}
             style={{ display: tasksLength > 0 ? 'block' : 'none' }}>
             View all
           </Button>
         </Box>
         <Divider style={{ margin: '3px 6px 8px 6px' }} />
-        {
-          tasksLength > 0 ?
-            <UpcomingTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
-            <NoUpcomingTasksMessage />
-        }
+        <Box className="upcoming-tasks-wrapper app-scrollable">
+          {
+            tasksLength > 0 ?
+              <UpcomingTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :
+              <NoUpcomingTasksMessage />
+          }
+        </Box>
       </Paper>
     </Grid>
   );
@@ -97,6 +100,7 @@ function UpcomingTaskRow({ task, buttonColor }) {
       justifyContent="center">
       <Box flexBasis={isSmallScreen ? 'unset' : '60%'} minWidth={75} mr='auto'>
         <Typography
+          lineHeight='14px'
           variant="body2">
           {taskName}
         </Typography>

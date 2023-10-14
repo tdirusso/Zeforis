@@ -41,8 +41,8 @@ export default function Dashboard() {
 
   return (
     <>
-      <KeyTasks tasks={keyTasks.slice(0, 10)} />
-      <UpcomingTasks tasks={tasksSortedByDate.slice(0, 8)} />
+      <KeyTasks tasks={keyTasks.slice(0, 30)} />
+      <UpcomingTasks tasks={tasksSortedByDate.slice(0, 30)} />
       <CustomWidgets widgets={widgets} />
       <KeyFolders
         folders={keyFolders}
