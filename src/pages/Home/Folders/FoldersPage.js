@@ -24,6 +24,7 @@ import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { createFolder } from "../../../api/folders";
+import { TransitionGroup } from "react-transition-group";
 
 export default function FoldersPage() {
   const {
@@ -420,47 +421,53 @@ function FolderList(props) {
               <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} />  Key Folders
             </ListSubheader>
           }>
-          {
-            keyFolders.map(folder => {
-              return (
-                <FolderListItem
-                  name={folder.name}
-                  id={folder.id}
-                  key={folder.id}
-                  selectedFolderId={selectedFolderId}
-                  handleFolderClick={handleFolderClick}
-                  allFolders={allFolders}
-                  openStates={openStates}
-                  setOpenStates={setOpenStates}
-                  query={query}
-                  viewingFolder={viewingFolder}
-                  handleAddNewFolderClick={handleAddNewFolderClick}
-                />
-              );
-            })
-          }
+          <TransitionGroup>
+            {
+              keyFolders.map(folder => {
+                return (
+                  <Collapse key={folder.id}>
+                    <FolderListItem
+                      name={folder.name}
+                      id={folder.id}
+                      selectedFolderId={selectedFolderId}
+                      handleFolderClick={handleFolderClick}
+                      allFolders={allFolders}
+                      openStates={openStates}
+                      setOpenStates={setOpenStates}
+                      query={query}
+                      viewingFolder={viewingFolder}
+                      handleAddNewFolderClick={handleAddNewFolderClick}
+                    />
+                  </Collapse>
+                );
+              })
+            }
+          </TransitionGroup>
           <ListSubheader className="flex-ac">
             Other Folders
           </ListSubheader>
-          {
-            otherFolders.map(folder => {
-              return (
-                <FolderListItem
-                  name={folder.name}
-                  id={folder.id}
-                  key={folder.id}
-                  selectedFolderId={selectedFolderId}
-                  handleFolderClick={handleFolderClick}
-                  allFolders={allFolders}
-                  openStates={openStates}
-                  setOpenStates={setOpenStates}
-                  query={query}
-                  viewingFolder={viewingFolder}
-                  handleAddNewFolderClick={handleAddNewFolderClick}
-                />
-              );
-            })
-          }
+          <TransitionGroup>
+            {
+              otherFolders.map(folder => {
+                return (
+                  <Collapse key={folder.id}>
+                    <FolderListItem
+                      name={folder.name}
+                      id={folder.id}
+                      selectedFolderId={selectedFolderId}
+                      handleFolderClick={handleFolderClick}
+                      allFolders={allFolders}
+                      openStates={openStates}
+                      setOpenStates={setOpenStates}
+                      query={query}
+                      viewingFolder={viewingFolder}
+                      handleAddNewFolderClick={handleAddNewFolderClick}
+                    />
+                  </Collapse>
+                );
+              })
+            }
+          </TransitionGroup>
         </List>
       </Paper>
 
@@ -561,7 +568,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
         </ListItemButton>
         {
           hasNestedFolders ?
-            <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
+            <Collapse in={openStates[folder.id]} timeout="auto">
               {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, depth)}
             </Collapse> : null
         }
@@ -646,7 +653,7 @@ export function FolderListItem(props) {
       </ListItemButton>
       {
         hasNestedFolders ?
-          <Collapse in={openStates[id]} timeout="auto" unmountOnExit>
+          <Collapse in={openStates[id]} timeout="auto">
             {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick)}
           </Collapse>
           : null
