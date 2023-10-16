@@ -347,8 +347,8 @@ export default function Home({ setTheme }) {
         isAdmin={isAdmin}
         toggleSideNav={toggleSideNav}
       />
-      <Box
-        component="main"
+      <main
+        //  component="main"
         style={{
           marginLeft: isSideNavOpen ? '280px' : '0px'
         }}>
@@ -408,7 +408,7 @@ export default function Home({ setTheme }) {
             <Outlet context={context} />
           </Grid>
         </Box>
-      </Box>
+      </main>
 
       <Snackbar
         isOpen={isOpen}

@@ -39,7 +39,7 @@ export default function UpcomingTasks({ tasks }) {
           </Button>
         </Box>
         <Divider style={{ margin: '3px 6px 8px 6px' }} />
-        <Box className="upcoming-tasks-wrapper app-scrollable">
+        <Box className={`upcoming-tasks-wrapper ${tasks.length > 9 ? 'app-scrollable' : ''}`}>
           {
             tasksLength > 0 ?
               <UpcomingTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :

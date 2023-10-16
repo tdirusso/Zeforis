@@ -37,7 +37,7 @@ export default function KeyTasks({ tasks }) {
           </Button>
         </Box>
         <Divider style={{ margin: '3px 6px 8px 6px' }} />
-        <Box className="key-tasks-wrapper app-scrollable">
+        <Box className={`key-tasks-wrapper ${tasks.length > 10 ? 'app-scrollable' : ''}`}>
           {
             tasksLength > 0 ?
               <KeyTasksList tasks={tasks} buttonColor={taskButtonTextColor} /> :

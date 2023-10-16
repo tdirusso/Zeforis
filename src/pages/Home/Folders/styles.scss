@@ -12,69 +12,6 @@
   }
 }
 
-.folder-transitioner {
-  text-align: center;
-  color: inherit !important;
-
-  .MuiCollapse-wrapper {
-    padding: 26px 15px 8px 15px;
-    border-radius: 8px;
-
-    &:hover {
-      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-  }
-}
-
-.folders-transition-group,
-.child-folders-container {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.folder-item {
-  height: 50px;
-  padding: 0 !important;
-  position: relative;
-  width: 80px;
-  box-shadow: none !important;
-}
-
-.child-folders-container {
-
-  .folder-container {
-    padding: 3px;
-    border-radius: 8px;
-    width: 85px;
-    text-align: center;
-    color: inherit !important;
-
-    &:hover {
-      text-decoration: underline;
-      color: var(--colors-primary) !important;
-    }
-  }
-}
-
-body.dark .folder-container:hover {
-  box-shadow: rgb(0 0 0) 0px 7px 24px 0px;
-}
-
-.edit-folder-button {
-  position: absolute !important;
-  top: 3px;
-  right: 3px;
-}
-
-.folders-controls {
-  .MuiToggleButtonGroup-grouped {
-    margin: 0 4px;
-    border: 0;
-    border-radius: 4px !important;
-  }
-}
-
 .new-folder-btn {
   cursor: pointer;
   border: 1px dashed transparent;
@@ -87,13 +24,33 @@ body.dark .folder-container:hover {
   }
 }
 
-.subfolder-item {
-  padding: 5px 10px !important;
-  color: #727272 !important;
-  margin: 5px;
-  transition: box-shadow 100ms;
+.folder-listitem {
+  .folder-actions {
+    opacity: 0.6;
+    visibility: hidden;
+    display: flex;
+
+    .MuiIconButton-root {
+      margin-left: -4px;
+      margin-right: -4px;
+    }
+  }
 
   &:hover {
-    box-shadow: rgba(33, 33, 52, 0.2) 0px 2px 4px !important;
+    .folder-actions {
+      visibility: visible !important;
+    }
+  }
+
+  .folder-icon {
+    color: gainsboro;
+  }
+}
+
+body.dark {
+  .folder-listitem {
+    .folder-icon {
+      color: #646464;
+    }
   }
 }

@@ -15,7 +15,6 @@ import AcceptInvitationPage from './pages/AcceptInvitation';
 import DashboardPage from './pages/Home/Dashboard';
 import SettingsPage, { SettingsSection } from './pages/Home/Settings';
 import FoldersPage from './pages/Home/Folders/FoldersPage';
-import FolderPage from './pages/Home/Folders/FolderPage';
 import TasksPage from './pages/Home/Tasks';
 import ToolsPage from './pages/Home/Tools';
 import AnalyticsPage from './pages/Home/Analytics';
@@ -53,7 +52,6 @@ function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="folders" element={<FoldersPage />} />
-              <Route path="folders/:folderId" element={<FolderPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="tools" element={<ToolsPage />} />
 

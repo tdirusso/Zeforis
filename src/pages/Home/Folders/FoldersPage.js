@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Fade } from "@mui/material";
+import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Fade, Menu } from "@mui/material";
 import './styles.scss';
 import { useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
@@ -20,13 +20,20 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
+import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import { createFolder } from "../../../api/folders";
 
 export default function FoldersPage() {
   const {
     folders,
     isAdmin,
     openDrawer,
-    foldersMap
+    foldersMap,
+    openSnackBar,
+    engagement,
+    setFolders
   } = useOutletContext();
 
   const [query, setQuery] = useState('');
@@ -108,14 +115,15 @@ export default function FoldersPage() {
 
     const lcQuery = query?.toLowerCase();
 
-    folders
-      .forEach(folder => {
+    folders.forEach(folder => {
+      if (!folder.parent_id) {
         if (folder.is_key_folder) {
           filteredKeyFolders.push(folder);
-        } else if (!folder.parent_id) {
+        } else {
           filteredOtherFolders.push(folder);
         }
-      });
+      }
+    });
 
     if (lcQuery) {
       folders.forEach((folder) => {
@@ -153,9 +161,6 @@ export default function FoldersPage() {
 
   return (
     <>
-      <Grid item xs={12}>
-        <Divider />
-      </Grid>
       {
         !renderReady ?
           <CircularProgress size={30} sx={{ mx: 5, my: 4 }} />
@@ -176,6 +181,9 @@ export default function FoldersPage() {
               viewingFolder={viewingFolder}
               setViewingFolder={setViewingFolder}
               foldersMap={foldersMap}
+              openSnackBar={openSnackBar}
+              engagement={engagement}
+              setFolders={setFolders}
             />
             {
               viewingFolder ?
@@ -194,6 +202,7 @@ function FolderView({ folder }) {
     <Grid item xs={8.5}>
       <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
         <Paper sx={{ px: 0 }}>
+          <h5>{folder.name}</h5>
           <TableContainer>
             <Table>
               <TableBody>
@@ -227,11 +236,21 @@ function FolderList(props) {
     openDrawer,
     viewingFolder,
     setViewingFolder,
-    foldersMap
+    foldersMap,
+    openSnackBar,
+    engagement,
+    setFolders
   } = props;
 
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [dblClickFlag, setDblClickFlag] = useState(false);
+  const [addFolderPopup, setAddFolderPopup] = useState(null);
+  const [editFolderId, setEditFolderId] = useState(null);
+  const [addingFolder, setAddingFolder] = useState(false);
+
+  const addFolderPopupOpen = Boolean(addFolderPopup);
+
+  const newFolderName = useRef();
 
   const handleFolderClick = (folderId, hasNestedFolders) => {
     if (hasNestedFolders) {
@@ -260,11 +279,55 @@ function FolderList(props) {
     }
   };
 
+  const handleAddNewFolderClick = (e, folderId) => {
+    e.stopPropagation();
+    setEditFolderId(folderId);
+    setAddFolderPopup(e.currentTarget);
+  };
+
+  const handleAddFolder = async () => {
+    const folderName = newFolderName.current.value;
+
+    if (!folderName) {
+      openSnackBar("Folder name can't be blank.");
+      return;
+    }
+
+    if (!editFolderId) {
+      openSnackBar("No folder is selected.");
+      return;
+    }
+
+    setAddingFolder(true);
+
+    try {
+      const { folder, message } = await createFolder({
+        name: folderName,
+        engagementId: engagement.id,
+        parentId: editFolderId
+      });
+
+      if (folder) {
+        openSnackBar('Folder added.', 'success');
+        setFolders(folders => [...folders, folder]);
+        setAddingFolder(false);
+        setAddFolderPopup(null);
+      } else {
+        openSnackBar(message, 'error');
+        setAddingFolder(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setAddingFolder(false);
+    }
+  };
+
   const gridWidth = viewingFolder ? 3.5 : 12;
 
   return (
     <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
       <Paper sx={{ px: 0, py: 1.5 }}>
+
         <Box className="flex-ac" px={viewingFolder ? 1.5 : 3} gap={3}>
           <Tooltip title="New folder" placement="bottom-end">
             <Box
@@ -371,6 +434,7 @@ function FolderList(props) {
                   setOpenStates={setOpenStates}
                   query={query}
                   viewingFolder={viewingFolder}
+                  handleAddNewFolderClick={handleAddNewFolderClick}
                 />
               );
             })
@@ -392,17 +456,69 @@ function FolderList(props) {
                   setOpenStates={setOpenStates}
                   query={query}
                   viewingFolder={viewingFolder}
+                  handleAddNewFolderClick={handleAddNewFolderClick}
                 />
               );
             })
           }
         </List>
       </Paper>
+
+      <Menu
+        anchorEl={addFolderPopup}
+        open={addFolderPopupOpen}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        onClose={() => setAddFolderPopup(null)}>
+        <TextField
+          disabled={addingFolder}
+          onKeyDown={e => e.key === 'Enter' ? handleAddFolder() : null}
+          autoFocus
+          size="small"
+          placeholder="Folder name"
+          style={{ margin: '0 10px' }}
+          variant="standard"
+          inputRef={newFolderName}
+          inputProps={{
+            style: {
+              fontSize: '14px'
+            }
+          }}
+          InputProps={{
+            endAdornment:
+              <InputAdornment position="end">
+                <Tooltip title="Save">
+                  <span>
+                    <IconButton
+                      disabled={addingFolder}
+                      size="small"
+                      onClick={handleAddFolder}>
+                      {
+                        addingFolder ?
+                          <CircularProgress size={15} />
+                          :
+                          <CheckRoundedIcon
+                            color="success"
+                            fontSize="small" />
+                      }
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </InputAdornment>
+          }}
+        />
+      </Menu>
     </Grid>
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, depth = 1) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
@@ -414,6 +530,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
     return (
       <div key={folder.id}>
         <ListItemButton
+          className="folder-listitem"
           disableRipple
           selected={selectedFolderId === folder.id}
           sx={{ pl: indent }}
@@ -426,14 +543,26 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
                   className="toggle-icon" />
                 : null
             }
-            <FolderIcon htmlColor="#f7df92" />
+            <FolderIcon className="folder-icon" />
           </ListItemIcon>
           <ListItemText primary={renderFolderName(query, folder.name)} />
+          <Box className="folder-actions">
+            <Tooltip title="Add folder">
+              <IconButton size="small" onClick={e => handleAddNewFolderClick(e, folder.id)}>
+                <AddCircleOutlineOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="More">
+              <IconButton size="small">
+                <MoreVertOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </ListItemButton>
         {
           hasNestedFolders ?
             <Collapse in={openStates[folder.id]} timeout="auto" unmountOnExit>
-              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, depth)}
+              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, depth)}
             </Collapse> : null
         }
       </div>
@@ -473,7 +602,8 @@ export function FolderListItem(props) {
     openStates,
     setOpenStates,
     query,
-    viewingFolder
+    viewingFolder,
+    handleAddNewFolderClick
   } = props;
 
   const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
@@ -481,6 +611,7 @@ export function FolderListItem(props) {
   return (
     <>
       <ListItemButton
+        className="folder-listitem"
         selected={selectedFolderId === id}
         disableRipple
         sx={{ pl: viewingFolder ? '32px' : '40px', transition: 'padding 250ms' }}
@@ -495,14 +626,28 @@ export function FolderListItem(props) {
                 className="toggle-icon" />
               : null
           }
-          <FolderIcon htmlColor="#f7df92" />
+          <FolderIcon className="folder-icon" />
         </ListItemIcon>
         <ListItemText primary={renderFolderName(query, name)} />
+        <Box className="folder-actions">
+          <Tooltip title="Add folder">
+            <IconButton
+              size="small"
+              onClick={e => handleAddNewFolderClick(e, id)}>
+              <AddCircleOutlineOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="More">
+            <IconButton size="small">
+              <MoreVertOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </ListItemButton>
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto" unmountOnExit>
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick)}
           </Collapse>
           : null
       }

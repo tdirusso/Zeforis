@@ -3,7 +3,7 @@ const { pool } = require('../../../database');
 module.exports = async (req, res, next) => {
   const {
     name,
-    isKeyFolder,
+    isKeyFolder = false,
     parentId = null
   } = req.body;
 
