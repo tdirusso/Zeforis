@@ -4,7 +4,8 @@ module.exports = async (req, res, next) => {
   const {
     name,
     isKeyFolder,
-    folderId
+    folderId,
+    parentId
   } = req.body;
 
   const { engagementId } = req;
@@ -17,15 +18,16 @@ module.exports = async (req, res, next) => {
 
   try {
     await pool.query(
-      'UPDATE folders SET name = ?, is_key_folder = ? WHERE id = ?',
-      [name, isKeyFolder, folderId]
+      'UPDATE folders SET name = ?, is_key_folder = ?, parent_id = ? WHERE id = ?',
+      [name, isKeyFolder, parentId, folderId]
     );
 
     const folderObject = {
       id: folderId,
       name,
       engagement_id: engagementId,
-      is_key_folder: isKeyFolder
+      is_key_folder: isKeyFolder,
+      parent_id: parentId
     };
 
     return res.json({ updatedFolder: folderObject });

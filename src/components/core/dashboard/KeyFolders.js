@@ -71,7 +71,7 @@ function NoFoldersMessage({ openDrawer, isAdmin }) {
           fullWidth
           hidden={!isAdmin}
           style={{ padding: '2.5rem 24px' }}
-          onClick={() => openDrawer('folder', { folderProp: { is_key_folder: true } })}>
+          onClick={() => openDrawer('folder', { folderProps: { is_key_folder: true } })}>
           + New folder
         </Button>
       </Paper>

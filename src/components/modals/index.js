@@ -11,6 +11,7 @@ import InviteEngagementUsers from "./InviteEngagementUsers";
 import SubscriptionPastDueModal from "./SubscriptionPastDueModal";
 import CloseAccountModal from "./CloseAccountModal";
 import UpgradeModal from "./UpgradeModal";
+import MoveFolderModal from "./MoveFolderModal";
 
 export default function Modals(props) {
   const {
@@ -89,6 +90,17 @@ export default function Modals(props) {
       <UpgradeModal
         isOpen={modalToOpen === 'upgrade'}
         close={closeModal}
+      />
+
+      <MoveFolderModal
+        isOpen={modalToOpen === 'move-folder'}
+        close={closeModal}
+        moveFolderId={props.moveFolderId}
+        foldersMap={props.foldersMap}
+        folders={props.folders}
+        openSnackBar={openSnackBar}
+        engagementId={props.engagement.id}
+        setFolders={props.setFolders}
       />
     </>
   );

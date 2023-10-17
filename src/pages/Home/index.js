@@ -348,7 +348,6 @@ export default function Home({ setTheme }) {
         toggleSideNav={toggleSideNav}
       />
       <main
-        //  component="main"
         style={{
           marginLeft: isSideNavOpen ? '280px' : '0px'
         }}>

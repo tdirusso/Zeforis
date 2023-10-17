@@ -47,6 +47,28 @@
   }
 }
 
+.folder-actions-menu {
+  .MuiList-root {
+    padding: 0;
+  }
+
+  .MuiMenuItem-root {
+    font-size: 13px;
+
+    span {
+      font-size: 13px;
+    }
+
+    svg {
+      color: #a8a8a8;
+      margin-right: 17px;
+    }
+  }
+
+
+
+}
+
 body.dark {
   .folder-listitem {
     .folder-icon {

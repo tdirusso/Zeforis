@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Fade, Menu } from "@mui/material";
+import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Fade, Menu, MenuItem, Typography } from "@mui/material";
 import './styles.scss';
 import { useOutletContext } from "react-router-dom";
 import Divider from '@mui/material/Divider';
@@ -25,6 +25,8 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { createFolder } from "../../../api/folders";
 import { TransitionGroup } from "react-transition-group";
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 
 export default function FoldersPage() {
   const {
@@ -34,7 +36,8 @@ export default function FoldersPage() {
     foldersMap,
     openSnackBar,
     engagement,
-    setFolders
+    setFolders,
+    openModal
   } = useOutletContext();
 
   const [query, setQuery] = useState('');
@@ -185,6 +188,7 @@ export default function FoldersPage() {
               openSnackBar={openSnackBar}
               engagement={engagement}
               setFolders={setFolders}
+              openModal={openModal}
             />
             {
               viewingFolder ?
@@ -240,16 +244,19 @@ function FolderList(props) {
     foldersMap,
     openSnackBar,
     engagement,
-    setFolders
+    setFolders,
+    openModal
   } = props;
 
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [dblClickFlag, setDblClickFlag] = useState(false);
   const [addFolderPopup, setAddFolderPopup] = useState(null);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState(null);
   const [editFolderId, setEditFolderId] = useState(null);
   const [addingFolder, setAddingFolder] = useState(false);
 
   const addFolderPopupOpen = Boolean(addFolderPopup);
+  const moreMenuOpen = Boolean(moreMenuAnchor);
 
   const newFolderName = useRef();
 
@@ -284,6 +291,12 @@ function FolderList(props) {
     e.stopPropagation();
     setEditFolderId(folderId);
     setAddFolderPopup(e.currentTarget);
+  };
+
+  const handleMoreMenuClick = (e, folderId) => {
+    e.stopPropagation();
+    setEditFolderId(folderId);
+    setMoreMenuAnchor(e.currentTarget);
   };
 
   const handleAddFolder = async () => {
@@ -323,25 +336,42 @@ function FolderList(props) {
     }
   };
 
+  const handleEditFolderClick = () => {
+    openDrawer('folder', { folderProps: { id: editFolderId } });
+    setMoreMenuAnchor(null);
+  };
+
+  const handleMoveFolderClick = () => {
+    openModal('move-folder', { moveFolderId: editFolderId });
+    setMoreMenuAnchor(null);
+  };
+
   const gridWidth = viewingFolder ? 3.5 : 12;
 
   return (
     <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
       <Paper sx={{ px: 0, py: 1.5 }}>
-
         <Box className="flex-ac" px={viewingFolder ? 1.5 : 3} gap={3}>
           <Tooltip title="New folder" placement="bottom-end">
             <Box
               hidden={!isAdmin}
               className="new-folder-btn"
               onClick={() => openDrawer('folder')}>
-              <img
-                width={40}
-                alt=""
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAEy0lEQVR4nO2bz28bRRTHV5T00CNwA/EHwDGi4hZpN8wa1SUgcMsFEIhyKFJFfHGEKpmgiKRuQrNukWshsWvRgJQckKAVTauCeitSULwQBDHubiFcWloJ4fU+IyoGjV2KMEkc79p+a8/7Sl8pUn7I+/3MvDczO1EUEolEIpFIJBKJRCKRSCQSiUQikUikJlVW33jUKyZPeHZyrWKPe56d5J10xR5/i0LfRHwtvdsrJk9W7OTtTofuEYQdhX+x28F7NBM2lxj5vQzfo3L035rfi7LjEYStRv/4PFb43j8zoZickbYxe/b4d9gAPJlXR14xWcEO35N5JjSHUF2b4P76FPfLsxwcg4Obldq+Y/Bqebbmr09/Xf1+an9XAVRLUxS6uw0QAaM0U+Qr6T0dB+CXj6GPNugT++XMzY5BuDvyI/Bg0EeulqZXOwJA1Hyq9dn2IThZXrs6uS88gHUa/RC0FJVmVkID8Mtz6NMZ+tT+1TkID8CdR38Q6FP7jvFXaADYDwF9bgLgEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKEH4YgGDqAS4BQB+FQDMAPwigEoQfBiCYeoBLANBHIdAMwA8CqAThhwEIph7gEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKUP+46hh81Z7khctH+NFzL/GXl57lY2fiXC88Wbf4+pWl5+rfEz9TtN/mvkM9gIcNfuOHYzx36TA/8PFTXLP0tnzwozGe++J1vrGeoSYMbQZ/vTTLjy8f4noh1nbwzRZ/Y+7Ca/z6j407tbQKcrcP//yVFB9biIcOvtlPL+zny19NEADYIviKM88z51/tePD/s8lOD+eHh+hyrvtv+L+VT/DUpy90P/y7Zufi+Xiwf1nCXpFAF0Z+b8NvWDXZxcRiYrf0ADK9KDtbz4Sc1AA+v5JqO7RWahtCgR2UEsCN0ix/5kwcHYBq6bdGFuIPSAfg+PKhQGWj4zOg0Q/ekwrAxnom8CarSwD+GC2MPiwNgNylw4EbZzcA3ClF01IA8J1s/ZwmagA0k/2SWEzsGngAq/Zk8JC6CaA+C9jegQdQuHwksgBGTTbREoDvZn/HDhFC+OjZF0MFHFbblyF9qTUAx1jDDhFCWLw4iSoA1WLftC5BjvEudogQwq2OmjEBaCb7tSWA2jXjEd8xbmMHCQHdav2PCUC1WK0lgEYfMAzsIEFmAHwlP+S7xgXsMEHGEtQEYd53sn9ihwoyNeHNegI42TnfzX7ru0YFO2AY9GVov0u19DfDbJZCBdzCqsVSyqBr1Iw9HlUA2gexx5RBVzqdvke19J+jBkA19Z/EZ1NkkGrp09EDwN5RZNHIh7GHxEuQqAAQ63/V2vegIpM0i+WiAkAz9ZOKbGLvs/vExgcbgGrqN9t6KT9IUs0nnscHEEsoMksz2emgjTO82SlFdiUWE7s0S/+k1+GrFjs78uXIvdjPHwnF8/E94sJsz8I39c8CX84dVA3nh4eCrozaLTs08reRuKsZZHW0g5JzQ/qGu1NpBe1+cV1QbJA6EHxNrPPFsnfHH4DUkNidimOLIGdH4nfE8YJ0O1ylC2oc4LG94t6OOLMXL07ErWZxnFG3pd/STGbf+V5KnGoGPVj7GyCRo+oGQ60BAAAAAElFTkSuQmCC" />
+              {
+                document.body.className.includes('dark') ?
+                  <img
+                    alt=""
+                    height={40}
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAACCklEQVR4nO2WzWrbQBSFRaF5iXTdF/AbSLZGxQXbwQ7YWfpWs9TG4GphnE0gbgLGzEDchTMqLYU29HlaMO2i0F27SLPPhOtSMKos+UfWTGEOHBBiBOe7ujNzLcvIyMjIyCimyWTyhDF2wxj7zTmX65gxdmrpEp5z/mvd4NpBMMZutgmvDQTboG20hOCcy/F4LHu9nqSUSgBQat/374Mg+BGGYWUtAAyvQ3CImVJ6PxgMSpkAWHnVYWGFgyD4ngmgY/VhqZ0yAVSHhAwbADB/AEwLpUp1i4DZxKC+ymCOUVBfaTAXGehpK0tKgvkg22FH1i4a0ruqyvLMWxif8V37ZWexRkuAdr8jybQqnYik2ptWZad/ohHAC5BHZ83M4P9YkIvhcPhIOcBW4aO/dkdKAbBtVoWLa9U6W7h1NQA+LPp5dwDyrfWxdVA4AJ42ae0RV9paW3itwgFql438ACLyLgngdp8A3vR5auAsxTbzlySAT/sEqMye5QcgyF0SwFMA+Pk/ANjCvU08iSilh91u98M+2gnHg9wAIvLZKlqOcN/ntYkd4b4tHKAckeP8TqFKs3CA0uvSY0eQ+c4XWUS+Jl5kRah8TY52/gNvSM1SKZwqnW2HOUHOLdXCkdiO3FebA7ij1HG6aNnCraftiaWqz5W3zSrhxsbBDGcbPNvxhkXj8593lSauSfr4AcLfCU7i0+ZhAAAAAElFTkSuQmCC"></img>
+                  :
+                  <img
+                    width={40}
+                    alt=""
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAEy0lEQVR4nO2bz28bRRTHV5T00CNwA/EHwDGi4hZpN8wa1SUgcMsFEIhyKFJFfHGEKpmgiKRuQrNukWshsWvRgJQckKAVTauCeitSULwQBDHubiFcWloJ4fU+IyoGjV2KMEkc79p+a8/7Sl8pUn7I+/3MvDczO1EUEolEIpFIJBKJRCKRSCQSiUQikUikJlVW33jUKyZPeHZyrWKPe56d5J10xR5/i0LfRHwtvdsrJk9W7OTtTofuEYQdhX+x28F7NBM2lxj5vQzfo3L035rfi7LjEYStRv/4PFb43j8zoZickbYxe/b4d9gAPJlXR14xWcEO35N5JjSHUF2b4P76FPfLsxwcg4Obldq+Y/Bqebbmr09/Xf1+an9XAVRLUxS6uw0QAaM0U+Qr6T0dB+CXj6GPNugT++XMzY5BuDvyI/Bg0EeulqZXOwJA1Hyq9dn2IThZXrs6uS88gHUa/RC0FJVmVkID8Mtz6NMZ+tT+1TkID8CdR38Q6FP7jvFXaADYDwF9bgLgEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKEH4YgGDqAS4BQB+FQDMAPwigEoQfBiCYeoBLANBHIdAMwA8CqAThhwEIph7gEgD0UQg0A/CDACpB+GEAgqkHuAQAfRQCzQD8IIBKUP+46hh81Z7khctH+NFzL/GXl57lY2fiXC88Wbf4+pWl5+rfEz9TtN/mvkM9gIcNfuOHYzx36TA/8PFTXLP0tnzwozGe++J1vrGeoSYMbQZ/vTTLjy8f4noh1nbwzRZ/Y+7Ca/z6j407tbQKcrcP//yVFB9biIcOvtlPL+zny19NEADYIviKM88z51/tePD/s8lOD+eHh+hyrvtv+L+VT/DUpy90P/y7Zufi+Xiwf1nCXpFAF0Z+b8NvWDXZxcRiYrf0ADK9KDtbz4Sc1AA+v5JqO7RWahtCgR2UEsCN0ix/5kwcHYBq6bdGFuIPSAfg+PKhQGWj4zOg0Q/ekwrAxnom8CarSwD+GC2MPiwNgNylw4EbZzcA3ClF01IA8J1s/ZwmagA0k/2SWEzsGngAq/Zk8JC6CaA+C9jegQdQuHwksgBGTTbREoDvZn/HDhFC+OjZF0MFHFbblyF9qTUAx1jDDhFCWLw4iSoA1WLftC5BjvEudogQwq2OmjEBaCb7tSWA2jXjEd8xbmMHCQHdav2PCUC1WK0lgEYfMAzsIEFmAHwlP+S7xgXsMEHGEtQEYd53sn9ihwoyNeHNegI42TnfzX7ru0YFO2AY9GVov0u19DfDbJZCBdzCqsVSyqBr1Iw9HlUA2gexx5RBVzqdvke19J+jBkA19Z/EZ1NkkGrp09EDwN5RZNHIh7GHxEuQqAAQ63/V2vegIpM0i+WiAkAz9ZOKbGLvs/vExgcbgGrqN9t6KT9IUs0nnscHEEsoMksz2emgjTO82SlFdiUWE7s0S/+k1+GrFjs78uXIvdjPHwnF8/E94sJsz8I39c8CX84dVA3nh4eCrozaLTs08reRuKsZZHW0g5JzQ/qGu1NpBe1+cV1QbJA6EHxNrPPFsnfHH4DUkNidimOLIGdH4nfE8YJ0O1ylC2oc4LG94t6OOLMXL07ErWZxnFG3pd/STGbf+V5KnGoGPVj7GyCRo+oGQ60BAAAAAElFTkSuQmCC" />
+              }
+
             </Box>
           </Tooltip>
-
           <ExpandCollapseButtonGroup
             handleExpandAll={handleExpandAll}
             handleCollapseAll={handleCollapseAll}
@@ -417,7 +447,7 @@ function FolderList(props) {
           dense
           component="nav"
           subheader={
-            <ListSubheader className="flex-ac">
+            <ListSubheader className="flex-ac" disableSticky>
               <StarIcon htmlColor="gold" style={{ marginRight: '2px' }} />  Key Folders
             </ListSubheader>
           }>
@@ -437,13 +467,14 @@ function FolderList(props) {
                       query={query}
                       viewingFolder={viewingFolder}
                       handleAddNewFolderClick={handleAddNewFolderClick}
+                      handleMoreMenuClick={handleMoreMenuClick}
                     />
                   </Collapse>
                 );
               })
             }
           </TransitionGroup>
-          <ListSubheader className="flex-ac">
+          <ListSubheader className="flex-ac" disableSticky>
             Other Folders
           </ListSubheader>
           <TransitionGroup>
@@ -462,6 +493,7 @@ function FolderList(props) {
                       query={query}
                       viewingFolder={viewingFolder}
                       handleAddNewFolderClick={handleAddNewFolderClick}
+                      handleMoreMenuClick={handleMoreMenuClick}
                     />
                   </Collapse>
                 );
@@ -521,60 +553,97 @@ function FolderList(props) {
           }}
         />
       </Menu>
+
+      <Menu
+        className="folder-actions-menu"
+        anchorEl={moreMenuAnchor}
+        open={moreMenuOpen}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        onClose={() => setMoreMenuAnchor(null)}>
+        <MenuItem dense onClick={handleEditFolderClick}>
+          <EditOutlinedIcon fontSize="small" />
+          Edit folder
+        </MenuItem>
+        <MenuItem dense onClick={handleMoveFolderClick}>
+          <ShortcutRoundedIcon fontSize="small" />
+          Move folder
+        </MenuItem>
+        <Divider className="m0" />
+        <MenuItem dense>
+          <ListItemText inset color="error">
+            <Typography color="error" component="span">
+              Delete folder
+            </Typography>
+          </ListItemText>
+        </MenuItem>
+      </Menu>
     </Grid>
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, depth = 1) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, handleMoreMenuClick, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
   const indent = viewingFolder ? (`${24 * depth}px`) : (`${36 * depth}px`);
 
-  return nestedFolders.map(folder => {
-    const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
+  return (
+    <TransitionGroup>
+      {
+        nestedFolders.map(folder => {
+          const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
 
-    return (
-      <div key={folder.id}>
-        <ListItemButton
-          className="folder-listitem"
-          disableRipple
-          selected={selectedFolderId === folder.id}
-          sx={{ pl: indent }}
-          onClick={() => handleFolderClick(folder.id, hasNestedFolders)}>
-          <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
-            {
-              hasNestedFolders ?
-                <ChevronRightRoundedIcon
-                  style={{ transform: openStates[folder.id] ? 'rotate(90deg)' : 'rotate(0deg)' }}
-                  className="toggle-icon" />
-                : null
-            }
-            <FolderIcon className="folder-icon" />
-          </ListItemIcon>
-          <ListItemText primary={renderFolderName(query, folder.name)} />
-          <Box className="folder-actions">
-            <Tooltip title="Add folder">
-              <IconButton size="small" onClick={e => handleAddNewFolderClick(e, folder.id)}>
-                <AddCircleOutlineOutlinedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="More">
-              <IconButton size="small">
-                <MoreVertOutlinedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </ListItemButton>
-        {
-          hasNestedFolders ?
-            <Collapse in={openStates[folder.id]} timeout="auto">
-              {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, depth)}
-            </Collapse> : null
-        }
-      </div>
-    );
-  });
+          return (
+            <Collapse key={folder.id}>
+              <ListItemButton
+                className="folder-listitem"
+                disableRipple
+                selected={selectedFolderId === folder.id}
+                sx={{ pl: indent }}
+                onClick={() => handleFolderClick(folder.id, hasNestedFolders)}>
+                <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
+                  {
+                    hasNestedFolders ?
+                      <ChevronRightRoundedIcon
+                        style={{ transform: openStates[folder.id] ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                        className="toggle-icon" />
+                      : null
+                  }
+                  <FolderIcon className="folder-icon" />
+                </ListItemIcon>
+                <ListItemText primary={renderFolderName(query, folder.name)} />
+                <Box className="folder-actions">
+                  <Tooltip title="Add folder">
+                    <IconButton size="small" onClick={e => handleAddNewFolderClick(e, folder.id)}>
+                      <AddCircleOutlineOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="More">
+                    <IconButton size="small" onClick={e => handleMoreMenuClick(e, folder.id)}>
+                      <MoreVertOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </ListItemButton>
+              {
+                hasNestedFolders ?
+                  <Collapse in={openStates[folder.id]} timeout="auto">
+                    {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, handleMoreMenuClick, depth)}
+                  </Collapse> : null
+              }
+            </Collapse>
+          );
+        })
+      }
+    </TransitionGroup>
+  );
 }
 
 function renderFolderName(lcQuery, name) {
@@ -610,7 +679,8 @@ export function FolderListItem(props) {
     setOpenStates,
     query,
     viewingFolder,
-    handleAddNewFolderClick
+    handleAddNewFolderClick,
+    handleMoreMenuClick
   } = props;
 
   const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
@@ -645,7 +715,9 @@ export function FolderListItem(props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="More">
-            <IconButton size="small">
+            <IconButton
+              onClick={e => handleMoreMenuClick(e, id)}
+              size="small">
               <MoreVertOutlinedIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -654,7 +726,7 @@ export function FolderListItem(props) {
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto">
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, handleMoreMenuClick)}
           </Collapse>
           : null
       }

@@ -1,6 +1,6 @@
 import { Component } from "react";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import Watermark from "./Watermark";
 import { logFrontendError } from "../../api/logs";
 
@@ -42,13 +42,9 @@ export class ErrorBoundary extends Component {
 
 function DefaultErrorFallback({ error }) {
   return (
-    <Box
-      bgcolor='white'
-      padding={2}
-      textAlign="center"
-      className="flex-centered"
-      height='100vh'
-      flexDirection="column">
+    <Paper
+      style={{ height: '100vh' }}
+      className="flex-centered">
       <Box maxWidth={650} margin="0 auto">
         <Box>
           <ErrorOutlineIcon style={{ fontSize: '5rem' }} color="error" />
@@ -89,6 +85,6 @@ function DefaultErrorFallback({ error }) {
         </Box>
         <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }}></Watermark>
       </Box>
-    </Box>
+    </Paper>
   );
 }

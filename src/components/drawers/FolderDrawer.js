@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useEffect, useRef, useState } from 'react';
@@ -18,7 +19,7 @@ export default function FolderDrawer(props) {
     engagement,
     openSnackBar,
     setFolders,
-    folderProp,
+    folderProps,
     foldersMap,
     parentId
   } = props;
@@ -34,12 +35,18 @@ export default function FolderDrawer(props) {
         name.current.focus();
       }
 
-      if (folderProp) {
-        name.current.value = folderProp.name || '';
-        setIsKeyFolder(Boolean(folderProp.is_key_folder));
+      if (folderProps) {
+        if (folderProps.id) {
+          const theFolder = foldersMap[folderProps.id];
+          name.current.value = theFolder.name;
+          setIsKeyFolder(Boolean(theFolder.is_key_folder));
+        } else {
+          name.current.value = '';
+          setIsKeyFolder(Boolean(folderProps.is_key_folder));
+        }
       }
     }
-  }, [isOpen, folderProp]);
+  }, [isOpen, folderProps]);
 
   const handleCreateFolder = async e => {
     e.preventDefault();
@@ -84,6 +91,8 @@ export default function FolderDrawer(props) {
       return;
     }
 
+    const theFolder = foldersMap[folderProps.id];
+
     setLoading(true);
 
     try {
@@ -91,14 +100,14 @@ export default function FolderDrawer(props) {
         name: nameVal,
         engagementId: engagement.id,
         isKeyFolder,
-        folderId: folderProp.id
+        folderId: folderProps.id,
+        parentId: theFolder.parent_id
       });
 
       if (updatedFolder) {
-        setLoading(false);
-        const theFolder = foldersMap[folderProp.id];
-        foldersMap[folderProp.id] = { ...theFolder, ...updatedFolder };
+        foldersMap[folderProps.id] = { ...theFolder, ...updatedFolder };
         setFolders(Object.values(foldersMap));
+        setLoading(false);
         openSnackBar('Folder updated.', 'success');
         handleClose();
       } else {
@@ -113,6 +122,7 @@ export default function FolderDrawer(props) {
 
   const handleClose = () => {
     close();
+
     setTimeout(() => {
       name.current.value = '';
       setIsKeyFolder(false);
@@ -151,11 +161,11 @@ export default function FolderDrawer(props) {
                   style={{
                     textAlign: 'center',
                   }}>
-                  {folderProp?.id ? 'Edit Folder' : 'Create New Folder'}
+                  {folderProps?.id ? 'Edit Folder' : 'Create New Folder'}
                 </DialogTitle>
               </Box>
             </Grid>
-            <Box component='form' width="100%" onSubmit={folderProp?.id ? handleUpdateFolder : handleCreateFolder}>
+            <Box component='form' width="100%" onSubmit={folderProps?.id ? handleUpdateFolder : handleCreateFolder}>
               <Grid item xs={12}>
                 <TextField
                   InputProps={{
@@ -204,7 +214,7 @@ export default function FolderDrawer(props) {
                 fullWidth
                 size='large'
                 loading={isLoading}>
-                {folderProp?.id ? 'Update folder' : 'Create folder'}
+                {folderProps?.id ? 'Update folder' : 'Create folder'}
               </LoadingButton>
             </Box>
           </Grid>
