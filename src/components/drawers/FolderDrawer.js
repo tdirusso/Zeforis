@@ -206,6 +206,7 @@ export default function FolderDrawer(props) {
                   placeholder='Folder name'>
                 </TextField>
                 <FormHelperText
+                  hidden={!folderProps?.id}
                   component={Box}
                   className='flex-ac'
                   justifyContent='space-between'>
