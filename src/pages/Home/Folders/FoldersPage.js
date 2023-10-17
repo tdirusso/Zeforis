@@ -15,18 +15,14 @@ import FolderIcon from '@mui/icons-material/Folder';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import CloseIcon from '@mui/icons-material/Close';
 import DoubleArrowRoundedIcon from '@mui/icons-material/DoubleArrowRounded';
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import AddIcon from '@mui/icons-material/Add';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { createFolder } from "../../../api/folders";
 import { TransitionGroup } from "react-transition-group";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
+import FolderView from "./FolderView";
 
 export default function FoldersPage() {
   const {
@@ -192,7 +188,10 @@ export default function FoldersPage() {
             />
             {
               viewingFolder ?
-                <FolderView folder={viewingFolder} />
+                <FolderView
+
+                  folder={viewingFolder}
+                />
                 :
                 null
             }
@@ -201,29 +200,6 @@ export default function FoldersPage() {
     </>
   );
 };
-
-function FolderView({ folder }) {
-  return (
-    <Grid item xs={8.5}>
-      <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
-        <Paper sx={{ px: 0 }}>
-          <h5>{folder.name}</h5>
-          <TableContainer>
-            <Table>
-              <TableBody>
-                {folder.tasks.map((task) => (
-                  <TableRow key={task.task_id}>
-                    <TableCell>{task.task_name}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      </Fade>
-    </Grid>
-  );
-}
 
 
 function FolderList(props) {
@@ -346,7 +322,7 @@ function FolderList(props) {
     setMoreMenuAnchor(null);
   };
 
-  const gridWidth = viewingFolder ? 3.5 : 12;
+  const gridWidth = viewingFolder ? 3 : 12;
 
   return (
     <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
@@ -593,6 +569,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
   const indent = viewingFolder ? (`${24 * depth}px`) : (`${36 * depth}px`);
+  const itemTextStyle = { flexGrow: viewingFolder ? 1 : 0, flexBasis: viewingFolder ? 'auto' : '20%' };
 
   return (
     <TransitionGroup>
@@ -618,11 +595,13 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
                   }
                   <FolderIcon className="folder-icon" />
                 </ListItemIcon>
-                <ListItemText primary={renderFolderName(query, folder.name)} />
+                <ListItemText
+                  style={itemTextStyle}
+                  primary={renderFolderName(query, folder.name)} />
                 <Box className="folder-actions">
                   <Tooltip title="Add folder">
                     <IconButton size="small" onClick={e => handleAddNewFolderClick(e, folder.id)}>
-                      <AddCircleOutlineOutlinedIcon fontSize="small" />
+                      <AddIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="More">
@@ -705,13 +684,17 @@ export function FolderListItem(props) {
           }
           <FolderIcon className="folder-icon" />
         </ListItemIcon>
-        <ListItemText primary={renderFolderName(query, name)} />
+        <ListItemText
+          primary={renderFolderName(query, name)}
+          style={{ flexGrow: viewingFolder ? 1 : 0, flexBasis: viewingFolder ? 'auto' : '20%' }}
+        />
+
         <Box className="folder-actions">
           <Tooltip title="Add folder">
             <IconButton
               size="small"
               onClick={e => handleAddNewFolderClick(e, id)}>
-              <AddCircleOutlineOutlinedIcon fontSize="small" />
+              <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title="More">

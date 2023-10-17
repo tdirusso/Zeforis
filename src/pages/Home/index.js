@@ -354,7 +354,7 @@ export default function Home({ setTheme }) {
         <Box
           className="content"
           style={{
-            maxWidth: isSideNavOpen ? '1300px' : '1500px'
+            maxWidth: '1500px'
           }}>
           <Grid container spacing={3}>
             <Header

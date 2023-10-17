@@ -208,9 +208,10 @@ export default function FolderDrawer(props) {
                 <FormHelperText
                   component={Box}
                   className='flex-ac'
-                  hidden={!path}
                   justifyContent='space-between'>
-                  {`${path} → ${name}`}
+                  <span hidden={!path}>
+                    {`${path} → ${name}`}
+                  </span>
                   <Button
                     size='small'
                     onClick={handleMoveClick}
