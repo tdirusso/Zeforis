@@ -2,7 +2,7 @@
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useEffect, useRef, useState } from 'react';
-import { Box, Checkbox, Drawer, FormControlLabel, Grid, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
+import { Box, Button, Checkbox, Drawer, FormControlLabel, FormHelperText, Grid, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createFolder, updateFolder } from '../../api/folders';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,6 +11,7 @@ import StarIcon from '@mui/icons-material/Star';
 import FolderIcon from '@mui/icons-material/Folder';
 import HelpIcon from '@mui/icons-material/Help';
 import { isMobile } from '../../lib/constants';
+import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 
 export default function FolderDrawer(props) {
   const {
@@ -21,50 +22,73 @@ export default function FolderDrawer(props) {
     setFolders,
     folderProps,
     foldersMap,
-    parentId
+    openModal
   } = props;
-
-  const name = useRef();
 
   const [isLoading, setLoading] = useState(false);
   const [isKeyFolder, setIsKeyFolder] = useState(false);
+  const [name, setName] = useState('');
+  const [path, setPath] = useState('');
+
+  const nameRef = useRef();
+
+  const getPath = (folderId) => {
+    const pathArray = [];
+
+    const findParentFolder = (folderId) => {
+      const parentFolder = foldersMap[folderId];
+      if (parentFolder) {
+        pathArray.unshift(parentFolder.name);
+        findParentFolder(parentFolder.parent_id);
+      }
+    };
+
+    findParentFolder(folderId);
+    return pathArray.join(' / ');
+  };
 
   useEffect(() => {
     if (isOpen) {
       if (!isMobile) {
-        name.current.focus();
+        nameRef.current.focus();
       }
 
       if (folderProps) {
         if (folderProps.id) {
           const theFolder = foldersMap[folderProps.id];
-          name.current.value = theFolder.name;
+          if (theFolder.parent_id) {
+            setPath(getPath(theFolder.parent_id));
+          }
+          setName(theFolder.name);
           setIsKeyFolder(Boolean(theFolder.is_key_folder));
         } else {
-          name.current.value = '';
+          setName('');
           setIsKeyFolder(Boolean(folderProps.is_key_folder));
         }
       }
     }
   }, [isOpen, folderProps]);
 
+  const handleMoveClick = () => {
+    openModal('move-folder', { moveFolderId: folderProps.id });
+    handleClose();
+  };
+
   const handleCreateFolder = async e => {
     e.preventDefault();
 
-    const nameVal = name.current.value;
-
-    if (!nameVal) {
+    if (!name) {
       openSnackBar('Please enter a name for the new folder.');
       return;
     }
 
     setLoading(true);
+
     try {
       const { folder, message } = await createFolder({
-        name: nameVal,
+        name,
         engagementId: engagement.id,
-        isKeyFolder,
-        parentId
+        isKeyFolder
       });
 
       if (folder) {
@@ -84,9 +108,7 @@ export default function FolderDrawer(props) {
   const handleUpdateFolder = async e => {
     e.preventDefault();
 
-    const nameVal = name.current.value;
-
-    if (!nameVal) {
+    if (!name) {
       openSnackBar('Enter a name for the folder.');
       return;
     }
@@ -97,7 +119,7 @@ export default function FolderDrawer(props) {
 
     try {
       const { updatedFolder, message } = await updateFolder({
-        name: nameVal,
+        name,
         engagementId: engagement.id,
         isKeyFolder,
         folderId: folderProps.id,
@@ -124,7 +146,8 @@ export default function FolderDrawer(props) {
     close();
 
     setTimeout(() => {
-      name.current.value = '';
+      setName('');
+      setPath('');
       setIsKeyFolder(false);
       setLoading(false);
     }, 500);
@@ -168,19 +191,33 @@ export default function FolderDrawer(props) {
             <Box component='form' width="100%" onSubmit={folderProps?.id ? handleUpdateFolder : handleCreateFolder}>
               <Grid item xs={12}>
                 <TextField
+                  inputRef={nameRef}
+                  value={name}
+                  onChange={e => setName(e.target.value)}
                   InputProps={{
                     startAdornment:
                       <InputAdornment position='start'>
                         <FolderIcon />
                       </InputAdornment>
                   }}
-                  // helperText={<><DriveFolderUploadOutlinedIcon />Test</>}
                   fullWidth
                   autoFocus={!isMobile}
                   disabled={isLoading}
-                  inputRef={name}
                   placeholder='Folder name'>
                 </TextField>
+                <FormHelperText
+                  component={Box}
+                  className='flex-ac'
+                  hidden={!path}
+                  justifyContent='space-between'>
+                  {`${path} → ${name}`}
+                  <Button
+                    size='small'
+                    onClick={handleMoveClick}
+                    startIcon={<ShortcutRoundedIcon fontSize='small' />}>
+                    Move
+                  </Button>
+                </FormHelperText>
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel

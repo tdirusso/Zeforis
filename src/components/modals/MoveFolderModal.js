@@ -114,7 +114,7 @@ export default function MoveFolderModal(props) {
       </DialogTitle>
 
       <DialogContent>
-        Select destination for {theFolder?.name}:
+        Select destination:
         <Box
           border='1px solid gainsboro'
           borderRadius='8px'
