@@ -41,7 +41,7 @@ export default function FoldersPage() {
   const [otherFolders, setOtherFolders] = useState([]);
   const [openStates, setOpenStates] = useState({});
   const [renderReady, setRenderReady] = useState(false);
-  const [viewingFolder, setViewingFolder] = useState(null);
+  const [viewingFolderId, setViewingFolderId] = useState(null);
 
   const prevFolders = useRef(folders);
   const prevQuery = useRef(query);
@@ -178,8 +178,8 @@ export default function FoldersPage() {
               setQuery={setQuery}
               isAdmin={isAdmin}
               openDrawer={openDrawer}
-              viewingFolder={viewingFolder}
-              setViewingFolder={setViewingFolder}
+              viewingFolderId={viewingFolderId}
+              setViewingFolderId={setViewingFolderId}
               foldersMap={foldersMap}
               openSnackBar={openSnackBar}
               engagement={engagement}
@@ -187,10 +187,9 @@ export default function FoldersPage() {
               openModal={openModal}
             />
             {
-              viewingFolder ?
+              viewingFolderId ?
                 <FolderView
-
-                  folder={viewingFolder}
+                  folderId={viewingFolderId}
                 />
                 :
                 null
@@ -215,9 +214,8 @@ function FolderList(props) {
     setQuery,
     isAdmin,
     openDrawer,
-    viewingFolder,
-    setViewingFolder,
-    foldersMap,
+    viewingFolderId,
+    setViewingFolderId,
     openSnackBar,
     engagement,
     setFolders,
@@ -240,7 +238,7 @@ function FolderList(props) {
     if (hasNestedFolders) {
       if (selectedFolderId === folderId && dblClickFlag === true) {
         clearTimeout(window.updateOpenFolderStates);
-        setViewingFolder(foldersMap[folderId]);
+        setViewingFolderId(folderId);
         return;
       }
 
@@ -259,7 +257,7 @@ function FolderList(props) {
       }, 200);
     } else {
       setSelectedFolderId(folderId);
-      setViewingFolder(foldersMap[folderId]);
+      setViewingFolderId(folderId);
     }
   };
 
@@ -322,12 +320,12 @@ function FolderList(props) {
     setMoreMenuAnchor(null);
   };
 
-  const gridWidth = viewingFolder ? 3 : 12;
+  const gridWidth = viewingFolderId ? 2.5 : 12;
 
   return (
     <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
       <Paper sx={{ px: 0, py: 1.5 }}>
-        <Box className="flex-ac" px={viewingFolder ? 1.5 : 3} gap={3}>
+        <Box className="flex-ac" px={viewingFolderId ? 1.5 : 3} gap={3}>
           <Tooltip title="New folder" placement="bottom-end">
             <Box
               hidden={!isAdmin}
@@ -353,7 +351,7 @@ function FolderList(props) {
             handleCollapseAll={handleCollapseAll}
           />
           {
-            !viewingFolder ?
+            !viewingFolderId ?
               <TextField
                 style={{ transition: 'all 1s' }}
                 onChange={e => setQuery(e.target.value)}
@@ -382,7 +380,7 @@ function FolderList(props) {
           }
         </Box>
         {
-          viewingFolder ?
+          viewingFolderId ?
             <Box p={1} ml={1}>
               <TextField
                 style={{ transition: 'all 1s' }}
@@ -441,7 +439,7 @@ function FolderList(props) {
                       openStates={openStates}
                       setOpenStates={setOpenStates}
                       query={query}
-                      viewingFolder={viewingFolder}
+                      viewingFolderId={viewingFolderId}
                       handleAddNewFolderClick={handleAddNewFolderClick}
                       handleMoreMenuClick={handleMoreMenuClick}
                     />
@@ -467,7 +465,7 @@ function FolderList(props) {
                       openStates={openStates}
                       setOpenStates={setOpenStates}
                       query={query}
-                      viewingFolder={viewingFolder}
+                      viewingFolderId={viewingFolderId}
                       handleAddNewFolderClick={handleAddNewFolderClick}
                       handleMoreMenuClick={handleMoreMenuClick}
                     />

@@ -181,7 +181,6 @@ export default function Home({ setTheme }) {
 
   useEffect(() => {
     if (isDataFetched) {
-
       if (!isReadyToRender) {
         tasks.sort((a, b) => a.task_name?.localeCompare(b.task_name));
       }

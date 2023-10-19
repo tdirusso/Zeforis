@@ -1,4 +1,5 @@
-import { Grid, Paper, Fade, TableHead, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button } from "@mui/material";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Grid, Paper, Fade, TableHead, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -17,15 +18,27 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import EastRoundedIcon from '@mui/icons-material/EastRounded';
+import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
+import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
+import { updateTask } from "../../../api/tasks";
 
-export default function FolderView({ folder }) {
+export default function FolderView({ folderId }) {
 
   const {
+    engagement,
     tagsMap,
     engagementAdmins,
     engagementMembers,
-    user
+    user,
+    openSnackBar,
+    setTasks,
+    tasksMap,
+    foldersMap
   } = useOutletContext();
+
+  const engagementId = engagement.id;
+  const folder = foldersMap[folderId];
 
   const [isEditMode, setEditMode] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -35,11 +48,14 @@ export default function FolderView({ folder }) {
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
   const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
+  const [taskActionsMenuAnchor, setTaskActionsMenuAnchor] = useState(null);
   const [tempAssignee, setTempAssignee] = useState(null);
+  const [doUpdate, setDoUpdate] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
   const dateDueMenuOpen = Boolean(dateDueMenuAnchor);
+  const taskActionsMenuOpen = Boolean(taskActionsMenuAnchor);
 
   const nameRef = useRef(null);
 
@@ -62,9 +78,77 @@ export default function FolderView({ folder }) {
     };
   }, []);
 
-  const tasks = folder.tasks;
+  useEffect(() => {
+    async function handleUpdateTask() {
+      try {
+        const { message, success } = { success: true };
+        // const { message, success } = await updateTask({
+        //   name: editingTask.task_name,
+        //   description: editingTask.description,
+        //   linkUrl: editingTask.link_url,
+        //   status: editingTask.status,
+        //   assignedToId: editingTask.assigned_to_id,
+        //   folderId: folder.id,
+        //   engagementId: engagementId,
+        //   isKeyTask: editingTask.is_key_task,
+        //   dateDue: editingTask.date_due,
+        //   taskId: editingTask.task_id,
+        //   currentTags: editingTask.oldTags ?
+        //     editingTask.oldTags :
+        //     (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
+        //       id: Number(tagId),
+        //       name: tagsMap[tagId].name,
+        //       engagement_id: engagementId
+        //     })),
+        //   tags: editingTask.newTags ?
+        //     editingTask.newTags :
+        //     (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
+        //       id: Number(tagId),
+        //       name: tagsMap[tagId].name,
+        //       engagement_id: engagementId
+        //     }))
+        // });
 
-  const filteredTasks = tasks;
+        if (success) {
+          const now = new Date().toISOString();
+          let dateCompletedToSet = null;
+
+          if (editingTask.status === 'Complete') {
+            if (editingTask.date_completed) {
+              dateCompletedToSet = editingTask.date_completed;
+            } else {
+              dateCompletedToSet = now;
+            }
+          }
+
+          const updatedTaskObject = {
+            ...(delete editingTask.newTags &&
+              delete editingTask.oldTags &&
+              editingTask),
+            date_completed: dateCompletedToSet,
+            date_last_updated: now
+          };
+
+          tasksMap[editingTask.task_id] = updatedTaskObject;
+          setTasks(Object.values(tasksMap));
+          setDoUpdate(false);
+          openSnackBar('Task successfully updated.', 'success');
+        } else {
+          setDoUpdate(false);
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        setDoUpdate(false);
+        openSnackBar(error.message, 'error');
+      }
+    }
+
+    if (doUpdate) {
+      handleUpdateTask();
+    }
+  }, [doUpdate]);
+
+  const filteredTasks = folder.tasks;
 
   const handleSelectAll = () => {
 
@@ -115,6 +199,16 @@ export default function FolderView({ folder }) {
     setDateDueMenuAnchor(e.currentTarget);
   };
 
+  const handleTaskMoreClick = (e, task) => {
+    setEditingTask(task);
+    setTaskActionsMenuAnchor(e.currentTarget);
+  };
+
+  const handleToggleKeyTask = (task) => {
+    setEditingTask({ ...task, is_key_task: !task.is_key_task });
+    setDoUpdate(true);
+  };
+
   useEffect(() => {
     if (isEditingName) {
       nameRef.current.focus();
@@ -122,8 +216,10 @@ export default function FolderView({ folder }) {
     }
   }, [isEditingName]);
 
+  console.log('rendering');
+
   return (
-    <Grid item xs={9}>
+    <Grid item xs={9.5}>
       <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
         <Paper sx={{ p: 2 }}>
           <h5>{folder.name}</h5>
@@ -145,7 +241,7 @@ export default function FolderView({ folder }) {
                     />
                   </Box>
                 </TableCell>
-                <TableCell onClick={() => setSortBy('status')}>
+                <TableCell onClick={() => setSortBy('status')} style={{ width: 150 }}>
                   <Box className="flex-ac">
                     Status <FilterListRoundedIcon
                       fontSize="small"
@@ -154,7 +250,7 @@ export default function FolderView({ folder }) {
                     />
                   </Box>
                 </TableCell>
-                <TableCell onClick={() => setSortBy('status')}>
+                <TableCell onClick={() => setSortBy('status')} style={{ width: 125 }}>
                   <Box className="flex-ac">
                     Assignee <FilterListRoundedIcon
                       fontSize="small"
@@ -163,7 +259,7 @@ export default function FolderView({ folder }) {
                     />
                   </Box>
                 </TableCell>
-                <TableCell onClick={() => setSortBy('dateDue')}>
+                <TableCell onClick={() => setSortBy('dateDue')} style={{ width: 100 }}>
                   <Box className="flex-ac">
                     Due <FilterListRoundedIcon
                       fontSize="small"
@@ -171,7 +267,7 @@ export default function FolderView({ folder }) {
                       style={{ marginLeft: '5px' }}
                     />
                   </Box></TableCell>
-                <TableCell style={{ width: '175px' }}>Tags</TableCell>
+                <TableCell>Tags</TableCell>
                 <TableCell style={{ width: '30px' }}></TableCell>
               </TableRow>
             </TableHead>
@@ -220,11 +316,32 @@ export default function FolderView({ folder }) {
                       </TableCell>
                       <TableCell scope="row" className="task-name-cell" style={{ paddingLeft: 0 }}>
                         <Box className="flex-ac" gap="5px" flexGrow={1}>
-                          <StarIcon
-                            style={{ visibility: task.is_key_task ? 'visible' : 'hidden' }}
-                            htmlColor="gold"
-                            fontSize="small"
-                          />
+                          <Box className="key-task-cell">
+                            {
+                              task.is_key_task ?
+                                <Tooltip title="Toggle key task">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleToggleKeyTask(task)}>
+                                    <StarIcon
+                                      style={{ fontSize: 16 }}
+                                      htmlColor="gold"
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                                :
+                                <Tooltip title="Toggle key task">
+                                  <IconButton
+                                    onClick={() => handleToggleKeyTask(task)}
+                                    size="small"
+                                    className="set-key-task-btn" >
+                                    <StarOutlineOutlinedIcon
+                                      style={{ fontSize: 16 }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                            }
+                          </Box>
                           {
                             isEditingName && editingTask.task_id === task.task_id ?
                               <TextField
@@ -263,9 +380,6 @@ export default function FolderView({ folder }) {
                           label={task.status}
                           deleteIcon={<MoreVertIcon fontSize="small" />}
                           onClick={e => handleStatusClick(e, task)}
-                          style={{
-                            marginRight: '2rem',
-                          }}
                           onDelete={e => handleStatusClick(e, task)}
                           className={task.status}>
                         </Chip>
@@ -311,31 +425,32 @@ export default function FolderView({ folder }) {
                           className="edit-icon"
                         />
                       </TableCell>
-                      <TableCell>{
+                      <TableCell className="task-tags-cell">{
                         tagsArray.map(tagId =>
                           <Chip
+                            className="chip"
                             key={tagId}
                             label={tagsMap[tagId].name}
                             size="small"
-                            style={{ marginRight: '10px', marginBottom: '5px' }}
                           />)}
+                        <Chip
+                          className="new-chip"
+                          size="small"
+                          variant="outlined"
+                          label='+ Tag'
+                          onClick={() => { }}
+                        />
                       </TableCell>
                       <TableCell>
-                        {
-                          task.link_url ?
-                            <Tooltip title="Open Link">
-                              <IconButton
-                                disabled={!task.link_url}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  window.open(task.link_url, '_blank');
-                                }}>
-                                <OpenInNewIcon
-                                  fontSize="small"
-                                />
-                              </IconButton>
-                            </Tooltip> : <Box height={36}></Box>
-                        }
+                        <Tooltip title="More">
+                          <IconButton
+                            size="small"
+                            onClick={e => handleTaskMoreClick(e, task)}>
+                            <MoreVertIcon
+                              fontSize="small"
+                            />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   );
@@ -345,6 +460,34 @@ export default function FolderView({ folder }) {
           </Table>
         </Paper>
       </Fade>
+
+      <Menu
+        className="task-actions-menu"
+        anchorEl={taskActionsMenuAnchor}
+        open={taskActionsMenuOpen}
+        onClose={() => setTaskActionsMenuAnchor(null)}>
+        <MenuItem dense>
+          <EastRoundedIcon fontSize="small" />
+          Quick view
+        </MenuItem>
+        <MenuItem dense>
+          <FullscreenOutlinedIcon fontSize="small" />
+          Full view
+        </MenuItem>
+        <Divider className="m0" />
+        <MenuItem dense>
+          <OpenInNewIcon fontSize="small" style={{ fontSize: 17, width: 20 }} />
+          Open resource
+        </MenuItem>
+        <Divider className="m0" />
+        <MenuItem dense>
+          <ListItemText inset color="error">
+            <Typography color="error" component="span">
+              Delete task
+            </Typography>
+          </ListItemText>
+        </MenuItem>
+      </Menu>
 
       <Menu
         anchorEl={dateDueMenuAnchor}
@@ -406,7 +549,7 @@ export default function FolderView({ folder }) {
               Assign to me
             </Button>
             <Button size="small">
-              Save
+              clear
             </Button>
           </Box>
         </Box>
