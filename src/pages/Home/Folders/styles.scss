@@ -67,13 +67,15 @@
 }
 
 .folder-tasks-table {
+  td {
+    position: relative;
+  }
+
   tr:last-child td {
     border-bottom: none;
   }
 
   .task-name-cell {
-
-    // cursor: pointer;
     .name-text {
       border: 1px dashed transparent;
       transition: border 250ms;
@@ -82,8 +84,87 @@
 
       &:hover {
         border: 1px dashed #b1b1b1;
+
+        +.edit-icon {
+          opacity: 1;
+        }
       }
     }
+
+    .edit-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      color: #b1b1b1;
+      opacity: 0;
+      transition: opacity 250ms;
+    }
+  }
+
+  .task-due-cell {
+    .due-text {
+      border: 1px dashed transparent;
+      transition: border 250ms;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: inherit;
+      cursor: pointer;
+
+      &:hover {
+        border: 1px dashed #b1b1b1;
+
+        +.edit-icon {
+          opacity: 1;
+        }
+      }
+    }
+
+    .edit-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      color: #b1b1b1;
+      opacity: 0;
+      transition: opacity 250ms;
+    }
+  }
+
+  .task-assigned-cell {
+    .MuiAvatar-root {
+      height: 30px;
+      width: 30px;
+      font-size: 16px;
+    }
+
+    .assigned-btn {
+      height: 32px;
+      width: 32px;
+    }
+
+    .unassigned-btn {
+      border: 1px dashed #a3a3a3;
+      height: 32px;
+      width: 32px;
+
+      svg {
+        color: #a3a3a3;
+      }
+    }
+  }
+}
+
+.assignee-menu {
+  width: 240px;
+}
+
+.assignee-menu-list {
+  .MuiListSubheader-root {
+    height: 28px;
+    line-height: 28px;
+  }
+
+  li {
+    font-size: 14px !important;
   }
 }
 

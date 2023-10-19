@@ -1,4 +1,4 @@
-import { Grid, Paper, Fade, TableHead, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField } from "@mui/material";
+import { Grid, Paper, Fade, TableHead, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -9,16 +9,22 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import EditIcon from '@mui/icons-material/Edit';
-
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { statuses } from "../../../lib/constants";
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import moment from "moment";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 export default function FolderView({ folder }) {
 
   const {
-    tagsMap
+    tagsMap,
+    engagementAdmins,
+    engagementMembers,
+    user
   } = useOutletContext();
 
   const [isEditMode, setEditMode] = useState(false);
@@ -26,8 +32,21 @@ export default function FolderView({ folder }) {
   const [sortBy, setSortBy] = useState('name');
   const [editingTask, setEditingTask] = useState(null);
   const [isEditingName, setEditingName] = useState(false);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
+  const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
+  const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
+  const [tempAssignee, setTempAssignee] = useState(null);
+
+  const statusMenuOpen = Boolean(statusMenuAnchor);
+  const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
+  const dateDueMenuOpen = Boolean(dateDueMenuAnchor);
 
   const nameRef = useRef(null);
+
+  const now = moment();
+  const tomorrow = moment().add(1, 'day');
+
+  const membersAndAdmins = [...engagementAdmins, ...engagementMembers];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -58,6 +77,42 @@ export default function FolderView({ folder }) {
   const handleEditNameClick = task => {
     setEditingTask(task);
     setEditingName(true);
+  };
+
+  const handleStatusClick = (e, task) => {
+    setEditingTask(task);
+    setStatusMenuAnchor(e.currentTarget);
+  };
+
+  const handleAssigneeClick = (e, task) => {
+    setEditingTask(task);
+    setTempAssignee(
+      task.assigned_to_id ?
+        {
+          id: task.assigned_to_id,
+          firstName: task.assigned_first,
+          lastName: task.assigned_last
+        } :
+        null
+    );
+    setAssigneeMenuAnchor(e.currentTarget);
+  };
+
+  const handleAssignToMe = () => {
+    setTempAssignee({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName
+    });
+  };
+
+  const handleAssigneeChange = (_, newVal) => {
+    setTempAssignee(newVal);
+  };
+
+  const handleDateDueClick = (e, task) => {
+    setEditingTask(task);
+    setDateDueMenuAnchor(e.currentTarget);
   };
 
   useEffect(() => {
@@ -99,6 +154,15 @@ export default function FolderView({ folder }) {
                     />
                   </Box>
                 </TableCell>
+                <TableCell onClick={() => setSortBy('status')}>
+                  <Box className="flex-ac">
+                    Assignee <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </TableCell>
                 <TableCell onClick={() => setSortBy('dateDue')}>
                   <Box className="flex-ac">
                     Due <FilterListRoundedIcon
@@ -115,9 +179,25 @@ export default function FolderView({ folder }) {
             <TableBody>
               {
                 filteredTasks.map((task) => {
-                  const dateDue = new Date(task.date_due);
-                  const dateDueDay = days[dateDue.getDay()];
-                  const dateDueMonth = months[dateDue.getMonth()];
+                  let dateDueText = '...';
+                  let dateDueColor = 'inherit';
+
+                  if (task.date_due) {
+                    const dateDue = moment(task.date_due);
+
+                    if (dateDue.isSame(now, 'day')) {
+                      dateDueText = 'Today';
+                      dateDueColor = '#ed6c02';
+                    } else if (dateDue.isSame(tomorrow, 'day')) {
+                      dateDueColor = '#0293e3';
+                      dateDueText = 'Tomorrow';
+                    } else if (dateDue.isBefore(now, 'day')) {
+                      dateDueText = dateDue.format('MMM Do');
+                      dateDueColor = 'error';
+                    } else {
+                      dateDueText = dateDue.format('MMM Do');
+                    }
+                  }
 
                   const tagsArray = task.tags?.split(',').filter(Boolean) || [];
                   const isSelectedRow = selectedTasks.includes(task.task_id);
@@ -126,6 +206,8 @@ export default function FolderView({ folder }) {
                   if (taskName.length > 100) {
                     taskName = taskName.substring(0, 100) + '...';
                   }
+
+                  // console.log(task);
                   return (
                     <TableRow
                       hover
@@ -160,28 +242,74 @@ export default function FolderView({ folder }) {
                                 value={editingTask.task_name}
                               />
                               :
-                              <Box
-                                className="name-text"
-                                width='100%'
-                                onClick={() => handleEditNameClick(task)}>
-                                {taskName}
-                              </Box>
+                              <>
+                                <Box
+                                  className="name-text"
+                                  width='100%'
+                                  onClick={() => handleEditNameClick(task)}>
+                                  {taskName}
+                                </Box>
+                                <EditRoundedIcon
+                                  fontSize="small"
+                                  className="edit-icon"
+                                />
+                              </>
                           }
                         </Box>
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={task.status}
-                          className={task.status}
                           size="small"
-                        />
+                          label={task.status}
+                          deleteIcon={<MoreVertIcon fontSize="small" />}
+                          onClick={e => handleStatusClick(e, task)}
+                          style={{
+                            marginRight: '2rem',
+                          }}
+                          onDelete={e => handleStatusClick(e, task)}
+                          className={task.status}>
+                        </Chip>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="task-assigned-cell">
                         {
-                          task.date_due ?
-                            `${dateDueDay}, ${dateDueMonth} ${dateDue.getDate()}` :
-                            'None'
+                          task.assigned_to_id ?
+                            <Tooltip title={`${task.assigned_first} ${task.assigned_last}`}>
+                              <IconButton
+                                onClick={e => handleAssigneeClick(e, task)}
+                                size="small"
+                                className="assigned-btn">
+                                {
+                                  <Avatar>
+                                    {task.assigned_first[0]}{task.assigned_last[0]}
+                                  </Avatar>
+                                }
+                              </IconButton>
+                            </Tooltip>
+                            :
+                            <Tooltip title="Assign task">
+                              <IconButton
+                                onClick={e => handleAssigneeClick(e, task)}
+                                size="small"
+                                className="unassigned-btn">
+                                <PersonOutlineIcon />
+                              </IconButton>
+                            </Tooltip>
                         }
+
+                      </TableCell>
+                      <TableCell className="task-due-cell">
+                        <Typography
+                          onClick={e => handleDateDueClick(e, task)}
+                          className="due-text"
+                          color={dateDueColor}>
+                          {
+                            dateDueText
+                          }
+                        </Typography>
+                        <EditRoundedIcon
+                          fontSize="small"
+                          className="edit-icon"
+                        />
                       </TableCell>
                       <TableCell>{
                         tagsArray.map(tagId =>
@@ -217,6 +345,96 @@ export default function FolderView({ folder }) {
           </Table>
         </Paper>
       </Fade>
-    </Grid>
+
+      <Menu
+        anchorEl={dateDueMenuAnchor}
+        open={dateDueMenuOpen}
+        onClose={() => setDateDueMenuAnchor(null)}>
+        <Box>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <StaticDatePicker
+              renderInput={() => { }}
+              onChange={() => { }}
+              displayStaticWrapperAs="desktop"
+            />
+          </LocalizationProvider>
+        </Box>
+      </Menu>
+
+
+      <Menu
+        PaperProps={{
+          className: 'assignee-menu'
+        }}
+        anchorEl={assigneeMenuAnchor}
+        open={assigneeMenuOpen}
+        onClose={() => setAssigneeMenuAnchor(null)}>
+        <Box mx={1} >
+          <FormControl fullWidth>
+            <Autocomplete
+              ListboxProps={{
+                className: 'assignee-menu-list'
+              }}
+              size="small"
+              options={membersAndAdmins}
+              renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
+              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              groupBy={(option) => option.role}
+              onChange={handleAssigneeChange}
+              value={tempAssignee}
+              renderInput={(params) => (
+                <TextField
+                  autoFocus
+                  {...params}
+                  inputProps={{
+                    ...params.inputProps,
+                    style: {
+                      fontSize: 14
+                    }
+                  }}
+                  placeholder="Assignee"
+                />
+              )}
+            />
+          </FormControl>
+          <Box className="flex-ac" justifyContent='space-between' mt={0.25}>
+            <Button
+              onClick={handleAssignToMe}
+              size="small"
+              color="secondary">
+              Assign to me
+            </Button>
+            <Button size="small">
+              Save
+            </Button>
+          </Box>
+        </Box>
+
+      </Menu>
+
+      <Menu
+        anchorEl={statusMenuAnchor}
+        open={statusMenuOpen}
+        onClose={() => setStatusMenuAnchor(null)}>
+        {
+          statuses.map(({ name }) => {
+            return (
+              <MenuItem
+                selected={name === editingTask?.status}
+                key={name}
+                onClick={() => { }}>
+                <Chip
+                  size="small"
+                  label={name}
+                  className={name}
+                  style={{ cursor: 'pointer' }}
+                />
+              </MenuItem>
+            );
+          })
+        }
+      </Menu>
+    </Grid >
   );
 }
