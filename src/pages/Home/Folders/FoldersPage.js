@@ -562,12 +562,12 @@ function FolderList(props) {
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, handleMoreMenuClick, depth = 1) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
-  const indent = viewingFolder ? (`${24 * depth}px`) : (`${36 * depth}px`);
-  const itemTextStyle = { flexGrow: viewingFolder ? 1 : 0, flexBasis: viewingFolder ? 'auto' : '20%' };
+  const indent = viewingFolderId ? (`${24 * depth}px`) : (`${36 * depth}px`);
+  const itemTextStyle = { flexGrow: viewingFolderId ? 1 : 0, flexBasis: viewingFolderId ? 'auto' : '20%' };
 
   return (
     <TransitionGroup>
@@ -612,7 +612,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
               {
                 hasNestedFolders ?
                   <Collapse in={openStates[folder.id]} timeout="auto">
-                    {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, handleMoreMenuClick, depth)}
+                    {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick, depth)}
                   </Collapse> : null
               }
             </Collapse>
@@ -655,7 +655,7 @@ export function FolderListItem(props) {
     openStates,
     setOpenStates,
     query,
-    viewingFolder,
+    viewingFolderId,
     handleAddNewFolderClick,
     handleMoreMenuClick
   } = props;
@@ -668,7 +668,7 @@ export function FolderListItem(props) {
         className="folder-listitem"
         selected={selectedFolderId === id}
         disableRipple
-        sx={{ pl: viewingFolder ? '32px' : '40px', transition: 'padding 250ms' }}
+        sx={{ pl: viewingFolderId ? '32px' : '40px', transition: 'padding 250ms' }}
         onClick={() => handleFolderClick(id, hasNestedFolders)}>
         <ListItemIcon style={{ position: 'relative', minWidth: 34 }}>
           {
@@ -684,7 +684,7 @@ export function FolderListItem(props) {
         </ListItemIcon>
         <ListItemText
           primary={renderFolderName(query, name)}
-          style={{ flexGrow: viewingFolder ? 1 : 0, flexBasis: viewingFolder ? 'auto' : '20%' }}
+          style={{ flexGrow: viewingFolderId ? 1 : 0, flexBasis: viewingFolderId ? 'auto' : '20%' }}
         />
 
         <Box className="folder-actions">
@@ -707,7 +707,7 @@ export function FolderListItem(props) {
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto">
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolder, handleAddNewFolderClick, handleMoreMenuClick)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick)}
           </Collapse>
           : null
       }

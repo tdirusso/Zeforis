@@ -81,33 +81,32 @@ export default function FolderView({ folderId }) {
   useEffect(() => {
     async function handleUpdateTask() {
       try {
-        const { message, success } = { success: true };
-        // const { message, success } = await updateTask({
-        //   name: editingTask.task_name,
-        //   description: editingTask.description,
-        //   linkUrl: editingTask.link_url,
-        //   status: editingTask.status,
-        //   assignedToId: editingTask.assigned_to_id,
-        //   folderId: folder.id,
-        //   engagementId: engagementId,
-        //   isKeyTask: editingTask.is_key_task,
-        //   dateDue: editingTask.date_due,
-        //   taskId: editingTask.task_id,
-        //   currentTags: editingTask.oldTags ?
-        //     editingTask.oldTags :
-        //     (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
-        //       id: Number(tagId),
-        //       name: tagsMap[tagId].name,
-        //       engagement_id: engagementId
-        //     })),
-        //   tags: editingTask.newTags ?
-        //     editingTask.newTags :
-        //     (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
-        //       id: Number(tagId),
-        //       name: tagsMap[tagId].name,
-        //       engagement_id: engagementId
-        //     }))
-        // });
+        const { message, success } = await updateTask({
+          name: editingTask.task_name,
+          description: editingTask.description,
+          linkUrl: editingTask.link_url,
+          status: editingTask.status,
+          assignedToId: editingTask.assigned_to_id,
+          folderId: folder.id,
+          engagementId: engagementId,
+          isKeyTask: editingTask.is_key_task,
+          dateDue: editingTask.date_due,
+          taskId: editingTask.task_id,
+          currentTags: editingTask.oldTags ?
+            editingTask.oldTags :
+            (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
+              id: Number(tagId),
+              name: tagsMap[tagId].name,
+              engagement_id: engagementId
+            })),
+          tags: editingTask.newTags ?
+            editingTask.newTags :
+            (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
+              id: Number(tagId),
+              name: tagsMap[tagId].name,
+              engagement_id: engagementId
+            }))
+        });
 
         if (success) {
           const now = new Date().toISOString();
@@ -132,12 +131,15 @@ export default function FolderView({ folderId }) {
           tasksMap[editingTask.task_id] = updatedTaskObject;
           setTasks(Object.values(tasksMap));
           setDoUpdate(false);
-          openSnackBar('Task successfully updated.', 'success');
+          setEditingName(false);
+          openSnackBar('Saved.', 'success');
         } else {
+          setEditingTask(null);
           setDoUpdate(false);
           openSnackBar(message, 'error');
         }
       } catch (error) {
+        setEditingTask(null);
         setDoUpdate(false);
         openSnackBar(error.message, 'error');
       }
@@ -209,14 +211,31 @@ export default function FolderView({ folderId }) {
     setDoUpdate(true);
   };
 
+  const handleNameSubmit = e => {
+    if (e && e.key === 'Enter') {
+      if (!nameRef.current.value) {
+        openSnackBar('Task name cannot be empty.');
+        return;
+      } else {
+        e.preventDefault();
+        setEditingTask({ ...editingTask, task_name: nameRef.current.value });
+        setDoUpdate(true);
+      }
+    }
+  };
+
+  const handleStatusSubmit = (newStatus) => {
+    setEditingTask({ ...editingTask, status: newStatus });
+    setStatusMenuAnchor(null);
+    setDoUpdate(true);
+  };
+
   useEffect(() => {
     if (isEditingName) {
       nameRef.current.focus();
       nameRef.current.setSelectionRange(1000, 1000);
     }
   }, [isEditingName]);
-
-  console.log('rendering');
 
   return (
     <Grid item xs={9.5}>
@@ -303,7 +322,8 @@ export default function FolderView({ folderId }) {
                     taskName = taskName.substring(0, 100) + '...';
                   }
 
-                  // console.log(task);
+                  const taskIsBeingEditted = editingTask?.task_id === task.task_id;
+
                   return (
                     <TableRow
                       hover
@@ -356,7 +376,8 @@ export default function FolderView({ folderId }) {
                                 fullWidth
                                 size="small"
                                 inputRef={nameRef}
-                                value={editingTask.task_name}
+                                defaultValue={editingTask.task_name}
+                                onKeyDown={handleNameSubmit}
                               />
                               :
                               <>
@@ -364,7 +385,11 @@ export default function FolderView({ folderId }) {
                                   className="name-text"
                                   width='100%'
                                   onClick={() => handleEditNameClick(task)}>
-                                  {taskName}
+                                  {
+                                    taskIsBeingEditted ?
+                                      editingTask.task_name :
+                                      taskName
+                                  }
                                 </Box>
                                 <EditRoundedIcon
                                   fontSize="small"
@@ -512,7 +537,7 @@ export default function FolderView({ folderId }) {
         anchorEl={assigneeMenuAnchor}
         open={assigneeMenuOpen}
         onClose={() => setAssigneeMenuAnchor(null)}>
-        <Box mx={1} >
+        <Box mx={1}>
           <FormControl fullWidth>
             <Autocomplete
               ListboxProps={{
@@ -566,7 +591,7 @@ export default function FolderView({ folderId }) {
               <MenuItem
                 selected={name === editingTask?.status}
                 key={name}
-                onClick={() => { }}>
+                onClick={() => handleStatusSubmit(name)}>
                 <Chip
                   size="small"
                   label={name}
