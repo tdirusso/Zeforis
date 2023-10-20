@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Paper, Fade, TableHead, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText } from "@mui/material";
+import { Grid, Paper, Fade, TableHead, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -22,6 +22,7 @@ import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
 import { updateTask } from "../../../api/tasks";
+import { createTag } from "../../../api/tags";
 
 export default function FolderView({ folderId }) {
 
@@ -34,7 +35,9 @@ export default function FolderView({ folderId }) {
     openSnackBar,
     setTasks,
     tasksMap,
-    foldersMap
+    foldersMap,
+    tags,
+    setTags
   } = useOutletContext();
 
   const engagementId = engagement.id;
@@ -49,13 +52,16 @@ export default function FolderView({ folderId }) {
   const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
   const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
   const [taskActionsMenuAnchor, setTaskActionsMenuAnchor] = useState(null);
+  const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
   const [tempAssignee, setTempAssignee] = useState(null);
+  const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [doUpdate, setDoUpdate] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
   const dateDueMenuOpen = Boolean(dateDueMenuAnchor);
   const taskActionsMenuOpen = Boolean(taskActionsMenuAnchor);
+  const tagsMenuOpen = Boolean(tagsMenuAnchor);
 
   const nameRef = useRef(null);
 
@@ -63,6 +69,12 @@ export default function FolderView({ folderId }) {
   const tomorrow = moment().add(1, 'day');
 
   const membersAndAdmins = [...engagementAdmins, ...engagementMembers];
+
+  const editingTaskTagIds = editingTask?.tags?.split(',').filter(Boolean).map(id => Number(id)) || [];
+
+  const availableTags = (
+    editingTask && tags.filter(tag => !editingTaskTagIds.includes(tag.id))
+  ) || [];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -81,6 +93,15 @@ export default function FolderView({ folderId }) {
   useEffect(() => {
     async function handleUpdateTask() {
       try {
+        const currentTags = editingTaskTagIds.map(tagId => ({
+          id: Number(tagId),
+          name: tagsMap[tagId].name
+        }));
+
+        const allTags = tempSelectedTags.length === 0 ?
+          currentTags :
+          [...currentTags, ...tempSelectedTags];
+
         const { message, success } = await updateTask({
           name: editingTask.task_name,
           description: editingTask.description,
@@ -92,20 +113,8 @@ export default function FolderView({ folderId }) {
           isKeyTask: editingTask.is_key_task,
           dateDue: editingTask.date_due,
           taskId: editingTask.task_id,
-          currentTags: editingTask.oldTags ?
-            editingTask.oldTags :
-            (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
-              id: Number(tagId),
-              name: tagsMap[tagId].name,
-              engagement_id: engagementId
-            })),
-          tags: editingTask.newTags ?
-            editingTask.newTags :
-            (editingTask.tags?.split(',').filter(Boolean) || []).map(tagId => ({
-              id: Number(tagId),
-              name: tagsMap[tagId].name,
-              engagement_id: engagementId
-            }))
+          currentTags,
+          tags: allTags
         });
 
         if (success) {
@@ -121,26 +130,30 @@ export default function FolderView({ folderId }) {
           }
 
           const updatedTaskObject = {
-            ...(delete editingTask.newTags &&
-              delete editingTask.oldTags &&
-              editingTask),
+            ...(delete editingTask.currentTags && editingTask),
             date_completed: dateCompletedToSet,
-            date_last_updated: now
+            date_last_updated: now,
+            tags: allTags.length > 0 ? allTags.map(t => t.id).join(',') : null
           };
 
           tasksMap[editingTask.task_id] = updatedTaskObject;
+
           setTasks(Object.values(tasksMap));
           setDoUpdate(false);
           setEditingName(false);
+          setTempSelectedTags([]);
+
           openSnackBar('Saved.', 'success');
         } else {
           setEditingTask(null);
           setDoUpdate(false);
+          setTempSelectedTags([]);
           openSnackBar(message, 'error');
         }
       } catch (error) {
         setEditingTask(null);
         setDoUpdate(false);
+        setTempSelectedTags([]);
         openSnackBar(error.message, 'error');
       }
     }
@@ -185,15 +198,44 @@ export default function FolderView({ folderId }) {
   };
 
   const handleAssignToMe = () => {
-    setTempAssignee({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName
+    setEditingTask({
+      ...editingTask,
+      assigned_to_id: user.id,
+      assigned_first: user.firstName,
+      assigned_last: user.lastName
     });
+    setAssigneeMenuAnchor(null);
+    setDoUpdate(true);
   };
 
   const handleAssigneeChange = (_, newVal) => {
-    setTempAssignee(newVal);
+    if (newVal) {
+      setEditingTask({
+        ...editingTask,
+        assigned_to_id: newVal.id,
+        assigned_first: newVal.firstName,
+        assigned_last: newVal.lastName
+      });
+      setAssigneeMenuAnchor(null);
+      setDoUpdate(true);
+    }
+  };
+
+  const handleClearAssignee = () => {
+    setEditingTask({
+      ...editingTask,
+      assigned_to_id: null,
+      assigned_first: null,
+      assigned_last: null
+    });
+    setAssigneeMenuAnchor(null);
+    setDoUpdate(true);
+  };
+
+  const handleClearDateDue = () => {
+    setEditingTask({ ...editingTask, date_due: null });
+    setDateDueMenuAnchor(null);
+    setDoUpdate(true);
   };
 
   const handleDateDueClick = (e, task) => {
@@ -228,6 +270,44 @@ export default function FolderView({ folderId }) {
     setEditingTask({ ...editingTask, status: newStatus });
     setStatusMenuAnchor(null);
     setDoUpdate(true);
+  };
+
+  const handleDateDueSubmit = newDate => {
+    setEditingTask({ ...editingTask, date_due: newDate.toISOString() });
+    setDateDueMenuAnchor(null);
+    setDoUpdate(true);
+  };
+
+  const handleAddTagClick = (e, task) => {
+    setEditingTask(task);
+    setTagsMenuAnchor(e.currentTarget);
+  };
+
+  const handleCreateTag = async e => {
+    const newTagValue = e.target.value;
+
+    if (newTagValue) {
+      const result = await createTag({
+        name: newTagValue,
+        engagementId
+      });
+
+      if (result.success) {
+        const newTag = result.tag;
+        setTags(tags => [...tags, newTag]);
+        setTempSelectedTags(tags => [...tags, newTag]);
+      } else {
+        openSnackBar(result.message, 'error');
+      }
+    }
+  };
+
+  const handleTagsSubmit = () => {
+    if (tempSelectedTags.length) {
+      setDoUpdate(true);
+    }
+
+    setTagsMenuAnchor(null);
   };
 
   useEffect(() => {
@@ -462,8 +542,8 @@ export default function FolderView({ folderId }) {
                           className="new-chip"
                           size="small"
                           variant="outlined"
-                          label='+ Tag'
-                          onClick={() => { }}
+                          label='+ Tags'
+                          onClick={e => handleAddTagClick(e, task)}
                         />
                       </TableCell>
                       <TableCell>
@@ -485,6 +565,69 @@ export default function FolderView({ folderId }) {
           </Table>
         </Paper>
       </Fade>
+
+      <Menu
+        PaperProps={{
+          className: 'tags-menu'
+        }}
+        anchorEl={tagsMenuAnchor}
+        open={tagsMenuOpen}
+        onClose={() => {
+          setTagsMenuAnchor(null);
+          setTimeout(() => {
+            setTempSelectedTags([]);
+          }, 250);
+        }}>
+        <Box mx={1}>
+          <FormControl fullWidth>
+            <Autocomplete
+              ListboxProps={{
+                className: 'tags-menu-list'
+              }}
+              size="small"
+              multiple
+              value={tempSelectedTags}
+              options={availableTags}
+              renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+              isOptionEqualToValue={(option, value) => option.name === value.name}
+              getOptionLabel={(option) => option.name}
+              filterSelectedOptions
+              disableCloseOnSelect
+              onKeyDown={e => e.key === 'Enter' ? handleCreateTag(e) : null}
+              onChange={(_, newVal) => setTempSelectedTags(newVal)}
+              componentsProps={{
+                popper: {
+                  placement: 'top'
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant='standard'
+                  placeholder='Add tags'
+                  InputProps={{
+                    ...params.InputProps,
+                    style: {
+                      fontSize: 14
+                    },
+                    autoFocus: true
+                  }}
+                />
+              )}
+            />
+          </FormControl>
+          <Box display='flex' alignItems='start' justifyContent='space-between' mt={.5}>
+            <FormHelperText>
+              "&#x23CE;" to create new
+            </FormHelperText>
+            <Button
+              onClick={handleTagsSubmit}
+              size="small">
+              Save
+            </Button>
+          </Box>
+        </Box>
+      </Menu>
 
       <Menu
         className="task-actions-menu"
@@ -519,10 +662,18 @@ export default function FolderView({ folderId }) {
         open={dateDueMenuOpen}
         onClose={() => setDateDueMenuAnchor(null)}>
         <Box>
+          <Box textAlign='right' mb={-2}>
+            <Button
+              onClick={handleClearDateDue}
+              style={{ marginRight: '5px' }}>
+              clear
+            </Button>
+          </Box>
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <StaticDatePicker
+              value={editingTask?.date_due}
               renderInput={() => { }}
-              onChange={() => { }}
+              onChange={handleDateDueSubmit}
               displayStaticWrapperAs="desktop"
             />
           </LocalizationProvider>
@@ -573,12 +724,14 @@ export default function FolderView({ folderId }) {
               color="secondary">
               Assign to me
             </Button>
-            <Button size="small">
+            <Button
+              onClick={handleClearAssignee}
+              hidden={!editingTask?.assigned_to_id}
+              size="small">
               clear
             </Button>
           </Box>
         </Box>
-
       </Menu>
 
       <Menu

@@ -127,8 +127,7 @@ export default function TaskDrawer(props) {
       setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
       setSelectedTags(tagIds.map(tagId => ({
         id: Number(tagId),
-        name: tagIdNameMap[tagId],
-        engagement_id: engagementId
+        name: tagIdNameMap[tagId]
       })));
     } else {
       setTask(defaultTask);
@@ -151,8 +150,7 @@ export default function TaskDrawer(props) {
 
   const curTags = curTagsIds.map(tagId => ({
     id: Number(tagId),
-    name: tagIdNameMap[tagId],
-    engagement_id: engagementId
+    name: tagIdNameMap[tagId]
   }));
 
   const handleCopyLink = () => {
