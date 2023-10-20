@@ -113,9 +113,9 @@
     }
 
     .edit-icon {
-      position: relative;
-      top: -12px;
-      right: 15px;
+      position: absolute;
+      top: -9px;
+      right: -9px;
       color: #b1b1b1;
       opacity: 0;
     }
@@ -141,6 +141,7 @@
       font-size: inherit;
       cursor: pointer;
       text-wrap: nowrap;
+      flex-grow: 1;
 
       &:hover {
         border: 1px dashed #b1b1b1;
@@ -152,9 +153,9 @@
     }
 
     .edit-icon {
-      position: relative;
-      top: -12px;
-      right: 10px;
+      position: absolute;
+      top: -9px;
+      right: -9px;
       color: #b1b1b1;
       opacity: 0;
     }

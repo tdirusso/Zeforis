@@ -38,7 +38,9 @@ export default function FolderView({ folderId }) {
     tasksMap,
     foldersMap,
     tags,
-    setTags
+    setTags,
+    openDrawer,
+    openModal
   } = useOutletContext();
 
   const engagementId = engagement.id;
@@ -58,6 +60,7 @@ export default function FolderView({ folderId }) {
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
+  const [doAction, setDoAction] = useState(null);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
@@ -331,11 +334,26 @@ export default function FolderView({ folderId }) {
     }
   }, [isEditingName]);
 
+  useEffect(() => {
+    if (doAction) {
+      if (doAction === 'quickview') {
+        const taskCopy = { ...editingTask };
+        openDrawer('task', { taskProp: taskCopy });
+      } else if (doAction === 'deleteTask') {
+        openModal('delete-tasks', { taskIds: [editingTask.task_id] });
+      }
+
+      setDoAction(null);
+    }
+  }, [doAction]);
+
   return (
     <Grid item xs={9.5}>
       <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
-        <Paper sx={{ p: 2, overflowX: 'auto' }}>
-          <h5>{folder.name}</h5>
+        <Paper sx={{ p: 0, overflowX: 'auto' }}>
+          <Box>
+            <h5>{folder.name}</h5>
+          </Box>
           <Table size="small" className="folder-tasks-table">
             <TableHead>
               <TableRow style={{ paddingBottom: '1.5rem' }}>
@@ -345,7 +363,7 @@ export default function FolderView({ folderId }) {
                     checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
                   />
                 </TableCell>
-                <TableCell style={{ width: '350px' }} onClick={() => setSortBy('name')}>
+                <TableCell style={{ width: '350px', paddingLeft: 45 }} onClick={() => setSortBy('name')}>
                   <Box className="flex-ac">
                     Name <FilterListRoundedIcon
                       fontSize="small"
@@ -411,12 +429,12 @@ export default function FolderView({ folderId }) {
                   const tagsArray = task.tags?.split(',').filter(Boolean) || [];
                   const isSelectedRow = selectedTasks.includes(task.task_id);
 
-                  let taskName = task.task_name;
+                  const taskIsBeingEditted = editingTask?.task_id === task.task_id;
+
+                  let taskName = (taskIsBeingEditted ? editingTask : task).task_name;
                   if (taskName.length > 100) {
                     taskName = taskName.substring(0, 100) + '...';
                   }
-
-                  const taskIsBeingEditted = editingTask?.task_id === task.task_id;
 
                   return (
                     <TableRow
@@ -428,8 +446,8 @@ export default function FolderView({ folderId }) {
                       <TableCell hidden={!isEditMode}>
                         <Checkbox checked={isSelectedRow} />
                       </TableCell>
-                      <TableCell scope="row" className="task-name-cell" style={{ paddingLeft: 0 }}>
-                        <Box className="flex-ac" gap="5px" flexGrow={1}>
+                      <TableCell scope="row" className="task-name-cell" style={{ paddingLeft: 5 }}>
+                        <Box className="flex-ac" gap="5px" flexGrow={1} position='relative'>
                           <Box className="key-task-cell">
                             {
                               task.is_key_task ?
@@ -479,11 +497,7 @@ export default function FolderView({ folderId }) {
                                   className="name-text"
                                   width='100%'
                                   onClick={() => handleEditNameClick(task)}>
-                                  {
-                                    taskIsBeingEditted ?
-                                      editingTask.task_name :
-                                      taskName
-                                  }
+                                  {taskName}
                                 </Box>
                                 <EditRoundedIcon
                                   fontSize="small"
@@ -531,7 +545,7 @@ export default function FolderView({ folderId }) {
 
                       </TableCell>
                       <TableCell className="task-due-cell">
-                        <Box className="flex-ac">
+                        <Box className="flex-ac" position='relative'>
                           <Typography
                             onClick={e => handleDateDueClick(e, task)}
                             className="due-text"
@@ -568,7 +582,7 @@ export default function FolderView({ folderId }) {
                           onClick={e => handleAddTagClick(e, task)}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell style={{ paddingRight: 5 }}>
                         <Tooltip title="More">
                           <IconButton
                             size="small"
@@ -656,7 +670,12 @@ export default function FolderView({ folderId }) {
         anchorEl={taskActionsMenuAnchor}
         open={taskActionsMenuOpen}
         onClose={() => setTaskActionsMenuAnchor(null)}>
-        <MenuItem dense>
+        <MenuItem
+          dense
+          onClick={() => {
+            setDoAction('quickview');
+            setTaskActionsMenuAnchor(null);
+          }}>
           <EastRoundedIcon fontSize="small" />
           Quick view
         </MenuItem>
@@ -665,13 +684,34 @@ export default function FolderView({ folderId }) {
           Full view
         </MenuItem>
         <Divider className="m0" />
-        <MenuItem dense>
-          <OpenInNewIcon fontSize="small" style={{ fontSize: 17, width: 20 }} />
-          Open resource
-        </MenuItem>
-        <Divider className="m0" />
-        <MenuItem dense>
-          <ListItemText inset color="error">
+        {
+          editingTask?.link_url ?
+            <Box>
+              <MenuItem
+                onClick={() => setTaskActionsMenuAnchor(null)}
+                style={{ color: 'inherit' }}
+                dense
+                component="a"
+                href={editingTask.link_url} target="_blank">
+                <OpenInNewIcon
+                  fontSize="small"
+                  style={{ fontSize: 17, width: 20 }} />
+                Open resource
+              </MenuItem>
+              <Divider className="m0" />
+            </Box>
+            :
+            null
+        }
+        <MenuItem
+          dense
+          onClick={() => {
+            setDoAction('deleteTask');
+            setTaskActionsMenuAnchor(null);
+          }}>
+          <ListItemText
+            inset
+            color="error">
             <Typography color="error" component="span">
               Delete task
             </Typography>

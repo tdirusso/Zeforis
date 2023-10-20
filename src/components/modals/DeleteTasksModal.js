@@ -40,13 +40,17 @@ export default function DeleteTasksModal(props) {
         const deletedLength = taskIds.length;
 
         setTimeout(() => {
-          openSnackBar(`Successully deleted ${deletedLength} tasks.`, 'success');
+          openSnackBar(`Deleted ${deletedLength} tasks.`, 'success');
         }, 250);
 
         taskIds.forEach(id => delete tasksMap[id]);
 
         setTasks(Object.values(tasksMap));
-        setSelectedTasks([]);
+
+        if (setSelectedTasks) {
+          setSelectedTasks([]);
+        }
+
         handleClose();
       } else {
         openSnackBar(resultMessage, 'error');
@@ -67,7 +71,15 @@ export default function DeleteTasksModal(props) {
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={handleClose} className='modal'>
+      <Dialog
+        PaperProps={{
+          style: {
+            padding: 0
+          }
+        }}
+        open={isOpen}
+        onClose={handleClose}
+        className='modal'>
         <DialogTitle>
           Delete Tasks
         </DialogTitle>
