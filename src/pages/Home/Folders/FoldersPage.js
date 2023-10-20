@@ -325,7 +325,7 @@ function FolderList(props) {
   return (
     <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
       <Paper sx={{ px: 0, py: 1.5 }}>
-        <Box className="flex-ac" px={viewingFolderId ? 1.5 : 3} gap={3}>
+        <Box className="flex-ac" px={viewingFolderId ? 1.5 : 3} gap={3} flexWrap='wrap'>
           <Tooltip title="New folder" placement="bottom-end">
             <Box
               hidden={!isAdmin}

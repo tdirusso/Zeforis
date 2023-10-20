@@ -23,6 +23,7 @@ import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
 import { updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
+import CancelIcon from '@mui/icons-material/Cancel';
 
 export default function FolderView({ folderId }) {
 
@@ -55,6 +56,7 @@ export default function FolderView({ folderId }) {
   const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
   const [tempAssignee, setTempAssignee] = useState(null);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
+  const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
@@ -98,9 +100,13 @@ export default function FolderView({ folderId }) {
           name: tagsMap[tagId].name
         }));
 
-        const allTags = tempSelectedTags.length === 0 ?
+        let allTags = tempSelectedTags.length === 0 ?
           currentTags :
           [...currentTags, ...tempSelectedTags];
+
+        if (tagIdToRemove) {
+          allTags = allTags.filter(tag => tag.id !== tagIdToRemove);
+        }
 
         const { message, success } = await updateTask({
           name: editingTask.task_name,
@@ -142,18 +148,20 @@ export default function FolderView({ folderId }) {
           setDoUpdate(false);
           setEditingName(false);
           setTempSelectedTags([]);
-
+          setTagIdToRemove(null);
           openSnackBar('Saved.', 'success');
         } else {
           setEditingTask(null);
           setDoUpdate(false);
           setTempSelectedTags([]);
+          setTagIdToRemove(null);
           openSnackBar(message, 'error');
         }
       } catch (error) {
         setEditingTask(null);
         setDoUpdate(false);
         setTempSelectedTags([]);
+        setTagIdToRemove(null);
         openSnackBar(error.message, 'error');
       }
     }
@@ -310,6 +318,12 @@ export default function FolderView({ folderId }) {
     setTagsMenuAnchor(null);
   };
 
+  const handleRemoveTag = async (tagId, task) => {
+    setTagIdToRemove(Number(tagId));
+    setEditingTask(task);
+    setDoUpdate(true);
+  };
+
   useEffect(() => {
     if (isEditingName) {
       nameRef.current.focus();
@@ -320,7 +334,7 @@ export default function FolderView({ folderId }) {
   return (
     <Grid item xs={9.5}>
       <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ p: 2, overflowX: 'auto' }}>
           <h5>{folder.name}</h5>
           <Table size="small" className="folder-tasks-table">
             <TableHead>
@@ -517,22 +531,30 @@ export default function FolderView({ folderId }) {
 
                       </TableCell>
                       <TableCell className="task-due-cell">
-                        <Typography
-                          onClick={e => handleDateDueClick(e, task)}
-                          className="due-text"
-                          color={dateDueColor}>
-                          {
-                            dateDueText
-                          }
-                        </Typography>
-                        <EditRoundedIcon
-                          fontSize="small"
-                          className="edit-icon"
-                        />
+                        <Box className="flex-ac">
+                          <Typography
+                            onClick={e => handleDateDueClick(e, task)}
+                            className="due-text"
+                            color={dateDueColor}>
+                            {
+                              dateDueText
+                            }
+                          </Typography>
+                          <EditRoundedIcon
+                            fontSize="small"
+                            className="edit-icon"
+                          />
+                        </Box>
                       </TableCell>
                       <TableCell className="task-tags-cell">{
                         tagsArray.map(tagId =>
                           <Chip
+                            deleteIcon={
+                              <Tooltip title="Remove tag">
+                                <CancelIcon />
+                              </Tooltip>
+                            }
+                            onDelete={() => handleRemoveTag(tagId, task)}
                             className="chip"
                             key={tagId}
                             label={tagsMap[tagId].name}
