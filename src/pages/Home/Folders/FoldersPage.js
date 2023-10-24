@@ -102,60 +102,63 @@ export default function FoldersPage() {
 
   useEffect(() => {
     let foldersUpdated = false;
+    let queryUpdated = query !== prevQuery.current;
 
-    if (query === prevQuery.current) {
+    if (!queryUpdated) {
       foldersUpdated = JSON.stringify(prevFolders.current) !== JSON.stringify(folders);
     } else {
       prevQuery.current = query;
     }
 
-    const tempOpenStates = {};
-    let filteredKeyFolders = [];
-    let filteredOtherFolders = [];
+    if ((queryUpdated || foldersUpdated) || !renderReady) {
+      const tempOpenStates = {};
+      let filteredKeyFolders = [];
+      let filteredOtherFolders = [];
 
-    const lcQuery = query?.toLowerCase();
+      const lcQuery = query?.toLowerCase();
 
-    folders.forEach(folder => {
-      if (!folder.parent_id) {
-        if (folder.is_key_folder) {
-          filteredKeyFolders.push(folder);
-        } else {
-          filteredOtherFolders.push(folder);
+      folders.forEach(folder => {
+        if (!folder.parent_id) {
+          if (folder.is_key_folder) {
+            filteredKeyFolders.push(folder);
+          } else {
+            filteredOtherFolders.push(folder);
+          }
         }
+      });
+
+      if (lcQuery) {
+        folders.forEach((folder) => {
+          if (folder.name.toLowerCase().includes(lcQuery)) {
+            openAllAncestors(folder.id, tempOpenStates);
+          }
+        });
+
+        filteredKeyFolders = filteredKeyFolders.filter((folder) => {
+          return (
+            tempOpenStates[folder.id]
+          );
+        });
+
+        filteredOtherFolders = filteredOtherFolders.filter((folder) => {
+          return (
+            tempOpenStates[folder.id]
+          );
+        });
       }
-    });
 
-    if (lcQuery) {
-      folders.forEach((folder) => {
-        if (folder.name.toLowerCase().includes(lcQuery)) {
-          openAllAncestors(folder.id, tempOpenStates);
-        }
-      });
+      setKeyFolders(filteredKeyFolders);
+      setOtherFolders(filteredOtherFolders);
 
-      filteredKeyFolders = filteredKeyFolders.filter((folder) => {
-        return (
-          tempOpenStates[folder.id]
-        );
-      });
+      if ((!foldersUpdated && lcQuery)) {
+        setOpenStates(tempOpenStates);
+      } else {
+        prevFolders.current = folders;
+      }
 
-      filteredOtherFolders = filteredOtherFolders.filter((folder) => {
-        return (
-          tempOpenStates[folder.id]
-        );
-      });
-    }
-
-    setKeyFolders(filteredKeyFolders);
-    setOtherFolders(filteredOtherFolders);
-
-    if ((!foldersUpdated && lcQuery)) {
-      setOpenStates(tempOpenStates);
-    } else {
-      prevFolders.current = folders;
-    }
-
-    if (!renderReady) {
-      setRenderReady(true);
+      if (!renderReady) {
+        setRenderReady(true);
+      }
     }
   }, [query, folders]);
 

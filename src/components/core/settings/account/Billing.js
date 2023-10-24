@@ -14,6 +14,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import AlertTitle from "@mui/material/AlertTitle/AlertTitle";
+import '../styles.scss';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
 

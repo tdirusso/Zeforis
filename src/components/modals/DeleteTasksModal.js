@@ -45,12 +45,11 @@ export default function DeleteTasksModal(props) {
 
         taskIds.forEach(id => delete tasksMap[id]);
 
-        setTasks(Object.values(tasksMap));
-
         if (setSelectedTasks) {
           setSelectedTasks([]);
         }
 
+        setTasks(Object.values(tasksMap));
         handleClose();
       } else {
         openSnackBar(resultMessage, 'error');

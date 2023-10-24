@@ -311,6 +311,13 @@ body.dark .app-scrollable {
   }
 }
 
+.widget {
+  img {
+    max-height: 250px;
+    border-radius: 6px;
+  }
+}
+
 @media screen and (max-width: 550px) {
   .wrap-on-small {
     flex-wrap: wrap;

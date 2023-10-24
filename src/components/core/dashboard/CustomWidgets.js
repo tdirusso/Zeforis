@@ -52,30 +52,11 @@ export default function CustomWidgets({ widgets }) {
                       in={expanded}
                       appear={false}
                       style={{ transitionDelay: `${index * 100}ms` }}>
-                      <Paper style={{
+                      <Paper className="widget" style={{
                         minHeight: '250px',
                         background: widget.backgroundColor
                       }}>
-                        <Box
-                          color={widget.textColor}
-                          component="h5"
-                          mb={1}>{widget.title}
-                        </Box>
-                        <TextField
-                          className="readonly-textfield"
-                          fullWidth
-                          inputProps={{
-                            style: {
-                              color: widget.textColor,
-                              fontWeight: 400,
-                              fontSize: '0.875rem'
-                            }
-                          }}
-                          InputProps={{ readOnly: true }}
-                          variant="standard"
-                          value={widget.body}
-                          multiline>
-                        </TextField>
+                        <div dangerouslySetInnerHTML={{ __html: widget.body }}></div>
                       </Paper>
                     </Grow>
                   </Grid>

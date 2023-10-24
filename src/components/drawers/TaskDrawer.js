@@ -113,6 +113,7 @@ export default function TaskDrawer(props) {
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const deleteMenuOpen = Boolean(deleteMenuAnchor);
 
+
   useEffect(() => {
     if (taskProp) {
       const tagIds = taskProp.tags?.split(',').filter(Boolean) || [];
@@ -489,7 +490,10 @@ export default function TaskDrawer(props) {
 
         <Divider style={{ marginTop: '2rem' }} />
         <Box my={3}>
-          <TextField
+          <Box ref={descriptionTextarea}>
+
+          </Box>
+          {/* <TextField
             disabled={isLoading}
             fullWidth
             placeholder='Description'
@@ -501,7 +505,7 @@ export default function TaskDrawer(props) {
             onChange={e => setDescription(e.target.value)}
             InputProps={{ readOnly: !isAdmin }}
             className={!isAdmin ? 'readonly-textfield' : ''}
-          />
+          /> */}
         </Box>
         <Divider />
         <Box my={4}>

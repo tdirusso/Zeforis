@@ -3,11 +3,9 @@ const { pool } = require('../../../database');
 module.exports = async (req, res, next) => {
   const {
     name,
-    title = '',
     body = '',
     isEnabled = 0,
     backgroundColor = '#ffffff',
-    textColor = '#000000'
   } = req.body;
 
   const { engagementId } = req;
@@ -24,15 +22,13 @@ module.exports = async (req, res, next) => {
         (
           engagement_id,
           name,
-          title,
           body, 
           is_enabled, 
-          background_color,
-          text_color
+          background_color
         ) 
         VALUES
-        (?,?,?,?,?,?,?)`,
-      [engagementId, name, title, body, isEnabled, backgroundColor, textColor]
+        (?,?,?,?,?)`,
+      [engagementId, name, body, isEnabled, backgroundColor]
     );
 
     const newWidgetId = newWidget[0].insertId;
@@ -41,11 +37,9 @@ module.exports = async (req, res, next) => {
       id: newWidgetId,
       engagementId,
       name,
-      title,
       body,
       isEnabled,
-      backgroundColor,
-      textColor
+      backgroundColor
     };
 
     return res.json({

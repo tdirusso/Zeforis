@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { LoadingButton } from "@mui/lab";
 import { Box, Divider, FormControlLabel, FormGroup, Grid, IconButton, List, ListItem, ListItemButton, ListItemText, ListSubheader, Menu, Paper, Switch, TextField, Tooltip, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChromePicker } from "react-color";
 import { useOutletContext } from "react-router-dom";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { createWidget, deleteWidget, updateWidget } from "../../../api/widgets";
 import './styles.scss';
+import Quill from "quill";
+import ImageCompress from 'quill-image-compress';
 
 export default function WidgetsTab() {
 
@@ -18,38 +20,66 @@ export default function WidgetsTab() {
   } = useOutletContext();
 
   const [widgetName, setWidgetName] = useState('');
-  const [widgetTitle, setWidgetTitle] = useState('');
   const [widgetBody, setWidgetBody] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-  const [textColor, setTextColor] = useState('#000000');
   const [bgColorMenu, setBgColorMenu] = useState(null);
-  const [textColorMenu, setTextColorMenu] = useState(null);
   const [isEnabled, setIsEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
   const [selectedWidget, setSelectedWidget] = useState(null);
 
+  const widgetEditor = useRef();
+
   const bgColorMenuOpen = Boolean(bgColorMenu);
-  const textColorMenuOpen = Boolean(textColorMenu);
 
   const deleteMenuOpen = Boolean(deleteMenuAnchor);
+
+  useEffect(() => {
+    Quill.register('modules/imageCompress', ImageCompress);
+
+    window.quillEditor = new Quill(widgetEditor.current, {
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline'],
+          ['link', 'image'],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          [{ 'align': [] }],
+          [{ 'color': [] }, { 'background': [] }],
+        ],
+        imageCompress: {
+          quality: 0.7,
+          maxWidth: 250,
+          maxHeight: 200,
+          imageType: 'image/jpeg',
+          debug: true,
+          suppressErrorLogging: false,
+          insertIntoEditor: undefined,
+        }
+      },
+      placeholder: 'Compose your widget...',
+      theme: 'snow'
+    });
+
+    window.quillEditor.on('text-change', () => {
+      setWidgetBody(window.quillEditor.root.innerHTML);
+    });
+  }, []);
 
   useEffect(() => {
     if (selectedWidget) {
       if (selectedWidget.id === 'new') {
         setWidgetName('');
-        setWidgetTitle('');
         setWidgetBody('');
         setBackgroundColor('#FFFFFF');
-        setTextColor('#000000');
         setIsEnabled(true);
+        window.quillEditor.root.innerHTML = '';
       } else {
         setWidgetName(selectedWidget.name);
-        setWidgetTitle(selectedWidget.title);
         setWidgetBody(selectedWidget.body);
         setBackgroundColor(selectedWidget.backgroundColor);
-        setTextColor(selectedWidget.textColor);
         setIsEnabled(Boolean(selectedWidget.isEnabled));
+        window.quillEditor.clipboard.dangerouslyPasteHTML(selectedWidget.body);
       }
     }
   }, [selectedWidget]);
@@ -66,10 +96,8 @@ export default function WidgetsTab() {
       const { widget, message } = await createWidget({
         engagementId: engagement.id,
         name: widgetName,
-        title: widgetTitle,
         body: widgetBody,
         backgroundColor,
-        textColor,
         isEnabled
       });
 
@@ -101,10 +129,8 @@ export default function WidgetsTab() {
         widgetId: selectedWidget.id,
         engagementId: engagement.id,
         name: widgetName,
-        title: widgetTitle,
         body: widgetBody,
         backgroundColor,
-        textColor,
         isEnabled
       };
 
@@ -164,7 +190,7 @@ export default function WidgetsTab() {
         <Paper className="widgets-tab">
           <Typography variant="body2">
             The Widget Creator allows you to create personalized widgets that will display on your customer's dashboard.
-            Customize titles, content, and design to enhance communication that engages and informs your customer's.
+            Customize content and design to enhance communication that engages and informs your customer's.
           </Typography>
         </Paper>
       </Grid>
@@ -236,21 +262,6 @@ export default function WidgetsTab() {
                     ml={0.75}>
                   </Box>
                 </Box>
-                <Box display='flex'>
-                  <Typography>Text color</Typography>
-                  <Box
-                    style={{
-                      cursor: 'pointer',
-                      background: textColor
-                    }}
-                    onClick={e => setTextColorMenu(e.currentTarget)}
-                    width={25}
-                    height={25}
-                    border="1px solid #9c9c9c"
-                    borderRadius="4px"
-                    ml={0.75}>
-                  </Box>
-                </Box>
               </Box>
             </Box>
             <Box mb={2}>
@@ -263,27 +274,9 @@ export default function WidgetsTab() {
                 label='Widget name'>
               </TextField>
             </Box>
-            <Box mb={3}>
-              <TextField
-                fullWidth
-                value={widgetTitle}
-                disabled={loading}
-                variant="standard"
-                onChange={e => setWidgetTitle(e.target.value)}
-                label='Widget title'>
-              </TextField>
-            </Box>
-            <Box mb={5}>
-              <TextField
-                disabled={loading}
-                value={widgetBody}
-                inputProps={{ style: { resize: 'vertical' } }}
-                fullWidth
-                variant="standard"
-                multiline
-                onChange={e => setWidgetBody(e.target.value)}
-                label='Widget body'>
-              </TextField>
+            <Box mb={5} mt={5}>
+              <Box ref={widgetEditor}>
+              </Box>
             </Box>
             <Box display='flex' justifyContent='space-between'>
               <LoadingButton
@@ -306,30 +299,11 @@ export default function WidgetsTab() {
           </Box>
 
           <Box style={{ flexBasis: '50%', padding: '25px' }}>
-            <Paper style={{
+            <Paper className="widget" style={{
               minHeight: '250px',
               background: backgroundColor
             }}>
-              <Box
-                style={{ color: textColor, marginBottom: '8px' }}
-                component="h5">
-                {widgetTitle}
-              </Box>
-              <TextField
-                className="readonly-textfield"
-                fullWidth
-                inputProps={{
-                  style: {
-                    color: textColor,
-                    fontWeight: 400,
-                    fontSize: '0.875rem'
-                  }
-                }}
-                InputProps={{ readOnly: true }}
-                variant="standard"
-                value={widgetBody}
-                multiline>
-              </TextField>
+              <div dangerouslySetInnerHTML={{ __html: widgetBody }}></div>
             </Paper>
           </Box>
         </Paper>
@@ -352,28 +326,6 @@ export default function WidgetsTab() {
           color={backgroundColor}
           disableAlpha
           onChange={color => setBackgroundColor(color.hex)}
-        />
-      </Menu>
-
-      <Menu
-        className="color-picker-menu"
-        PaperProps={{ className: 'widget-color-picker-menu' }}
-        anchorEl={textColorMenu}
-        open={textColorMenuOpen}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={() => setTextColorMenu(null)}>
-
-        <ChromePicker
-          color={textColor}
-          disableAlpha
-          onChange={color => setTextColor(color.hex)}
         />
       </Menu>
 

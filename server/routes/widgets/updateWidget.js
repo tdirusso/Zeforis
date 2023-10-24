@@ -4,11 +4,9 @@ module.exports = async (req, res, next) => {
   const {
     widgetId,
     name,
-    title,
     body,
     isEnabled,
-    backgroundColor,
-    textColor
+    backgroundColor
   } = req.body;
 
   if (!name || !widgetId) {
@@ -22,14 +20,12 @@ module.exports = async (req, res, next) => {
       `
         UPDATE widgets SET 
           name = ?,
-          title = ?,
           body = ?,
           is_enabled = ?,
-          background_color = ?,
-          text_color = ?
+          background_color = ?
         WHERE id = ?
       `,
-      [name, title, body, isEnabled, backgroundColor, textColor, widgetId]
+      [name, body, isEnabled, backgroundColor, widgetId]
     );
 
     return res.json({
