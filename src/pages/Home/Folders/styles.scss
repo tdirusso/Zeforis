@@ -68,8 +68,13 @@
 }
 
 .folder-tasks-table {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding: 0 !important;
+
   .task-select-cell {
-    flex-basis: 3%;
+    width: 10px;
   }
 
   .MuiListItem-root {
@@ -77,22 +82,27 @@
     padding-right: 0;
   }
 
-  .MuiCollapse-wrapperInner {
+  .MuiCollapse-root {
+    border-bottom: 1px solid #e4e4e4;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
+
+  .row-wrapper {
     display: flex;
     align-items: center;
-    gap: 15px;
-  }
+    //gap: 15px;
+    padding: 3px 0;
 
-  td {
-    position: relative;
-  }
-
-  tr:last-child td {
-    border-bottom: none;
+    &>div {
+      flex-shrink: 0;
+    }
   }
 
   .task-tags-cell {
-    flex-basis: 30%;
+    width: 250px;
 
     &:hover {
       .new-chip {
@@ -114,11 +124,11 @@
   }
 
   .task-status-cell {
-    flex-basis: 12%;
+    width: 130px;
   }
 
   .task-name-cell {
-    flex-basis: 38%;
+    width: 450px;
 
     .name-text {
       border: 1px dashed transparent;
@@ -156,8 +166,7 @@
   }
 
   .task-due-cell {
-    flex-basis: 10%;
-    padding-left: 7px;
+    width: 90px;
 
     .due-text {
       border: 1px dashed transparent;
@@ -188,7 +197,7 @@
   }
 
   .task-assigned-cell {
-    flex-basis: 5%;
+    width: 50px;
 
     .MuiAvatar-root {
       height: 30px;

@@ -52,8 +52,8 @@ export default function WidgetsTab() {
           maxWidth: 250,
           maxHeight: 200,
           imageType: 'image/jpeg',
-          debug: true,
-          suppressErrorLogging: false,
+          debug: false,
+          suppressErrorLogging: true,
           insertIntoEditor: undefined,
         }
       },

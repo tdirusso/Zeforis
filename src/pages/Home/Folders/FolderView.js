@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Paper, Fade, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem } from "@mui/material";
+import { Grid, Paper, Fade, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem, Grow } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { statuses } from "../../../lib/constants";
@@ -69,7 +69,8 @@ export default function FolderView({ folderId }) {
   const now = moment();
   const tomorrow = moment().add(1, 'day');
 
-  const membersAndAdmins = [...engagementAdmins, ...engagementMembers];
+  const membersAndAdmins = useMemo(() => [...engagementAdmins, ...engagementMembers],
+    [engagementAdmins, engagementMembers]);
 
   const editingTaskTagIds = editingTask?.tags?.split(',').filter(Boolean).map(id => Number(id)) || [];
 
@@ -343,8 +344,6 @@ export default function FolderView({ folderId }) {
     }
   }, [doAction]);
 
-  const filteredTasksLength = filteredTasks.length;
-
   return (
     <Grid item xs={9.5}>
       <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
@@ -391,161 +390,165 @@ export default function FolderView({ folderId }) {
 
                 return (
                   <Collapse
-                    component={ListItem}
-                    divider={index < filteredTasksLength - 1}
+                    in
+                    unmountOnExit
+                    component={Box}
                     onClick={() => handleTaskSelection(task)}
                     key={task.task_id}
-                    className={isSelectedRow ? 'selected' : ''}
-                    style={{ position: 'relative', }}>
-                    <Box className="task-select-cell" hidden={!isEditMode}>
-                      <Checkbox checked={isSelectedRow} />
-                    </Box>
-                    <Box className="task-name-cell" style={{ paddingLeft: 5 }}>
-                      <Box className="flex-ac" gap="5px" flexGrow={1} position='relative'>
-                        <Box className="key-task-cell">
+                    //className={isSelectedRow ? 'selected' : ''}
+                    style={{ position: 'relative', }}
+                  >
+                    <Box className="row-wrapper">
+                      <Box className="task-select-cell" hidden={!isEditMode}>
+                        <Checkbox checked={isSelectedRow} />
+                      </Box>
+                      <Box className="task-name-cell" style={{ paddingLeft: 5 }}>
+                        <Box className="flex-ac" gap="5px" flexGrow={1} position='relative'>
+                          <Box className="key-task-cell">
+                            {
+                              task.is_key_task ?
+                                <Tooltip title="Toggle key task">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleToggleKeyTask(task)}>
+                                    <StarIcon
+                                      style={{ fontSize: 16 }}
+                                      htmlColor="gold"
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                                :
+                                <Tooltip title="Toggle key task">
+                                  <IconButton
+                                    onClick={() => handleToggleKeyTask(task)}
+                                    size="small"
+                                    className="set-key-task-btn" >
+                                    <StarOutlineOutlinedIcon
+                                      style={{ fontSize: 16 }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                            }
+                          </Box>
                           {
-                            task.is_key_task ?
-                              <Tooltip title="Toggle key task">
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleToggleKeyTask(task)}>
-                                  <StarIcon
-                                    style={{ fontSize: 16 }}
-                                    htmlColor="gold"
-                                  />
-                                </IconButton>
-                              </Tooltip>
+                            isEditingName && editingTask.task_id === task.task_id ?
+                              <TextField
+                                multiline
+                                variant="standard"
+                                inputProps={{
+                                  style: {
+                                    fontSize: 14,
+                                    padding: '0 8px'
+                                  }
+                                }}
+                                fullWidth
+                                size="small"
+                                inputRef={nameRef}
+                                defaultValue={editingTask.task_name}
+                                onKeyDown={handleNameSubmit}
+                              />
                               :
-                              <Tooltip title="Toggle key task">
-                                <IconButton
-                                  onClick={() => handleToggleKeyTask(task)}
-                                  size="small"
-                                  className="set-key-task-btn" >
-                                  <StarOutlineOutlinedIcon
-                                    style={{ fontSize: 16 }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
+                              <>
+                                <Box
+                                  className="name-text"
+                                  width='100%'
+                                  onClick={() => handleEditNameClick(task)}>
+                                  {taskName}
+                                </Box>
+                                <EditRoundedIcon
+                                  fontSize="small"
+                                  className="edit-icon"
+                                />
+                              </>
                           }
                         </Box>
-                        {
-                          isEditingName && editingTask.task_id === task.task_id ?
-                            <TextField
-                              multiline
-                              variant="standard"
-                              inputProps={{
-                                style: {
-                                  fontSize: 14,
-                                  padding: '0 8px'
-                                }
-                              }}
-                              fullWidth
-                              size="small"
-                              inputRef={nameRef}
-                              defaultValue={editingTask.task_name}
-                              onKeyDown={handleNameSubmit}
-                            />
-                            :
-                            <>
-                              <Box
-                                className="name-text"
-                                width='100%'
-                                onClick={() => handleEditNameClick(task)}>
-                                {taskName}
-                              </Box>
-                              <EditRoundedIcon
-                                fontSize="small"
-                                className="edit-icon"
-                              />
-                            </>
-                        }
                       </Box>
-                    </Box>
-                    <Box className="task-status-cell">
-                      <Chip
-                        size="small"
-                        label={task.status}
-                        deleteIcon={<MoreVertIcon fontSize="small" />}
-                        onClick={e => handleStatusClick(e, task)}
-                        onDelete={e => handleStatusClick(e, task)}
-                        className={task.status}>
-                      </Chip>
-                    </Box>
-                    <Box className="task-assigned-cell">
-                      {
-                        task.assigned_to_id ?
-                          <Tooltip title={`${task.assigned_first} ${task.assigned_last}`}>
-                            <IconButton
-                              onClick={e => handleAssigneeClick(e, task)}
-                              size="small"
-                              className="assigned-btn">
-                              {
-                                <Avatar>
-                                  {task.assigned_first[0]}{task.assigned_last[0]}
-                                </Avatar>
-                              }
-                            </IconButton>
-                          </Tooltip>
-                          :
-                          <Tooltip title="Assign task">
-                            <IconButton
-                              onClick={e => handleAssigneeClick(e, task)}
-                              size="small"
-                              className="unassigned-btn">
-                              <PersonOutlineIcon />
-                            </IconButton>
-                          </Tooltip>
-                      }
+                      <Box className="task-status-cell">
+                        <Chip
+                          size="small"
+                          label={task.status}
+                          deleteIcon={<MoreVertIcon fontSize="small" />}
+                          onClick={e => handleStatusClick(e, task)}
+                          onDelete={e => handleStatusClick(e, task)}
+                          className={task.status}>
+                        </Chip>
+                      </Box>
+                      <Box className="task-assigned-cell">
+                        {
+                          task.assigned_to_id ?
+                            <Tooltip title={`${task.assigned_first} ${task.assigned_last}`}>
+                              <IconButton
+                                onClick={e => handleAssigneeClick(e, task)}
+                                size="small"
+                                className="assigned-btn">
+                                {
+                                  <Avatar>
+                                    {task.assigned_first[0]}{task.assigned_last[0]}
+                                  </Avatar>
+                                }
+                              </IconButton>
+                            </Tooltip>
+                            :
+                            <Tooltip title="Assign task">
+                              <IconButton
+                                onClick={e => handleAssigneeClick(e, task)}
+                                size="small"
+                                className="unassigned-btn">
+                                <PersonOutlineIcon />
+                              </IconButton>
+                            </Tooltip>
+                        }
 
-                    </Box>
-                    <Box className="task-due-cell">
-                      <Box className="flex-ac" position='relative'>
-                        <Typography
-                          onClick={e => handleDateDueClick(e, task)}
-                          className="due-text"
-                          color={dateDueColor}>
-                          {
-                            dateDueText
-                          }
-                        </Typography>
-                        <EditRoundedIcon
-                          fontSize="small"
-                          className="edit-icon"
+                      </Box>
+                      <Box className="task-due-cell">
+                        <Box className="flex-ac" position='relative'>
+                          <Typography
+                            onClick={e => handleDateDueClick(e, task)}
+                            className="due-text"
+                            color={dateDueColor}>
+                            {
+                              dateDueText
+                            }
+                          </Typography>
+                          <EditRoundedIcon
+                            fontSize="small"
+                            className="edit-icon"
+                          />
+                        </Box>
+                      </Box>
+                      <Box className="task-tags-cell">{
+                        tagsArray.map(tagId =>
+                          <Chip
+                            deleteIcon={
+                              <Tooltip title="Remove tag">
+                                <CancelIcon />
+                              </Tooltip>
+                            }
+                            onDelete={() => handleRemoveTag(tagId, task)}
+                            className="chip"
+                            key={tagId}
+                            label={tagsMap[tagId].name}
+                            size="small"
+                          />)}
+                        <Chip
+                          className="new-chip"
+                          size="small"
+                          variant="outlined"
+                          label='+ Tags'
+                          onClick={e => handleAddTagClick(e, task)}
                         />
                       </Box>
-                    </Box>
-                    <Box className="task-tags-cell">{
-                      tagsArray.map(tagId =>
-                        <Chip
-                          deleteIcon={
-                            <Tooltip title="Remove tag">
-                              <CancelIcon />
-                            </Tooltip>
-                          }
-                          onDelete={() => handleRemoveTag(tagId, task)}
-                          className="chip"
-                          key={tagId}
-                          label={tagsMap[tagId].name}
-                          size="small"
-                        />)}
-                      <Chip
-                        className="new-chip"
-                        size="small"
-                        variant="outlined"
-                        label='+ Tags'
-                        onClick={e => handleAddTagClick(e, task)}
-                      />
-                    </Box>
-                    <Box style={{ paddingRight: 5, flexBasis: '2%' }}>
-                      <Tooltip title="More">
-                        <IconButton
-                          size="small"
-                          onClick={e => handleTaskMoreClick(e, task)}>
-                          <MoreVertIcon
-                            fontSize="small"
-                          />
-                        </IconButton>
-                      </Tooltip>
+                      <Box style={{ paddingRight: 5, flexBasis: '2%' }}>
+                        <Tooltip title="More">
+                          <IconButton
+                            size="small"
+                            onClick={e => handleTaskMoreClick(e, task)}>
+                            <MoreVertIcon
+                              fontSize="small"
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </Box>
                   </Collapse>
                 );

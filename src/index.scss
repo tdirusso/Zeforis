@@ -316,6 +316,10 @@ body.dark .app-scrollable {
     max-height: 250px;
     border-radius: 6px;
   }
+
+  p {
+    font-size: 14px;
+  }
 }
 
 @media screen and (max-width: 550px) {
