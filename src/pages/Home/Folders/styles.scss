@@ -68,13 +68,23 @@
 }
 
 .folder-tasks-table {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
+  display: table;
   padding: 0 !important;
+  width: 100%;
+
+  .table-header {
+    font-size: 14px;
+    font-weight: 600;
+
+    .row-wrapper>div {
+      cursor: pointer;
+    }
+  }
 
   .task-select-cell {
-    width: 10px;
+    width: 0px;
+    overflow: hidden;
+    transition: width 150ms;
   }
 
   .MuiListItem-root {
@@ -84,6 +94,8 @@
 
   .MuiCollapse-root {
     border-bottom: 1px solid #e4e4e4;
+    width: 100%;
+    will-change: height;
 
     &:last-of-type {
       border-bottom: none;
@@ -93,12 +105,20 @@
   .row-wrapper {
     display: flex;
     align-items: center;
-    //gap: 15px;
-    padding: 3px 0;
+    gap: 8px;
+    padding: 5px 0;
 
-    &>div {
-      flex-shrink: 0;
+    &.edit-mode {
+      .task-select-cell {
+        width: 38px;
+      }
     }
+  }
+
+  .task-more-cell {
+    padding-right: 5px;
+    flex-grow: 1;
+    text-align: end;
   }
 
   .task-tags-cell {
@@ -128,7 +148,7 @@
   }
 
   .task-name-cell {
-    width: 450px;
+    width: 350px;
 
     .name-text {
       border: 1px dashed transparent;
@@ -166,7 +186,7 @@
   }
 
   .task-due-cell {
-    width: 90px;
+    width: 100px;
 
     .due-text {
       border: 1px dashed transparent;
@@ -197,7 +217,7 @@
   }
 
   .task-assigned-cell {
-    width: 50px;
+    width: 125px;
 
     .MuiAvatar-root {
       height: 30px;
@@ -272,5 +292,36 @@ body.dark {
     .folder-icon {
       color: #646464;
     }
+  }
+
+  .folder-tasks-table {
+    .MuiCollapse-root {
+      border-bottom: 1px solid #575757;
+    }
+  }
+}
+
+.folder-tasks-wrapper {
+  animation: fadeIn 250ms;
+  animation-delay: 260ms;
+  padding: 0 !important;
+  overflow-x: auto;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.folder-tasks-header {
+  padding: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

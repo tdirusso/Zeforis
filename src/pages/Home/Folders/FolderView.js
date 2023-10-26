@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Paper, Fade, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem, Grow } from "@mui/material";
+import { Grid, Paper, Fade, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem, Grow, Slide, Zoom } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -20,6 +20,9 @@ import { updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from "react-transition-group";
+import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 
 export default function FolderView({ folderId }) {
 
@@ -42,7 +45,7 @@ export default function FolderView({ folderId }) {
   const engagementId = engagement.id;
   const folder = foldersMap[folderId];
 
-  const [isEditMode, setEditMode] = useState(false);
+  const [isBulkEditMode, setBulkEditMode] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [sortBy, setSortBy] = useState('name');
   const [editingTask, setEditingTask] = useState(null);
@@ -57,6 +60,38 @@ export default function FolderView({ folderId }) {
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
   const [doAction, setDoAction] = useState(null);
+
+  const folderTasks = useMemo(() => {
+    const theTasks = folder.tasks;
+
+    switch (sortBy) {
+      case 'name':
+        theTasks.sort((a, b) => a.task_name.localeCompare(b.task_name));
+        break;
+      case 'status':
+        theTasks.sort((a, b) => a.status.localeCompare(b.status));
+        break;
+      case 'dateDue':
+        theTasks.sort((a, b) => {
+          // Sort all tasks without due dates to the bottom
+          if (!a.date_due) return 1;
+          if (!b.date_due) return -1;
+          else return 0;
+        }).sort((a, b) => {
+          // Now sort by the due date
+          if (!a.date_due || !b.date_due) return 1;
+          return new Date(a.date_due) - new Date(b.date_due);
+        });
+        break;
+      case 'assignee':
+        theTasks.sort((a, b) => a.assigned_first?.localeCompare(b.assigned_first));
+        break;
+      default:
+        break;
+    }
+
+    return theTasks;
+  }, [sortBy, folder]);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
@@ -170,8 +205,6 @@ export default function FolderView({ folderId }) {
       handleUpdateTask();
     }
   }, [doUpdate]);
-
-  const filteredTasks = folder.tasks;
 
   const handleSelectAll = () => {
 
@@ -344,219 +377,304 @@ export default function FolderView({ folderId }) {
     }
   }, [doAction]);
 
+  const handleBulkEditChange = () => {
+    setSelectedTasks([]);
+    setBulkEditMode(prev => !prev);
+  };
+
+  const rowWrapperClass = `row-wrapper ${isBulkEditMode ? 'edit-mode' : ''}`;
+
   return (
     <Grid item xs={9.5}>
-      <Fade in appear style={{ transitionDuration: '250ms', transitionDelay: '255ms' }}>
-        <Paper sx={{ p: 0, overflowX: 'auto' }}>
-          <Box>
-            <h5>{folder.name}</h5>
-          </Box>
+      <Paper className="folder-tasks-wrapper">
+        <Box className="folder-tasks-header">
+          <h5>{folder.name}</h5>
+        </Box>
+        <Box>
+          <Tooltip title="Toggle bulk edit" placement="top">
+            <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
+              <LibraryAddCheckOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Filter">
+            <IconButton >
+              <FilterAltOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
 
-          <TransitionGroup
-            component={List}
-            dense
-            className="folder-tasks-table">
-            {
-              filteredTasks.map((task, index) => {
-                let dateDueText = '...';
-                let dateDueColor = 'inherit';
+        <TransitionGroup
+          className="folder-tasks-table">
+          <Collapse in={false}>
+            <Box className="table-header">
+              <Box className={rowWrapperClass}>
+                <Box className="task-select-cell">
+                  <Checkbox size="small" />
+                </Box>
+                <Box
+                  placement="top"
+                  component={Tooltip}
+                  title="Sort name"
+                  onClick={() => setSortBy('name')}
+                  className="task-name-cell"
+                  style={{ paddingLeft: 45 }}>
+                  <Box className="flex-ac">
+                    Name <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </Box>
+                <Box
+                  placement="top-start"
+                  component={Tooltip}
+                  title="Sort status"
+                  className="task-status-cell"
+                  onClick={() => setSortBy('status')}>
+                  <Box className="flex-ac">
+                    Status <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </Box>
+                <Box
+                  placement="top-start"
+                  component={Tooltip}
+                  title="Sort assignee"
+                  className="task-assigned-cell"
+                  onClick={() => setSortBy('assignee')}>
+                  <Box className="flex-ac">
+                    Assignee <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </Box>
+                <Box
+                  placement="top-start"
+                  component={Tooltip}
+                  title="Sort due date"
+                  className="task-due-cell"
+                  onClick={() => setSortBy('dateDue')}>
+                  <Box className="flex-ac" textAlign='center'>
+                    Due <FilterListRoundedIcon
+                      fontSize="small"
+                      htmlColor="#cbced4"
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </Box>
+                </Box>
+                <Box
+                  style={{ cursor: 'default' }}
+                  className="task-tags-cell"
+                  textAlign='center'>
+                  Tags
+                </Box>
+              </Box>
+            </Box>
+          </Collapse>
+          {
+            folderTasks.map((task) => {
+              let dateDueText = '...';
+              let dateDueColor = 'inherit';
 
-                if (task.date_due) {
-                  const dateDue = moment(task.date_due);
+              if (task.date_due) {
+                const dateDue = moment(task.date_due);
 
-                  if (dateDue.isSame(now, 'day')) {
-                    dateDueText = 'Today';
-                    dateDueColor = '#ed6c02';
-                  } else if (dateDue.isSame(tomorrow, 'day')) {
-                    dateDueColor = '#0293e3';
-                    dateDueText = 'Tomorrow';
-                  } else if (dateDue.isBefore(now, 'day')) {
-                    dateDueText = dateDue.format('MMM Do');
-                    dateDueColor = 'error';
-                  } else {
-                    dateDueText = dateDue.format('MMM Do');
-                  }
+                if (dateDue.isSame(now, 'day')) {
+                  dateDueText = 'Today';
+                  dateDueColor = '#ed6c02';
+                } else if (dateDue.isSame(tomorrow, 'day')) {
+                  dateDueColor = '#0293e3';
+                  dateDueText = 'Tomorrow';
+                } else if (dateDue.isBefore(now, 'day')) {
+                  dateDueText = dateDue.format('MMM Do');
+                  dateDueColor = 'error';
+                } else {
+                  dateDueText = dateDue.format('MMM Do');
                 }
+              }
 
-                const tagsArray = task.tags?.split(',').filter(Boolean) || [];
-                const isSelectedRow = selectedTasks.includes(task.task_id);
+              const tagsArray = task.tags?.split(',').filter(Boolean) || [];
+              const isSelectedRow = selectedTasks.includes(task.task_id);
 
-                const taskIsBeingEditted = editingTask?.task_id === task.task_id;
+              const taskIsBeingEditted = editingTask?.task_id === task.task_id;
 
-                let taskName = (taskIsBeingEditted ? editingTask : task).task_name;
-                if (taskName.length > 100) {
-                  taskName = taskName.substring(0, 100) + '...';
-                }
+              let taskName = (taskIsBeingEditted ? editingTask : task).task_name;
+              if (taskName.length > 100) {
+                taskName = taskName.substring(0, 100) + '...';
+              }
 
-                return (
-                  <Collapse
-                    in
-                    unmountOnExit
-                    component={Box}
-                    onClick={() => handleTaskSelection(task)}
-                    key={task.task_id}
-                    //className={isSelectedRow ? 'selected' : ''}
-                    style={{ position: 'relative', }}
-                  >
-                    <Box className="row-wrapper">
-                      <Box className="task-select-cell" hidden={!isEditMode}>
-                        <Checkbox checked={isSelectedRow} />
-                      </Box>
-                      <Box className="task-name-cell" style={{ paddingLeft: 5 }}>
-                        <Box className="flex-ac" gap="5px" flexGrow={1} position='relative'>
-                          <Box className="key-task-cell">
-                            {
-                              task.is_key_task ?
-                                <Tooltip title="Toggle key task">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleToggleKeyTask(task)}>
-                                    <StarIcon
-                                      style={{ fontSize: 16 }}
-                                      htmlColor="gold"
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                                :
-                                <Tooltip title="Toggle key task">
-                                  <IconButton
-                                    onClick={() => handleToggleKeyTask(task)}
-                                    size="small"
-                                    className="set-key-task-btn" >
-                                    <StarOutlineOutlinedIcon
-                                      style={{ fontSize: 16 }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                            }
-                          </Box>
+              return (
+                <Collapse
+                  unmountOnExit
+                  onClick={() => handleTaskSelection(task)}
+                  key={task.task_id}
+                  //className={isSelectedRow ? 'selected' : ''}
+                  style={{ position: 'relative', }}
+                >
+                  <Box className={rowWrapperClass}>
+                    <Box className="task-select-cell">
+                      <Checkbox checked={isSelectedRow} size="small" />
+                    </Box>
+                    <Box className="task-name-cell" style={{ paddingLeft: 5 }}>
+                      <Box className="flex-ac" gap="5px" position='relative'>
+                        <Box className="key-task-cell">
                           {
-                            isEditingName && editingTask.task_id === task.task_id ?
-                              <TextField
-                                multiline
-                                variant="standard"
-                                inputProps={{
-                                  style: {
-                                    fontSize: 14,
-                                    padding: '0 8px'
-                                  }
-                                }}
-                                fullWidth
-                                size="small"
-                                inputRef={nameRef}
-                                defaultValue={editingTask.task_name}
-                                onKeyDown={handleNameSubmit}
-                              />
+                            task.is_key_task ?
+                              <Tooltip title="Toggle key task">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleToggleKeyTask(task)}>
+                                  <StarIcon
+                                    style={{ fontSize: 16 }}
+                                    htmlColor="gold"
+                                  />
+                                </IconButton>
+                              </Tooltip>
                               :
-                              <>
-                                <Box
-                                  className="name-text"
-                                  width='100%'
-                                  onClick={() => handleEditNameClick(task)}>
-                                  {taskName}
-                                </Box>
-                                <EditRoundedIcon
-                                  fontSize="small"
-                                  className="edit-icon"
-                                />
-                              </>
+                              <Tooltip title="Toggle key task">
+                                <IconButton
+                                  onClick={() => handleToggleKeyTask(task)}
+                                  size="small"
+                                  className="set-key-task-btn" >
+                                  <StarOutlineOutlinedIcon
+                                    style={{ fontSize: 16 }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
                           }
                         </Box>
-                      </Box>
-                      <Box className="task-status-cell">
-                        <Chip
-                          size="small"
-                          label={task.status}
-                          deleteIcon={<MoreVertIcon fontSize="small" />}
-                          onClick={e => handleStatusClick(e, task)}
-                          onDelete={e => handleStatusClick(e, task)}
-                          className={task.status}>
-                        </Chip>
-                      </Box>
-                      <Box className="task-assigned-cell">
                         {
-                          task.assigned_to_id ?
-                            <Tooltip title={`${task.assigned_first} ${task.assigned_last}`}>
-                              <IconButton
-                                onClick={e => handleAssigneeClick(e, task)}
-                                size="small"
-                                className="assigned-btn">
-                                {
-                                  <Avatar>
-                                    {task.assigned_first[0]}{task.assigned_last[0]}
-                                  </Avatar>
+                          isEditingName && editingTask.task_id === task.task_id ?
+                            <TextField
+                              multiline
+                              variant="standard"
+                              inputProps={{
+                                style: {
+                                  fontSize: 14,
+                                  padding: '0 8px'
                                 }
-                              </IconButton>
-                            </Tooltip>
-                            :
-                            <Tooltip title="Assign task">
-                              <IconButton
-                                onClick={e => handleAssigneeClick(e, task)}
-                                size="small"
-                                className="unassigned-btn">
-                                <PersonOutlineIcon />
-                              </IconButton>
-                            </Tooltip>
-                        }
-
-                      </Box>
-                      <Box className="task-due-cell">
-                        <Box className="flex-ac" position='relative'>
-                          <Typography
-                            onClick={e => handleDateDueClick(e, task)}
-                            className="due-text"
-                            color={dateDueColor}>
-                            {
-                              dateDueText
-                            }
-                          </Typography>
-                          <EditRoundedIcon
-                            fontSize="small"
-                            className="edit-icon"
-                          />
-                        </Box>
-                      </Box>
-                      <Box className="task-tags-cell">{
-                        tagsArray.map(tagId =>
-                          <Chip
-                            deleteIcon={
-                              <Tooltip title="Remove tag">
-                                <CancelIcon />
-                              </Tooltip>
-                            }
-                            onDelete={() => handleRemoveTag(tagId, task)}
-                            className="chip"
-                            key={tagId}
-                            label={tagsMap[tagId].name}
-                            size="small"
-                          />)}
-                        <Chip
-                          className="new-chip"
-                          size="small"
-                          variant="outlined"
-                          label='+ Tags'
-                          onClick={e => handleAddTagClick(e, task)}
-                        />
-                      </Box>
-                      <Box style={{ paddingRight: 5, flexBasis: '2%' }}>
-                        <Tooltip title="More">
-                          <IconButton
-                            size="small"
-                            onClick={e => handleTaskMoreClick(e, task)}>
-                            <MoreVertIcon
-                              fontSize="small"
+                              }}
+                              fullWidth
+                              size="small"
+                              inputRef={nameRef}
+                              defaultValue={editingTask.task_name}
+                              onKeyDown={handleNameSubmit}
                             />
-                          </IconButton>
-                        </Tooltip>
+                            :
+                            <>
+                              <Box
+                                className="name-text"
+                                width='100%'
+                                onClick={() => handleEditNameClick(task)}>
+                                {taskName}
+                              </Box>
+                              <EditRoundedIcon
+                                fontSize="small"
+                                className="edit-icon"
+                              />
+                            </>
+                        }
                       </Box>
                     </Box>
-                  </Collapse>
-                );
-              })
-            }
-          </TransitionGroup>
-        </Paper>
-      </Fade>
+                    <Box className="task-status-cell">
+                      <Chip
+                        size="small"
+                        label={task.status}
+                        deleteIcon={<MoreVertIcon fontSize="small" />}
+                        onClick={e => handleStatusClick(e, task)}
+                        onDelete={e => handleStatusClick(e, task)}
+                        className={task.status}>
+                      </Chip>
+                    </Box>
+                    <Box className="task-assigned-cell">
+                      {
+                        task.assigned_to_id ?
+                          <Tooltip title={`${task.assigned_first} ${task.assigned_last}`}>
+                            <IconButton
+                              onClick={e => handleAssigneeClick(e, task)}
+                              size="small"
+                              className="assigned-btn">
+                              {
+                                <Avatar>
+                                  {task.assigned_first[0]}{task.assigned_last[0]}
+                                </Avatar>
+                              }
+                            </IconButton>
+                          </Tooltip>
+                          :
+                          <Tooltip title="Assign task">
+                            <IconButton
+                              onClick={e => handleAssigneeClick(e, task)}
+                              size="small"
+                              className="unassigned-btn">
+                              <PersonOutlineIcon />
+                            </IconButton>
+                          </Tooltip>
+                      }
+
+                    </Box>
+                    <Box className="task-due-cell">
+                      <Box className="flex-ac" position='relative'>
+                        <Typography
+                          onClick={e => handleDateDueClick(e, task)}
+                          className="due-text"
+                          color={dateDueColor}>
+                          {
+                            dateDueText
+                          }
+                        </Typography>
+                        <EditRoundedIcon
+                          fontSize="small"
+                          className="edit-icon"
+                        />
+                      </Box>
+                    </Box>
+                    <Box className="task-tags-cell">{
+                      tagsArray.map(tagId =>
+                        <Chip
+                          deleteIcon={
+                            <Tooltip title="Remove tag">
+                              <CancelIcon />
+                            </Tooltip>
+                          }
+                          onDelete={() => handleRemoveTag(tagId, task)}
+                          className="chip"
+                          key={tagId}
+                          label={tagsMap[tagId].name}
+                          size="small"
+                        />)}
+                      <Chip
+                        className="new-chip"
+                        size="small"
+                        variant="outlined"
+                        label='+ Tags'
+                        onClick={e => handleAddTagClick(e, task)}
+                      />
+                    </Box>
+                    <Box className="task-more-cell">
+                      <Tooltip title="More">
+                        <IconButton
+                          size="small"
+                          onClick={e => handleTaskMoreClick(e, task)}>
+                          <MoreVertIcon
+                            fontSize="small"
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Box>
+                </Collapse>
+              );
+            })
+          }
+        </TransitionGroup>
+      </Paper>
 
       <Menu
         PaperProps={{
