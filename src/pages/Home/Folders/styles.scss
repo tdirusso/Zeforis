@@ -85,6 +85,7 @@
     width: 0px;
     overflow: hidden;
     transition: width 150ms;
+    //padding-left: 4px;
   }
 
   .MuiListItem-root {
@@ -102,16 +103,40 @@
     }
   }
 
+  .table-header .row-wrapper.edit-mode {
+    .task-select-cell {
+      width: 38px;
+    }
+  }
+
   .row-wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 5px 0;
 
-    &.edit-mode {
+    &.edit-mode.table-row {
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.04);
+      }
+
       .task-select-cell {
         width: 38px;
       }
+
+      .task-name-cell,
+      .task-status-cell,
+      .task-assigned-cell,
+      .task-due-cell,
+      .task-tags-cell {
+        pointer-events: none;
+      }
+    }
+
+    &.selected {
+      background: rgba(var(--colors-primary-rgb), 0.075) !important;
     }
   }
 
@@ -299,6 +324,12 @@ body.dark {
       border-bottom: 1px solid #575757;
     }
   }
+
+  .row-wrapper {
+    &.edit-mode:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
 }
 
 .folder-tasks-wrapper {
@@ -312,6 +343,25 @@ body.dark {
 
 .folder-tasks-header {
   padding: 20px;
+}
+
+.folder-tasks-controls {
+  padding: 0 11px;
+  padding-bottom: 10px;
+
+  .tasks-selected-count {
+    font-size: 14px;
+    margin-right: 12px;
+  }
+
+  button span {
+    margin-right: 2px;
+  }
+
+  .task-bulk-actions {
+    justify-content: space-between;
+    flex-grow: 1;
+  }
 }
 
 @keyframes fadeIn {

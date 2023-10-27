@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Paper, Fade, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem, Grow, Slide, Zoom } from "@mui/material";
+import { Grid, Paper, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem, Grow, Slide, Zoom } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -20,9 +20,15 @@ import { updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from "react-transition-group";
-import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
+import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
 export default function FolderView({ folderId }) {
 
@@ -76,7 +82,7 @@ export default function FolderView({ folderId }) {
           // Sort all tasks without due dates to the bottom
           if (!a.date_due) return 1;
           if (!b.date_due) return -1;
-          else return 0;
+          return 0;
         }).sort((a, b) => {
           // Now sort by the due date
           if (!a.date_due || !b.date_due) return 1;
@@ -84,7 +90,14 @@ export default function FolderView({ folderId }) {
         });
         break;
       case 'assignee':
-        theTasks.sort((a, b) => a.assigned_first?.localeCompare(b.assigned_first));
+        theTasks.sort((a, b) => {
+          if (!a.assigned_first) return 1;
+          if (!b.assigned_first) return -1;
+          return 0;
+        }).sort((a, b) => {
+          if (!a.assigned_first || !b.assigned_first) return 1;
+          return a.assigned_first.localeCompare(b.assigned_first);
+        });
         break;
       default:
         break;
@@ -206,12 +219,22 @@ export default function FolderView({ folderId }) {
     }
   }, [doUpdate]);
 
-  const handleSelectAll = () => {
-
+  const handleSelectAll = (_, isChecked) => {
+    if (isChecked) {
+      setSelectedTasks(folderTasks.map(({ task_id }) => task_id));
+    } else {
+      setSelectedTasks([]);
+    }
   };
 
-  const handleTaskSelection = () => {
-
+  const handleTaskSelection = taskId => {
+    if (isBulkEditMode) {
+      if (selectedTasks.includes(taskId)) {
+        setSelectedTasks(selectedTasks.filter(id => id !== taskId));
+      } else {
+        setSelectedTasks(taskIds => [...taskIds, taskId]);
+      }
+    }
   };
 
   const handleEditNameClick = task => {
@@ -388,19 +411,78 @@ export default function FolderView({ folderId }) {
     <Grid item xs={9.5}>
       <Paper className="folder-tasks-wrapper">
         <Box className="folder-tasks-header">
-          <h5>{folder.name}</h5>
+          <h4>{folder.name}</h4>
         </Box>
-        <Box>
-          <Tooltip title="Toggle bulk edit" placement="top">
-            <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
-              <LibraryAddCheckOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Filter">
-            <IconButton >
-              <FilterAltOutlinedIcon />
-            </IconButton>
-          </Tooltip>
+        <Box className="flex-ac folder-tasks-controls">
+          <Box className="flex-ac" gap='4px'>
+            <Tooltip title="Toggle bulk edit" placement="top">
+              <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
+                <EditNoteRoundedIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title="Filter"
+              placement="top">
+              <Button
+                style={{ color: 'inherit' }}
+                startIcon={<FilterAltOutlinedIcon />}>
+                All tasks
+              </Button>
+            </Tooltip>
+          </Box>
+          <Divider
+            hidden={!isBulkEditMode}
+            flexItem
+            orientation="vertical"
+            style={{ margin: '4px 12px' }} />
+          <Box
+            hidden={!isBulkEditMode}
+            component="span"
+            className="tasks-selected-count">
+            {selectedTasks.length} selected
+          </Box>
+          <Box className="task-bulk-actions flex-ac" hidden={!isBulkEditMode}>
+            <Box className="flex-ac" gap='4px'>
+              <Button
+                disabled={selectedTasks.length === 0}
+                size="small"
+                startIcon={<TaskAltOutlinedIcon />}>
+                Status
+              </Button>
+              <Button
+                disabled={selectedTasks.length === 0}
+                size="small"
+                startIcon={<PersonOutlineOutlinedIcon />}>
+                Assignee
+              </Button>
+              <Button
+                disabled={selectedTasks.length === 0}
+                size="small"
+                startIcon={<CalendarTodayOutlinedIcon />}>
+                Due
+              </Button>
+              <Button
+                disabled={selectedTasks.length === 0}
+                size="small"
+                startIcon={<FolderOutlinedIcon />}>
+                Folder
+              </Button>
+              <Button
+                disabled={selectedTasks.length === 0}
+                size="small"
+                startIcon={<LocalOfferOutlinedIcon />}>
+                Tags
+              </Button>
+            </Box>
+            <Button
+              disabled={selectedTasks.length === 0}
+              style={{ marginRight: '15px' }}
+              size="small"
+              color="error"
+              startIcon={<DeleteOutlineOutlinedIcon />}>
+              Delete
+            </Button>
+          </Box>
         </Box>
 
         <TransitionGroup
@@ -409,7 +491,10 @@ export default function FolderView({ folderId }) {
             <Box className="table-header">
               <Box className={rowWrapperClass}>
                 <Box className="task-select-cell">
-                  <Checkbox size="small" />
+                  <Checkbox size="small"
+                    onChange={handleSelectAll}
+                    checked={selectedTasks.length === folderTasks.length && folderTasks.length > 0}
+                  />
                 </Box>
                 <Box
                   placement="top"
@@ -512,12 +597,11 @@ export default function FolderView({ folderId }) {
               return (
                 <Collapse
                   unmountOnExit
-                  onClick={() => handleTaskSelection(task)}
+                  onClick={() => handleTaskSelection(task.task_id)}
                   key={task.task_id}
-                  //className={isSelectedRow ? 'selected' : ''}
-                  style={{ position: 'relative', }}
-                >
-                  <Box className={rowWrapperClass}>
+                  className={isSelectedRow ? 'selected' : ''}
+                  style={{ position: 'relative', }}>
+                  <Box className={`table-row ${rowWrapperClass} ${isSelectedRow ? 'selected' : ''}`}>
                     <Box className="task-select-cell">
                       <Checkbox checked={isSelectedRow} size="small" />
                     </Box>
