@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Paper, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse, List, ListItem, Grow, Slide, Zoom } from "@mui/material";
+import { Grid, Paper, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -16,7 +16,7 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
-import { updateTask } from "../../../api/tasks";
+import { batchUpdateTasks, updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from "react-transition-group";
@@ -29,6 +29,7 @@ import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import { LoadingButton } from "@mui/lab";
 
 export default function FolderView({ folderId }) {
 
@@ -66,6 +67,13 @@ export default function FolderView({ folderId }) {
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
   const [doAction, setDoAction] = useState(null);
+
+  const [bulkEditAction, setBulkEditAction] = useState(null);
+  const [bulkStatusValue, setBulkStatusValue] = useState(null);
+  const [bulkDueValue, setBulkDueValue] = useState(null);
+  const [bulkFolderValue, setBulkFolderValue] = useState(null);
+  const [bulkAssigneeValue, setBulkAssigneeValue] = useState(null);
+  const [bulkTagAction, setBulkTagAction] = useState(null);
 
   const folderTasks = useMemo(() => {
     const theTasks = folder.tasks;
@@ -214,8 +222,45 @@ export default function FolderView({ folderId }) {
       }
     }
 
+    async function handleBulkUpdateTasks() {
+
+      try {
+        const { updatedTasks, message } = await batchUpdateTasks({
+          engagementId,
+          taskIds: selectedTasks,
+          action: bulkEditAction,
+          status: bulkStatusValue,
+          dateDue: bulkDueValue,
+          folderId: bulkFolderValue,
+          assigneeId: bulkAssigneeValue,
+          tags: tempSelectedTags,
+          tagAction: bulkTagAction
+        });
+
+        if (updatedTasks) {
+          updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
+          setTasks(Object.values(tasksMap));
+          setStatusMenuAnchor(null);
+          setAssigneeMenuAnchor(null);
+          setBulkEditAction(null);
+          setDoUpdate(false);
+          openSnackBar(`Updated ${updatedTasks.length} tasks.`, 'success');
+        } else {
+          setDoUpdate(false);
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        setDoUpdate(false);
+        openSnackBar(error.message, 'error');
+      }
+    }
+
     if (doUpdate) {
-      handleUpdateTask();
+      if (isBulkEditMode) {
+        handleBulkUpdateTasks();
+      } else {
+        handleUpdateTask();
+      }
     }
   }, [doUpdate]);
 
@@ -243,21 +288,28 @@ export default function FolderView({ folderId }) {
   };
 
   const handleStatusClick = (e, task) => {
-    setEditingTask(task);
+    if (!isBulkEditMode) {
+      setEditingTask(task);
+    }
+
     setStatusMenuAnchor(e.currentTarget);
   };
 
   const handleAssigneeClick = (e, task) => {
-    setEditingTask(task);
-    setTempAssignee(
-      task.assigned_to_id ?
-        {
-          id: task.assigned_to_id,
-          firstName: task.assigned_first,
-          lastName: task.assigned_last
-        } :
-        null
-    );
+    if (!isBulkEditMode) {
+      setEditingTask(task);
+
+      setTempAssignee(
+        task.assigned_to_id ?
+          {
+            id: task.assigned_to_id,
+            firstName: task.assigned_first,
+            lastName: task.assigned_last
+          } :
+          null
+      );
+    }
+
     setAssigneeMenuAnchor(e.currentTarget);
   };
 
@@ -274,13 +326,19 @@ export default function FolderView({ folderId }) {
 
   const handleAssigneeChange = (_, newVal) => {
     if (newVal) {
-      setEditingTask({
-        ...editingTask,
-        assigned_to_id: newVal.id,
-        assigned_first: newVal.firstName,
-        assigned_last: newVal.lastName
-      });
-      setAssigneeMenuAnchor(null);
+      if (!isBulkEditMode) {
+        setEditingTask({
+          ...editingTask,
+          assigned_to_id: newVal.id,
+          assigned_first: newVal.firstName,
+          assigned_last: newVal.lastName
+        });
+        setAssigneeMenuAnchor(null);
+      } else {
+        setBulkEditAction('assignee');
+        setBulkAssigneeValue(newVal.id);
+      }
+
       setDoUpdate(true);
     }
   };
@@ -331,8 +389,14 @@ export default function FolderView({ folderId }) {
   };
 
   const handleStatusSubmit = (newStatus) => {
-    setEditingTask({ ...editingTask, status: newStatus });
-    setStatusMenuAnchor(null);
+    if (!isBulkEditMode) {
+      setEditingTask({ ...editingTask, status: newStatus });
+      setStatusMenuAnchor(null);
+    } else {
+      setBulkEditAction('status');
+      setBulkStatusValue(newStatus);
+    }
+
     setDoUpdate(true);
   };
 
@@ -443,36 +507,40 @@ export default function FolderView({ folderId }) {
           </Box>
           <Box className="task-bulk-actions flex-ac" hidden={!isBulkEditMode}>
             <Box className="flex-ac" gap='4px'>
-              <Button
+              <LoadingButton
+                loading={bulkEditAction === 'status'}
+                onClick={handleStatusClick}
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<TaskAltOutlinedIcon />}>
                 Status
-              </Button>
-              <Button
+              </LoadingButton>
+              <LoadingButton
+                loading={bulkEditAction === 'assignee'}
+                onClick={handleAssigneeClick}
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<PersonOutlineOutlinedIcon />}>
                 Assignee
-              </Button>
-              <Button
+              </LoadingButton>
+              <LoadingButton
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<CalendarTodayOutlinedIcon />}>
                 Due
-              </Button>
-              <Button
+              </LoadingButton>
+              <LoadingButton
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<FolderOutlinedIcon />}>
                 Folder
-              </Button>
-              <Button
+              </LoadingButton>
+              <LoadingButton
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<LocalOfferOutlinedIcon />}>
                 Tags
-              </Button>
+              </LoadingButton>
             </Box>
             <Button
               disabled={selectedTasks.length === 0}
@@ -900,17 +968,20 @@ export default function FolderView({ folderId }) {
         </Box>
       </Menu>
 
-
       <Menu
         PaperProps={{
           className: 'assignee-menu'
         }}
         anchorEl={assigneeMenuAnchor}
         open={assigneeMenuOpen}
-        onClose={() => setAssigneeMenuAnchor(null)}>
+        onClose={() => {
+          setTempAssignee(null);
+          setAssigneeMenuAnchor(null);
+        }}>
         <Box mx={1}>
           <FormControl fullWidth>
             <Autocomplete
+              disabled={bulkEditAction === 'assignee'}
               ListboxProps={{
                 className: 'assignee-menu-list'
               }}
@@ -939,16 +1010,18 @@ export default function FolderView({ folderId }) {
           </FormControl>
           <Box className="flex-ac" justifyContent='space-between' mt={0.25}>
             <Button
+              disabled={bulkEditAction === 'assignee'}
               onClick={handleAssignToMe}
               size="small"
               color="secondary">
               Assign to me
             </Button>
             <Button
+              disabled={bulkEditAction === 'assignee'}
               onClick={handleClearAssignee}
-              hidden={!editingTask?.assigned_to_id}
+              hidden={!isBulkEditMode && !editingTask?.assigned_to_id}
               size="small">
-              clear
+              Unassign
             </Button>
           </Box>
         </Box>
@@ -962,6 +1035,7 @@ export default function FolderView({ folderId }) {
           statuses.map(({ name }) => {
             return (
               <MenuItem
+                disabled={bulkEditAction === 'status'}
                 selected={name === editingTask?.status}
                 key={name}
                 onClick={() => handleStatusSubmit(name)}>
