@@ -242,6 +242,7 @@ export default function FolderView({ folderId }) {
           setTasks(Object.values(tasksMap));
           setStatusMenuAnchor(null);
           setAssigneeMenuAnchor(null);
+          setDateDueMenuAnchor(null);
           setBulkEditAction(null);
           setDoUpdate(false);
           openSnackBar(`Updated ${updatedTasks.length} tasks.`, 'success');
@@ -314,13 +315,18 @@ export default function FolderView({ folderId }) {
   };
 
   const handleAssignToMe = () => {
-    setEditingTask({
-      ...editingTask,
-      assigned_to_id: user.id,
-      assigned_first: user.firstName,
-      assigned_last: user.lastName
-    });
-    setAssigneeMenuAnchor(null);
+    if (!isBulkEditMode) {
+      setEditingTask({
+        ...editingTask,
+        assigned_to_id: user.id,
+        assigned_first: user.firstName,
+        assigned_last: user.lastName
+      });
+      setAssigneeMenuAnchor(null);
+    } else {
+      setBulkEditAction('assignee');
+      setBulkAssigneeValue(user.id);
+    }
     setDoUpdate(true);
   };
 
@@ -344,24 +350,40 @@ export default function FolderView({ folderId }) {
   };
 
   const handleClearAssignee = () => {
-    setEditingTask({
-      ...editingTask,
-      assigned_to_id: null,
-      assigned_first: null,
-      assigned_last: null
-    });
-    setAssigneeMenuAnchor(null);
+    if (!isBulkEditMode) {
+      setEditingTask({
+        ...editingTask,
+        assigned_to_id: null,
+        assigned_first: null,
+        assigned_last: null
+      });
+      setAssigneeMenuAnchor(null);
+    } else {
+      setBulkEditAction('assignee');
+      setBulkAssigneeValue(null);
+    }
+
+
     setDoUpdate(true);
   };
 
   const handleClearDateDue = () => {
-    setEditingTask({ ...editingTask, date_due: null });
-    setDateDueMenuAnchor(null);
+    if (!isBulkEditMode) {
+      setEditingTask({ ...editingTask, date_due: null });
+      setDateDueMenuAnchor(null);
+    } else {
+      setBulkEditAction('dateDue');
+      setBulkDueValue(null);
+    }
+
     setDoUpdate(true);
   };
 
   const handleDateDueClick = (e, task) => {
-    setEditingTask(task);
+    if (!isBulkEditMode) {
+      setEditingTask(task);
+    }
+
     setDateDueMenuAnchor(e.currentTarget);
   };
 
@@ -401,8 +423,14 @@ export default function FolderView({ folderId }) {
   };
 
   const handleDateDueSubmit = newDate => {
-    setEditingTask({ ...editingTask, date_due: newDate.toISOString() });
-    setDateDueMenuAnchor(null);
+    if (!isBulkEditMode) {
+      setEditingTask({ ...editingTask, date_due: newDate.toISOString() });
+      setDateDueMenuAnchor(null);
+    } else {
+      setBulkEditAction('dateDue');
+      setBulkDueValue(newDate.toISOString());
+    }
+
     setDoUpdate(true);
   };
 
@@ -524,6 +552,8 @@ export default function FolderView({ folderId }) {
                 Assignee
               </LoadingButton>
               <LoadingButton
+                loading={bulkEditAction === 'dateDue'}
+                onClick={handleDateDueClick}
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<CalendarTodayOutlinedIcon />}>
@@ -952,6 +982,7 @@ export default function FolderView({ folderId }) {
         <Box>
           <Box textAlign='right' mb={-2}>
             <Button
+              disabled={bulkEditAction === 'dateDue'}
               onClick={handleClearDateDue}
               style={{ marginRight: '5px' }}>
               clear
@@ -959,6 +990,7 @@ export default function FolderView({ folderId }) {
           </Box>
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <StaticDatePicker
+              disabled={bulkEditAction === 'dateDue'}
               value={editingTask?.date_due}
               renderInput={() => { }}
               onChange={handleDateDueSubmit}

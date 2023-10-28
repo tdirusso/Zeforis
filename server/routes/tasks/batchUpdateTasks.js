@@ -33,13 +33,7 @@ module.exports = async (req, res, next) => {
   try {
     switch (action) {
       case 'assignee':
-        if (!assigneeId) {
-          return res.json({
-            message: 'Missing assigneeId.'
-          });
-        } else {
-          await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
-        }
+        await updateAssignees(taskIds, assigneeId, updaterUserId, connection);
         break;
       case 'folder':
         if (!folderId) {
