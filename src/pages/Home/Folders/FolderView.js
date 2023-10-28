@@ -25,11 +25,11 @@ import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
-import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import { LoadingButton } from "@mui/lab";
+import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 
 export default function FolderView({ folderId }) {
 
@@ -73,7 +73,7 @@ export default function FolderView({ folderId }) {
   const [bulkDueValue, setBulkDueValue] = useState(null);
   const [bulkFolderValue, setBulkFolderValue] = useState(null);
   const [bulkAssigneeValue, setBulkAssigneeValue] = useState(null);
-  const [bulkTagAction, setBulkTagAction] = useState(null);
+  const [bulkTagAction, setBulkTagAction] = useState('add');
 
   const folderTasks = useMemo(() => {
     const theTasks = folder.tasks;
@@ -223,7 +223,6 @@ export default function FolderView({ folderId }) {
     }
 
     async function handleBulkUpdateTasks() {
-
       try {
         const { updatedTasks, message } = await batchUpdateTasks({
           engagementId,
@@ -244,6 +243,8 @@ export default function FolderView({ folderId }) {
           setAssigneeMenuAnchor(null);
           setDateDueMenuAnchor(null);
           setBulkEditAction(null);
+          setTempSelectedTags([]);
+          setTagsMenuAnchor(null);
           setDoUpdate(false);
           openSnackBar(`Updated ${updatedTasks.length} tasks.`, 'success');
         } else {
@@ -435,7 +436,10 @@ export default function FolderView({ folderId }) {
   };
 
   const handleAddTagClick = (e, task) => {
-    setEditingTask(task);
+    if (!isBulkEditMode) {
+      setEditingTask(task);
+    }
+
     setTagsMenuAnchor(e.currentTarget);
   };
 
@@ -459,11 +463,16 @@ export default function FolderView({ folderId }) {
   };
 
   const handleTagsSubmit = () => {
-    if (tempSelectedTags.length) {
-      setDoUpdate(true);
+    if (!isBulkEditMode) {
+      setTagsMenuAnchor(null);
     }
 
-    setTagsMenuAnchor(null);
+    if (tempSelectedTags.length) {
+      if (isBulkEditMode) {
+        setBulkEditAction('tags');
+      }
+      setDoUpdate(true);
+    }
   };
 
   const handleRemoveTag = async (tagId, task) => {
@@ -560,26 +569,30 @@ export default function FolderView({ folderId }) {
                 Due
               </LoadingButton>
               <LoadingButton
-                disabled={selectedTasks.length === 0}
-                size="small"
-                startIcon={<FolderOutlinedIcon />}>
-                Folder
-              </LoadingButton>
-              <LoadingButton
+                loading={bulkEditAction === 'tags'}
+                onClick={handleAddTagClick}
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<LocalOfferOutlinedIcon />}>
                 Tags
               </LoadingButton>
             </Box>
-            <Button
-              disabled={selectedTasks.length === 0}
-              style={{ marginRight: '15px' }}
-              size="small"
-              color="error"
-              startIcon={<DeleteOutlineOutlinedIcon />}>
-              Delete
-            </Button>
+            <Box className="flex-ac" gap='5px'>
+              <LoadingButton
+                disabled={selectedTasks.length === 0}
+                size="small"
+                startIcon={<ShortcutRoundedIcon />}>
+                Move
+              </LoadingButton>
+              <Button
+                disabled={selectedTasks.length === 0}
+                style={{ marginRight: '15px' }}
+                size="small"
+                color="error"
+                startIcon={<DeleteOutlineOutlinedIcon />}>
+                Delete
+              </Button>
+            </Box>
           </Box>
         </Box>
 
@@ -873,13 +886,14 @@ export default function FolderView({ folderId }) {
         <Box mx={1}>
           <FormControl fullWidth>
             <Autocomplete
+              disabled={bulkEditAction === 'tags'}
               ListboxProps={{
                 className: 'tags-menu-list'
               }}
               size="small"
               multiple
               value={tempSelectedTags}
-              options={availableTags}
+              options={isBulkEditMode ? tags : availableTags}
               renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
               isOptionEqualToValue={(option, value) => option.name === value.name}
               getOptionLabel={(option) => option.name}
@@ -912,11 +926,25 @@ export default function FolderView({ folderId }) {
             <FormHelperText>
               "&#x23CE;" to create new
             </FormHelperText>
-            <Button
-              onClick={handleTagsSubmit}
-              size="small">
-              Save
-            </Button>
+            <Box display='flex' alignItems='baseline'>
+              <Box mr={1} hidden={!isBulkEditMode}>
+                <Typography variant="caption">
+                  Remove&nbsp;
+                </Typography>
+                <Checkbox
+                  disabled={bulkEditAction === 'tags'}
+                  style={{ padding: 0 }}
+                  size="small"
+                  onChange={(_, isChecked) => setBulkTagAction(isChecked ? 'remove' : 'add')}
+                />
+              </Box>
+              <Button
+                disabled={tempSelectedTags.length === 0 || bulkEditAction === 'tags'}
+                onClick={handleTagsSubmit}
+                size="small">
+                Save
+              </Button>
+            </Box>
           </Box>
         </Box>
       </Menu>
