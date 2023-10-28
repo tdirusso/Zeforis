@@ -266,6 +266,17 @@
   }
 }
 
+.folders-menu {
+  width: 240px;
+
+}
+
+.folders-menu-list {
+  li {
+    font-size: 14px !important;
+  }
+}
+
 .assignee-menu {
   width: 240px;
 }
@@ -347,6 +358,7 @@ body.dark {
 .folder-tasks-controls {
   padding: 0 11px;
   padding-bottom: 10px;
+  padding-left: 30px;
 
   .tasks-selected-count {
     font-size: 14px;

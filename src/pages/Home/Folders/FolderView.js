@@ -46,7 +46,8 @@ export default function FolderView({ folderId }) {
     tags,
     setTags,
     openDrawer,
-    openModal
+    openModal,
+    folders
   } = useOutletContext();
 
   const engagementId = engagement.id;
@@ -62,6 +63,7 @@ export default function FolderView({ folderId }) {
   const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
   const [taskActionsMenuAnchor, setTaskActionsMenuAnchor] = useState(null);
   const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
+  const [folderMenuAnchor, setFolderMenuAnchor] = useState(null);
   const [tempAssignee, setTempAssignee] = useState(null);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
@@ -119,6 +121,7 @@ export default function FolderView({ folderId }) {
   const dateDueMenuOpen = Boolean(dateDueMenuAnchor);
   const taskActionsMenuOpen = Boolean(taskActionsMenuAnchor);
   const tagsMenuOpen = Boolean(tagsMenuAnchor);
+  const folderMenuOpen = Boolean(folderMenuAnchor);
 
   const nameRef = useRef(null);
 
@@ -138,6 +141,7 @@ export default function FolderView({ folderId }) {
     const handleClickOutside = (event) => {
       if (nameRef.current && !nameRef.current.contains(event.target)) {
         setEditingName(false);
+        setEditingTask(null);
       }
     };
 
@@ -205,6 +209,7 @@ export default function FolderView({ folderId }) {
           setEditingName(false);
           setTempSelectedTags([]);
           setTagIdToRemove(null);
+          setEditingTask(null);
           openSnackBar('Saved.', 'success');
         } else {
           setEditingTask(null);
@@ -238,6 +243,9 @@ export default function FolderView({ folderId }) {
 
         if (updatedTasks) {
           updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
+          if (bulkEditAction === 'folder') {
+            setSelectedTasks([]);
+          }
           setTasks(Object.values(tasksMap));
           setStatusMenuAnchor(null);
           setAssigneeMenuAnchor(null);
@@ -245,6 +253,8 @@ export default function FolderView({ folderId }) {
           setBulkEditAction(null);
           setTempSelectedTags([]);
           setTagsMenuAnchor(null);
+          setFolderMenuAnchor(null);
+          setBulkFolderValue(null);
           setDoUpdate(false);
           openSnackBar(`Updated ${updatedTasks.length} tasks.`, 'success');
         } else {
@@ -481,6 +491,14 @@ export default function FolderView({ folderId }) {
     setDoUpdate(true);
   };
 
+  const handleFolderSubmit = (_, folderVal) => {
+    if (folderVal) {
+      setBulkFolderValue(folderVal.id);
+      setBulkEditAction('folder');
+      setDoUpdate(true);
+    }
+  };
+
   useEffect(() => {
     if (isEditingName) {
       nameRef.current.focus();
@@ -498,6 +516,7 @@ export default function FolderView({ folderId }) {
       }
 
       setDoAction(null);
+      setEditingTask(null);
     }
   }, [doAction]);
 
@@ -579,6 +598,8 @@ export default function FolderView({ folderId }) {
             </Box>
             <Box className="flex-ac" gap='5px'>
               <LoadingButton
+                loading={bulkEditAction === 'folder'}
+                onClick={e => setFolderMenuAnchor(e.currentTarget)}
                 disabled={selectedTasks.length === 0}
                 size="small"
                 startIcon={<ShortcutRoundedIcon />}>
@@ -873,6 +894,48 @@ export default function FolderView({ folderId }) {
 
       <Menu
         PaperProps={{
+          className: 'folders-menu'
+        }}
+        anchorEl={folderMenuAnchor}
+        open={folderMenuOpen}
+        onClose={() => {
+          setFolderMenuAnchor(null);
+        }}>
+        <Box mx={1}>
+          <FormControl fullWidth>
+            <Autocomplete
+              disabled={bulkEditAction === 'folder'}
+              ListboxProps={{
+                className: 'folders-menu-list'
+              }}
+              size="small"
+              options={folders}
+              value={null}
+              renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+              getOptionLabel={(option) => option.name || ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              onChange={handleFolderSubmit}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant='standard'
+                  placeholder='Choose folder'
+                  InputProps={{
+                    ...params.InputProps,
+                    style: {
+                      fontSize: 14
+                    },
+                    autoFocus: true
+                  }}
+                />
+              )}
+            />
+          </FormControl>
+        </Box>
+      </Menu>
+
+      <Menu
+        PaperProps={{
           className: 'tags-menu'
         }}
         anchorEl={tagsMenuAnchor}
@@ -880,6 +943,7 @@ export default function FolderView({ folderId }) {
         onClose={() => {
           setTagsMenuAnchor(null);
           setTimeout(() => {
+            setEditingTask(null);
             setTempSelectedTags([]);
           }, 250);
         }}>
@@ -953,7 +1017,10 @@ export default function FolderView({ folderId }) {
         className="task-actions-menu"
         anchorEl={taskActionsMenuAnchor}
         open={taskActionsMenuOpen}
-        onClose={() => setTaskActionsMenuAnchor(null)}>
+        onClose={() => {
+          setTaskActionsMenuAnchor(null);
+          setEditingTask(null);
+        }}>
         <MenuItem
           dense
           onClick={() => {
@@ -972,7 +1039,10 @@ export default function FolderView({ folderId }) {
           editingTask?.link_url ?
             <Box>
               <MenuItem
-                onClick={() => setTaskActionsMenuAnchor(null)}
+                onClick={() => {
+                  setTaskActionsMenuAnchor(null);
+                  setEditingTask(null);
+                }}
                 style={{ color: 'inherit' }}
                 dense
                 component="a"
@@ -1006,7 +1076,10 @@ export default function FolderView({ folderId }) {
       <Menu
         anchorEl={dateDueMenuAnchor}
         open={dateDueMenuOpen}
-        onClose={() => setDateDueMenuAnchor(null)}>
+        onClose={() => {
+          setDateDueMenuAnchor(null);
+          setEditingTask(null);
+        }}>
         <Box>
           <Box textAlign='right' mb={-2}>
             <Button
@@ -1036,6 +1109,7 @@ export default function FolderView({ folderId }) {
         open={assigneeMenuOpen}
         onClose={() => {
           setTempAssignee(null);
+          setEditingTask(null);
           setAssigneeMenuAnchor(null);
         }}>
         <Box mx={1}>
@@ -1090,7 +1164,10 @@ export default function FolderView({ folderId }) {
       <Menu
         anchorEl={statusMenuAnchor}
         open={statusMenuOpen}
-        onClose={() => setStatusMenuAnchor(null)}>
+        onClose={() => {
+          setStatusMenuAnchor(null);
+          setEditingTask(null);
+        }}>
         {
           statuses.map(({ name }) => {
             return (
@@ -1110,6 +1187,6 @@ export default function FolderView({ folderId }) {
           })
         }
       </Menu>
-    </Grid >
+    </Grid>
   );
 }
