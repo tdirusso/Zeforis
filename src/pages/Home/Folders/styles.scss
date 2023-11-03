@@ -375,6 +375,14 @@ body.dark {
   }
 }
 
+.filters-row {
+
+  input,
+  .MuiFormLabel-root {
+    font-size: 14px;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

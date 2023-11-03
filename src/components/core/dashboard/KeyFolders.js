@@ -39,7 +39,7 @@ export default function KeyFolders({ folders, isAdmin, openDrawer }) {
                   </Box>
                   <Button
                     size="small"
-                    onClick={() => navigate(`/home/tasks?folderId=${folder.id}`)}>
+                    onClick={() => navigate(`/home/folders?viewingFolderId=${folder.id}`)}>
                     View folder
                   </Button>
                 </Box>

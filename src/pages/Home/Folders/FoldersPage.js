@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Menu, MenuItem, Typography } from "@mui/material";
 import './styles.scss';
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import Divider from '@mui/material/Divider';
 import React, { useEffect, useRef, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
@@ -36,12 +36,29 @@ export default function FoldersPage() {
     openModal
   } = useOutletContext();
 
-  const [query, setQuery] = useState('');
   const [keyFolders, setKeyFolders] = useState([]);
   const [otherFolders, setOtherFolders] = useState([]);
   const [openStates, setOpenStates] = useState({});
   const [renderReady, setRenderReady] = useState(false);
-  const [viewingFolderId, setViewingFolderId] = useState(null);
+
+  const [searchParams, setSearchParams] = useSearchParams({ folderQ: '' });
+
+  const viewingFolderId = searchParams.get('viewingFolderId');
+  const query = searchParams.get('folderQ');
+
+  const setViewingFolderId = id => {
+    setSearchParams(prev => {
+      prev.set('viewingFolderId', id);
+      return prev;
+    }, { replace: true });
+  };
+
+  const setQuery = value => {
+    setSearchParams(prev => {
+      prev.set('folderQ', value);
+      return prev;
+    }, { replace: true });
+  };
 
   const prevFolders = useRef(folders);
   const prevQuery = useRef(query);
@@ -166,7 +183,12 @@ export default function FoldersPage() {
     <>
       {
         !renderReady ?
-          <CircularProgress size={30} sx={{ mx: 5, my: 4 }} />
+          <Grid item xs={12} style={{ transition: 'all 250ms' }}>
+            <Paper className="flex-ac">
+              Loading folders ...
+              <CircularProgress size={30} sx={{ mx: 2, my: 4 }} />
+            </Paper>
+          </Grid>
           :
           <>
             <FolderList
@@ -188,6 +210,7 @@ export default function FoldersPage() {
               engagement={engagement}
               setFolders={setFolders}
               openModal={openModal}
+              renderReady={renderReady}
             />
             {
               viewingFolderId ?
@@ -326,7 +349,7 @@ function FolderList(props) {
   const gridWidth = viewingFolderId ? 2.5 : 12;
 
   return (
-    <Grid item xs={gridWidth} style={{ transition: 'all 250ms' }}>
+    <Grid item xs={gridWidth} style={{ transition: 'flex-basis 250ms, max-width 250ms' }}>
       <Paper sx={{ px: 0, py: 1.5 }}>
         <Box className="flex-ac" px={viewingFolderId ? 1.5 : 3} gap={3} flexWrap='wrap'>
           <Tooltip title="New folder" placement="bottom-end">

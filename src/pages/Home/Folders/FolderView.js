@@ -1,5 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Paper, Checkbox, Box, Tooltip, IconButton, Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl, Autocomplete, Button, Divider, ListItemText, FormHelperText, Collapse } from "@mui/material";
+import {
+  Grid, Paper, Checkbox, Box, Tooltip, IconButton,
+  Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl,
+  Autocomplete, Button, Divider, ListItemText, FormHelperText,
+  Collapse,
+  InputAdornment,
+  InputLabel,
+  Select
+} from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
@@ -20,7 +28,6 @@ import { batchUpdateTasks, updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from "react-transition-group";
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
@@ -30,6 +37,9 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import { LoadingButton } from "@mui/lab";
 import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
+import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
 
 export default function FolderView({ folderId }) {
 
@@ -64,11 +74,17 @@ export default function FolderView({ folderId }) {
   const [taskActionsMenuAnchor, setTaskActionsMenuAnchor] = useState(null);
   const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
   const [folderMenuAnchor, setFolderMenuAnchor] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
   const [tempAssignee, setTempAssignee] = useState(null);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
   const [doAction, setDoAction] = useState(null);
+
+  const [filterName, setFilterName] = useState('');
+  const [filterTags, setFilterTags] = useState([]);
+  const [filterAssignedTo, setFilterAssignedTo] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const [bulkEditAction, setBulkEditAction] = useState(null);
   const [bulkStatusValue, setBulkStatusValue] = useState(null);
@@ -78,7 +94,21 @@ export default function FolderView({ folderId }) {
   const [bulkTagAction, setBulkTagAction] = useState('add');
 
   const folderTasks = useMemo(() => {
-    const theTasks = folder.tasks;
+    let theTasks = folder.tasks;
+    const lcFilterName = filterName?.toLowerCase();
+
+    theTasks = theTasks.filter(task => {
+      let tagIds;
+
+      if (filterTags.length) {
+        tagIds = task.tags?.split(',').filter(Boolean).map(id => String(id)) || [];
+      }
+
+      return (!lcFilterName || task.task_name.toLowerCase().includes(lcFilterName)) &&
+        (!filterAssignedTo || filterAssignedTo.id === task.assigned_to_id) &&
+        (filterTags.length === 0 || filterTags.every(tag => tagIds.includes(tag.id.toString()))) &&
+        (filterStatus === 'all' || filterStatus === task.status);
+    });
 
     switch (sortBy) {
       case 'name':
@@ -114,7 +144,12 @@ export default function FolderView({ folderId }) {
     }
 
     return theTasks;
-  }, [sortBy, folder]);
+  }, [sortBy, folder, filterName, filterAssignedTo, filterTags, filterStatus]);
+
+  const filterCount = (filterName ? 1 : 0) +
+    (filterAssignedTo ? 1 : 0) +
+    (filterTags.length ? 1 : 0) +
+    (filterStatus !== 'all' ? 1 : 0);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
@@ -209,7 +244,9 @@ export default function FolderView({ folderId }) {
           setEditingName(false);
           setTempSelectedTags([]);
           setTagIdToRemove(null);
-          setEditingTask(null);
+          setTimeout(() => {
+            setEditingTask(null);
+          }, 300);
           openSnackBar('Saved.', 'success');
         } else {
           setEditingTask(null);
@@ -499,6 +536,13 @@ export default function FolderView({ folderId }) {
     }
   };
 
+  const resetFilters = () => {
+    setFilterName('');
+    setFilterTags([]);
+    setFilterAssignedTo(null);
+    setFilterStatus('all');
+  };
+
   useEffect(() => {
     if (isEditingName) {
       nameRef.current.focus();
@@ -541,12 +585,24 @@ export default function FolderView({ folderId }) {
               </IconButton>
             </Tooltip>
             <Tooltip
-              title="Filter"
+              title={showFilters ? 'Hide filters' : 'Show filters'}
               placement="top">
               <Button
-                style={{ color: 'inherit' }}
-                startIcon={<FilterAltOutlinedIcon />}>
-                All tasks
+                color={filterCount === 0 ? 'inherit' : 'primary'}
+                endIcon={<ExpandMoreIcon
+                  style={{
+                    transform: showFilters ? 'rotate(-180deg)' : 'rotate(0)',
+                    transition: 'transform 250ms'
+                  }}
+                />}
+                onClick={() => setShowFilters(old => !old)}
+                style={{
+                  color: filterCount === 0 ? 'grey' : ''
+                }}
+                startIcon={<FilterAltRoundedIcon />}>
+                {
+                  filterCount === 0 ? 'All tasks' : `${filterCount} filters`
+                }
               </Button>
             </Tooltip>
           </Box>
@@ -606,6 +662,7 @@ export default function FolderView({ folderId }) {
                 Move
               </LoadingButton>
               <Button
+                onClick={() => openModal('delete-tasks', { taskIds: selectedTasks })}
                 disabled={selectedTasks.length === 0}
                 style={{ marginRight: '15px' }}
                 size="small"
@@ -616,6 +673,131 @@ export default function FolderView({ folderId }) {
             </Box>
           </Box>
         </Box>
+
+
+
+        <Collapse in={showFilters}>
+          <Box
+            gap={2}
+            className="flex-ac filters-row"
+            style={{ padding: '6px 22px 2px 22px' }}>
+            <Tooltip title="Reset filters">
+              <IconButton
+                onClick={resetFilters}
+                disabled={filterCount === 0}
+                size="small"
+                style={{ marginRight: '-10px' }}>
+                <ReplayRoundedIcon />
+              </IconButton>
+            </Tooltip>
+            <TextField
+              size="small"
+              placeholder='Name ...'
+              value={filterName}
+              onChange={e => setFilterName(e.target.value)}
+            />
+            <FormControl style={{ width: 185 }}>
+              <Autocomplete
+                ListboxProps={{
+                  style: {
+                    fontSize: 14
+                  }
+                }}
+                size="small"
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
+                options={[...engagementAdmins, ...engagementMembers]}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                groupBy={(option) => option.role}
+                onChange={(_, newVal) => setFilterAssignedTo(newVal)}
+                value={filterAssignedTo}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Assignee ..."
+                    InputProps={{
+                      ...params.InputProps,
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+            <Divider flexItem orientation="vertical" />
+            <FormControl style={{ width: 140 }}>
+              <InputLabel size="small">Status</InputLabel>
+              <Select
+                style={{ fontSize: 14 }}
+                value={filterStatus}
+                label="Status"
+                size="small"
+                onChange={e => setFilterStatus(e.target.value)}>
+                <MenuItem
+                  style={{ fontSize: 14 }}
+                  value='all'>All</MenuItem>
+                <Divider />
+                {
+                  statuses.map(({ name }) =>
+                    <MenuItem
+                      key={name}
+                      value={name}>
+                      <Chip
+                        size="small"
+                        className={name}
+                        label={name}
+                        style={{ cursor: 'pointer' }}>
+                      </Chip>
+
+                    </MenuItem>)
+                }
+              </Select>
+            </FormControl>
+            <Divider flexItem orientation="vertical" />
+            <FormControl style={{
+              flexGrow: 1,
+              maxWidth: 275,
+              minWidth: 200
+            }}>
+              <Autocomplete
+                ListboxProps={{
+                  style: {
+                    fontSize: 14
+                  }
+                }}
+                multiple
+                options={tags}
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+                isOptionEqualToValue={(option, value) => option.name === value.name}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                disableCloseOnSelect
+                size="small"
+                onChange={(_, newVal) => setFilterTags(newVal)}
+                value={filterTags}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Tags"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment:
+                        <>
+                          <InputAdornment position='start'>
+                            <LocalOfferOutlinedIcon />
+                          </InputAdornment>
+                          {params.InputProps.startAdornment}
+                        </>
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+        </Collapse>
+
+
+
+
+
 
         <TransitionGroup
           className="folder-tasks-table">
@@ -802,9 +984,7 @@ export default function FolderView({ folderId }) {
                       <Chip
                         size="small"
                         label={task.status}
-                        deleteIcon={<MoreVertIcon fontSize="small" />}
                         onClick={e => handleStatusClick(e, task)}
-                        onDelete={e => handleStatusClick(e, task)}
                         className={task.status}>
                       </Chip>
                     </Box>
@@ -1187,6 +1367,6 @@ export default function FolderView({ folderId }) {
           })
         }
       </Menu>
-    </Grid>
+    </Grid >
   );
 }
