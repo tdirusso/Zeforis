@@ -6,7 +6,8 @@ import {
   Collapse,
   InputAdornment,
   InputLabel,
-  Select
+  Select,
+  useTheme
 } from "@mui/material";
 import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -59,6 +60,8 @@ export default function FolderView({ folderId }) {
     openModal,
     folders
   } = useOutletContext();
+
+  const theme = useTheme(); // Get the current theme
 
   const engagementId = engagement.id;
   const folder = foldersMap[folderId];
@@ -588,7 +591,6 @@ export default function FolderView({ folderId }) {
               title={showFilters ? 'Hide filters' : 'Show filters'}
               placement="top">
               <Button
-                color={filterCount === 0 ? 'inherit' : 'primary'}
                 endIcon={<ExpandMoreIcon
                   style={{
                     transform: showFilters ? 'rotate(-180deg)' : 'rotate(0)',
@@ -597,7 +599,7 @@ export default function FolderView({ folderId }) {
                 />}
                 onClick={() => setShowFilters(old => !old)}
                 style={{
-                  color: filterCount === 0 ? 'grey' : ''
+                  color: filterCount === 0 ? theme.palette.text.secondary : theme.palette.primary.main
                 }}
                 startIcon={<FilterAltRoundedIcon />}>
                 {
@@ -682,13 +684,15 @@ export default function FolderView({ folderId }) {
             className="flex-ac filters-row"
             style={{ padding: '6px 22px 2px 22px' }}>
             <Tooltip title="Reset filters">
-              <IconButton
-                onClick={resetFilters}
-                disabled={filterCount === 0}
-                size="small"
-                style={{ marginRight: '-10px' }}>
-                <ReplayRoundedIcon />
-              </IconButton>
+              <span>
+                <IconButton
+                  onClick={resetFilters}
+                  disabled={filterCount === 0}
+                  size="small"
+                  style={{ marginRight: '-10px' }}>
+                  <ReplayRoundedIcon />
+                </IconButton>
+              </span>
             </Tooltip>
             <TextField
               size="small"
@@ -1367,6 +1371,6 @@ export default function FolderView({ folderId }) {
           })
         }
       </Menu>
-    </Grid >
+    </Grid>
   );
 }
