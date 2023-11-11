@@ -12,7 +12,7 @@ export default function DeleteFolderModal(props) {
   const {
     isOpen,
     close,
-    folder,
+    folderId,
     engagement,
     foldersMap,
     setFolders,
@@ -21,6 +21,7 @@ export default function DeleteFolderModal(props) {
   } = props;
 
   const engagementId = engagement.id;
+  const folder = foldersMap[folderId];
 
   const [isLoading, setLoading] = useState(false);
 

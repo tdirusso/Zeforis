@@ -45,7 +45,7 @@ export default function CreateEngagementDialog(props) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         deleteActiveEngagementId();
-        window.location.reload();
+        window.location.replace('/home/dashboard');
       }, 500);
     }
   }, [orgId]);

@@ -27,7 +27,7 @@ export default function DeleteEngagementModal(props) {
     try {
       const { success, message } = await deleteEngagement({
         engagementId,
-        org: org.id
+        orgId: org.id
       });
 
       if (success) {

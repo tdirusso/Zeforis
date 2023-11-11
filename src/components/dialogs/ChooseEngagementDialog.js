@@ -79,13 +79,13 @@ export default function ChooseEngagementDialog(props) {
     if (isLoadingEngagement) {
       setTimeout(() => {
         setActiveEngagementId(engagementId);
-        window.location.reload();
+        window.location = window.location.pathname;
       }, 500);
     } else if (isLoadingOrg) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         deleteActiveEngagementId();
-        window.location.reload();
+        window.location = window.location.pathname;
       }, 500);
     }
   }, [engagementId, orgId]);

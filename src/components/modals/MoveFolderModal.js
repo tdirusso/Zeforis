@@ -114,7 +114,7 @@ export default function MoveFolderModal(props) {
       </DialogTitle>
 
       <DialogContent>
-        Select destination:
+        Select destination:  {selectedFolderId && foldersMap[selectedFolderId].name}
         <Box
           border='1px solid gainsboro'
           borderRadius='8px'
@@ -129,6 +129,7 @@ export default function MoveFolderModal(props) {
             selectedFolderId={selectedFolderId}
             setSelectedFolderId={setSelectedFolderId}
             moveToTop={moveToTop}
+            moveFolderId={moveFolderId}
           />
         </Box>
         <Box className='flex-ac' mb={1}>
@@ -171,7 +172,8 @@ function FolderList(props) {
     setOpenStates,
     selectedFolderId,
     setSelectedFolderId,
-    moveToTop
+    moveToTop,
+    moveFolderId
   } = props;
 
   const handleFolderClick = (folderId, hasNestedFolders) => {
@@ -209,6 +211,7 @@ function FolderList(props) {
               openStates={openStates}
               setOpenStates={setOpenStates}
               moveToTop={moveToTop}
+              moveFolderId={moveFolderId}
             />
           );
         })
@@ -230,6 +233,7 @@ function FolderList(props) {
               openStates={openStates}
               setOpenStates={setOpenStates}
               moveToTop={moveToTop}
+              moveFolderId={moveFolderId}
             />
           );
         })
@@ -247,7 +251,8 @@ function FolderListItem(props) {
     allFolders,
     openStates,
     setOpenStates,
-    moveToTop
+    moveToTop,
+    moveFolderId
   } = props;
 
   const hasNestedFolders = allFolders.some(subfolder => subfolder.parent_id === id);
@@ -255,7 +260,7 @@ function FolderListItem(props) {
   return (
     <>
       <ListItemButton
-        disabled={moveToTop}
+        disabled={moveToTop || id === moveFolderId}
         className="folder-listitem"
         selected={selectedFolderId === id}
         disableRipple
@@ -278,7 +283,7 @@ function FolderListItem(props) {
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto">
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop, moveFolderId)}
           </Collapse>
           : null
       }
@@ -286,21 +291,20 @@ function FolderListItem(props) {
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop, depth = 1) {
+function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop, moveFolderId, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
   const indent = (`${36 * depth}px`);
 
   return (
-
     nestedFolders.map(folder => {
       const hasNestedFolders = folders.some(subfolder => subfolder.parent_id === folder.id);
 
       return (
         <Box key={folder.id}>
           <ListItemButton
-            disabled={moveToTop}
+            disabled={moveToTop || folder.id === moveFolderId}
             className="folder-listitem"
             disableRipple
             selected={selectedFolderId === folder.id}
@@ -321,7 +325,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
           {
             hasNestedFolders ?
               <Collapse in={openStates[folder.id]} timeout="auto">
-                {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop, depth)}
+                {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop, moveFolderId, depth)}
               </Collapse> : null
           }
         </Box>

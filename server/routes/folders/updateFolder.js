@@ -16,6 +16,12 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  if (parentId && folderId === parentId) {
+    return res.json({
+      message: "Folder cannot be it's own parent."
+    });
+  }
+
   try {
     await pool.query(
       'UPDATE folders SET name = ?, is_key_folder = ?, parent_id = ? WHERE id = ?',

@@ -346,6 +346,11 @@ function FolderList(props) {
     setMoreMenuAnchor(null);
   };
 
+  const handleDeleteFolderClick = () => {
+    openModal('delete-folder', { folderId: editFolderId });
+    setMoreMenuAnchor(null);
+  };
+
   const gridWidth = viewingFolderId ? 2.5 : 12;
 
   return (
@@ -576,7 +581,7 @@ function FolderList(props) {
           Move folder
         </MenuItem>
         <Divider className="m0" />
-        <MenuItem dense>
+        <MenuItem dense onClick={handleDeleteFolderClick}>
           <ListItemText inset color="error">
             <Typography color="error" component="span">
               Delete folder
