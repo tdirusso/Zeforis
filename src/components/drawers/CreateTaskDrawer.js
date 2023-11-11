@@ -65,9 +65,6 @@ export default function CreateTaskDrawer(props) {
     }
   }, [defaultFolder, isOpen]);
 
-  const tagIdNameMap = {};
-  tags.forEach(tag => tagIdNameMap[tag.id] = tag.name);
-
   const handleCreateTask = async () => {
     if (isLoading) {
       openSnackBar('Task is being created.');

@@ -17,7 +17,6 @@ const fixedTransition = forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={{ enter: 0 }} />;
 });
 
-
 export default function ChooseEngagementDialog(props) {
   const {
     isOpen,
@@ -79,13 +78,13 @@ export default function ChooseEngagementDialog(props) {
     if (isLoadingEngagement) {
       setTimeout(() => {
         setActiveEngagementId(engagementId);
-        window.location = window.location.pathname;
+        window.location.href = '/home/dashboard';
       }, 500);
     } else if (isLoadingOrg) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         deleteActiveEngagementId();
-        window.location = window.location.pathname;
+        window.location.href = '/home/dashboard';
       }, 500);
     }
   }, [engagementId, orgId]);

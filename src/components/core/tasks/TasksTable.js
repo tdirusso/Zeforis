@@ -29,7 +29,7 @@ import {
   ListItemText,
   FormHelperText
 } from "@mui/material";
-import { useLocation, useOutletContext } from "react-router-dom";
+import { Link, useLocation, useOutletContext } from "react-router-dom";
 import './styles.scss';
 import { useMemo, useRef, useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
@@ -1150,7 +1150,7 @@ export default function TasksTable() {
             <EastRoundedIcon fontSize="small" />
             Quick view
           </MenuItem>
-          <MenuItem dense>
+          <MenuItem dense component={Link} to={`/${editingTask?.task_id}`}>
             <FullscreenOutlinedIcon fontSize="small" />
             Full view
           </MenuItem>

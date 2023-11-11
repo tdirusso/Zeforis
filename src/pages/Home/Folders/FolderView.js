@@ -13,7 +13,7 @@ import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { statuses } from "../../../lib/constants";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -1214,7 +1214,7 @@ export default function FolderView({ folderId }) {
           <EastRoundedIcon fontSize="small" />
           Quick view
         </MenuItem>
-        <MenuItem dense>
+        <MenuItem dense component={Link} to={`../tasks/${editingTask?.task_id}`}>
           <FullscreenOutlinedIcon fontSize="small" />
           Full view
         </MenuItem>

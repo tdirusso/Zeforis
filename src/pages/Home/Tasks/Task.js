@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
-import { createTag } from '../../api/tags';
+import { createTag } from '../../../api/tags';
 import LinkIcon from '@mui/icons-material/Link';
 import FolderIcon from '@mui/icons-material/Folder';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -31,20 +31,20 @@ import CloseIcon from '@mui/icons-material/Close';
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import './styles.scss';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { statuses } from '../../lib/constants';
+import { statuses } from '../../../lib/constants';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { updateTask } from '../../api/tasks';
+import { updateTask } from '../../../api/tasks';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { deleteTasks } from '../../api/tasks';
+import { deleteTasks } from '../../../api/tasks';
 import { LoadingButton } from '@mui/lab';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import CheckIcon from '@mui/icons-material/Check';
 import moment from 'moment';
+import { useOutletContext, useParams } from 'react-router-dom';
 
 const defaultTask = {
   task_id: null,
@@ -82,12 +82,15 @@ export default function TaskDrawer(props) {
     setTags,
     openSnackBar,
     foldersMap,
-    taskProp,
     setTasks,
     user,
     tasksMap,
     tagsMap
-  } = props;
+  } = useOutletContext();
+
+  const { taskId } = useParams();
+
+  const task = tasksMap[taskId];
 
   const engagementId = engagement.id;
 
@@ -98,7 +101,6 @@ export default function TaskDrawer(props) {
   const [description, setDescription] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [copyButtonText, setCopyButtonText] = useState('Copy Link');
-  const [task, setTask] = useState(defaultTask);
   const [membersAndAdmins] = useState([...engagementAdmins, ...engagementMembers]);
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
@@ -113,36 +115,6 @@ export default function TaskDrawer(props) {
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const deleteMenuOpen = Boolean(deleteMenuAnchor);
-
-  useEffect(() => {
-    if (taskProp) {
-      const tagIds = taskProp.tags?.split(',').filter(Boolean) || [];
-      setTask(taskProp);
-      setName(taskProp.task_name);
-      setDescription(taskProp.description);
-      setLinkUrl(taskProp.link_url);
-      setDateDue(taskProp.date_due ? moment(taskProp.date_due) : null);
-      setIsKeyTask(Boolean(taskProp.is_key_task));
-      setFolder(foldersMap[taskProp.folder_id] || null);
-      setStatus(taskProp.status);
-      setAssignedTo(membersAndAdmins.find(u => u.id === taskProp.assigned_to_id) || null);
-      setSelectedTags(tagIds.map(tagId => ({
-        id: Number(tagId),
-        name: tagsMap[tagId].name
-      })));
-    } else {
-      setTask(defaultTask);
-      setName('');
-      setDescription('');
-      setLinkUrl('');
-      setDateDue(null);
-      setIsKeyTask(false);
-      setFolder(null);
-      setStatus(null);
-      setAssignedTo(null);
-      setSelectedTags([]);
-    }
-  }, [taskProp]);
 
   const curTagsIds = task.tags?.split(',').filter(Boolean) || [];
 
@@ -279,7 +251,6 @@ export default function TaskDrawer(props) {
         };
 
         tasksMap[task.task_id] = newTaskObject;
-        setTask(newTaskObject);
         setTasks(Object.values(tasksMap));
         setLoading(false);
         handleClose();
@@ -338,42 +309,8 @@ export default function TaskDrawer(props) {
   };
 
   return (
-    <Drawer
-      className='task-drawer'
-      anchor="right"
-      open={isOpen}
-      onClose={handleClose}
-      hideBackdrop
-      variant='persistent'
-      PaperProps={{
-        className: 'drawer'
-      }}>
-      <Paper className='p0 minimize-btn br50'>
-        <Tooltip title="Close">
-          <IconButton onClick={handleClose}>
-            <KeyboardDoubleArrowRightIcon />
-          </IconButton>
-        </Tooltip>
-      </Paper>
-      <Paper className='p0 close-btn br50' hidden={!isAdmin}>
-        <Tooltip title="Cancel" placement='top'>
-          <IconButton onClick={handleClose} disabled={isLoading}>
-            <CloseIcon color={isLoading ? '' : 'error'} />
-          </IconButton>
-        </Tooltip>
-      </Paper>
-      <Paper className='p0 save-btn br50' hidden={!isAdmin}>
-        <Tooltip title="Save">
-          <IconButton onClick={handleUpdateTask}>
-            {
-              isLoading ?
-                <CircularProgress size='20px' /> :
-                <CheckIcon htmlColor='#00c975' />
-            }
-          </IconButton>
-        </Tooltip>
-      </Paper>
-      <DialogContent style={{ paddingTop: '15px' }}>
+    <Grid item xs={12} md={8} style={{ margin: '0 auto' }}>
+      <Paper>
         <Grid container rowSpacing={0} columnSpacing={1.5}>
           <Grid item xs={12} mb={2}>
             <Box display='flex' justifyContent='space-between'>
@@ -674,7 +611,25 @@ export default function TaskDrawer(props) {
             </Typography>
           </Alert>
         </Box>
-      </DialogContent>
-    </Drawer >
+      </Paper>
+    </Grid>
   );
 };
+
+function NoTaskFoundMessage({ taskId }) {
+  return (
+    <Grid item md={6} xs={12} style={{ margin: '0 auto' }}>
+      <Paper style={{ textAlign: 'center' }}>
+        <Box mb={2}>
+          No task was found with id:  {taskId}
+        </Box>
+        <Button
+          variant="contained"
+          onClick={() => window.history.back()}
+        >
+          Go back
+        </Button>
+      </Paper>
+    </Grid>
+  );
+}

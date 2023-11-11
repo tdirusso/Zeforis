@@ -30,6 +30,7 @@ import AboutOrg from './components/core/settings/org/About';
 import Members from './components/core/settings/org/Members';
 import Profile from './components/core/settings/account/Profile';
 import Billing from './components/core/settings/account/Billing';
+import TaskPage from './pages/Home/Tasks/Task';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -51,6 +52,7 @@ function App() {
             <Route path="home/*" element={<HomePage setTheme={setTheme} />}>
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="tasks" element={<TasksPage />} />
+              <Route path="tasks/:taskId" element={<TaskPage />} />
               <Route path="folders" element={<FoldersPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="tools" element={<ToolsPage />} />
