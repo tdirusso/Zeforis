@@ -114,12 +114,12 @@
     gap: 8px;
     padding: 5px 0;
 
+    &.table-row:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
     &.edit-mode.table-row {
       cursor: pointer;
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.04);
-      }
 
       .task-select-cell {
         width: 38px;
@@ -137,12 +137,6 @@
     &.selected {
       background: rgba(var(--colors-primary-rgb), 0.075) !important;
     }
-  }
-
-  .task-more-cell {
-    padding-right: 5px;
-    flex-grow: 1;
-    text-align: end;
   }
 
   .task-tags-cell {
@@ -336,7 +330,8 @@ body.dark {
   }
 
   .row-wrapper {
-    &.edit-mode:hover {
+
+    &.table-row:hover {
       background: rgba(255, 255, 255, 0.08);
     }
   }
@@ -353,6 +348,8 @@ body.dark {
 
 .folder-tasks-header {
   padding: 20px;
+  padding-left: 37px;
+  padding-bottom: 10px;
 }
 
 .folder-tasks-controls {

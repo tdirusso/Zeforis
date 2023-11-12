@@ -43,7 +43,9 @@ import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
-import { LoadingButton, LocalizationProvider, StaticDatePicker } from "@mui/lab";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { LoadingButton } from "@mui/lab";
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
@@ -53,7 +55,6 @@ import { statuses } from "../../../lib/constants";
 import { useEffect } from "react";
 import moment from "moment";
 import { createTag } from "../../../api/tags";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { TransitionGroup } from "react-transition-group";
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -135,6 +136,9 @@ export default function TasksTable() {
   const taskActionsMenuOpen = Boolean(taskActionsMenuAnchor);
   const tagsMenuOpen = Boolean(tagsMenuAnchor);
   const folderMenuOpen = Boolean(folderMenuAnchor);
+
+  const [mouseX, setMouseX] = useState(0);
+  const [mouseY, setMouseY] = useState(0);
 
   const nameRef = useRef(null);
 
@@ -340,9 +344,12 @@ export default function TasksTable() {
     setDateDueMenuAnchor(e.currentTarget);
   };
 
-  const handleTaskMoreClick = (e, task) => {
+  const handleOpenTaskContextMenu = (e, task) => {
+    e.preventDefault();
     setEditingTask(task);
     setTaskActionsMenuAnchor(e.currentTarget);
+    setMouseX(e.clientX);
+    setMouseY(e.clientY);
   };
 
   const handleToggleKeyTask = (task) => {
@@ -483,15 +490,19 @@ export default function TasksTable() {
 
   return (
     <>
-
-
       <Grid item xs={12}>
         <Paper className="px0" style={{ overflowX: 'auto' }}>
-
-
-
+          <Box pl={4} pr={2} pb='10px'>
+            <h4 style={{ fontSize: '1.15rem' }}>Tasks Table</h4>
+          </Box>
           <Box className="flex-ac folder-tasks-controls">
             <Box className="flex-ac" gap='4px'>
+              <Box hidden={!isAdmin} mr={3}>
+                <Button
+                  onClick={() => openDrawer('create-task')}>
+                  + Task
+                </Button>
+              </Box>
               <Tooltip title="Toggle bulk edit" placement="top">
                 <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
                   <EditNoteRoundedIcon />
@@ -586,13 +597,11 @@ export default function TasksTable() {
             </Box>
           </Box>
 
-
-
           <Collapse in={showFilters}>
             <Box
               gap={2}
               className="flex-ac filters-row"
-              style={{ padding: '6px 22px 2px 22px' }}>
+              style={{ padding: '6px 22px 5px 22px' }}>
               <Tooltip title="Reset filters">
                 <span>
                   <IconButton
@@ -610,32 +619,6 @@ export default function TasksTable() {
                 value={filterName}
                 onChange={e => setFilterName(e.target.value)}
               />
-              <FormControl style={{ width: 185 }}>
-                <Autocomplete
-                  ListboxProps={{
-                    style: {
-                      fontSize: 14
-                    }
-                  }}
-                  size="small"
-                  renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
-                  options={[...engagementAdmins, ...engagementMembers]}
-                  getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  groupBy={(option) => option.role}
-                  onChange={(_, newVal) => setFilterAssignedTo(newVal)}
-                  value={filterAssignedTo}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Assignee ..."
-                      InputProps={{
-                        ...params.InputProps,
-                      }}
-                    />
-                  )}
-                />
-              </FormControl>
               <Divider flexItem orientation="vertical" />
               <FormControl style={{ width: 140 }}>
                 <InputLabel size="small">Status</InputLabel>
@@ -665,6 +648,34 @@ export default function TasksTable() {
                   }
                 </Select>
               </FormControl>
+              <Divider flexItem orientation="vertical" />
+              <FormControl style={{ width: 185 }}>
+                <Autocomplete
+                  ListboxProps={{
+                    style: {
+                      fontSize: 14
+                    }
+                  }}
+                  size="small"
+                  renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
+                  options={[...engagementAdmins, ...engagementMembers]}
+                  getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  groupBy={(option) => option.role}
+                  onChange={(_, newVal) => setFilterAssignedTo(newVal)}
+                  value={filterAssignedTo}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Assignee ..."
+                      InputProps={{
+                        ...params.InputProps,
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+
               <Divider flexItem orientation="vertical" />
               <FormControl style={{
                 flexGrow: 1,
@@ -707,21 +718,6 @@ export default function TasksTable() {
               </FormControl>
             </Box>
           </Collapse>
-
-
-
-
-
-          <Box px={3} mb={2} hidden={!isAdmin}>
-            <Button
-              variant="contained"
-              onClick={() => openDrawer('create-task')}>
-              New Task
-            </Button>
-          </Box>
-
-
-
 
           <TransitionGroup
             className="folder-tasks-table">
@@ -835,6 +831,7 @@ export default function TasksTable() {
                 return (
                   <Collapse
                     unmountOnExit
+                    onContextMenu={e => handleOpenTaskContextMenu(e, task)}
                     onClick={() => handleTaskSelection(task.task_id)}
                     key={task.task_id}
                     className={isSelectedRow ? 'selected' : ''}
@@ -976,17 +973,6 @@ export default function TasksTable() {
                           label='+ Tags'
                           onClick={e => handleAddTagClick(e, task)}
                         />
-                      </Box>
-                      <Box className="task-more-cell">
-                        <Tooltip title="More">
-                          <IconButton
-                            size="small"
-                            onClick={e => handleTaskMoreClick(e, task)}>
-                            <MoreVertIcon
-                              fontSize="small"
-                            />
-                          </IconButton>
-                        </Tooltip>
                       </Box>
                     </Box>
                   </Collapse>
@@ -1135,7 +1121,11 @@ export default function TasksTable() {
 
         <Menu
           className="task-actions-menu"
-          anchorEl={taskActionsMenuAnchor}
+          anchorReference="anchorPosition"
+          anchorPosition={{
+            top: mouseY,
+            left: mouseX
+          }}
           open={taskActionsMenuOpen}
           onClose={() => {
             setTaskActionsMenuAnchor(null);
@@ -1150,7 +1140,11 @@ export default function TasksTable() {
             <EastRoundedIcon fontSize="small" />
             Quick view
           </MenuItem>
-          <MenuItem dense component={Link} to={`/${editingTask?.task_id}`}>
+          <MenuItem
+            style={{ color: 'inherit' }}
+            dense
+            component={Link}
+            to={`${editingTask?.task_id}`}>
             <FullscreenOutlinedIcon fontSize="small" />
             Full view
           </MenuItem>

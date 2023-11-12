@@ -14,7 +14,6 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { statuses } from "../../../lib/constants";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import moment from "moment";
@@ -95,6 +94,9 @@ export default function FolderView({ folderId }) {
   const [bulkFolderValue, setBulkFolderValue] = useState(null);
   const [bulkAssigneeValue, setBulkAssigneeValue] = useState(null);
   const [bulkTagAction, setBulkTagAction] = useState('add');
+
+  const [mouseX, setMouseX] = useState(0);
+  const [mouseY, setMouseY] = useState(0);
 
   const folderTasks = useMemo(() => {
     let theTasks = folder.tasks;
@@ -438,11 +440,6 @@ export default function FolderView({ folderId }) {
     setDateDueMenuAnchor(e.currentTarget);
   };
 
-  const handleTaskMoreClick = (e, task) => {
-    setEditingTask(task);
-    setTaskActionsMenuAnchor(e.currentTarget);
-  };
-
   const handleToggleKeyTask = (task) => {
     setEditingTask({ ...task, is_key_task: !task.is_key_task });
     setDoUpdate(true);
@@ -572,13 +569,21 @@ export default function FolderView({ folderId }) {
     setBulkEditMode(prev => !prev);
   };
 
+  const handleOpenTaskContextMenu = (e, task) => {
+    e.preventDefault();
+    setEditingTask(task);
+    setTaskActionsMenuAnchor(e.currentTarget);
+    setMouseX(e.clientX);
+    setMouseY(e.clientY);
+  };
+
   const rowWrapperClass = `row-wrapper ${isBulkEditMode ? 'edit-mode' : ''}`;
 
   return (
     <Grid item xs={9.5}>
       <Paper className="folder-tasks-wrapper">
         <Box className="folder-tasks-header">
-          <h4>{folder.name}</h4>
+          <h4 style={{ fontSize: '1.15rem' }}>{folder.name}</h4>
         </Box>
         <Box className="flex-ac folder-tasks-controls">
           <Box className="flex-ac" gap='4px'>
@@ -676,13 +681,11 @@ export default function FolderView({ folderId }) {
           </Box>
         </Box>
 
-
-
         <Collapse in={showFilters}>
           <Box
             gap={2}
             className="flex-ac filters-row"
-            style={{ padding: '6px 22px 2px 22px' }}>
+            style={{ padding: '6px 22px 5px 22px' }}>
             <Tooltip title="Reset filters">
               <span>
                 <IconButton
@@ -700,32 +703,6 @@ export default function FolderView({ folderId }) {
               value={filterName}
               onChange={e => setFilterName(e.target.value)}
             />
-            <FormControl style={{ width: 185 }}>
-              <Autocomplete
-                ListboxProps={{
-                  style: {
-                    fontSize: 14
-                  }
-                }}
-                size="small"
-                renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
-                options={[...engagementAdmins, ...engagementMembers]}
-                getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.role}
-                onChange={(_, newVal) => setFilterAssignedTo(newVal)}
-                value={filterAssignedTo}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Assignee ..."
-                    InputProps={{
-                      ...params.InputProps,
-                    }}
-                  />
-                )}
-              />
-            </FormControl>
             <Divider flexItem orientation="vertical" />
             <FormControl style={{ width: 140 }}>
               <InputLabel size="small">Status</InputLabel>
@@ -754,6 +731,33 @@ export default function FolderView({ folderId }) {
                     </MenuItem>)
                 }
               </Select>
+            </FormControl>
+            <Divider flexItem orientation="vertical" />
+            <FormControl style={{ width: 185 }}>
+              <Autocomplete
+                ListboxProps={{
+                  style: {
+                    fontSize: 14
+                  }
+                }}
+                size="small"
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
+                options={[...engagementAdmins, ...engagementMembers]}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                groupBy={(option) => option.role}
+                onChange={(_, newVal) => setFilterAssignedTo(newVal)}
+                value={filterAssignedTo}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Assignee ..."
+                    InputProps={{
+                      ...params.InputProps,
+                    }}
+                  />
+                )}
+              />
             </FormControl>
             <Divider flexItem orientation="vertical" />
             <FormControl style={{
@@ -797,11 +801,6 @@ export default function FolderView({ folderId }) {
             </FormControl>
           </Box>
         </Collapse>
-
-
-
-
-
 
         <TransitionGroup
           className="folder-tasks-table">
@@ -915,11 +914,15 @@ export default function FolderView({ folderId }) {
               return (
                 <Collapse
                   unmountOnExit
+                  onContextMenu={e => handleOpenTaskContextMenu(e, task)}
                   onClick={() => handleTaskSelection(task.task_id)}
                   key={task.task_id}
                   className={isSelectedRow ? 'selected' : ''}
                   style={{ position: 'relative', }}>
-                  <Box className={`table-row ${rowWrapperClass} ${isSelectedRow ? 'selected' : ''}`}>
+                  <Box
+                    className={
+                      `table-row ${rowWrapperClass} ${isSelectedRow ? 'selected' : ''}`
+                    }>
                     <Box className="task-select-cell">
                       <Checkbox checked={isSelectedRow} size="small" />
                     </Box>
@@ -1057,17 +1060,6 @@ export default function FolderView({ folderId }) {
                         onClick={e => handleAddTagClick(e, task)}
                       />
                     </Box>
-                    <Box className="task-more-cell">
-                      <Tooltip title="More">
-                        <IconButton
-                          size="small"
-                          onClick={e => handleTaskMoreClick(e, task)}>
-                          <MoreVertIcon
-                            fontSize="small"
-                          />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
                   </Box>
                 </Collapse>
               );
@@ -1199,7 +1191,11 @@ export default function FolderView({ folderId }) {
 
       <Menu
         className="task-actions-menu"
-        anchorEl={taskActionsMenuAnchor}
+        anchorPosition={{
+          top: mouseY,
+          left: mouseX
+        }}
+        anchorReference="anchorPosition"
         open={taskActionsMenuOpen}
         onClose={() => {
           setTaskActionsMenuAnchor(null);
@@ -1214,7 +1210,11 @@ export default function FolderView({ folderId }) {
           <EastRoundedIcon fontSize="small" />
           Quick view
         </MenuItem>
-        <MenuItem dense component={Link} to={`../tasks/${editingTask?.task_id}`}>
+        <MenuItem
+          style={{ color: 'inherit' }}
+          dense
+          component={Link}
+          to={`../tasks/${editingTask?.task_id}`}>
           <FullscreenOutlinedIcon fontSize="small" />
           Full view
         </MenuItem>

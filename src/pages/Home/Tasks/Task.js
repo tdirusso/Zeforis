@@ -45,6 +45,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import CheckIcon from '@mui/icons-material/Check';
 import moment from 'moment';
 import { useOutletContext, useParams } from 'react-router-dom';
+import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
 
 const defaultTask = {
   task_id: null,
@@ -314,12 +315,11 @@ export default function TaskDrawer(props) {
         <Grid container rowSpacing={0} columnSpacing={1.5}>
           <Grid item xs={12} mb={2}>
             <Box display='flex' justifyContent='space-between'>
-              <Tooltip title='Close'>
-                <IconButton
-                  onClick={handleClose}>
-                  <CloseIcon />
-                </IconButton>
-              </Tooltip>
+              <Button
+                startIcon={<KeyboardBackspaceRoundedIcon />}
+                onClick={() => window.history.back()}>
+                Back
+              </Button>
               <Tooltip title='Delete task' hidden={!isAdmin}>
                 <IconButton
                   disabled={isLoading}
@@ -421,8 +421,6 @@ export default function TaskDrawer(props) {
               null
           }
         </Box>
-
-        <Divider style={{ marginTop: '2rem' }} />
         <Box my={3}>
           <TextField
             disabled={isLoading}
@@ -438,7 +436,6 @@ export default function TaskDrawer(props) {
             className={!isAdmin ? 'readonly-textfield' : ''}
           />
         </Box>
-        <Divider />
         <Box my={4}>
           <Box my={2}>
             <TextField
