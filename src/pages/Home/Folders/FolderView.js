@@ -13,7 +13,7 @@ import './styles.scss';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { statuses } from "../../../lib/constants";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import moment from "moment";
@@ -24,7 +24,7 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
-import { batchUpdateTasks, updateTask } from "../../../api/tasks";
+import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from "react-transition-group";
@@ -62,6 +62,8 @@ export default function FolderView({ folderId }) {
 
   const theme = useTheme(); // Get the current theme
 
+  const navigate = useNavigate();
+
   const engagementId = engagement.id;
   const folder = foldersMap[folderId];
 
@@ -97,6 +99,8 @@ export default function FolderView({ folderId }) {
 
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
+  const [addingTask, setAddingTask] = useState(false);
+  const [addingTaskLoading, setAddingTaskLoading] = useState(false);
 
   const folderTasks = useMemo(() => {
     let theTasks = folder.tasks;
@@ -119,8 +123,14 @@ export default function FolderView({ folderId }) {
       case 'name':
         theTasks.sort((a, b) => a.task_name.localeCompare(b.task_name));
         break;
+      case 'nameReverse':
+        theTasks.sort((a, b) => b.task_name.localeCompare(a.task_name));
+        break;
       case 'status':
         theTasks.sort((a, b) => a.status.localeCompare(b.status));
+        break;
+      case 'statusReverse':
+        theTasks.sort((a, b) => b.status.localeCompare(a.status));
         break;
       case 'dateDue':
         theTasks.sort((a, b) => {
@@ -134,6 +144,18 @@ export default function FolderView({ folderId }) {
           return new Date(a.date_due) - new Date(b.date_due);
         });
         break;
+      case 'dateDueReverse':
+        theTasks.sort((a, b) => {
+          // Sort all tasks without due dates to the bottom
+          if (!a.date_due) return 1;
+          if (!b.date_due) return -1;
+          return 0;
+        }).sort((a, b) => {
+          // Now sort by the due date
+          if (!a.date_due || !b.date_due) return 1;
+          return new Date(a.date_due) - new Date(b.date_due);
+        }).reverse();
+        break;
       case 'assignee':
         theTasks.sort((a, b) => {
           if (!a.assigned_first) return 1;
@@ -143,6 +165,16 @@ export default function FolderView({ folderId }) {
           if (!a.assigned_first || !b.assigned_first) return 1;
           return a.assigned_first.localeCompare(b.assigned_first);
         });
+        break;
+      case 'assigneeReverse':
+        theTasks.sort((a, b) => {
+          if (!a.assigned_first) return 1;
+          if (!b.assigned_first) return -1;
+          return 0;
+        }).sort((a, b) => {
+          if (!a.assigned_first || !b.assigned_first) return 1;
+          return a.assigned_first.localeCompare(b.assigned_first);
+        }).reverse();
         break;
       default:
         break;
@@ -164,6 +196,7 @@ export default function FolderView({ folderId }) {
   const folderMenuOpen = Boolean(folderMenuAnchor);
 
   const nameRef = useRef(null);
+  const addingTaskNameRef = useRef(null);
 
   const now = moment();
   const tomorrow = moment().add(1, 'day');
@@ -179,9 +212,14 @@ export default function FolderView({ folderId }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+
       if (nameRef.current && !nameRef.current.contains(event.target)) {
         setEditingName(false);
         setEditingTask(null);
+      }
+
+      if (addingTaskNameRef.current && !addingTaskNameRef.current.contains(event.target)) {
+        setAddingTask(false);
       }
     };
 
@@ -447,11 +485,11 @@ export default function FolderView({ folderId }) {
 
   const handleNameSubmit = e => {
     if (e && e.key === 'Enter') {
+      e.preventDefault();
       if (!nameRef.current.value) {
         openSnackBar('Task name cannot be empty.');
         return;
       } else {
-        e.preventDefault();
         setEditingTask({ ...editingTask, task_name: nameRef.current.value });
         setDoUpdate(true);
       }
@@ -577,24 +615,107 @@ export default function FolderView({ folderId }) {
     setMouseY(e.clientY);
   };
 
+  const handleCreateTask = async e => {
+    if (e && e.key === 'Enter') {
+      e.preventDefault();
+
+      const newTaskName = addingTaskNameRef.current.value;
+
+      if (!newTaskName) {
+        openSnackBar('Task name cannot be empty.');
+        return;
+      } else {
+        setAddingTaskLoading(true);
+
+        try {
+          const { message, task, uiProps } = await createTask({
+            name: newTaskName,
+            folderId,
+            engagementId
+          });
+
+          if (task) {
+            const now = new Date().toISOString();
+
+            openSnackBar('Task created.', 'success');
+
+            setAddingTaskLoading(false);
+            setTasks(tasks => [...tasks, {
+              task_id: task.id,
+              task_name: newTaskName,
+              description: '',
+              date_created: now,
+              created_by_id: user.id,
+              status: 'New',
+              folder_id: folderId,
+              link_url: '',
+              assigned_to_id: null,
+              date_completed: null,
+              is_key_task: 0,
+              date_due: null,
+              date_last_updated: now,
+              tags: null,
+              assigned_first: null,
+              assigned_last: null,
+              created_first: user.firstName,
+              created_last: user.lastName,
+              updated_by_first: user.firstName,
+              updated_by_last: user.lastName
+            }]);
+
+
+            addingTaskNameRef.current.value = '';
+            setTimeout(() => {
+              addingTaskNameRef.current.focus();
+            }, 250);
+          } else {
+            if (uiProps && uiProps.alertType === 'upgrade') {
+              openSnackBar(message, 'error', {
+                actionName: 'Upgrade Now',
+                actionHandler: () => {
+                  navigate('settings/account/billing');
+                }
+              });
+            } else {
+              openSnackBar(message, 'error');
+            }
+            setAddingTaskLoading(false);
+          }
+        } catch (error) {
+          openSnackBar(error.message, 'error');
+          setAddingTaskLoading(false);
+        }
+      }
+    }
+  };
+
   const rowWrapperClass = `row-wrapper ${isBulkEditMode ? 'edit-mode' : ''}`;
 
   return (
     <Grid item xs={9.5}>
       <Paper className="folder-tasks-wrapper">
-        <Box className="folder-tasks-header">
+        <Box className="folder-tasks-header flex-ac">
           <h4 style={{ fontSize: '1.15rem' }}>{folder.name}</h4>
+          <Box ml={3}>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => setAddingTask(true)}>
+              + Task
+            </Button>
+          </Box>
         </Box>
         <Box className="flex-ac folder-tasks-controls">
-          <Box className="flex-ac" gap='4px'>
-            <Tooltip title="Toggle bulk edit" placement="top">
+          <Box className="flex-ac" gap='8px'>
+            <Tooltip title="Toggle bulk edit" placement="left">
               <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
                 <EditNoteRoundedIcon />
               </IconButton>
             </Tooltip>
+            <Divider flexItem orientation="vertical" style={{ margin: '5px 0' }} />
             <Tooltip
               title={showFilters ? 'Hide filters' : 'Show filters'}
-              placement="top">
+              placement="right">
               <Button
                 endIcon={<ExpandMoreIcon
                   style={{
@@ -608,7 +729,7 @@ export default function FolderView({ folderId }) {
                 }}
                 startIcon={<FilterAltRoundedIcon />}>
                 {
-                  filterCount === 0 ? 'All tasks' : `${filterCount} filters`
+                  filterCount === 0 ? 'Filters' : `${filterCount} filters`
                 }
               </Button>
             </Tooltip>
@@ -617,7 +738,7 @@ export default function FolderView({ folderId }) {
             hidden={!isBulkEditMode}
             flexItem
             orientation="vertical"
-            style={{ margin: '4px 12px' }} />
+            style={{ margin: '4px 12px 4px 0' }} />
           <Box
             hidden={!isBulkEditMode}
             component="span"
@@ -684,8 +805,7 @@ export default function FolderView({ folderId }) {
         <Collapse in={showFilters}>
           <Box
             gap={2}
-            className="flex-ac filters-row"
-            style={{ padding: '6px 22px 5px 22px' }}>
+            className="flex-ac filters-row">
             <Tooltip title="Reset filters">
               <span>
                 <IconButton
@@ -814,10 +934,10 @@ export default function FolderView({ folderId }) {
                   />
                 </Box>
                 <Box
-                  placement="top"
+                  placement="top-start"
                   component={Tooltip}
                   title="Sort name"
-                  onClick={() => setSortBy('name')}
+                  onClick={() => sortBy === 'name' ? setSortBy('nameReverse') : setSortBy('name')}
                   className="task-name-cell"
                   style={{ paddingLeft: 45 }}>
                   <Box className="flex-ac">
@@ -833,7 +953,7 @@ export default function FolderView({ folderId }) {
                   component={Tooltip}
                   title="Sort status"
                   className="task-status-cell"
-                  onClick={() => setSortBy('status')}>
+                  onClick={() => sortBy === 'status' ? setSortBy('statusReverse') : setSortBy('status')}>
                   <Box className="flex-ac">
                     Status <FilterListRoundedIcon
                       fontSize="small"
@@ -847,7 +967,7 @@ export default function FolderView({ folderId }) {
                   component={Tooltip}
                   title="Sort assignee"
                   className="task-assigned-cell"
-                  onClick={() => setSortBy('assignee')}>
+                  onClick={() => sortBy === 'assignee' ? setSortBy('assigneeReverse') : setSortBy('assignee')}>
                   <Box className="flex-ac">
                     Assignee <FilterListRoundedIcon
                       fontSize="small"
@@ -861,7 +981,7 @@ export default function FolderView({ folderId }) {
                   component={Tooltip}
                   title="Sort due date"
                   className="task-due-cell"
-                  onClick={() => setSortBy('dateDue')}>
+                  onClick={() => sortBy === 'dateDue' ? setSortBy('dateDueReverse') : setSortBy('dateDue')}>
                   <Box className="flex-ac" textAlign='center'>
                     Due <FilterListRoundedIcon
                       fontSize="small"
@@ -879,6 +999,39 @@ export default function FolderView({ folderId }) {
               </Box>
             </Box>
           </Collapse>
+          {
+            addingTask &&
+            <Collapse unmountOnExit>
+              <Box
+                className={
+                  `table-row ${rowWrapperClass}`
+                }>
+                <Box className="task-select-cell">
+                </Box>
+                <Box
+                  className="task-name-cell" style={{ paddingLeft: 38 }}>
+                  <TextField
+                    disabled={addingTaskLoading}
+                    placeholder="New task"
+                    multiline
+                    variant="standard"
+                    inputProps={{
+                      style: {
+                        fontSize: 14,
+                        padding: '0 8px'
+                      }
+                    }}
+                    fullWidth
+                    size="small"
+                    inputRef={addingTaskNameRef}
+                    onKeyDown={handleCreateTask}
+                    autoFocus
+                  />
+                </Box>
+              </Box>
+            </Collapse>
+          }
+
           {
             folderTasks.map((task) => {
               let dateDueText = '...';
@@ -917,8 +1070,7 @@ export default function FolderView({ folderId }) {
                   onContextMenu={e => handleOpenTaskContextMenu(e, task)}
                   onClick={() => handleTaskSelection(task.task_id)}
                   key={task.task_id}
-                  className={isSelectedRow ? 'selected' : ''}
-                  style={{ position: 'relative', }}>
+                  className={isSelectedRow ? 'selected' : ''}>
                   <Box
                     className={
                       `table-row ${rowWrapperClass} ${isSelectedRow ? 'selected' : ''}`

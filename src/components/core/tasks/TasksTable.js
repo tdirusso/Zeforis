@@ -9,10 +9,6 @@ import {
   Button,
   TablePagination,
   Tooltip,
-  FormGroup,
-  FormControlLabel,
-  Switch,
-  useMediaQuery,
   Divider,
   Collapse,
   TextField,
@@ -32,9 +28,6 @@ import {
 import { Link, useLocation, useOutletContext } from "react-router-dom";
 import './styles.scss';
 import { useMemo, useRef, useState } from "react";
-import EditIcon from '@mui/icons-material/Edit';
-import TasksFilter from "./TasksFilter";
-import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
@@ -986,7 +979,7 @@ export default function TasksTable() {
 
 
 
-          {/* <Box mt={2} mr={2}>
+          <Box mt={2} mr={2}>
             <TablePagination
               rowsPerPageOptions={[-1]}
               component="div"
@@ -995,7 +988,7 @@ export default function TasksTable() {
               page={page}
               onPageChange={(_, pageNum) => setPage(pageNum)}
             />
-          </Box> */}
+          </Box>
         </Paper>
 
         <Menu

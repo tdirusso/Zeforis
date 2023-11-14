@@ -70,6 +70,7 @@ export default function CreateTaskDrawer(props) {
       openSnackBar('Task is being created.');
       return;
     }
+
     const nameVal = name.current.value;
     const descriptionVal = description.current.value;
     const linkVal = linkUrl.current.value;

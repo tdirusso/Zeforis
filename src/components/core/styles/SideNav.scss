@@ -41,6 +41,10 @@
     justify-content: flex-start;
   }
 
+  body.dark {
+    .nav-button {}
+  }
+
   .engagement-header {
     display: none;
     text-align: center;
@@ -59,10 +63,27 @@
   }
 }
 
-body.dark .Sidenav {
-  background-color: var(--colors-body-background-dark);
-  box-shadow: rgba(5, 5, 5, 0.35) 1px 1px 10px;
-  border-right: none;
+body.dark {
+  .Sidenav {
+    background-color: var(--colors-body-background-dark);
+    box-shadow: rgba(5, 5, 5, 0.35) 1px 1px 10px;
+    border-right: none;
+
+    .menu li {
+      color: #b7b7b7;
+    }
+  }
+
+  .Sidenav .menu li:hover,
+  .Sidenav .menu .active li {
+    background-color: rgba(var(--colors-primary-rgb), 0.1);
+    color: white !important;
+  }
+
+  .Sidenav .menu li:hover svg,
+  .Sidenav .menu .active svg {
+    color: var(--colors-primary);
+  }
 }
 
 .Sidenav .container {

@@ -172,6 +172,18 @@ h6 {
   color: brown;
 }
 
+body.dark {
+  .MuiChip-root.New {
+    background-color: #002eb8;
+    color: #b6bfff;
+  }
+
+  .MuiChip-root.On.Hold {
+    background-color: #b23030;
+    color: #ffcbcb;
+  }
+}
+
 [hidden] {
   display: none !important;
 }
