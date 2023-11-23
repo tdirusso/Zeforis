@@ -210,10 +210,6 @@ export default function TaskDrawer(props) {
       errors.push('name');
     }
 
-    if (!folderId) {
-      errors.push('folder');
-    }
-
     if (errors.length) {
       setFormErrors(errors);
       openSnackBar('Task name and folder are required.');
@@ -417,6 +413,12 @@ export default function TaskDrawer(props) {
               placeholder='Task name'
               variant="standard"
               value={name}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleUpdateTask();
+                }
+              }}
               multiline
               onChange={handleNameChange}
               error={formErrors.includes('name')}

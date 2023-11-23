@@ -183,10 +183,6 @@ export default function TaskDrawer(props) {
       errors.push('name');
     }
 
-    if (!folderId) {
-      errors.push('folder');
-    }
-
     if (errors.length) {
       setFormErrors(errors);
       openSnackBar('Task name and folder are required.');

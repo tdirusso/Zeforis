@@ -934,7 +934,7 @@ export default function FolderView({ folderId }) {
                   />
                 </Box>
                 <Box
-                  placement="top-start"
+                  placement="top"
                   component={Tooltip}
                   title="Sort name"
                   onClick={() => sortBy === 'name' ? setSortBy('nameReverse') : setSortBy('name')}

@@ -187,13 +187,15 @@ export default function Home({ setTheme }) {
 
       const foldersMapResult = {};
       folders.forEach(folder => {
-        foldersMapResult[String(folder.id)] = { ...folder, tasks: [] };
+        if (folder.name !== '_hidden_') {
+          foldersMapResult[String(folder.id)] = { ...folder, tasks: [] };
+        }
       });
 
       const tasksMapResult = {};
 
       tasks.forEach(task => {
-        foldersMapResult[task.folder_id].tasks.push(task);
+        foldersMapResult[task.folder_id]?.tasks.push(task);
         tasksMapResult[task.task_id] = task;
       });
 

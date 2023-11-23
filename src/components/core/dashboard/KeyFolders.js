@@ -24,7 +24,7 @@ export default function KeyFolders({ folders, isAdmin, openDrawer }) {
           const taskLength = folder.tasks.length;
 
           return (
-            <Grid item xs={12} md={4} key={folder.id} marginBottom={3}>
+            <Grid item xs={12} md={3} key={folder.id} marginBottom={3}>
               <Paper style={{ height: '100%' }} className="folder">
                 <Box
                   gap={2}

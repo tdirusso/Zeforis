@@ -1,3 +1,4 @@
+const cache = require('../../../cache');
 const { pool } = require('../../../database');
 const moment = require('moment');
 
@@ -5,7 +6,6 @@ module.exports = async (req, res, next) => {
   const {
     name,
     description,
-    folderId,
     linkUrl,
     assignedToId = null,
     tags = [],
@@ -16,15 +16,45 @@ module.exports = async (req, res, next) => {
     status
   } = req.body;
 
-  const creatorUserId = req.userId;
+  let { folderId } = req.body;
 
-  if (!name || !folderId || !creatorUserId) {
+  const creatorUserId = req.userId;
+  const engagementId = req.engagementId;
+
+
+  if (!name || !creatorUserId) {
     return res.json({
       message: 'Missing task parameters.'
     });
   }
 
+  const connection = await pool.getConnection();
+
   try {
+    if (!folderId) {
+      folderId = cache.get(`hiddenFolder-eng${engagementId}`);
+
+      if (!folderId) {
+        const [hiddenFolderResult] = await connection.query(
+          'SELECT id FROM folders WHERE name = "_hidden_" AND engagement_id = ?',
+          [engagementId]
+        );
+
+        if (hiddenFolderResult.length) {
+          folderId = hiddenFolderResult[0].id;
+          cache.set(`hiddenFolder-eng${engagementId}`, folderId);
+        } else {
+          const [createHiddenFolderResult] = await connection.query(
+            'INSERT INTO folders (name, engagement_id) VALUES ("_hidden_", ?)',
+            [engagementId]
+          );
+
+          folderId = createHiddenFolderResult.insertId;
+          cache.set(`hiddenFolder-eng${engagementId}`, folderId);
+        }
+      }
+    }
+
     const [updatedTaskResult] = await pool.query(
       `
         UPDATE tasks SET 
@@ -83,11 +113,13 @@ module.exports = async (req, res, next) => {
         );
       }
 
+      connection.release();
       return res.json({ success: true });
     }
 
     return res.json({ message: 'Task not found.' });
   } catch (error) {
+    connection.release();
     next(error);
   }
 };

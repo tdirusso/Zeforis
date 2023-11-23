@@ -83,10 +83,6 @@ export default function CreateTaskDrawer(props) {
       errors.push('name');
     }
 
-    if (!folderId) {
-      errors.push('folder');
-    }
-
     if (errors.length) {
       setFormErrors(errors);
       openSnackBar('Task name and folder are required.');
@@ -259,6 +255,12 @@ export default function CreateTaskDrawer(props) {
         <Box className='task-content'>
           <Box>
             <TextField
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleCreateTask();
+                }
+              }}
               onChange={handleNameChange}
               error={formErrors.includes('name')}
               fullWidth

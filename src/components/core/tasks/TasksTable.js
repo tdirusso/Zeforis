@@ -25,7 +25,7 @@ import {
   ListItemText,
   FormHelperText
 } from "@mui/material";
-import { Link, useLocation, useOutletContext } from "react-router-dom";
+import { Link, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import './styles.scss';
 import { useMemo, useRef, useState } from "react";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -56,6 +56,7 @@ import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
+import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
 
 export default function TasksTable() {
   const {
@@ -79,18 +80,10 @@ export default function TasksTable() {
 
   const engagementId = engagement.id;
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  const [isEditMode, setIsEditMode] = useState(false);
-
-  const { search } = useLocation();
-
-  const queryParams = new URLSearchParams(search);
-
-  const preFilterKeyTasks = queryParams.get('preFilterKeyTasks');
-  const preSort = queryParams.get('preSort') || 'name';
-  const folderId = queryParams.get('folderId');
 
   const [editingTask, setEditingTask] = useState(null);
   const [isEditingName, setEditingName] = useState(false);
@@ -110,10 +103,9 @@ export default function TasksTable() {
   const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
   const [filterAssignedTo, setFilterAssignedTo] = useState(null);
-  const [filterFolder, setFilterFolder] = useState(folderId ? foldersMap[folderId] : null);
+  const [filterFolder, setFilterFolder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
-  const [filterKeyTasks, setFilterKeyTasks] = useState(Boolean(preFilterKeyTasks));
-  const [sortBy, setSortBy] = useState(preSort);
+  const [sortBy, setSortBy] = useState('name');
 
   const [isBulkEditMode, setBulkEditMode] = useState(false);
   const [bulkEditAction, setBulkEditAction] = useState(null);
@@ -132,8 +124,11 @@ export default function TasksTable() {
 
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
+  const [addingTask, setAddingTask] = useState(false);
+  const [addingTaskLoading, setAddingTaskLoading] = useState(false);
 
   const nameRef = useRef(null);
+  const addingTaskNameRef = useRef(null);
 
   const now = moment();
   const tomorrow = moment().add(1, 'day');
@@ -168,8 +163,14 @@ export default function TasksTable() {
       case 'name':
         theTasks.sort((a, b) => a.task_name.localeCompare(b.task_name));
         break;
+      case 'nameReverse':
+        theTasks.sort((a, b) => b.task_name.localeCompare(a.task_name));
+        break;
       case 'status':
         theTasks.sort((a, b) => a.status.localeCompare(b.status));
+        break;
+      case 'statusReverse':
+        theTasks.sort((a, b) => b.status.localeCompare(a.status));
         break;
       case 'dateDue':
         theTasks.sort((a, b) => {
@@ -183,6 +184,18 @@ export default function TasksTable() {
           return new Date(a.date_due) - new Date(b.date_due);
         });
         break;
+      case 'dateDueReverse':
+        theTasks.sort((a, b) => {
+          // Sort all tasks without due dates to the bottom
+          if (!a.date_due) return 1;
+          if (!b.date_due) return -1;
+          return 0;
+        }).sort((a, b) => {
+          // Now sort by the due date
+          if (!a.date_due || !b.date_due) return 1;
+          return new Date(a.date_due) - new Date(b.date_due);
+        }).reverse();
+        break;
       case 'assignee':
         theTasks.sort((a, b) => {
           if (!a.assigned_first) return 1;
@@ -193,18 +206,32 @@ export default function TasksTable() {
           return a.assigned_first.localeCompare(b.assigned_first);
         });
         break;
+      case 'assigneeReverse':
+        theTasks.sort((a, b) => {
+          if (!a.assigned_first) return 1;
+          if (!b.assigned_first) return -1;
+          return 0;
+        }).sort((a, b) => {
+          if (!a.assigned_first || !b.assigned_first) return 1;
+          return a.assigned_first.localeCompare(b.assigned_first);
+        }).reverse();
+        break;
       default:
         break;
     }
 
     return theTasks;
-  }, [sortBy, filterName, filterAssignedTo, filterTags, filterStatus]);
+  }, [tasks, sortBy, filterName, filterAssignedTo, filterTags, filterStatus]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (nameRef.current && !nameRef.current.contains(event.target)) {
         setEditingName(false);
         setEditingTask(null);
+      }
+
+      if (addingTaskNameRef.current && !addingTaskNameRef.current.contains(event.target)) {
+        setAddingTask(false);
       }
     };
 
@@ -214,6 +241,132 @@ export default function TasksTable() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    async function handleUpdateTask() {
+      try {
+        const currentTags = editingTaskTagIds.map(tagId => ({
+          id: Number(tagId),
+          name: tagsMap[tagId].name
+        }));
+
+        let allTags = tempSelectedTags.length === 0 ?
+          currentTags :
+          [...currentTags, ...tempSelectedTags];
+
+        if (tagIdToRemove) {
+          allTags = allTags.filter(tag => tag.id !== tagIdToRemove);
+        }
+
+        const { message, success } = await updateTask({
+          name: editingTask.task_name,
+          description: editingTask.description,
+          linkUrl: editingTask.link_url,
+          status: editingTask.status,
+          assignedToId: editingTask.assigned_to_id,
+          folderId: editingTask.folder_id,
+          engagementId: engagementId,
+          isKeyTask: editingTask.is_key_task,
+          dateDue: editingTask.date_due,
+          taskId: editingTask.task_id,
+          currentTags,
+          tags: allTags
+        });
+
+        if (success) {
+          const now = new Date().toISOString();
+          let dateCompletedToSet = null;
+
+          if (editingTask.status === 'Complete') {
+            if (editingTask.date_completed) {
+              dateCompletedToSet = editingTask.date_completed;
+            } else {
+              dateCompletedToSet = now;
+            }
+          }
+
+          const updatedTaskObject = {
+            ...(delete editingTask.currentTags && editingTask),
+            date_completed: dateCompletedToSet,
+            date_last_updated: now,
+            tags: allTags.length > 0 ? allTags.map(t => t.id).join(',') : null
+          };
+
+          tasksMap[editingTask.task_id] = updatedTaskObject;
+
+          setTasks(Object.values(tasksMap));
+          setDoUpdate(false);
+          setEditingName(false);
+          setTempSelectedTags([]);
+          setTagIdToRemove(null);
+          setTimeout(() => {
+            setEditingTask(null);
+          }, 300);
+          openSnackBar('Saved.', 'success');
+        } else {
+          setEditingTask(null);
+          setDoUpdate(false);
+          setTempSelectedTags([]);
+          setTagIdToRemove(null);
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        setEditingTask(null);
+        setDoUpdate(false);
+        setTempSelectedTags([]);
+        setTagIdToRemove(null);
+        openSnackBar(error.message, 'error');
+      }
+    }
+
+    async function handleBulkUpdateTasks() {
+      try {
+        const { updatedTasks, message } = await batchUpdateTasks({
+          engagementId,
+          taskIds: selectedTasks,
+          action: bulkEditAction,
+          status: bulkStatusValue,
+          dateDue: bulkDueValue,
+          folderId: bulkFolderValue,
+          assigneeId: bulkAssigneeValue,
+          tags: tempSelectedTags,
+          tagAction: bulkTagAction
+        });
+
+        if (updatedTasks) {
+          updatedTasks.forEach(updatedTask => tasksMap[updatedTask.task_id] = updatedTask);
+          if (bulkEditAction === 'folder') {
+            setSelectedTasks([]);
+          }
+          setTasks(Object.values(tasksMap));
+          setStatusMenuAnchor(null);
+          setAssigneeMenuAnchor(null);
+          setDateDueMenuAnchor(null);
+          setBulkEditAction(null);
+          setTempSelectedTags([]);
+          setTagsMenuAnchor(null);
+          setFolderMenuAnchor(null);
+          setBulkFolderValue(null);
+          setDoUpdate(false);
+          openSnackBar(`Updated ${updatedTasks.length} tasks.`, 'success');
+        } else {
+          setDoUpdate(false);
+          openSnackBar(message, 'error');
+        }
+      } catch (error) {
+        setDoUpdate(false);
+        openSnackBar(error.message, 'error');
+      }
+    }
+
+    if (doUpdate) {
+      if (isBulkEditMode) {
+        handleBulkUpdateTasks();
+      } else {
+        handleUpdateTask();
+      }
+    }
+  }, [doUpdate]);
 
   const handleSelectAll = (_, isChecked) => {
     if (isChecked) {
@@ -441,6 +594,79 @@ export default function TasksTable() {
     }
   };
 
+  const handleCreateTask = async e => {
+    if (e && e.key === 'Enter') {
+      e.preventDefault();
+
+      const newTaskName = addingTaskNameRef.current.value;
+
+      if (!newTaskName) {
+        openSnackBar('Task name cannot be empty.');
+        return;
+      } else {
+        setAddingTaskLoading(true);
+
+        try {
+          const { message, task, uiProps } = await createTask({
+            name: newTaskName,
+            engagementId
+          });
+
+          if (task) {
+            const now = new Date().toISOString();
+
+            openSnackBar('Task created.', 'success');
+
+            setAddingTaskLoading(false);
+            setTasks(tasks => [...tasks, {
+              task_id: task.id,
+              task_name: newTaskName,
+              description: '',
+              date_created: now,
+              created_by_id: user.id,
+              status: 'New',
+              folder_id: null,
+              link_url: '',
+              assigned_to_id: null,
+              date_completed: null,
+              is_key_task: 0,
+              date_due: null,
+              date_last_updated: now,
+              tags: null,
+              assigned_first: null,
+              assigned_last: null,
+              created_first: user.firstName,
+              created_last: user.lastName,
+              updated_by_first: user.firstName,
+              updated_by_last: user.lastName
+            }]);
+
+
+            addingTaskNameRef.current.value = '';
+            setTimeout(() => {
+              addingTaskNameRef.current.focus();
+            }, 250);
+          } else {
+            if (uiProps && uiProps.alertType === 'upgrade') {
+              openSnackBar(message, 'error', {
+                actionName: 'Upgrade Now',
+                actionHandler: () => {
+                  navigate('settings/account/billing');
+                }
+              });
+            } else {
+              openSnackBar(message, 'error');
+            }
+            setAddingTaskLoading(false);
+          }
+        } catch (error) {
+          openSnackBar(error.message, 'error');
+          setAddingTaskLoading(false);
+        }
+      }
+    }
+  };
+
   const resetFilters = () => {
     setFilterName('');
     setFilterTags([]);
@@ -485,22 +711,26 @@ export default function TasksTable() {
     <>
       <Grid item xs={12}>
         <Paper className="px0" style={{ overflowX: 'auto' }}>
-          <Box pl={4} pr={2} pb='10px'>
+          <Box pl={4} pr={2} pb='10px' className="flex-ac">
             <h4 style={{ fontSize: '1.15rem' }}>Tasks Table</h4>
+            <Box ml={3}>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setAddingTask(true)}>
+                + Task
+              </Button>
+            </Box>
           </Box>
           <Box className="flex-ac folder-tasks-controls">
-            <Box className="flex-ac" gap='4px'>
-              <Box hidden={!isAdmin} mr={3}>
-                <Button
-                  onClick={() => openDrawer('create-task')}>
-                  + Task
-                </Button>
-              </Box>
+            <Box className="flex-ac" gap='8px'>
               <Tooltip title="Toggle bulk edit" placement="top">
                 <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
                   <EditNoteRoundedIcon />
                 </IconButton>
               </Tooltip>
+              <Divider flexItem orientation="vertical" style={{ margin: '5px 0' }} />
+
               <Tooltip
                 title={showFilters ? 'Hide filters' : 'Show filters'}
                 placement="top">
@@ -517,7 +747,7 @@ export default function TasksTable() {
                   }}
                   startIcon={<FilterAltRoundedIcon />}>
                   {
-                    filterCount === 0 ? 'All tasks' : `${filterCount} filters`
+                    filterCount === 0 ? 'Filters' : `${filterCount} filters`
                   }
                 </Button>
               </Tooltip>
@@ -526,7 +756,7 @@ export default function TasksTable() {
               hidden={!isBulkEditMode}
               flexItem
               orientation="vertical"
-              style={{ margin: '4px 12px' }} />
+              style={{ margin: '4px 12px 4px 0' }} />
             <Box
               hidden={!isBulkEditMode}
               component="span"
@@ -727,7 +957,7 @@ export default function TasksTable() {
                     placement="top"
                     component={Tooltip}
                     title="Sort name"
-                    onClick={() => setSortBy('name')}
+                    onClick={() => sortBy === 'name' ? setSortBy('nameReverse') : setSortBy('name')}
                     className="task-name-cell"
                     style={{ paddingLeft: 45 }}>
                     <Box className="flex-ac">
@@ -743,7 +973,7 @@ export default function TasksTable() {
                     component={Tooltip}
                     title="Sort status"
                     className="task-status-cell"
-                    onClick={() => setSortBy('status')}>
+                    onClick={() => sortBy === 'status' ? setSortBy('statusReverse') : setSortBy('status')}>
                     <Box className="flex-ac">
                       Status <FilterListRoundedIcon
                         fontSize="small"
@@ -757,7 +987,7 @@ export default function TasksTable() {
                     component={Tooltip}
                     title="Sort assignee"
                     className="task-assigned-cell"
-                    onClick={() => setSortBy('assignee')}>
+                    onClick={() => sortBy === 'assignee' ? setSortBy('assigneeReverse') : setSortBy('assignee')}>
                     <Box className="flex-ac">
                       Assignee <FilterListRoundedIcon
                         fontSize="small"
@@ -771,7 +1001,7 @@ export default function TasksTable() {
                     component={Tooltip}
                     title="Sort due date"
                     className="task-due-cell"
-                    onClick={() => setSortBy('dateDue')}>
+                    onClick={() => sortBy === 'dateDue' ? setSortBy('dateDueReverse') : setSortBy('dateDue')}>
                     <Box className="flex-ac" textAlign='center'>
                       Due <FilterListRoundedIcon
                         fontSize="small"
@@ -789,6 +1019,38 @@ export default function TasksTable() {
                 </Box>
               </Box>
             </Collapse>
+            {
+              addingTask &&
+              <Collapse unmountOnExit>
+                <Box
+                  className={
+                    `table-row ${rowWrapperClass}`
+                  }>
+                  <Box className="task-select-cell">
+                  </Box>
+                  <Box
+                    className="task-name-cell" style={{ paddingLeft: 38 }}>
+                    <TextField
+                      disabled={addingTaskLoading}
+                      placeholder="New task"
+                      multiline
+                      variant="standard"
+                      inputProps={{
+                        style: {
+                          fontSize: 14,
+                          padding: '0 8px'
+                        }
+                      }}
+                      fullWidth
+                      size="small"
+                      inputRef={addingTaskNameRef}
+                      onKeyDown={handleCreateTask}
+                      autoFocus
+                    />
+                  </Box>
+                </Box>
+              </Collapse>
+            }
             {
               filteredTasks.map((task) => {
                 let dateDueText = '...';

@@ -16,6 +16,12 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  if (name === '_hidden_') {
+    return res.json({
+      message: 'Invalid folder name - "_hidden_" is reserved.'
+    });
+  }
+
   if (parentId && folderId === parentId) {
     return res.json({
       message: "Folder cannot be it's own parent."
