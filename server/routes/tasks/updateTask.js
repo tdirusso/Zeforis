@@ -1,5 +1,5 @@
 const cache = require('../../../cache');
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
 const moment = require('moment');
 
 module.exports = async (req, res, next) => {
@@ -32,27 +32,7 @@ module.exports = async (req, res, next) => {
 
   try {
     if (!folderId) {
-      folderId = cache.get(`hiddenFolder-eng${engagementId}`);
-
-      if (!folderId) {
-        const [hiddenFolderResult] = await connection.query(
-          'SELECT id FROM folders WHERE name = "_hidden_" AND engagement_id = ?',
-          [engagementId]
-        );
-
-        if (hiddenFolderResult.length) {
-          folderId = hiddenFolderResult[0].id;
-          cache.set(`hiddenFolder-eng${engagementId}`, folderId);
-        } else {
-          const [createHiddenFolderResult] = await connection.query(
-            'INSERT INTO folders (name, engagement_id) VALUES ("_hidden_", ?)',
-            [engagementId]
-          );
-
-          folderId = createHiddenFolderResult.insertId;
-          cache.set(`hiddenFolder-eng${engagementId}`, folderId);
-        }
-      }
+      folderId = commonQueries.getEngagementHiddenFolder(connection, engagementId);
     }
 
     const [updatedTaskResult] = await pool.query(

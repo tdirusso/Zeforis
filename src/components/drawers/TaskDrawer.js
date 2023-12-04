@@ -677,6 +677,6 @@ export default function TaskDrawer(props) {
           </Alert>
         </Box>
       </DialogContent>
-    </Drawer >
+    </Drawer>
   );
 };

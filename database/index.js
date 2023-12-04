@@ -73,6 +73,31 @@ const commonQueries = {
     );
 
     return orgAdminCountResult[0].adminCount;
+  },
+  getEngagementHiddenFolder: async (connection, engagementId) => {
+    let folderId = cache.get(`hiddenFolder-eng${engagementId}`);
+
+    if (!folderId) {
+      const [hiddenFolderResult] = await connection.query(
+        'SELECT id FROM folders WHERE name = "_hidden_" AND engagement_id = ?',
+        [engagementId]
+      );
+
+      if (hiddenFolderResult.length) {
+        folderId = hiddenFolderResult[0].id;
+        cache.set(`hiddenFolder-eng${engagementId}`, folderId);
+      } else {
+        const [createHiddenFolderResult] = await connection.query(
+          'INSERT INTO folders (name, engagement_id) VALUES ("_hidden_", ?)',
+          [engagementId]
+        );
+
+        folderId = createHiddenFolderResult.insertId;
+        cache.set(`hiddenFolder-eng${engagementId}`, folderId);
+      }
+    }
+
+    return folderId;
   }
 };
 

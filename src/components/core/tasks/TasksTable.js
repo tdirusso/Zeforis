@@ -58,6 +58,8 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
 
+const tasksPerPage = 25;
+
 export default function TasksTable() {
   const {
     foldersMap,
@@ -84,6 +86,7 @@ export default function TasksTable() {
 
   const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
 
   const [editingTask, setEditingTask] = useState(null);
   const [isEditingName, setEditingName] = useState(false);
@@ -222,6 +225,9 @@ export default function TasksTable() {
 
     return theTasks;
   }, [tasks, sortBy, filterName, filterAssignedTo, filterTags, filterStatus]);
+
+  const startIndex = (page) * tasksPerPage;
+  const endIndex = startIndex + tasksPerPage;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -367,6 +373,17 @@ export default function TasksTable() {
       }
     }
   }, [doUpdate]);
+
+  const handlePageChange = (_, pageNum) => {
+    setShouldAnimate(false);
+
+    setTimeout(() => {
+      setPage(pageNum);
+      setTimeout(() => {
+        setShouldAnimate(true);
+      }, 0);
+    }, 0);
+  };
 
   const handleSelectAll = (_, isChecked) => {
     if (isChecked) {
@@ -710,7 +727,9 @@ export default function TasksTable() {
   return (
     <>
       <Grid item xs={12}>
-        <Paper className="px0" style={{ overflowX: 'auto' }}>
+        <Paper
+          className="px0"
+          style={{ overflowX: 'auto', marginBottom: '3rem' }}>
           <Box pl={4} pr={2} pb='10px' className="flex-ac">
             <h4 style={{ fontSize: '1.15rem' }}>Tasks Table</h4>
             <Box ml={3}>
@@ -943,6 +962,8 @@ export default function TasksTable() {
           </Collapse>
 
           <TransitionGroup
+            enter={shouldAnimate}
+            exit={shouldAnimate}
             className="folder-tasks-table">
             <Collapse in={false}>
               <Box className="table-header">
@@ -1052,7 +1073,7 @@ export default function TasksTable() {
               </Collapse>
             }
             {
-              filteredTasks.map((task) => {
+              filteredTasks.slice(startIndex, endIndex).map((task) => {
                 let dateDueText = '...';
                 let dateDueColor = 'inherit';
 
@@ -1246,9 +1267,9 @@ export default function TasksTable() {
               rowsPerPageOptions={[-1]}
               component="div"
               count={filteredTasks.length}
-              rowsPerPage={25}
+              rowsPerPage={tasksPerPage}
               page={page}
-              onPageChange={(_, pageNum) => setPage(pageNum)}
+              onPageChange={handlePageChange}
             />
           </Box>
         </Paper>
@@ -1375,6 +1396,7 @@ export default function TasksTable() {
         </Menu>
 
         <Menu
+          transitionDuration={0}
           className="task-actions-menu"
           anchorReference="anchorPosition"
           anchorPosition={{

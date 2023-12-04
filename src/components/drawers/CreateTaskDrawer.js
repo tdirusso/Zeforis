@@ -19,6 +19,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import CheckIcon from '@mui/icons-material/Check';
 import { useNavigate } from 'react-router-dom';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import { createFolder } from '../../api/folders';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
 export default function CreateTaskDrawer(props) {
   const {
@@ -33,7 +36,8 @@ export default function CreateTaskDrawer(props) {
     setTags,
     setTasks,
     user,
-    openSnackBar
+    openSnackBar,
+    setFolders
   } = props;
 
   const engagementId = engagement.id;
@@ -54,8 +58,13 @@ export default function CreateTaskDrawer(props) {
   const [membersAndAdmins] = useState([...engagementAdmins, ...engagementMembers]);
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [formErrors, setFormErrors] = useState([]);
+  const [addFolderPopup, setAddFolderPopup] = useState(null);
+  const [addingFolder, setAddingFolder] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
+  const addFolderPopupOpen = Boolean(addFolderPopup);
+
+  const newFolderName = useRef();
 
   useEffect(() => {
     setFolder(defaultFolder || null);
@@ -64,6 +73,41 @@ export default function CreateTaskDrawer(props) {
       name.current.focus();
     }
   }, [defaultFolder, isOpen]);
+
+  const handleCreateFolder = async () => {
+    const folderName = newFolderName.current.value;
+
+    if (!folderName) {
+      openSnackBar("Folder name can't be blank.");
+      return;
+    }
+
+    setAddingFolder(true);
+
+    try {
+      const { folder, message } = await createFolder({
+        name: folderName,
+        engagementId: engagement.id,
+      });
+
+      if (folder) {
+        openSnackBar('Folder added.', 'success');
+
+        setFolders(folders => [...folders, folder]);
+        setAddingFolder(false);
+        setAddFolderPopup(null);
+        setTimeout(() => {
+          setFolder(folder);
+        }, 0);
+      } else {
+        openSnackBar(message, 'error');
+        setAddingFolder(false);
+      }
+    } catch (error) {
+      openSnackBar(error.message, 'error');
+      setAddingFolder(false);
+    }
+  };
 
   const handleCreateTask = async () => {
     if (isLoading) {
@@ -208,9 +252,6 @@ export default function CreateTaskDrawer(props) {
 
   const handleFolderChange = (_, newVal) => {
     setFolder(newVal);
-    if (newVal && formErrors.includes('folder')) {
-      setFormErrors(prev => prev.filter(er => er !== 'folder'));
-    }
   };
 
   return (
@@ -368,7 +409,6 @@ export default function CreateTaskDrawer(props) {
                 renderInput={(params) => (
                   <TextField
                     placeholder='Folder'
-                    error={formErrors.includes('folder')}
                     {...params}
                     InputProps={{
                       ...params.InputProps,
@@ -376,12 +416,23 @@ export default function CreateTaskDrawer(props) {
                         <InputAdornment position='start'>
                           <FolderIcon />
                         </InputAdornment>,
-                      endAdornment: params.InputProps.endAdornment
+                      endAdornment:
+                        <Box>
+                          {params.InputProps.endAdornment}
+                          <InputAdornment position='end'>
+                            <Tooltip title='New folder'>
+                              <IconButton size='small' onClick={e => setAddFolderPopup(e.currentTarget)}>
+                                <AddRoundedIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </InputAdornment>
+                        </Box>
                     }}
                   />
                 )}
               />
             </FormControl>
+
           </Box>
 
           <Box my={2}>
@@ -474,6 +525,49 @@ export default function CreateTaskDrawer(props) {
           </Box>
         </Box>
       </DialogContent>
+
+      <Menu
+        anchorEl={addFolderPopup}
+        open={addFolderPopupOpen}
+        onClose={() => setAddFolderPopup(null)}>
+        <TextField
+          disabled={addingFolder}
+          onKeyDown={e => e.key === 'Enter' ? handleCreateFolder() : null}
+          autoFocus
+          size="small"
+          placeholder="Folder name"
+          style={{ margin: '0 10px' }}
+          variant="standard"
+          inputRef={newFolderName}
+          inputProps={{
+            style: {
+              fontSize: '14px'
+            }
+          }}
+          InputProps={{
+            endAdornment:
+              <InputAdornment position="end">
+                <Tooltip title="Save">
+                  <span>
+                    <IconButton
+                      disabled={addingFolder}
+                      size="small"
+                      onClick={handleCreateFolder}>
+                      {
+                        addingFolder ?
+                          <CircularProgress size={15} />
+                          :
+                          <CheckRoundedIcon
+                            color="success"
+                            fontSize="small" />
+                      }
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </InputAdornment>
+          }}
+        />
+      </Menu>
     </Drawer>
   );
 };

@@ -1,10 +1,9 @@
-const { pool } = require('../../../database');
+const { pool, commonQueries } = require('../../../database');
 const moment = require('moment');
 
 module.exports = async (req, res, next) => {
   const {
     action,
-    folderId,
     assigneeId,
     status,
     taskIds,
@@ -14,6 +13,9 @@ module.exports = async (req, res, next) => {
     tagAction = 'add'
   } = req.body;
 
+  let { folderId } = req.body;
+
+  const engagementId = req.engagementId;
   const updaterUserId = req.userId;
 
   if (!action) {
@@ -37,12 +39,11 @@ module.exports = async (req, res, next) => {
         break;
       case 'folder':
         if (!folderId) {
-          return res.json({
-            message: 'Missing folderId.'
-          });
-        } else {
-          await updateFolders(taskIds, folderId, updaterUserId, connection);
+          folderId = await commonQueries.getEngagementHiddenFolder(connection, engagementId);
         }
+
+        await updateFolders(taskIds, folderId, updaterUserId, connection);
+
         break;
       case 'status':
         if (!status) {

@@ -1342,6 +1342,7 @@ export default function FolderView({ folderId }) {
       </Menu>
 
       <Menu
+        transitionDuration={0}
         className="task-actions-menu"
         anchorPosition={{
           top: mouseY,
