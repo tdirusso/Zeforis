@@ -25,7 +25,7 @@ import {
   ListItemText,
   FormHelperText
 } from "@mui/material";
-import { Link, useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useLocation, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import './styles.scss';
 import { useMemo, useRef, useState } from "react";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -59,6 +59,7 @@ import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
 
 const tasksPerPage = 25;
+const tasksParamsKey = 'params-tasks';
 
 export default function TasksTable() {
   const {
@@ -77,14 +78,28 @@ export default function TasksTable() {
     tasksMap,
     setTags,
     folders,
-    tasks
+    tasks,
+    orgUsersMap
   } = useOutletContext();
+
+  const [searchParams, setSearchParams] = useSearchParams(localStorage.getItem(tasksParamsKey) || '');
+
+  const showFilters = searchParams.get('showFilters') === 'true';
+  const filterName = searchParams.get('filterName') || '';
+  const filterStatus = searchParams.get('filterStatus') || 'all';
+
+  const filterAssignedToString = searchParams.get('filterAssignedTo');
+  const filterAssignedTo = filterAssignedToString ? Number(filterAssignedToString) : null;
+
+  const pageString = searchParams.get('page');
+  const page = pageString ? Number(pageString) : 0;
+
+  localStorage.setItem(tasksParamsKey, searchParams.toString());
 
   const engagementId = engagement.id;
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [page, setPage] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [shouldAnimate, setShouldAnimate] = useState(true);
 
@@ -102,12 +117,8 @@ export default function TasksTable() {
   const [doUpdate, setDoUpdate] = useState(false);
   const [doAction, setDoAction] = useState(null);
 
-  const [showFilters, setShowFilters] = useState(false);
-  const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
-  const [filterAssignedTo, setFilterAssignedTo] = useState(null);
   const [filterFolder, setFilterFolder] = useState(null);
-  const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
 
   const [isBulkEditMode, setBulkEditMode] = useState(false);
@@ -157,7 +168,7 @@ export default function TasksTable() {
       }
 
       return (!lcFilterName || task.task_name.toLowerCase().includes(lcFilterName)) &&
-        (!filterAssignedTo || filterAssignedTo.id === task.assigned_to_id) &&
+        (!filterAssignedTo || filterAssignedTo === task.assigned_to_id) &&
         (filterTags.length === 0 || filterTags.every(tag => tagIds.includes(tag.id.toString()))) &&
         (filterStatus === 'all' || filterStatus === task.status);
     });
@@ -378,7 +389,10 @@ export default function TasksTable() {
     setShouldAnimate(false);
 
     setTimeout(() => {
-      setPage(pageNum);
+      setSearchParams(prev => {
+        prev.set('page', pageNum);
+        return prev;
+      }, { replace: true });
       setTimeout(() => {
         setShouldAnimate(true);
       }, 0);
@@ -685,10 +699,13 @@ export default function TasksTable() {
   };
 
   const resetFilters = () => {
-    setFilterName('');
     setFilterTags([]);
-    setFilterAssignedTo(null);
-    setFilterStatus('all');
+    setSearchParams(prev => {
+      prev.set('filterName', '');
+      prev.set('filterAssignedTo', '');
+      prev.set('filterStatus', '');
+      return prev;
+    }, { replace: true });
   };
 
   useEffect(() => {
@@ -715,6 +732,13 @@ export default function TasksTable() {
   const handleBulkEditChange = () => {
     setSelectedTasks([]);
     setBulkEditMode(prev => !prev);
+  };
+
+  const handleToggleFilters = () => {
+    setSearchParams(prev => {
+      prev.set('showFilters', !showFilters);
+      return prev;
+    }, { replace: true });
   };
 
   const filterCount = (filterName ? 1 : 0) +
@@ -760,7 +784,7 @@ export default function TasksTable() {
                       transition: 'transform 250ms'
                     }}
                   />}
-                  onClick={() => setShowFilters(old => !old)}
+                  onClick={handleToggleFilters}
                   style={{
                     color: filterCount === 0 ? theme.palette.text.secondary : theme.palette.primary.main
                   }}
@@ -859,7 +883,10 @@ export default function TasksTable() {
                 size="small"
                 placeholder='Name ...'
                 value={filterName}
-                onChange={e => setFilterName(e.target.value)}
+                onChange={e => setSearchParams(prev => {
+                  prev.set('filterName', e.target.value);
+                  return prev;
+                }, { replace: true })}
               />
               <Divider flexItem orientation="vertical" />
               <FormControl style={{ width: 140 }}>
@@ -869,7 +896,10 @@ export default function TasksTable() {
                   value={filterStatus}
                   label="Status"
                   size="small"
-                  onChange={e => setFilterStatus(e.target.value)}>
+                  onChange={e => setSearchParams(prev => {
+                    prev.set('filterStatus', e.target.value);
+                    return prev;
+                  }, { replace: true })}>
                   <MenuItem
                     style={{ fontSize: 14 }}
                     value='all'>All</MenuItem>
@@ -900,11 +930,20 @@ export default function TasksTable() {
                   }}
                   size="small"
                   renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
-                  options={[...engagementAdmins, ...engagementMembers]}
-                  getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  options={membersAndAdmins}
+                  getOptionLabel={(option) => {
+                    if (option.firstName) {
+                      return `${option.firstName} ${option.lastName}`;
+                    }
+                    return orgUsersMap[option]?.firstName + ' ' + orgUsersMap[option]?.lastName;
+                  }
+                  }
+                  isOptionEqualToValue={(option, value) => option.id === value}
                   groupBy={(option) => option.role}
-                  onChange={(_, newVal) => setFilterAssignedTo(newVal)}
+                  onChange={(_, newVal) => setSearchParams(prev => {
+                    prev.set('filterAssignedTo', newVal?.id || '');
+                    return prev;
+                  }, { replace: true })}
                   value={filterAssignedTo}
                   renderInput={(params) => (
                     <TextField
