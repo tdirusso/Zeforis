@@ -1,9 +1,9 @@
-import { Paper, Box, TextField, Grid, Divider, Tooltip, IconButton, Grow, Collapse } from "@mui/material";
+import { Paper, Grid, Divider, Tooltip, IconButton, Grow, Collapse } from "@mui/material";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import React, { useState } from "react";
 import './styles.scss';
 
-export default function CustomWidgets({ widgets }) {
+export default function Widgets({ widgets }) {
   const showDashboardWidgetsValue = localStorage.getItem('showDashboardWidgets');
   const showWidgetsOnLoad = showDashboardWidgetsValue === null || showDashboardWidgetsValue === 'true';
 
@@ -54,7 +54,8 @@ export default function CustomWidgets({ widgets }) {
                       style={{ transitionDelay: `${index * 100}ms` }}>
                       <Paper className="widget" style={{
                         minHeight: '250px',
-                        background: widget.backgroundColor
+                        background: widget.backgroundColor,
+                        height: '100%'
                       }}>
                         <div dangerouslySetInnerHTML={{ __html: widget.body }}></div>
                       </Paper>

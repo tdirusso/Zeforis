@@ -4,7 +4,7 @@ import KeyFolders from "../../../components/core/dashboard/KeyFolders";
 import KeyTasks from "../../../components/core/dashboard/KeyTasks";
 import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
 import './styles.css';
-import CustomWidgets from "../../../components/core/dashboard/CustomWidgets";
+import Widgets from "../../../components/core/dashboard/Widgets";
 import { useEffect } from "react";
 
 export default function Dashboard() {
@@ -43,7 +43,7 @@ export default function Dashboard() {
     <>
       <KeyTasks tasks={keyTasks.slice(0, 30)} />
       <UpcomingTasks tasks={tasksSortedByDate.slice(0, 30)} />
-      <CustomWidgets widgets={widgets} />
+      <Widgets widgets={widgets} />
       <KeyFolders
         folders={keyFolders}
         isAdmin={isAdmin}

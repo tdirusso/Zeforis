@@ -32,7 +32,7 @@ module.exports = async (req, res, next) => {
 
   try {
     if (!folderId) {
-      folderId = commonQueries.getEngagementHiddenFolder(connection, engagementId);
+      folderId = await commonQueries.getEngagementHiddenFolder(connection, engagementId);
     }
 
     const [updatedTaskResult] = await pool.query(
