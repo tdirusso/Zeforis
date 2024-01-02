@@ -19,7 +19,8 @@ import {
   Grid,
   Paper,
   CircularProgress,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material';
 import { FormControl } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
@@ -47,30 +48,7 @@ import moment from 'moment';
 import { useOutletContext, useParams } from 'react-router-dom';
 import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
 
-const defaultTask = {
-  task_id: null,
-  task_name: null,
-  description: null,
-  date_created: null,
-  created_by_id: null,
-  status: null,
-  folder_id: null,
-  link_url: null,
-  assigned_to_id: null,
-  date_completed: null,
-  is_key_task: 0,
-  date_due: null,
-  date_last_updated: null,
-  tags: null,
-  assigned_first: null,
-  assigned_last: null,
-  created_first: null,
-  created_last: null,
-  updated_by_first: null,
-  updated_by_last: null
-};
-
-export default function TaskDrawer(props) {
+export default function TaskPage(props) {
   const {
     isOpen,
     isAdmin,
@@ -88,6 +66,8 @@ export default function TaskDrawer(props) {
     tasksMap,
     tagsMap
   } = useOutletContext();
+
+  const palette = useTheme().palette;
 
   const { taskId } = useParams();
 
@@ -305,6 +285,12 @@ export default function TaskDrawer(props) {
     }
   };
 
+
+  const handleEditNameClick = task => {
+    //  setEditingTask(task);
+    // setEditingName(true);
+  };
+
   return (
     <Grid item xs={12} md={8} style={{ margin: '0 auto' }}>
       <Paper>
@@ -344,7 +330,13 @@ export default function TaskDrawer(props) {
 
         <Box>
           <Box>
-            <TextField
+            <Box
+              className="name-text"
+              width='100%'
+              onClick={() => handleEditNameClick(task)}>
+              {task.task_name}
+            </Box>
+            {/* <TextField
               disabled={isLoading}
               fullWidth
               placeholder='Task name'
@@ -357,14 +349,14 @@ export default function TaskDrawer(props) {
                 style: { fontSize: '1.25rem' }
               }}
               InputProps={{ readOnly: !isAdmin }}
-              className={!isAdmin ? 'readonly-textfield' : ''}
-            />
+              className={!isAdmin ? 'no-border-textfield' : ''}
+            /> */}
           </Box>
         </Box>
         <Box display="flex" alignItems="center" mt={2.5}>
           <Chip
             disabled={isLoading}
-            label={status}
+            label={task.status}
             deleteIcon={<MoreVertIcon />}
             onClick={isAdmin ? e => setStatusMenuAnchor(e.currentTarget) : () => { }}
             style={{
@@ -372,7 +364,7 @@ export default function TaskDrawer(props) {
               cursor: isAdmin ? 'pointer' : 'unset'
             }}
             onDelete={isAdmin ? e => setStatusMenuAnchor(e.currentTarget) : () => { }}
-            className={status}>
+            className={task.status}>
           </Chip>
           <Menu
             anchorEl={statusMenuAnchor}
@@ -418,7 +410,18 @@ export default function TaskDrawer(props) {
           }
         </Box>
         <Box my={3}>
-          <TextField
+          <Box
+            // className="name-text"
+            width='100%'
+            onClick={() => handleEditNameClick(task)}>
+            {
+              !task.description ? <span style={{
+                color: palette.grey[700]
+              }}>Description</span> :
+                task.description
+            }
+          </Box>
+          {/* <TextField
             disabled={isLoading}
             fullWidth
             placeholder='Description'
@@ -429,8 +432,8 @@ export default function TaskDrawer(props) {
             inputProps={{ style: { resize: 'vertical' } }}
             onChange={e => setDescription(e.target.value)}
             InputProps={{ readOnly: !isAdmin }}
-            className={!isAdmin ? 'readonly-textfield' : ''}
-          />
+            className={!isAdmin ? 'no-border-textfield' : ''}
+          /> */}
         </Box>
         <Box my={4}>
           <Box my={2}>
@@ -442,7 +445,7 @@ export default function TaskDrawer(props) {
               variant="standard"
               value={linkUrl}
               onChange={e => setLinkUrl(e.target.value)}
-              className={!isAdmin ? 'readonly-textfield' : ''}
+              className={!isAdmin ? 'no-border-textfield' : ''}
               InputProps={{
                 startAdornment:
                   <InputAdornment position='start' style={{ transform: 'rotate(-45deg)' }}>
@@ -572,7 +575,7 @@ export default function TaskDrawer(props) {
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
                 onChange={handleTagsChange}
-                className={!isAdmin ? 'readonly-textfield' : ''}
+                className={!isAdmin ? 'no-border-textfield' : ''}
                 componentsProps={{
                   popper: {
                     placement: 'top'

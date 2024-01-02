@@ -22,13 +22,11 @@ import {
   Avatar,
   Typography,
   Menu,
-  ListItemText,
   FormHelperText
 } from "@mui/material";
-import { Link, useLocation, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import './styles.scss';
 import { useMemo, useRef, useState } from "react";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
@@ -52,10 +50,8 @@ import { TransitionGroup } from "react-transition-group";
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
 
 const tasksPerPage = 25;
@@ -63,10 +59,7 @@ const tasksParamsKey = 'params-tasks';
 
 export default function TasksTable() {
   const {
-    foldersMap,
     tagsMap,
-    isAdmin,
-    openDrawer,
     openModal,
     tags,
     user,
@@ -79,7 +72,8 @@ export default function TasksTable() {
     setTags,
     folders,
     tasks,
-    orgUsersMap
+    orgUsersMap,
+    openContextMenu
   } = useOutletContext();
 
   const [searchParams, setSearchParams] = useSearchParams(localStorage.getItem(tasksParamsKey) || '');
@@ -108,17 +102,15 @@ export default function TasksTable() {
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
   const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
-  const [taskActionsMenuAnchor, setTaskActionsMenuAnchor] = useState(null);
   const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
   const [folderMenuAnchor, setFolderMenuAnchor] = useState(null);
   const [tempAssignee, setTempAssignee] = useState(null);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
-  const [doAction, setDoAction] = useState(null);
 
   const [filterTags, setFilterTags] = useState([]);
-  const [filterFolder, setFilterFolder] = useState(null);
+  //const [filterFolder, setFilterFolder] = useState(null);
   const [sortBy, setSortBy] = useState('name');
 
   const [isBulkEditMode, setBulkEditMode] = useState(false);
@@ -132,12 +124,9 @@ export default function TasksTable() {
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
   const dateDueMenuOpen = Boolean(dateDueMenuAnchor);
-  const taskActionsMenuOpen = Boolean(taskActionsMenuAnchor);
   const tagsMenuOpen = Boolean(tagsMenuAnchor);
   const folderMenuOpen = Boolean(folderMenuAnchor);
 
-  const [mouseX, setMouseX] = useState(0);
-  const [mouseY, setMouseY] = useState(0);
   const [addingTask, setAddingTask] = useState(false);
   const [addingTaskLoading, setAddingTaskLoading] = useState(false);
 
@@ -521,14 +510,6 @@ export default function TasksTable() {
     setDateDueMenuAnchor(e.currentTarget);
   };
 
-  const handleOpenTaskContextMenu = (e, task) => {
-    e.preventDefault();
-    setEditingTask(task);
-    setTaskActionsMenuAnchor(e.currentTarget);
-    setMouseX(e.clientX);
-    setMouseY(e.clientY);
-  };
-
   const handleToggleKeyTask = (task) => {
     setEditingTask({ ...task, is_key_task: !task.is_key_task });
     setDoUpdate(true);
@@ -714,20 +695,6 @@ export default function TasksTable() {
       nameRef.current.setSelectionRange(1000, 1000);
     }
   }, [isEditingName]);
-
-  useEffect(() => {
-    if (doAction) {
-      if (doAction === 'quickview') {
-        const taskCopy = { ...editingTask };
-        openDrawer('task', { taskProp: taskCopy });
-      } else if (doAction === 'deleteTask') {
-        openModal('delete-tasks', { taskIds: [editingTask.task_id] });
-      }
-
-      setDoAction(null);
-      setEditingTask(null);
-    }
-  }, [doAction]);
 
   const handleBulkEditChange = () => {
     setSelectedTasks([]);
@@ -1146,7 +1113,7 @@ export default function TasksTable() {
                 return (
                   <Collapse
                     unmountOnExit
-                    onContextMenu={e => handleOpenTaskContextMenu(e, task)}
+                    onContextMenu={e => openContextMenu(e, 'task', { task })}
                     onClick={() => handleTaskSelection(task.task_id)}
                     key={task.task_id}
                     className={isSelectedRow ? 'selected' : ''}
@@ -1296,11 +1263,6 @@ export default function TasksTable() {
             }
           </TransitionGroup>
 
-
-
-
-
-
           <Box mt={2} mr={2}>
             <TablePagination
               rowsPerPageOptions={[-1]}
@@ -1432,75 +1394,6 @@ export default function TasksTable() {
               </Box>
             </Box>
           </Box>
-        </Menu>
-
-        <Menu
-          transitionDuration={0}
-          className="task-actions-menu"
-          anchorReference="anchorPosition"
-          anchorPosition={{
-            top: mouseY,
-            left: mouseX
-          }}
-          open={taskActionsMenuOpen}
-          onClose={() => {
-            setTaskActionsMenuAnchor(null);
-            setEditingTask(null);
-          }}>
-          <MenuItem
-            dense
-            onClick={() => {
-              setDoAction('quickview');
-              setTaskActionsMenuAnchor(null);
-            }}>
-            <EastRoundedIcon fontSize="small" />
-            Quick view
-          </MenuItem>
-          <MenuItem
-            style={{ color: 'inherit' }}
-            dense
-            component={Link}
-            to={`${editingTask?.task_id}`}>
-            <FullscreenOutlinedIcon fontSize="small" />
-            Full view
-          </MenuItem>
-          <Divider className="m0" />
-          {
-            editingTask?.link_url ?
-              <Box>
-                <MenuItem
-                  onClick={() => {
-                    setTaskActionsMenuAnchor(null);
-                    setEditingTask(null);
-                  }}
-                  style={{ color: 'inherit' }}
-                  dense
-                  component="a"
-                  href={editingTask.link_url} target="_blank">
-                  <OpenInNewIcon
-                    fontSize="small"
-                    style={{ fontSize: 17, width: 20 }} />
-                  Open resource
-                </MenuItem>
-                <Divider className="m0" />
-              </Box>
-              :
-              null
-          }
-          <MenuItem
-            dense
-            onClick={() => {
-              setDoAction('deleteTask');
-              setTaskActionsMenuAnchor(null);
-            }}>
-            <ListItemText
-              inset
-              color="error">
-              <Typography color="error" component="span">
-                Delete task
-              </Typography>
-            </ListItemText>
-          </MenuItem>
         </Menu>
 
         <Menu

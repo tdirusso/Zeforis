@@ -82,11 +82,11 @@ export default function TaskDrawer(props) {
     setTags,
     openSnackBar,
     foldersMap,
-    taskProp,
     setTasks,
     user,
     tasksMap,
-    tagsMap
+    tagsMap,
+    drawerProps: { taskProp }
   } = props;
 
   const engagementId = engagement.id;
@@ -426,7 +426,7 @@ export default function TaskDrawer(props) {
                 style: { fontSize: '1.25rem' }
               }}
               InputProps={{ readOnly: !isAdmin }}
-              className={!isAdmin ? 'readonly-textfield' : ''}
+              className={!isAdmin ? 'no-border-textfield' : ''}
             />
           </Box>
         </Box>
@@ -500,7 +500,7 @@ export default function TaskDrawer(props) {
             inputProps={{ style: { resize: 'vertical' } }}
             onChange={e => setDescription(e.target.value)}
             InputProps={{ readOnly: !isAdmin }}
-            className={!isAdmin ? 'readonly-textfield' : ''}
+            className={!isAdmin ? 'no-border-textfield' : ''}
           />
         </Box>
         <Divider />
@@ -514,7 +514,7 @@ export default function TaskDrawer(props) {
               variant="standard"
               value={linkUrl}
               onChange={e => setLinkUrl(e.target.value)}
-              className={!isAdmin ? 'readonly-textfield' : ''}
+              className={!isAdmin ? 'no-border-textfield' : ''}
               InputProps={{
                 startAdornment:
                   <InputAdornment position='start' style={{ transform: 'rotate(-45deg)' }}>
@@ -644,7 +644,7 @@ export default function TaskDrawer(props) {
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
                 onChange={handleTagsChange}
-                className={!isAdmin ? 'readonly-textfield' : ''}
+                className={!isAdmin ? 'no-border-textfield' : ''}
                 componentsProps={{
                   popper: {
                     placement: 'top'

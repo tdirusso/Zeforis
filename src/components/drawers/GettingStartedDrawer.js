@@ -469,7 +469,7 @@ function AdminGettingStartedDrawer(props) {
             mb={1}>This is an example widget
           </Box>
           <TextField
-            className="readonly-textfield"
+            className="no-border-textfield"
             fullWidth
             inputProps={{
               style: {

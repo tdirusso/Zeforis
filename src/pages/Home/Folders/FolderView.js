@@ -2,7 +2,7 @@
 import {
   Grid, Paper, Checkbox, Box, Tooltip, IconButton,
   Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl,
-  Autocomplete, Button, Divider, ListItemText, FormHelperText,
+  Autocomplete, Button, Divider, FormHelperText,
   Collapse,
   InputAdornment,
   InputLabel,
@@ -10,10 +10,9 @@ import {
   useTheme
 } from "@mui/material";
 import './styles.scss';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StarIcon from '@mui/icons-material/Star';
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { statuses } from "../../../lib/constants";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import moment from "moment";
@@ -21,8 +20,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import EastRoundedIcon from '@mui/icons-material/EastRounded';
-import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
 import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
 import { createTag } from "../../../api/tags";
@@ -55,9 +52,9 @@ export default function FolderView({ folderId }) {
     foldersMap,
     tags,
     setTags,
-    openDrawer,
     openModal,
-    folders
+    folders,
+    openContextMenu
   } = useOutletContext();
 
   const theme = useTheme(); // Get the current theme
@@ -75,7 +72,6 @@ export default function FolderView({ folderId }) {
   const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
   const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
   const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
-  const [taskActionsMenuAnchor, setTaskActionsMenuAnchor] = useState(null);
   const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
   const [folderMenuAnchor, setFolderMenuAnchor] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -83,7 +79,6 @@ export default function FolderView({ folderId }) {
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tagIdToRemove, setTagIdToRemove] = useState(null);
   const [doUpdate, setDoUpdate] = useState(false);
-  const [doAction, setDoAction] = useState(null);
 
   const [filterName, setFilterName] = useState('');
   const [filterTags, setFilterTags] = useState([]);
@@ -97,8 +92,6 @@ export default function FolderView({ folderId }) {
   const [bulkAssigneeValue, setBulkAssigneeValue] = useState(null);
   const [bulkTagAction, setBulkTagAction] = useState('add');
 
-  const [mouseX, setMouseX] = useState(0);
-  const [mouseY, setMouseY] = useState(0);
   const [addingTask, setAddingTask] = useState(false);
   const [addingTaskLoading, setAddingTaskLoading] = useState(false);
 
@@ -191,7 +184,6 @@ export default function FolderView({ folderId }) {
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const assigneeMenuOpen = Boolean(assigneeMenuAnchor);
   const dateDueMenuOpen = Boolean(dateDueMenuAnchor);
-  const taskActionsMenuOpen = Boolean(taskActionsMenuAnchor);
   const tagsMenuOpen = Boolean(tagsMenuAnchor);
   const folderMenuOpen = Boolean(folderMenuAnchor);
 
@@ -588,31 +580,9 @@ export default function FolderView({ folderId }) {
     }
   }, [isEditingName]);
 
-  useEffect(() => {
-    if (doAction) {
-      if (doAction === 'quickview') {
-        const taskCopy = { ...editingTask };
-        openDrawer('task', { taskProp: taskCopy });
-      } else if (doAction === 'deleteTask') {
-        openModal('delete-tasks', { taskIds: [editingTask.task_id] });
-      }
-
-      setDoAction(null);
-      setEditingTask(null);
-    }
-  }, [doAction]);
-
   const handleBulkEditChange = () => {
     setSelectedTasks([]);
     setBulkEditMode(prev => !prev);
-  };
-
-  const handleOpenTaskContextMenu = (e, task) => {
-    e.preventDefault();
-    setEditingTask(task);
-    setTaskActionsMenuAnchor(e.currentTarget);
-    setMouseX(e.clientX);
-    setMouseY(e.clientY);
   };
 
   const handleCreateTask = async e => {
@@ -1067,7 +1037,7 @@ export default function FolderView({ folderId }) {
               return (
                 <Collapse
                   unmountOnExit
-                  onContextMenu={e => handleOpenTaskContextMenu(e, task)}
+                  onContextMenu={e => openContextMenu(e, 'task', { task })}
                   onClick={() => handleTaskSelection(task.task_id)}
                   key={task.task_id}
                   className={isSelectedRow ? 'selected' : ''}>
@@ -1339,75 +1309,6 @@ export default function FolderView({ folderId }) {
             </Box>
           </Box>
         </Box>
-      </Menu>
-
-      <Menu
-        transitionDuration={0}
-        className="task-actions-menu"
-        anchorPosition={{
-          top: mouseY,
-          left: mouseX
-        }}
-        anchorReference="anchorPosition"
-        open={taskActionsMenuOpen}
-        onClose={() => {
-          setTaskActionsMenuAnchor(null);
-          setEditingTask(null);
-        }}>
-        <MenuItem
-          dense
-          onClick={() => {
-            setDoAction('quickview');
-            setTaskActionsMenuAnchor(null);
-          }}>
-          <EastRoundedIcon fontSize="small" />
-          Quick view
-        </MenuItem>
-        <MenuItem
-          style={{ color: 'inherit' }}
-          dense
-          component={Link}
-          to={`../tasks/${editingTask?.task_id}`}>
-          <FullscreenOutlinedIcon fontSize="small" />
-          Full view
-        </MenuItem>
-        <Divider className="m0" />
-        {
-          editingTask?.link_url ?
-            <Box>
-              <MenuItem
-                onClick={() => {
-                  setTaskActionsMenuAnchor(null);
-                  setEditingTask(null);
-                }}
-                style={{ color: 'inherit' }}
-                dense
-                component="a"
-                href={editingTask.link_url} target="_blank">
-                <OpenInNewIcon
-                  fontSize="small"
-                  style={{ fontSize: 17, width: 20 }} />
-                Open resource
-              </MenuItem>
-              <Divider className="m0" />
-            </Box>
-            :
-            null
-        }
-        <MenuItem
-          dense
-          onClick={() => {
-            setDoAction('deleteTask');
-            setTaskActionsMenuAnchor(null);
-          }}>
-          <ListItemText
-            inset
-            color="error">
-            <Typography color="error" component="span">
-              Delete task
-            </Typography>
-          </ListItemText>
-        </MenuItem>
       </Menu>
 
       <Menu

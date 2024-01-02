@@ -26,6 +26,8 @@ import './styles.scss';
 import NoEngagementsDialog from "../../components/dialogs/NoEngagementsDialog";
 import useNotification from "../../hooks/useNotification";
 import ActionCenter from "../../components/admin/ActionCenter";
+import useContextMenu from "../../hooks/useContextMenu";
+import ContextMenus from "../../components/core/contextMenus";
 
 export default function Home({ setTheme }) {
   let activeOrgId = getActiveOrgId();
@@ -86,6 +88,14 @@ export default function Home({ setTheme }) {
     openDialog,
     closeDialog
   } = useDialog();
+
+  const {
+    contextMenuToOpen,
+    contextMenuProps,
+    mouseCoords,
+    openContextMenu,
+    closeContextMenu
+  } = useContextMenu();
 
   useNotification({ user, openModal, isOrgOwner });
 
@@ -336,7 +346,8 @@ export default function Home({ setTheme }) {
     openSnackBar,
     openModal,
     openDrawer,
-    openDialog
+    openDialog,
+    openContextMenu
   };
 
   return (
@@ -381,7 +392,7 @@ export default function Home({ setTheme }) {
 
             <Drawers
               {...context}
-              {...drawerProps}
+              drawerProps={drawerProps}
               drawerToOpen={drawerToOpen}
               closeDrawer={closeDrawer}
             />
@@ -391,6 +402,14 @@ export default function Home({ setTheme }) {
               {...dialogProps}
               dialogToOpen={dialogToOpen}
               closeDialog={closeDialog}
+            />
+
+            <ContextMenus
+              {...context}
+              contextMenuProps={contextMenuProps}
+              mouseCoords={mouseCoords}
+              contextMenuToOpen={contextMenuToOpen}
+              closeContextMenu={closeContextMenu}
             />
 
             {

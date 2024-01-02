@@ -11,7 +11,10 @@ export default function useDrawer() {
       localStorage.removeItem('gsDrawerToReopen');
     }
 
-    setDrawerProps(props);
+    if (props) {
+      setDrawerProps(props);
+    }
+
     setDrawerToOpen(drawerType);
   };
 

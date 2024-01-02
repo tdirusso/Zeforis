@@ -6,7 +6,8 @@ import TaskDrawer from "./TaskDrawer";
 export default function Drawers(props) {
   const {
     drawerToOpen,
-    closeDrawer
+    closeDrawer,
+    drawerProps
   } = props;
 
   return (
@@ -15,18 +16,21 @@ export default function Drawers(props) {
         {...props}
         isOpen={drawerToOpen === 'create-task'}
         close={closeDrawer}
+        drawerProps={drawerProps}
       />
 
       <FolderDrawer
         {...props}
         isOpen={drawerToOpen === 'folder'}
         close={closeDrawer}
+        drawerProps={drawerProps}
       />
 
       <TaskDrawer
         {...props}
         isOpen={drawerToOpen === 'task'}
         close={closeDrawer}
+        drawerProps={drawerProps}
       />
 
       <GettingStartedDrawer

@@ -20,9 +20,9 @@ export default function FolderDrawer(props) {
     engagement,
     openSnackBar,
     setFolders,
-    folderProps,
     foldersMap,
-    openModal
+    openModal,
+    drawerProps: { folderProps }
   } = props;
 
   const [isLoading, setLoading] = useState(false);

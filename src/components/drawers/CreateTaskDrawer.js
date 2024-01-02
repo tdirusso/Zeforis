@@ -24,10 +24,10 @@ import { createFolder } from '../../api/folders';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
 export default function CreateTaskDrawer(props) {
+
   const {
     isOpen,
     close,
-    defaultFolder,
     folders,
     engagementMembers,
     engagementAdmins,
@@ -37,7 +37,8 @@ export default function CreateTaskDrawer(props) {
     setTasks,
     user,
     openSnackBar,
-    setFolders
+    setFolders,
+    drawerProps: { defaultFolder }
   } = props;
 
   const engagementId = engagement.id;
