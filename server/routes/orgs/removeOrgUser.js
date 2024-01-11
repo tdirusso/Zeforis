@@ -4,7 +4,7 @@ const { updateStripeSubscription } = require('../../../lib/utils');
 module.exports = async (req, res, next) => {
   const {
     userId
-  } = req.body;
+  } = req.params;
 
   const orgId = req.ownedOrg.id;
   const updaterUserId = req.userId;

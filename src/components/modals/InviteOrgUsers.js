@@ -6,13 +6,13 @@ import { Alert, Autocomplete, Box, FormControl, Grow, Paper, TextField, Typograp
 import BuildIcon from '@mui/icons-material/Build';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import validator from 'email-validator';
-import { inviteEngagementUsers } from '../../api/engagements';
+import { inviteOrgUsers } from '../../api/orgs';
 import { appLimits } from '../../lib/constants';
 import { Link } from 'react-router-dom';
 
 const inviteLimit = appLimits.simultaneousEmailInvites;
 
-export default function InviteEngagementUsers(props) {
+export default function InviteOrgUsers(props) {
 
   const {
     close,
@@ -117,10 +117,9 @@ export default function InviteEngagementUsers(props) {
         success,
         message,
         invitedUsers
-      } = await inviteEngagementUsers({
+      } = await inviteOrgUsers(orgId, {
         usersToInvite: inviteeUsers,
         engagementId,
-        orgId,
         engagementName,
         orgName,
         inviteType,

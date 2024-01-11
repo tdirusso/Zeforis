@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { useOutletContext } from "react-router";
 import { useRef } from "react";
-import { sendPasswordResetLink, updateProfile } from "../../../../api/users";
+import { sendPasswordResetLink, updateUser } from "../../../../api/users";
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
@@ -42,9 +42,9 @@ export default function Profile() {
     setUpdatingName(true);
 
     try {
-      const { success, message } = await updateProfile({
-        firstName: firstNameVal,
-        lastName: lastNameVal
+      const { success, message } = await updateUser(user.id, {
+        first_name: firstNameVal,
+        last_name: lastNameVal
       });
 
       if (success) {

@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { removeEngagementUser } from "../../../../api/users";
+import { removeEngagementUser } from "../../../../api/engagements";
 
 export default function Collaborators() {
 
@@ -47,11 +47,7 @@ export default function Collaborators() {
       userToRemove.memberOfEngagements.length + userToRemove.adminOfEngagements.length === 1;
 
     try {
-      const result = await removeEngagementUser({
-        engagementId,
-        userId: userToRemove.id,
-        orgId: org.id
-      });
+      const result = await removeEngagementUser(engagementId, userToRemove.id);
 
       const success = result.success;
       const resultMessage = result.message;

@@ -43,6 +43,18 @@ const leaveOrg = async (payload) => {
   return data;
 };
 
+const removeOrgUser = async (orgId, userId) => {
+  const { data } = await request.delete(`orgs/${orgId}/users/${userId}`);
+
+  return data;
+};
+
+const inviteOrgUsers = async (orgId, payload) => {
+  const { data } = await request.post(`orgs/${orgId}/invite`, payload);
+
+  return data;
+};
+
 export {
   getActiveOrgId,
   setActiveOrgId,
@@ -51,5 +63,7 @@ export {
   createOrg,
   getOrg,
   deleteOrg,
-  leaveOrg
+  leaveOrg,
+  removeOrgUser,
+  inviteOrgUsers
 };

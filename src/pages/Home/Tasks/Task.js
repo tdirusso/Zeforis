@@ -416,8 +416,8 @@ export default function TaskPage(props) {
             onClick={() => handleEditNameClick(task)}>
             {
               !task.description ? <span style={{
-                color: palette.grey[700]
-              }}>Description</span> :
+                color: palette.grey[400]
+              }}>No description</span> :
                 task.description
             }
           </Box>

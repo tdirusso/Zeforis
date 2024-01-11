@@ -1,13 +1,13 @@
 import request from '../lib/request';
 
 const register = async (payload) => {
-  const { data } = await request.post(`users/register`, payload);
+  const { data } = await request.post(`register`, payload);
 
   return data;
 };
 
-const updateProfile = async (payload) => {
-  const { data } = await request.patch(`users`, payload);
+const updateUser = async (userId, payload) => {
+  const { data } = await request.patch(`users/${userId}`, payload);
   return data;
 };
 
@@ -51,18 +51,6 @@ const resendVerificationLink = async (payload) => {
   return data;
 };
 
-const removeEngagementUser = async (payload) => {
-  const { data } = await request.delete(`users/removeEngagementUser`, { data: payload });
-
-  return data;
-};
-
-const removeOrgUser = async (payload) => {
-  const { data } = await request.delete(`users/removeOrgUser`, { data: payload });
-
-  return data;
-};
-
 const closeAccount = async () => {
   const { data } = await request.delete(`users`);
 
@@ -70,7 +58,7 @@ const closeAccount = async () => {
 };
 
 export {
-  updateProfile,
+  updateUser,
   updatePermission,
   updateAccess,
   register,
@@ -80,7 +68,5 @@ export {
   resendVerificationLink,
   batchUpdateAccess,
   batchUpdatePermission,
-  removeOrgUser,
-  removeEngagementUser,
   closeAccount
 };

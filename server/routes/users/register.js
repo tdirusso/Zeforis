@@ -7,8 +7,6 @@ const slackbot = require('../../../slackbot');
 
 const { pool } = require('../../../database');
 
-const slackEventsChannelId = 'C05ML3A3DC3';
-
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
 module.exports = async (req, res, next) => {
@@ -106,9 +104,7 @@ module.exports = async (req, res, next) => {
 };
 
 async function sendVerifyEmail(userId, verificationCode, email) {
-  const qs = `userId=${userId}&verificationCode=${verificationCode}`;
-
-  const verificationUrl = `${process.env.REACT_APP_API_DOMAIN}/api/users/verify?${qs}`;
+  const verificationUrl = `${process.env.REACT_APP_API_DOMAIN}/api/users/${userId}/verify?verificationCode=${verificationCode}`;
 
   await emailService.sendEmailFromTemplate({
     to: email,

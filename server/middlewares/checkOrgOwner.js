@@ -8,14 +8,11 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'No authentication token provided.' });
   }
 
-  let { orgId } = req.body;
+  let orgId = req.params.orgId || req.body.orgId || req.query.orgId;
+  let engagementId = req.params.engagementId || req.body.engagementId || req.query.engagementId;
 
-  if (!orgId) {
-    orgId = req.query.orgId;
-  }
-
-  if (!orgId) {
-    return res.json({ message: 'No orgId provided.' });
+  if (!orgId && !engagementId) {
+    return res.json({ message: 'No ID provided for engagement or org.' });
   }
 
   try {
@@ -24,10 +21,23 @@ module.exports = async (req, res, next) => {
     const userId = decoded.user.id;
     const userEmail = decoded.user.email;
 
-    const [ownerOfOrgResult] = await pool.query(
-      'SELECT id, name FROM orgs WHERE id = ? AND owner_id = ?',
-      [orgId, userId]
-    );
+    let ownerOfOrgResult;
+
+    if (orgId) {
+      [ownerOfOrgResult] = await pool.query(
+        'SELECT id, name FROM orgs WHERE id = ? AND owner_id = ?',
+        [orgId, userId]
+      );
+    } else {
+      [ownerOfOrgResult] = await pool.query(
+        `SELECT orgs.id, orgs.name
+         FROM orgs
+         JOIN engagements ON orgs.id = engagements.org_id
+         WHERE engagements.id = ?
+         AND orgs.owner_id = ?`,
+        [engagementId, userId]
+      );
+    }
 
     if (ownerOfOrgResult.length) {
       req.userId = userId;

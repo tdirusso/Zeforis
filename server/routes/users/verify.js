@@ -2,9 +2,12 @@ const { pool } = require('../../../database');
 
 module.exports = async (req, res, next) => {
   const {
-    userId,
     verificationCode
   } = req.query;
+
+  const {
+    userId
+  } = req.params;
 
   if (!userId || !verificationCode) {
     return res.json({

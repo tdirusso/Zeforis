@@ -13,17 +13,17 @@ const { initializeDatabase, pool } = require('../database');
 const emailService = require('../email');
 const slackbot = require('../slackbot');
 
-const login = require('./routes/users/login');
-const authenticate = require('./routes/users/authenticate');
+const login = require('./routes/auth/login');
+const authenticate = require('./routes/auth/authenticate');
 const createEngagement = require('./routes/engagements/createEngagement');
 const getEngagement = require('./routes/engagements/getEngagementData');
 const createFolder = require('./routes/folders/createFolder');
 const updateEngagement = require('./routes/engagements/updateEngagement');
 const register = require('./routes/users/register');
 const verify = require('./routes/users/verify');
-const inviteEngagementUsers = require('./routes/users/inviteEngagementUsers');
-const removeEngagementUser = require('./routes/users/removeEngagementUser');
-const updateProfile = require('./routes/users/updateProfile');
+const inviteOrgUsers = require('./routes/orgs/inviteOrgUsers');
+const removeEngagementUser = require('./routes/engagements/removeEngagementUser');
+const updateUser = require('./routes/users/updateUser');
 const updateFolder = require('./routes/folders/updateFolder');
 const createTask = require('./routes/tasks/createTask');
 const createTag = require('./routes/tags/createTag');
@@ -32,7 +32,7 @@ const deleteTag = require('./routes/tags/deleteTag');
 const deleteTasks = require('./routes/tasks/deleteTasks');
 const deleteFolder = require('./routes/folders/deleteFolder');
 const deleteEngagement = require('./routes/engagements/deleteEngagement');
-const removeOrgUser = require('./routes/users/removeOrgUser');
+const removeOrgUser = require('./routes/orgs/removeOrgUser');
 const updateTask = require('./routes/tasks/updateTask');
 const updatePermission = require('./routes/users/updatePermission');
 const updateAccess = require('./routes/users/updateAccess');
@@ -131,14 +131,13 @@ const boot = async () => {
 
   app.use(express.json());
 
-  app.post('/api/users/login', unAuthenicatedUserRateLimit, login);
-  app.post('/api/users/authenticate', authenicatedUserRateLimit, authenticate);
-  app.get('/api/users/verify', unAuthenicatedUserRateLimit, verify);
-  app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
-  app.post('/api/users/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteEngagementUsers);
-  app.delete('/api/users/removeEngagementUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
-  app.delete('/api/users/removeOrgUser', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
-  app.patch('/api/users', authenicatedUserRateLimit, checkAuthMW, updateProfile);
+  app.post('/api/login', unAuthenicatedUserRateLimit, login);
+  app.post('/api/authenticate', authenicatedUserRateLimit, authenticate);
+  app.post('/api/register', unAuthenicatedUserRateLimit, register);
+
+  app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
+  app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
+
   app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
   app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
   app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
@@ -151,6 +150,7 @@ const boot = async () => {
 
   app.post('/api/stripe/subscriptions', authenicatedUserRateLimit, checkOrgOwnerMW, stripe_createSubscription);
 
+  app.delete('/api/engagements/:engagementId/users/:userId', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
   app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
@@ -171,6 +171,8 @@ const boot = async () => {
   app.delete('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, deleteTag);
   app.patch('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, updateTag);
 
+  app.delete('/api/orgs/:orgId/users/:userId', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
+  app.post('/api/orgs/:orgId/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteOrgUsers);
   app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
   app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);
   app.get('/api/orgs', unAuthenicatedUserRateLimit, getOrg);

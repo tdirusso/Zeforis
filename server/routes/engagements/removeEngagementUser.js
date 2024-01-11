@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
   const {
     userId,
     engagementId
-  } = req.body;
+  } = req.params;
 
   const updaterUserId = req.userId;
   const orgId = req.ownedOrg.id;

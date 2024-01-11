@@ -1,7 +1,7 @@
 import request from '../lib/request';
 
 const login = async (payload) => {
-  const { data } = await request.post(`users/login`, payload);
+  const { data } = await request.post(`login`, payload);
 
   return data;
 };
@@ -12,7 +12,7 @@ const logout = (logoutPageUrl) => {
 };
 
 const authenticate = async () => {
-  const { data } = await request.post(`users/authenticate`);
+  const { data } = await request.post(`authenticate`);
 
   if (!data.user) {
     deleteToken();
