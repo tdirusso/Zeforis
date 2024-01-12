@@ -11,18 +11,8 @@ const updateUser = async (userId, payload) => {
   return data;
 };
 
-const updatePermission = async (payload) => {
-  const { data } = await request.patch(`users/permissions`, payload);
-  return data;
-};
-
 const batchUpdatePermission = async (payload) => {
   const { data } = await request.patch(`users/permissions/batch`, payload);
-  return data;
-};
-
-const updateAccess = async (payload) => {
-  const { data } = await request.patch(`users/access`, payload);
   return data;
 };
 
@@ -59,8 +49,6 @@ const closeAccount = async () => {
 
 export {
   updateUser,
-  updatePermission,
-  updateAccess,
   register,
   getInvitationData,
   updatePassword,

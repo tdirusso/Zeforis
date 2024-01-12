@@ -66,6 +66,11 @@ const removeEngagementUser = async (engagementId, userId) => {
   return data;
 };
 
+const updateUserPermissions = async (engagementId, userId, payload) => {
+  const { data } = await request.patch(`engagements/${engagementId}/users/${userId}/permissions`, payload);
+  return data;
+};
+
 export {
   createEngagement,
   updateEngagement,
@@ -76,5 +81,6 @@ export {
   getEngagementData,
   deleteEngagement,
   leaveEngagement,
-  removeEngagementUser
+  removeEngagementUser,
+  updateUserPermissions
 };

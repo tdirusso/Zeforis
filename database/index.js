@@ -101,8 +101,16 @@ const commonQueries = {
   }
 };
 
+const apiFieldMappings = {
+  users: {
+    'firstName': 'first_name',
+    'lastName': 'last_name'
+  }
+};
+
 module.exports = {
   pool,
   initializeDatabase,
-  commonQueries
+  commonQueries,
+  apiFieldMappings
 };

@@ -55,6 +55,11 @@ const inviteOrgUsers = async (orgId, payload) => {
   return data;
 };
 
+const updateAccess = async (orgId, userId, payload) => {
+  const { data } = await request.patch(`orgs/${orgId}/users/${userId}/access`, payload);
+  return data;
+};
+
 export {
   getActiveOrgId,
   setActiveOrgId,
@@ -65,5 +70,6 @@ export {
   deleteOrg,
   leaveOrg,
   removeOrgUser,
-  inviteOrgUsers
+  inviteOrgUsers,
+  updateAccess
 };

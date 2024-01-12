@@ -3,10 +3,13 @@ const { updateStripeSubscription } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
-    engagementId,
-    userId,
     isAdmin = false
   } = req.body;
+
+  const {
+    engagementId,
+    userId
+  } = req.params;
 
   const { userObject, ownedOrg } = req;
 

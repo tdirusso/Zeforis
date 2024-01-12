@@ -43,8 +43,8 @@ export default function Profile() {
 
     try {
       const { success, message } = await updateUser(user.id, {
-        first_name: firstNameVal,
-        last_name: lastNameVal
+        firstName: firstNameVal,
+        lastName: lastNameVal
       });
 
       if (success) {

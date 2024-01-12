@@ -34,7 +34,7 @@ const deleteFolder = require('./routes/folders/deleteFolder');
 const deleteEngagement = require('./routes/engagements/deleteEngagement');
 const removeOrgUser = require('./routes/orgs/removeOrgUser');
 const updateTask = require('./routes/tasks/updateTask');
-const updatePermission = require('./routes/users/updatePermission');
+const updateUserPermissions = require('./routes/engagements/updateUserPermissions');
 const updateAccess = require('./routes/users/updateAccess');
 const updateOrg = require('./routes/orgs/updateOrg');
 const batchUpdateTasks = require('./routes/tasks/batchUpdateTasks');
@@ -51,7 +51,6 @@ const resendVerificationLink = require('./routes/users/resendVerificationLink');
 const deleteOrg = require('./routes/orgs/deleteOrg');
 const leaveEngagement = require('./routes/engagements/leaveEngagement');
 const leaveOrg = require('./routes/orgs/leaveOrg');
-const batchUpdateAccess = require('./routes/users/batchUpdateAccess');
 const batchUpdatePermission = require('./routes/users/batchUpdatePermission');
 const slackbotStats = require('./routes/slackbot/stats');
 const logFrontendError = require('./routes/logs/logFrontendError');
@@ -138,19 +137,21 @@ const boot = async () => {
   app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
 
-  app.patch('/api/users/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updatePermission);
   app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
+  app.patch('/api/orgs/:orgId/users/:userId/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
+
+
   app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
   app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
   app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
-  app.patch('/api/users/access/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdateAccess);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
   app.delete('/api/users', authenicatedUserRateLimit, checkAuthMW, closeAccount);
 
   app.post('/api/stripe/subscriptions', authenicatedUserRateLimit, checkOrgOwnerMW, stripe_createSubscription);
 
   app.delete('/api/engagements/:engagementId/users/:userId', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
+  app.patch('/api/engagements/:engagementId/users/:userId/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updateUserPermissions);
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
   app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);

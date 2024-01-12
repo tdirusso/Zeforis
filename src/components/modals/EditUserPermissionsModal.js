@@ -2,7 +2,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import { useState } from 'react';
 import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery, DialogTitle } from '@mui/material';
-import { updateAccess, updatePermission, batchUpdateAccess, batchUpdatePermission } from '../../api/users';
+import { batchUpdateAccess, batchUpdatePermission } from '../../api/users';
+import { updateAccess } from '../../api/orgs';
+import { updateUserPermissions } from '../../api/engagements';
 import Switch from '@mui/material/Switch';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -45,18 +47,15 @@ export default function EditUserPermissionsModal(props) {
 
   const theUser = orgUsersMap[user?.id];
 
-  const handleUpdatePermission = async (isAdmin, engagementObject) => {
+  const handleUpdatePermissions = async (isAdmin, engagementObject) => {
     setLoading(true);
 
     const engagementId = engagementObject.id;
     const engagementName = engagementObject.name;
 
     try {
-      const { success, message, uiProps } = await updatePermission({
-        isAdmin,
-        engagementId,
-        userId: user.id,
-        orgId: org.id
+      const { success, message, uiProps } = await updateUserPermissions(engagementId, user.id, {
+        isAdmin
       });
 
       if (success) {
@@ -104,11 +103,8 @@ export default function EditUserPermissionsModal(props) {
     const engagementName = engagementObject.name;
 
     try {
-      const { success, message } = await updateAccess({
-        hasAccess,
-        engagementId,
-        userId: user.id,
-        orgId: org.id
+      const { success, message } = await updateAccess(org.id, user.id, {
+        engagements: [{ id: engagementId, hasAccess }]
       });
 
       if (success) {
@@ -342,7 +338,7 @@ export default function EditUserPermissionsModal(props) {
                     <Box flexBasis='20%' textAlign='center'>
                       <Switch
                         disabled={!isMember && !isAdmin}
-                        onChange={(_, isChecked) => handleUpdatePermission(isChecked, engagement)}
+                        onChange={(_, isChecked) => handleUpdatePermissions(isChecked, engagement)}
                         checked={isAdmin}
                       />
                     </Box>
