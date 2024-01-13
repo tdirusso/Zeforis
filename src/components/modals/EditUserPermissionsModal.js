@@ -1,8 +1,8 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import { useState } from 'react';
-import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery, DialogTitle } from '@mui/material';
-import { batchUpdateAccess, batchUpdatePermission } from '../../api/users';
+import { Box, Checkbox, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tooltip, useMediaQuery, DialogTitle, DialogContentText, Button } from '@mui/material';
+import { batchUpdatePermission } from '../../api/users';
 import { updateAccess } from '../../api/orgs';
 import { updateUserPermissions } from '../../api/engagements';
 import Switch from '@mui/material/Switch';
@@ -14,6 +14,7 @@ import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import HelpIcon from '@mui/icons-material/Help';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
+import { LoadingButton } from '@mui/lab';
 
 export default function EditUserPermissionsModal(props) {
   const {
@@ -24,7 +25,9 @@ export default function EditUserPermissionsModal(props) {
     setOrgUsers,
     orgUsersMap,
     openSnackBar,
-    org
+    org,
+    tasks,
+    setTasks
   } = props;
 
   const navigate = useNavigate();
@@ -41,6 +44,7 @@ export default function EditUserPermissionsModal(props) {
   const [isDisablingAccess, setDisablingAccess] = useState(false);
   const [isEnablingAdmin, setEnablingAdmin] = useState(false);
   const [isDisablingAdmin, setDisablingAdmin] = useState(false);
+  const [confirmDisableAllAccessOpen, setConfirmDisableAllAccessOpen] = useState(false);
 
   const bulkAccessMenuOpen = Boolean(bulkAccessMenu);
   const bulkAdminMenuOpen = Boolean(bulkAdminMenu);
@@ -141,18 +145,20 @@ export default function EditUserPermissionsModal(props) {
     }, 500);
   };
 
-  const handleBulkUpdateAccess = async hasAccess => {
+  const handleBulkUpdateAccess = async (hasAccess, isConfirmed) => {
     if (hasAccess) {
       setEnablingAccess(true);
     } else {
+      if (!isConfirmed) {
+        setConfirmDisableAllAccessOpen(true);
+        return;
+      }
       setDisablingAccess(true);
     }
 
     try {
-      const { success, message } = await batchUpdateAccess({
-        hasAccess,
-        userId: user.id,
-        orgId: org.id
+      const { success, message } = await updateAccess(org.id, user.id, {
+        engagements: engagements.map(({ id }) => ({ id, hasAccess }))
       });
 
       if (success) {
@@ -169,6 +175,21 @@ export default function EditUserPermissionsModal(props) {
         setEnablingAccess(false);
         setDisablingAccess(false);
         setBulkAccessMenu(null);
+        setOrgUsers(orgUsers => hasAccess ? Object.values(orgUsersMap) : orgUsers.filter(u => u.id !== theUser.id));
+
+        if (!hasAccess) {
+          setConfirmDisableAllAccessOpen(false);
+
+          const tasksClone = [...tasks];
+          tasksClone.forEach(task => {
+            if (task.assigned_to_id && task.assigned_to_id === theUser.id) {
+              task.assigned_to_id = null;
+            }
+          });
+          setTasks(tasksClone);
+          handleClose();
+        }
+
         openSnackBar('Access updated.', 'success');
       } else {
         openSnackBar(message, 'error');
@@ -359,7 +380,7 @@ export default function EditUserPermissionsModal(props) {
           <ListItemIcon>
             <CheckBoxIcon color='primary' />
           </ListItemIcon>
-          Enable all
+          Add all
           <CircularProgress
             hidden={!isEnablingAccess}
             style={{ marginLeft: '5px' }}
@@ -370,7 +391,7 @@ export default function EditUserPermissionsModal(props) {
           <ListItemIcon>
             <CheckBoxOutlineBlankIcon color='primary' />
           </ListItemIcon>
-          Disable all
+          Remove all
           <CircularProgress
             hidden={!isDisablingAccess}
             style={{ marginLeft: '5px' }}
@@ -387,7 +408,7 @@ export default function EditUserPermissionsModal(props) {
           <ListItemIcon>
             <ToggleOnIcon color='primary' />
           </ListItemIcon>
-          Enable all
+          Add all
           <CircularProgress
             hidden={!isEnablingAdmin}
             style={{ marginLeft: '5px' }}
@@ -398,7 +419,7 @@ export default function EditUserPermissionsModal(props) {
           <ListItemIcon>
             <ToggleOffIcon />
           </ListItemIcon>
-          Disable all
+          Remove all
           <CircularProgress
             hidden={!isDisablingAdmin}
             style={{ marginLeft: '5px' }}
@@ -406,6 +427,36 @@ export default function EditUserPermissionsModal(props) {
           />
         </MenuItem>
       </Menu>
+
+      <Dialog
+        open={confirmDisableAllAccessOpen}
+        onClose={() => setConfirmDisableAllAccessOpen(false)}>
+        <DialogTitle>
+          Confirmation Needed
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Removing access to all engagements will remove this user from the organization.
+            <br></br>
+            You can always re-invite this user, if needed.
+            <br></br>
+            <br></br>
+            <Button
+              disabled={isDisablingAccess}
+              style={{ marginRight: '15px' }}
+              variant='outlined'
+              onClick={() => setConfirmDisableAllAccessOpen(false)}>
+              Cancel
+            </Button>
+            <LoadingButton
+              loading={isDisablingAccess}
+              variant='contained'
+              onClick={() => handleBulkUpdateAccess(false, true)}>
+              Remove access
+            </LoadingButton>
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

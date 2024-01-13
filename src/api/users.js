@@ -16,11 +16,6 @@ const batchUpdatePermission = async (payload) => {
   return data;
 };
 
-const batchUpdateAccess = async (payload) => {
-  const { data } = await request.patch(`users/access/batch`, payload);
-  return data;
-};
-
 const getInvitationData = async ({ userId, engagementId, invitationCode }) => {
   const { data } = await request.get(`users/invitation?userId=${userId}&engagementId=${engagementId}&invitationCode=${invitationCode}`);
   return data;
@@ -54,7 +49,6 @@ export {
   updatePassword,
   sendPasswordResetLink,
   resendVerificationLink,
-  batchUpdateAccess,
   batchUpdatePermission,
   closeAccount
 };

@@ -3,15 +3,16 @@ const { createJWT } = require('../../../lib/utils');
 const validFieldMappings = require('../../../database').apiFieldMappings.users;
 
 module.exports = async (req, res, next) => {
-  const { userId, userObject } = req;
+  const { userObject } = req;
+  const { userId } = req.params;
   const updateFields = req.body;
 
-  if (Object.keys(updateFields).length === 0) {
-    return res.json({ message: `No valid fields were provided.  Available fields: ${Object.keys(validFieldMappings).join(', ')}` });
+  if (isNaN(userId)) {
+    return res.json({ message: `Invalid userId provided: ${userId} - must be a number.` });
   }
 
-  if (!userId) {
-    return res.json({ message: 'Missing userId.' });
+  if (Object.keys(updateFields).length === 0) {
+    return res.json({ message: `No fields were provided.  Available fields: ${Object.keys(validFieldMappings).join(', ')}` });
   }
 
   try {
@@ -25,7 +26,7 @@ module.exports = async (req, res, next) => {
       }
     }
 
-    if (fieldUpdates.length > 0) {
+    if (fieldUpdates.length === 0) {
       return res.json({ message: `No valid fields were provided.  Available fields: ${Object.keys(validFieldMappings).join(', ')}` });
     }
 

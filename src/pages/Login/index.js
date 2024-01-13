@@ -299,7 +299,7 @@ export default function LoginPage({ setTheme }) {
             placeholder="Password"
             variant="outlined"
             type="password"
-            helperText={<a tabIndex={1} href="password-reset">Forgot password?</a>}
+            helperText={<a tabIndex={1} href="password-reset">Password reset</a>}
             inputRef={password}
             disabled={isLoading}
           />

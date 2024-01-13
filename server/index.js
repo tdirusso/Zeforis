@@ -137,11 +137,8 @@ const boot = async () => {
   app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
 
-  app.patch('/api/users/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
-  app.patch('/api/orgs/:orgId/users/:userId/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
-
-
   app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
+
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
   app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
   app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
@@ -173,6 +170,7 @@ const boot = async () => {
   app.patch('/api/tags', authenicatedUserRateLimit, checkEngagementAdminMW, updateTag);
 
   app.delete('/api/orgs/:orgId/users/:userId', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
+  app.patch('/api/orgs/:orgId/users/:userId/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
   app.post('/api/orgs/:orgId/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteOrgUsers);
   app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
   app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);

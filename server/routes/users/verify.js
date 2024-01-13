@@ -9,10 +9,12 @@ module.exports = async (req, res, next) => {
     userId
   } = req.params;
 
-  if (!userId || !verificationCode) {
-    return res.json({
-      message: 'Missing verification parameters.'
-    });
+  if (isNaN(userId)) {
+    return res.json({ message: `Invalid userId provided: ${userId} - must be a number.` });
+  }
+
+  if (!verificationCode) {
+    return res.json({ message: 'Missing verificationCode.' });
   }
 
   try {
