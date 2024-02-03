@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../../api/auth";
-import { useLocation } from "react-router-dom";
-import Paper from '@mui/material/Paper';
+import { Link, useLocation } from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -10,7 +9,7 @@ import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import '../styles.scss';
+import './styles.scss';
 import { Button, CircularProgress, Divider, createTheme, useMediaQuery } from "@mui/material";
 import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
@@ -20,21 +19,22 @@ import { resendVerificationLink } from "../../api/users";
 import Watermark from "../../components/core/Watermark";
 import { isMobile } from "../../lib/constants";
 import { setActiveEngagementId } from "../../api/engagements";
+import validator from 'email-validator';
 
 export default function LoginPage({ setTheme }) {
   const { search } = useLocation();
 
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
+  const formWidth = isSmallScreen ? 300 : 425;
 
   const searchParams = new URLSearchParams(search);
 
+  const [email, setEmail] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
-  const [customPageData, setCustomPageData] = useState(null);
+  const [org, setOrg] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [verificationContent, setVerificationContent] = useState('');
-
-  const email = useRef();
-  const password = useRef();
 
   const {
     isOpen,
@@ -52,15 +52,16 @@ export default function LoginPage({ setTheme }) {
     try {
       const cpParamVal = window.atob(customPageParam);
       orgId = new URLSearchParams(cpParamVal).get('orgId');
+
       if (orgId) {
         needsCustomPage = true;
       }
     } catch (error) { }
   }
 
-
   const handleGoogleLogin = async (authResponse) => {
     if (authResponse.credential) {
+      setFormErrors({});
       setLoading(true);
 
       try {
@@ -71,7 +72,7 @@ export default function LoginPage({ setTheme }) {
         });
 
         if (result.token) {
-          if (needsCustomPage && customPageData) {
+          if (needsCustomPage && org) {
             if (engagementIdParam) {
               setActiveEngagementId(engagementIdParam);
             }
@@ -141,7 +142,7 @@ export default function LoginPage({ setTheme }) {
           themeConfig.palette.primary.main = org.brand_color;
           setTheme(createTheme(themeConfig));
           document.title = `${org.name} Portal - Login`;
-          setCustomPageData(org);
+          setOrg(org);
           setDoneFetchingCustomPage(true);
         } else {
           window.location.href = '/login';
@@ -164,25 +165,17 @@ export default function LoginPage({ setTheme }) {
   const handleLogin = async e => {
     e.preventDefault();
 
-    const emailVal = email.current.value;
-    const passwordVal = password.current.value;
-
-    if (!emailVal) {
-      openSnackBar('Please enter a valid email address');
+    if (!validator.validate(email)) {
+      setFormErrors({ email: 'Please enter a valid email address.' });
       return;
     }
 
-    if (!passwordVal) {
-      openSnackBar('Please enter your password');
-      return;
-    }
-
+    setFormErrors({});
     setLoading(true);
 
     try {
       const result = await login({
-        email: emailVal,
-        password: passwordVal,
+        email,
         isFromCustomLoginPage: needsCustomPage,
         orgId
       });
@@ -191,7 +184,7 @@ export default function LoginPage({ setTheme }) {
         setLoading(false);
         setVerificationContent(unverifiedText);
       } else if (result.token) {
-        if (needsCustomPage && customPageData) {
+        if (needsCustomPage && org) {
           setActiveOrgId(orgId);
         }
         window.location.href = '/home/dashboard';
@@ -206,9 +199,7 @@ export default function LoginPage({ setTheme }) {
   };
 
   const handleResendVerificationLink = () => {
-    const emailVal = email.current.value;
-
-    if (!emailVal) {
+    if (email) {
       openSnackBar('Please enter a valid email address');
       return;
     }
@@ -218,7 +209,7 @@ export default function LoginPage({ setTheme }) {
     setTimeout(async () => {
       try {
         const { success, message } = await resendVerificationLink({
-          email: emailVal
+          email
         });
 
         setVerificationContent('');
@@ -252,85 +243,97 @@ export default function LoginPage({ setTheme }) {
 
   let pageIcon =
     <Box component="a" href="https://www.zeforis.com" target="_blank">
-      <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
+      <img src={zeforisLogo} alt="Zeforis" className="logo" />
     </Box>;
 
+  let orgName = 'Zeforis';
+
   if (needsCustomPage) {
-    if (customPageData.logo_url) {
+    orgName = org.name;
+    if (org.logo_url) {
       pageIcon = <Box>
-        <img src={customPageData.logo_url} alt={customPageData.name} className="header-logo" />
+        <img src={org.logo_url} alt={org.name} className="logo" />
       </Box>;
     } else {
-      pageIcon = <Box component="h1" color={customPageData.brand_color}>{customPageData.name}</Box>;
+      pageIcon = <Box component="h1" color={org.brand_color}>{org.name}</Box>;
     }
   }
 
   return (
-    <Box className="info-page flex-centered">
+    <Box className="Login">
       <Box component="header">
-        {pageIcon}
-        <Box display="flex" alignItems="center">
-          <Box mr={1.5}>No account?</Box>
-          <Button
-            variant="contained"
-            component={'a'}
-            href="/register"
-            size={isSmallScreen ? 'medium' : 'large'}>
-            Sign Up
-          </Button>
-        </Box>
-      </Box>
-      <Paper className="container" style={{ zIndex: 2 }}>
-        <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>
-          Sign in
-        </Typography>
-        <Box id="google-signin"></Box>
-        <Divider className="my4" />
-        <Box component='form' onSubmit={handleLogin} display='flex' flexDirection='column' gap='1rem'>
-          <TextField
-            placeholder="Email"
-            variant="outlined"
-            type="email"
-            inputRef={email}
-            disabled={isLoading}
-            autoFocus={!isMobile}
-          />
-          <TextField
-            placeholder="Password"
-            variant="outlined"
-            type="password"
-            helperText={<a tabIndex={1} href="password-reset">Password reset</a>}
-            inputRef={password}
-            disabled={isLoading}
-          />
-
-          <LoadingButton
-            loading={isLoading}
-            disabled={isLoading}
-            fullWidth
-            size="large"
-            style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
-            variant="contained"
-            type="submit">
-            Sign in
-          </LoadingButton>
-          <Box mt={1} hidden={!Boolean(verificationContent)}>
-            {verificationContent}
+        <Box className="inner">
+          {pageIcon}
+          <Box display="flex" alignItems="center">
+            <Button
+              style={{ padding: '4px 16px' }}
+              variant="outlined"
+              component={Link}
+              to="/register">
+              Sign Up
+            </Button>
           </Box>
         </Box>
-      </Paper>
-      <Box
-        hidden={!needsCustomPage}
-        component="a"
-        href="/login"
-        style={{ fontSize: '13px' }}
-        mt={1}>
-        Go to universal login
       </Box>
-      <Box className="circle"></Box>
+      <Box className="form-wrapper">
+        <Box className="inner">
+          <h1>
+            Log in to <span style={{ color: org ? org.brand_color : 'inherit' }}>{orgName}</span>
+          </h1>
+          <Box id="google-signin"></Box>
+          <Box width={formWidth} my='22px'>
+            <Divider />
+          </Box>
+
+          <form onSubmit={handleLogin} style={{ width: formWidth }}>
+            <TextField
+              placeholder="Email"
+              variant="outlined"
+              type="email"
+              name="email"
+              disabled={isLoading}
+              fullWidth
+              autoComplete="email"
+              autoFocus={!isMobile}
+              onChange={e => {
+                setFormErrors({});
+                setEmail(e.target.value);
+              }}
+              error={Boolean(formErrors.email)}
+              helperText={formErrors.email}
+            />
+            <LoadingButton
+              loading={isLoading}
+              disabled={!validator.validate(email) || isLoading}
+              fullWidth
+              size="large"
+              style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
+              variant="contained"
+              type="submit">
+              Sign in
+            </LoadingButton>
+            <Box mt={1} hidden={!Boolean(verificationContent)}>
+              {verificationContent}
+            </Box>
+            <Box
+              hidden={!needsCustomPage}
+              component="a"
+              href="/login"
+              style={{ fontSize: '14px' }}
+              mt={4}>
+              &larr; Go to universal login
+            </Box>
+          </form>
+        </Box>
+      </Box>
       {
         needsCustomPage ?
-          <Watermark positionStyle={{ bottom: 10, right: 10, position: 'absolute' }} />
+          <Watermark
+            positionStyle={{
+              bottom: 10,
+              right: 10,
+              position: 'fixed'
+            }} />
           : null
       }
       <Snackbar

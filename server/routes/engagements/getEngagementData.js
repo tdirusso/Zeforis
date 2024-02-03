@@ -1,9 +1,8 @@
 const { pool, commonQueries } = require('../../../database');
-const { createJWT } = require('../../../lib/utils');
 
 module.exports = async (req, res, next) => {
 
-  const { userObject, engagementId, orgId } = req;
+  const { engagementId, orgId } = req;
 
   if (!orgId) {
     return res.json({ message: 'No orgId provided.' });
@@ -114,7 +113,6 @@ module.exports = async (req, res, next) => {
 
     return res.json({
       engagement: engagementData,
-      token: createJWT({ ...userObject, orgId })
     });
 
   } catch (error) {

@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const emailService = require('../../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
@@ -6,6 +5,7 @@ const { OAuth2Client } = require('google-auth-library');
 const slackbot = require('../../../slackbot');
 
 const { pool } = require('../../../database');
+const { getMissingFields } = require('../../../lib/utils');
 
 const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
 
@@ -14,18 +14,19 @@ module.exports = async (req, res, next) => {
     email,
     firstName,
     lastName,
-    password,
     googleCredential
   } = req.body;
 
-  if ((!email || !password || !firstName || !lastName) && !googleCredential) {
-    return res.json({
-      message: 'Missing registration parameters.'
+  const missingFields = getMissingFields(['email', 'firstName', 'lastName'], req.body, true);
+
+  if (missingFields.length > 0 && !googleCredential) {
+    return res.status(400).json({
+      message: `Missing required fields: ${missingFields.join(', ')}`
     });
   }
 
   if (email && !validator.validate(email)) {
-    return res.json({ message: 'Email address is not valid.' });
+    return res.status(422).json({ message: 'Email address is not in a valid format.' });
   }
 
   try {
@@ -53,7 +54,7 @@ module.exports = async (req, res, next) => {
           );
         }
 
-        return res.json({ success: true });
+        return res.sendStatus(204);
       } else {
         await pool.query(
           'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
@@ -65,7 +66,7 @@ module.exports = async (req, res, next) => {
           message: `*New User*\n${googleEmail}`
         });
 
-        return res.json({ success: true });
+        return res.sendStatus(204);
       }
     } else {
       const lcEmail = email.toLowerCase();
@@ -73,30 +74,27 @@ module.exports = async (req, res, next) => {
       const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [lcEmail]);
 
       if (existsResult.length) {
-        return res.json({
-          message: `"${email}" is already in use.  Please sign in instead.`
+        return res.status(409).json({
+          message: `Email address is already in use.`
         });
       }
 
       const verificationCode = uuidv4().substring(0, 16);
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
       const createUserResult = await pool.query(
-        'INSERT INTO users (first_name, last_name, email, password, verification_code) VALUES (?,?,?,?,?)',
-        [firstName, lastName, lcEmail, hashedPassword, verificationCode]);
+        'INSERT INTO users (first_name, last_name, email, verification_code) VALUES (?,?,?,?)',
+        [firstName, lastName, lcEmail, verificationCode]);
 
       const userId = createUserResult[0].insertId;
 
       await sendVerifyEmail(userId, verificationCode, lcEmail);
-
 
       await slackbot.post({
         channel: slackbot.channels.events,
         message: `*New User*\n${lcEmail}`
       });
 
-      return res.json({ success: true });
+      return res.sendStatus(204);
     }
   } catch (error) {
     next(error);

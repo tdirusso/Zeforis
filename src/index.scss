@@ -1,15 +1,18 @@
 :root {
   --colors-primary: #3365f6;
   --colors-primary-rgb: 35, 153, 239;
-  --colors-body-background: #f3f4f9;
+  --colors-body-background: white;
   --colors-body-background-dark: #101418;
+  --header-height: 64px;
+  --vh100-offset: var(--header-height);
+  --colors-light-field-label: #9a9a9a;
+  --colors-error: #d32f2f;
 }
 
 html,
 body,
 #root {
   box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 body {
@@ -112,9 +115,18 @@ a.MuiButtonBase-root {
   color: white;
 }
 
+a.MuiButton-outlined.MuiButtonBase-root {
+  color: var(--colors-primary);
+}
+
 
 a.MuiListItem-root {
   color: initial;
+}
+
+.Mui-error .MuiFormControlLabel-label,
+.Mui-error+span.MuiFormControlLabel-label {
+  color: var(--colors-error) !important;
 }
 
 h2,

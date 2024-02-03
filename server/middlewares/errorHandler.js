@@ -25,8 +25,9 @@ module.exports = async (error, __, res, _) => {
     }
   }
 
-  return res.json({
-    error: true,
-    message: error.message
+  return res.status(500).json({
+    error: error.message,
+    stack: error.stack,
+    message: 'Internal server error',
   });
 };

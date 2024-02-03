@@ -1,0 +1,75 @@
+.Register {
+  &.wrapper {
+    min-height: 100vh;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  header {
+    top: 0;
+    height: auto;
+    position: sticky;
+    height: var(--header-height);
+    border-bottom: 1px solid rgba(0, 0, 0, .08);
+    display: flex;
+    background-color: white;
+
+    .logo {
+      height: 1.6rem;
+    }
+
+    .inner {
+      max-width: 1400px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      margin: 16px auto;
+      flex-grow: 1;
+    }
+  }
+
+  .form-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-height));
+
+    .inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      margin-top: -4rem;
+
+      h1 {
+        font-weight: 200;
+        margin-bottom: 2.5rem;
+        text-align: center;
+
+        span {
+          font-weight: 700;
+        }
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .MuiFormControlLabel-label {
+          margin-right: auto !important;
+          color: var(--colors-light-field-label);
+          margin-bottom: 4px;
+          margin-left: 2px;
+          font-size: 14px;
+        }
+
+        .MuiFormControlLabel-root {
+          margin: 0;
+        }
+      }
+    }
+  }
+}

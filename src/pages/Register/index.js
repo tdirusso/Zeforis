@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
@@ -10,15 +8,22 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import { register } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
-import { Button, Divider, useMediaQuery } from "@mui/material";
+import { Button, Divider, FormControlLabel, Typography, useMediaQuery } from "@mui/material";
+import './styles.scss';
+import { isMobile } from "../../lib/constants";
+import validator from 'email-validator';
 
 export default function RegisterPage() {
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
+  const formWidth = isSmallScreen ? 300 : 425;
 
-  const email = useRef();
-  const password = useRef();
-  const firstName = useRef();
-  const lastName = useRef();
+  const [formData, setFormData] = useState({
+    email: '',
+    firstName: '',
+    lastName: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [registerError, setRegisterError] = useState('');
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -32,6 +37,7 @@ export default function RegisterPage() {
 
   const handleGoogleRegistration = authResponse => {
     if (authResponse.credential) {
+      setFormErrors({});
       setLoading(true);
 
       setTimeout(async () => {
@@ -81,33 +87,54 @@ export default function RegisterPage() {
   const handleRegistration = e => {
     e.preventDefault();
 
-    const emailVal = email.current.value;
-    const passwordVal = password.current.value;
-    const firstNameVal = firstName.current.value;
-    const lastNameVal = lastName.current.value;
+    const { email, firstName, lastName } = formData;
 
-    if (!emailVal || !passwordVal || !firstNameVal || !lastNameVal) {
-      openSnackBar('Please enter all required fields above.', 'error');
+    const newFormErrors = getFormErrors();
+
+    if (Object.keys(newFormErrors).length > 0) {
+      setFormErrors(newFormErrors);
       return;
     }
 
+    setFormErrors({});
     setLoading(true);
 
     setTimeout(async () => {
-      const { success, message } = await register({
-        email: emailVal,
-        password: passwordVal,
-        firstName: firstNameVal,
-        lastName: lastNameVal
-      });
+      try {
+        await register({
+          email,
+          firstName,
+          lastName
+        });
 
-      if (success) {
         navigate('/register-success');
-      } else {
-        setLoading(false);
-        openSnackBar(message, 'error');
+      } catch (error) {
+        if (error.response) {
+          setRegisterError(error.response ? error.response.data.message : 'Something went wrong, please try again.');
+          setLoading(false);
+        }
       }
     }, 1000);
+  };
+
+  const getFormErrors = () => {
+    const { email, firstName, lastName } = formData;
+
+    const newFormErrors = {};
+
+    if (!firstName) {
+      newFormErrors.firstName = 'First name is required.';
+    }
+
+    if (!lastName) {
+      newFormErrors.lastName = 'Last name is required.';
+    }
+
+    if (!validator.validate(email)) {
+      newFormErrors.email = 'Please enter a valid email address.';
+    }
+
+    return newFormErrors;
   };
 
   useEffect(() => {
@@ -117,73 +144,130 @@ export default function RegisterPage() {
     }
   }, []);
 
+  const handleInputChange = e => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+
+    setFormErrors(({ [name]: _, ...rest }) => rest);
+
+    if (e.target.matches(':autofill')) {
+      if (name === 'firstName') {
+        document.querySelector('input[name="lastName"]').focus();
+      } else if (name === 'lastName') {
+        document.querySelector('input[name="email"]').focus();
+      }
+    }
+  };
+
   return (
-    <Box className="info-page flex-centered">
+    <Box className="Register">
       <Box component="header">
-        <Box component="a" href="https://www.zeforis.com" target="_blank">
-          <img src={zeforisLogo} alt="Zeforis" className="header-logo" />
-        </Box>
-        <Box display="flex" alignItems="center">
-          <Box mr={1.5} display={isSmallScreen ? 'none' : 'block'}>
-            Already have an account?
+        <Box className="inner">
+          <Box component="a" href="https://www.zeforis.com" target="_blank">
+            <img src={zeforisLogo} alt="Zeforis" className="logo" />
           </Box>
-          <Button
-            variant="contained"
-            component={'a'}
-            href='/login'
-            size={isSmallScreen ? 'medium' : 'large'}>
-            Sign In
-          </Button>
+          <Box display="flex" alignItems="center">
+            <Button
+              style={{ padding: '4px 16px' }}
+              variant="outlined"
+              component={Link}
+              to='/login'>
+              Log In
+            </Button>
+          </Box>
         </Box>
       </Box>
-      <Paper className="container" style={{ zIndex: 2 }}>
-        <Typography variant="h5" style={{ marginBottom: '1.75rem' }}>Sign Up</Typography>
-        <Box id="google-signin"></Box>
-        <Divider className="my4" />
+      <Box className="form-wrapper">
+        <Box className="inner">
+          <h1 style={{ marginBottom: '1.75rem' }}>Create Your <span>Zeforis</span> Account</h1>
+          <Box id="google-signin"></Box>
+          <Box width={formWidth} my='22px'>
+            <Divider />
+          </Box>
 
-        <Box component='form' onSubmit={handleRegistration} display='flex' flexDirection='column' gap='1rem'>
-          <TextField
-            placeholder="First name"
-            variant="outlined"
-            inputRef={firstName}
-            disabled={isLoading}
-            autoComplete="off"
-          />
-          <TextField
-            placeholder="Last name"
-            variant="outlined"
-            inputRef={lastName}
-            disabled={isLoading}
-            autoComplete="off"
-          />
+          <form onSubmit={handleRegistration} style={{ width: formWidth }}>
+            <FormControlLabel
+              label="First name"
+              labelPlacement="top"
+              control={
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  disabled={isLoading}
+                  autoComplete="given-name"
+                  autoFocus={!isMobile}
+                  fullWidth
+                  error={Boolean(formErrors.firstName)}
+                  helperText={formErrors.firstName}
+                  name="firstName"
+                  onChange={handleInputChange}
+                />}>
+            </FormControlLabel>
 
-          <TextField
-            placeholder="Email"
-            variant="outlined"
-            type="email"
-            inputRef={email}
-            disabled={isLoading}
-          />
-          <TextField
-            placeholder="Password"
-            variant="outlined"
-            type="password"
-            inputRef={password}
-            disabled={isLoading}
-          />
-          <LoadingButton
-            loading={isLoading}
-            disabled={isLoading}
-            fullWidth
-            variant="contained"
-            type="submit"
-            size="large"
-            style={{ marginTop: '1rem' }}>
-            Create Account
-          </LoadingButton>
+            <FormControlLabel
+              label="Last name"
+              labelPlacement="top"
+              control={
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  disabled={isLoading}
+                  autoComplete="family-name"
+                  fullWidth
+                  error={Boolean(formErrors.lastName)}
+                  helperText={formErrors.lastName}
+                  name="lastName"
+                  onChange={handleInputChange}
+                />}>
+            </FormControlLabel>
+
+            <FormControlLabel
+              label="Email"
+              labelPlacement="top"
+              control={
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  type="email"
+                  disabled={isLoading}
+                  name="email"
+                  autoComplete="email"
+                  fullWidth
+                  error={Boolean(formErrors.email)}
+                  helperText={formErrors.email}
+                  onChange={handleInputChange}
+                />
+              }>
+            </FormControlLabel>
+
+            <Typography
+              style={{ fontSize: '14px' }}
+              component="span"
+              color="error">
+              {registerError}
+            </Typography>
+
+            <LoadingButton
+              loading={isLoading}
+              disabled={Object.keys(getFormErrors()).length > 0 || isLoading}
+              fullWidth
+              variant="contained"
+              type="submit"
+              size="large"
+              style={{ marginTop: '0.25rem' }}>
+              Create Account
+            </LoadingButton>
+          </form>
+
+          <Box mt='3rem' style={{ fontSize: '14px', textAlign: 'center' }} px={.5}>
+            By joining, you agree to our <a href="https://www.zeforis.com/terms-of-service" target="_blank" rel="noreferrer">Terms of Service</a> and <a target="_blank" rel="noreferrer" href="https://www.zeforis.com/privacy-policy">Privacy Policy</a>.
+          </Box>
         </Box>
-      </Paper>
-      <Box className="circle"></Box>
+      </Box>
       <Snackbar
         isOpen={isOpen}
         type={type}

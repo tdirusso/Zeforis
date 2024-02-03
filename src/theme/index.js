@@ -15,6 +15,14 @@ const theme = {
     fontFamily: 'Inter',
   },
   components: {
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          marginLeft: '2px',
+          marginTop: '0'
+        }
+      }
+    },
     MuiTooltip: {
       defaultProps: {
         arrow: false,
@@ -108,6 +116,7 @@ const theme = {
         root: {
           '& fieldset': {
             borderRadius: '6px',
+            borderColor: '#eeeeee'
           }
         }
       }
@@ -198,6 +207,15 @@ const theme = {
 
 const darkThemeOverrides = {
   components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderColor: '#333333'
+          }
+        }
+      }
+    },
     MuiMenu: {
       styleOverrides: {
         paper: {
