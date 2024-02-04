@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import { forwardRef, useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Typography, Zoom } from '@mui/material';

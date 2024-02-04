@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Button, Checkbox, FormControlLabel, FormHelperText, Grid, Paper, Typography } from "@mui/material";
 import importTemplate from '../../../assets/import-template.csv';
 import DownloadIcon from '@mui/icons-material/Download';

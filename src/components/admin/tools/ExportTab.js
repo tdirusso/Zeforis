@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useOutletContext } from "react-router-dom";

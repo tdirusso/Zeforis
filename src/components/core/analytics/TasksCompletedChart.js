@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Chart from "react-apexcharts";
 import moment from 'moment';
 import { useOutletContext } from "react-router-dom";

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Grid, Paper, Checkbox, Box, Tooltip, IconButton,
   Chip, Typography, TextField, Menu, MenuItem, Avatar, FormControl,

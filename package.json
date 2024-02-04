@@ -9,13 +9,13 @@
     "@mui/lab": "^5.0.0-alpha.110",
     "@mui/material": "^5.10.16",
     "@mui/x-date-pickers": "^5.0.12",
-    "@sendgrid/mail": "^7.7.0",
+    "@sendgrid/mail": "^8.1.0",
     "@slack/web-api": "^6.9.0",
     "@stripe/react-stripe-js": "^2.1.2",
     "@stripe/stripe-js": "^2.1.1",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.52",
+    "@types/react-dom": "^18.2.18",
     "apexcharts": "^3.40.0",
     "aws-sdk": "^2.1268.0",
     "axios": "^1.2.0",
@@ -29,7 +29,7 @@
     "express-fileupload": "^1.4.0",
     "express-rate-limit": "^6.9.0",
     "google-auth-library": "^8.9.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "lru-cache": "^10.0.1",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
@@ -45,10 +45,10 @@
     "react-dom": "^18.2.0",
     "react-papaparse": "^4.1.0",
     "react-router-dom": "^6.4.3",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "react-transition-group": "^4.4.5",
     "sass": "^1.64.2",
-    "sharp": "^0.31.2",
+    "sharp": "0.32.6",
     "stripe": "^13.4.0",
     "uuid": "^9.0.0"
   },
@@ -59,12 +59,6 @@
     "build-app": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -79,6 +73,6 @@
     ]
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.0.3"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   BrowserRouter as Router,
@@ -7,9 +7,9 @@ import {
   Navigate
 } from 'react-router-dom';
 import './index.scss';
-import HomePage from './pages/Home';
-import LoginPage from './pages/Login';
-import RegisterPage from './pages/Register';
+// import HomePage from './pages/Home';
+// import LoginPage from './pages/Login';
+// import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
 import AcceptInvitationPage from './pages/AcceptInvitation';
 import DashboardPage from './pages/Home/Dashboard';
@@ -32,6 +32,10 @@ import Profile from './components/core/settings/account/Profile';
 import Billing from './components/core/settings/account/Billing';
 import TaskPage from './pages/Home/Tasks/Task';
 
+const LoginPage = lazy(() => import('./pages/Login'));
+const RegisterPage = lazy(() => import('./pages/Register'));
+const HomePage = lazy(() => import('./pages/Home'));
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 function App() {
@@ -42,7 +46,7 @@ function App() {
       <ErrorBoundary>
         <Router>
           <Routes>
-            <Route path="login" element={<LoginPage setTheme={setTheme} />} />
+            <Route path="login" element={<Suspense fallback={<>loading com</>}> <LoginPage setTheme={setTheme} /></Suspense>} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="register-success" element={<RegisterSuccessPage />} />
             <Route path="accept-invitation" element={<AcceptInvitationPage />} />

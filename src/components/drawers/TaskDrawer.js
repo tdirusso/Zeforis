@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import DialogContent from '@mui/material/DialogContent';
 import { useEffect, useRef, useState } from 'react';
 import {

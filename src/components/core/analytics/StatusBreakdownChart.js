@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Chart from "react-apexcharts";
 import { useEffect } from "react";
 import apexchart from "apexcharts";

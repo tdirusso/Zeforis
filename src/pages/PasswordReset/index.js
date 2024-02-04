@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Paper from '@mui/material/Paper';

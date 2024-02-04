@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { forwardRef, useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Divider, Fade, Grow, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { deleteActiveEngagementId } from '../../api/engagements';
