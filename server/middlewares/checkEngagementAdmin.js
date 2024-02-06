@@ -18,12 +18,6 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'No engagementId provided.' });
   }
 
-  let { orgId } = req.body;
-
-  if (!orgId) {
-    orgId = req.query.orgId;
-  }
-
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
@@ -35,23 +29,19 @@ module.exports = async (req, res, next) => {
         [userId, engagementId]
       );
 
-      if (orgId) {
-        const [orgIdForEngagementResult] = await pool.query(
-          'SELECT org_id FROM engagements WHERE id = ?',
-          [engagementId]
-        );
+      const [orgIdForEngagementResult] = await pool.query(
+        'SELECT org_id FROM engagements WHERE id = ?',
+        [engagementId]
+      );
 
-        const orgIdForEngagement = orgIdForEngagementResult[0].org_id;
-
-        if (orgIdForEngagement !== Number(orgId)) {
-          return res.json({ message: 'Engagement and org mismatch.' });
-        }
-      }
+      const orgIdForEngagement = orgIdForEngagementResult[0].org_id;
 
       if (doesEngagementAdminExistResult.length) {
         req.userId = userId;
         req.userObject = decoded.user;
         req.engagementId = engagementId;
+        req.orgId = orgIdForEngagement;
+
         return next();
       } else {
         return res.json({ message: 'Only administrators in this engagement can perform this operation.' });

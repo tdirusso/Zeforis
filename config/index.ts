@@ -14,7 +14,7 @@ const stripeSubscriptionPriceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID;
 
 const pricePerAdminMonthly = 7.50;
 
-module.exports = {
+export {
   isDev,
   appLimits,
   stripeSubscriptionPriceId,

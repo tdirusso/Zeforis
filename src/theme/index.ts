@@ -1,9 +1,15 @@
 import { Fade, ThemeOptions } from "@mui/material";
 
+declare module '@mui/material' {
+  interface Color {
+    main?: string;
+  }
+}
+
 const lightBoxShadow = 'rgba(33, 33, 52, 0.1) 0px 1px 4px !important';
 const darkBoxShadow = 'rgba(5, 5, 5, 0.35) 1px 1px 10px  !important';
 
-const theme = {
+const theme: ThemeOptions = {
   palette: {
     primary: {
       main: '#3365f6',
@@ -49,14 +55,14 @@ const theme = {
         }
       }
     },
-    MuiPickersPopper: {
-      styleOverrides: {
-        paper: {
-          boxShadow: lightBoxShadow,
-          padding: '0 !important'
-        }
-      }
-    },
+    // MuiPickersPopper: {
+    //   styleOverrides: {
+    //     paper: {
+    //       boxShadow: lightBoxShadow,
+    //       padding: '0 !important'
+    //     }
+    //   }
+    // },
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -84,21 +90,21 @@ const theme = {
         }
       }
     },
-    MuiLoadingButton: {
-      defaultProps: { disableFocusRipple: true },
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          boxShadow: 'none',
-          fontWeight: 400,
-          borderRadius: '6px',
-          transitionDuration: '0s',
-          '&:hover': {
-            boxShadow: 'none'
-          }
-        }
-      }
-    },
+    // MuiLoadingButton: {
+    //   defaultProps: { disableFocusRipple: true },
+    //   styleOverrides: {
+    //     root: {
+    //       textTransform: 'none',
+    //       boxShadow: 'none',
+    //       fontWeight: 400,
+    //       borderRadius: '6px',
+    //       transitionDuration: '0s',
+    //       '&:hover': {
+    //         boxShadow: 'none'
+    //       }
+    //     }
+    //   }
+    // },
     MuiTextField: {
       defaultProps: {
         InputLabelProps: {
@@ -203,9 +209,9 @@ const theme = {
       }
     }
   }
-} as ThemeOptions;
+};
 
-const darkThemeOverrides = {
+const darkThemeOverrides: ThemeOptions = {
   components: {
     MuiTextField: {
       styleOverrides: {
@@ -236,14 +242,14 @@ const darkThemeOverrides = {
         }
       }
     },
-    MuiPickersPopper: {
-      styleOverrides: {
-        paper: {
-          boxShadow: darkBoxShadow,
-          padding: '0 !important'
-        }
-      }
-    },
+    // MuiPickersPopper: {
+    //   styleOverrides: {
+    //     paper: {
+    //       boxShadow: darkBoxShadow,
+    //       padding: '0 !important'
+    //     }
+    //   }
+    // },
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -302,7 +308,7 @@ const darkThemeOverrides = {
       }
     }
   }
-} as ThemeOptions;
+};
 
 export default theme;
 

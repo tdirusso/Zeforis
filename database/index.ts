@@ -1,5 +1,6 @@
-const mysql = require('mysql2/promise');
-const cache = require('../cache');
+import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import cache from '../cache';
+import { CachedOrg } from '../server/types/cache';
 
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
@@ -21,12 +22,12 @@ const initializeDatabase = async () => {
 };
 
 const commonQueries = {
-  getOrgTaskCount: async (connection, orgId) => {
-    let cachedOrgData = cache.get(`org-${orgId}`);
+  getOrgTaskCount: async (connection: mysql.PoolConnection, orgId: string | number) => {
+    let cachedOrgData: CachedOrg = cache.get(`org-${orgId}`);
     let orgTaskCount = cachedOrgData?.taskCount;
 
     if (!orgTaskCount) {
-      const [taskCountResult] = await connection.query(
+      const [taskCountResult] = await connection.query<RowDataPacket[]>(
         ` 
           SELECT COUNT(DISTINCT tasks.id) AS taskCount
           FROM tasks
@@ -43,12 +44,12 @@ const commonQueries = {
 
     return orgTaskCount;
   },
-  getOrgOwnerPlan: async (connection, orgId) => {
-    let cachedOrgData = cache.get(`org-${orgId}`);
+  getOrgOwnerPlan: async (connection: mysql.PoolConnection, orgId: string | number) => {
+    let cachedOrgData: CachedOrg = cache.get(`org-${orgId}`);
     let orgOwnerPlan = cachedOrgData?.ownerPlan;
 
     if (orgOwnerPlan === undefined) {
-      const [planResult] = await connection.query(
+      const [planResult] = await connection.query<RowDataPacket[]>(
         'SELECT users.plan FROM orgs LEFT JOIN users ON orgs.owner_id = users.id WHERE orgs.id = ?',
         [orgId]
       );
@@ -60,8 +61,8 @@ const commonQueries = {
 
     return orgOwnerPlan;
   },
-  getOrgAdminCount: async (connection, orgId) => {
-    const [orgAdminCountResult] = await connection.query(
+  getOrgAdminCount: async (connection: mysql.PoolConnection, orgId: string | number) => {
+    const [orgAdminCountResult] = await connection.query<RowDataPacket[]>(
       ` 
       SELECT COUNT(DISTINCT user_id) AS adminCount
       FROM engagement_users
@@ -74,11 +75,11 @@ const commonQueries = {
 
     return orgAdminCountResult[0].adminCount;
   },
-  getEngagementHiddenFolder: async (connection, engagementId) => {
+  getEngagementHiddenFolder: async (connection: mysql.PoolConnection, engagementId: string | number) => {
     let folderId = cache.get(`hiddenFolder-eng${engagementId}`);
 
     if (!folderId) {
-      const [hiddenFolderResult] = await connection.query(
+      const [hiddenFolderResult] = await connection.query<RowDataPacket[]>(
         'SELECT id FROM folders WHERE name = "_hidden_" AND engagement_id = ?',
         [engagementId]
       );
@@ -87,7 +88,7 @@ const commonQueries = {
         folderId = hiddenFolderResult[0].id;
         cache.set(`hiddenFolder-eng${engagementId}`, folderId);
       } else {
-        const [createHiddenFolderResult] = await connection.query(
+        const [createHiddenFolderResult] = await connection.query<ResultSetHeader>(
           'INSERT INTO folders (name, engagement_id) VALUES ("_hidden_", ?)',
           [engagementId]
         );
@@ -108,7 +109,7 @@ const apiFieldMappings = {
   }
 };
 
-module.exports = {
+export {
   pool,
   initializeDatabase,
   commonQueries,

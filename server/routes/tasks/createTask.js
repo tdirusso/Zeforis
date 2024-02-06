@@ -17,10 +17,8 @@ module.exports = async (req, res, next) => {
   let { folderId } = req.body;
 
   const creatorUserId = req.userId;
-  const userObject = req.userObject;
   const engagementId = req.engagementId;
-
-  const { orgId } = userObject;
+  const orgId = req.orgId;
 
   if (!name || !creatorUserId) {
     return res.json({

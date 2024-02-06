@@ -7,7 +7,7 @@ import {
   Navigate
 } from 'react-router-dom';
 import './index.scss';
-// import HomePage from './pages/Home';
+import HomePage from './pages/Home';
 // import LoginPage from './pages/Login';
 // import RegisterPage from './pages/Register';
 import RegisterSuccessPage from './pages/Register/RegisterSuccess';
@@ -31,10 +31,11 @@ import Members from './components/core/settings/org/Members';
 import Profile from './components/core/settings/account/Profile';
 import Billing from './components/core/settings/account/Billing';
 import TaskPage from './pages/Home/Tasks/Task';
+import Loader from './components/core/Loader';
 
 const LoginPage = lazy(() => import('./pages/Login'));
 const RegisterPage = lazy(() => import('./pages/Register'));
-const HomePage = lazy(() => import('./pages/Home'));
+//const HomePage = lazy(() => import('./pages/Home'));
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -46,8 +47,8 @@ function App() {
       <ErrorBoundary>
         <Router>
           <Routes>
-            <Route path="login" element={<Suspense fallback={<>loading com</>}> <LoginPage setTheme={setTheme} /></Suspense>} />
-            <Route path="register" element={<RegisterPage />} />
+            <Route path="login" element={<Suspense fallback={<Loader />}> <LoginPage setTheme={setTheme} /></Suspense>} />
+            <Route path="register" element={<Suspense fallback={<Loader />}> <RegisterPage /></Suspense>} />
             <Route path="register-success" element={<RegisterSuccessPage />} />
             <Route path="accept-invitation" element={<AcceptInvitationPage />} />
             <Route path="password-reset" element={<PasswordResetPage />} />

@@ -1,4 +1,4 @@
-const { LRUCache } = require('lru-cache');
+import { LRUCache } from 'lru-cache';
 
 const cache = new LRUCache({
   max: 1000,
@@ -8,4 +8,4 @@ const cache = new LRUCache({
   }
 });
 
-module.exports = cache;
+export default cache;
