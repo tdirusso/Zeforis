@@ -5,7 +5,6 @@
     "jsx": "preserve",
     "module": "esnext",
     "allowJs": true,
-    "outDir": "./test",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -22,11 +21,11 @@
     "noEmit": true,
     "paths": {
       "@shared/types/*": [
-        "shared/types/*"
+        "../shared/types/*"
       ]
     }
   },
   "include": [
-    "./src/**/*"
+    "src/**/*"
   ]
 }

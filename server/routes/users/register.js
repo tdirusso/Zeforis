@@ -1,13 +1,13 @@
-const emailService = require('../../../email');
+const emailService = require('../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 const { OAuth2Client } = require('google-auth-library');
-const slackbot = require('../../../slackbot');
+const slackbot = require('../../slackbot');
 
-const { pool } = require('../../../database');
-const { getMissingFields } = require('../../../lib/utils');
+const { pool } = require('../../database');
+const { getMissingFields } = require('../../lib/utils');
 
-const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
+const authClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
 module.exports = async (req, res, next) => {
   const {
@@ -33,7 +33,7 @@ module.exports = async (req, res, next) => {
     if (googleCredential) {
       const ticket = await authClient.verifyIdToken({
         idToken: googleCredential,
-        audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
       });
 
       const payload = ticket.getPayload();
@@ -102,7 +102,7 @@ module.exports = async (req, res, next) => {
 };
 
 async function sendVerifyEmail(userId, verificationCode, email) {
-  const verificationUrl = `${process.env.REACT_APP_API_DOMAIN}/api/users/${userId}/verify?verificationCode=${verificationCode}`;
+  const verificationUrl = `${process.env.API_DOMAIN}/api/users/${userId}/verify?verificationCode=${verificationCode}`;
 
   await emailService.sendEmailFromTemplate({
     to: email,

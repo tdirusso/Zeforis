@@ -1,5 +1,5 @@
-const { pool } = require('../../../database');
-const stripe = require('../../../stripe');
+const { pool } = require('../../database');
+const stripe = require('../../stripe');
 
 module.exports = async (req, res, next) => {
   const { userId } = req;

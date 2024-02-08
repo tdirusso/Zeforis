@@ -1,4 +1,4 @@
-const { pool } = require('../../../database');
+const { pool } = require('../../database');
 
 module.exports = async (req, res, next) => {
   const orgId = req.ownedOrg.id;

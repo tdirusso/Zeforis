@@ -1,19 +1,34 @@
-const jwt = require('jsonwebtoken');
-const stripe = require('../stripe');
-const { commonQueries } = require('../database');
+import jwt from 'jsonwebtoken';
+import stripe from '../stripe';
+import { commonQueries } from '../database';
+import type { User } from '@shared/types/User';
+import { RowDataPacket } from 'mysql2';
+import { PoolConnection } from 'mysql2/promise';
 
-function createJWT(userObject) {
-  return jwt.sign(
-    {
-      user: userObject
-    },
-    process.env.SECRET_KEY,
-    { expiresIn: 36000 }
-  );
+type RequestBody = {
+  [key: string]: any;
+};
+
+type FrontendFieldMappings = {
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
+function createJWT(user: User) {
+  if (process.env.SECRET_KEY) {
+    return jwt.sign(
+      { user },
+      process.env.SECRET_KEY,
+      { expiresIn: 36000 }
+    );
+  }
+
+  throw new Error('Environment variable missing:  "SECRET_KEY".');
 }
 
-async function updateStripeSubscription(con, userId, orgId) {
-  const [customerIdResult] = await con.query('SELECT stripe_customerId FROM users WHERE id = ?', [userId]);
+async function updateStripeSubscription(con: PoolConnection, userId: number, orgId: number) {
+  const [customerIdResult] = await con.query<RowDataPacket[]>('SELECT stripe_customerId FROM users WHERE id = ?', [userId]);
   const customerId = customerIdResult[0].stripe_customerId;
 
   if (!customerId) {
@@ -53,14 +68,14 @@ async function updateStripeSubscription(con, userId, orgId) {
   return { success: true };
 }
 
-const frontendFieldMappings = {
+const frontendFieldMappings: FrontendFieldMappings = {
   email: 'Email',
   firstName: 'First name',
   lastName: 'Last name',
 };
 
-const getMissingFields = (requiredFields, requestBody, useFrontEndMappings) => {
-  const missingFields = [];
+const getMissingFields = (requiredFields: (keyof FrontendFieldMappings)[], requestBody: RequestBody, useFrontEndMappings = false) => {
+  const missingFields: string[] = [];
 
   for (const field of requiredFields) {
     if (!requestBody[field]) {
@@ -71,7 +86,7 @@ const getMissingFields = (requiredFields, requestBody, useFrontEndMappings) => {
   return missingFields;
 };
 
-module.exports = {
+export {
   createJWT,
   updateStripeSubscription,
   getMissingFields

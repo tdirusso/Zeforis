@@ -1,5 +1,5 @@
-const cache = require('../../../cache');
-const { pool, commonQueries } = require('../../../database');
+const cache = require('../../cache');
+const { pool, commonQueries } = require('../../database');
 const moment = require('moment');
 
 module.exports = async (req, res, next) => {

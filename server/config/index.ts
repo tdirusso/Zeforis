@@ -1,7 +1,7 @@
 const isDev = process.env.NODE_ENV !== 'production';
 
 if (isDev) {
-  require('dotenv').config({ path: __dirname + '/../.env.local' });
+  require('dotenv').config({ path: __dirname + '/../.env' });
 }
 
 const appLimits = {

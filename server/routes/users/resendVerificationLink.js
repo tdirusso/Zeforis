@@ -1,8 +1,8 @@
-const emailService = require('../../../email');
+const emailService = require('../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 
-const { pool } = require('../../../database');
+const { pool } = require('../../database');
 
 module.exports = async (req, res, next) => {
   const {
@@ -47,7 +47,7 @@ module.exports = async (req, res, next) => {
 };
 
 async function sendVerifyEmail(userId, verificationCode, email) {
-  const verificationUrl = `${process.env.REACT_APP_API_DOMAIN}/api/users/${userId}/verify?verificationCode=${verificationCode}`;
+  const verificationUrl = `${process.env.API_DOMAIN}/api/users/${userId}/verify?verificationCode=${verificationCode}`;
 
   await emailService.sendEmailFromTemplate({
     to: email,

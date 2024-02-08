@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { pool } = require('../../database');
+const { pool } = require('../database');
 
 module.exports = async (req, res, next) => {
   const token = req.headers['x-access-token'];

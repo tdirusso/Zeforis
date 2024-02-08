@@ -1,4 +1,4 @@
-const { pool } = require('../../../database');
+const { pool } = require('../../database');
 
 module.exports = async (req, res, next) => {
   const {
@@ -24,7 +24,7 @@ module.exports = async (req, res, next) => {
     );
 
     if (result.affectedRows) {
-      return res.redirect(`${process.env.REACT_APP_APP_DOMAIN}/login?postVerify=true`);
+      return res.redirect(`${process.env.APP_DOMAIN}/login?postVerify=true`);
     }
 
     return res.json({

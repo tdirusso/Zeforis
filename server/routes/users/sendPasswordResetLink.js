@@ -1,9 +1,9 @@
-const emailService = require('../../../email');
+const emailService = require('../../email');
 const validator = require("email-validator");
 const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 
-const { pool } = require('../../../database');
+const { pool } = require('../../database');
 
 module.exports = async (req, res, next) => {
   const {
@@ -69,7 +69,7 @@ module.exports = async (req, res, next) => {
 async function sendPasswordResetLink(resetCode, email) {
   const qs = `resetCode=${resetCode}&email=${email}`;
 
-  const passwordResetUrl = `${process.env.REACT_APP_APP_DOMAIN}/password-reset?${qs}`;
+  const passwordResetUrl = `${process.env.APP_DOMAIN}/password-reset?${qs}`;
 
   await emailService.sendEmailFromTemplate({
     to: email,

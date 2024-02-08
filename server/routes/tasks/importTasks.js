@@ -1,6 +1,6 @@
-const { pool, commonQueries } = require('../../../database');
-const cache = require('../../../cache');
-const { appLimits } = require('../../../config');
+const { pool, commonQueries } = require('../../database');
+const cache = require('../../cache');
+const { appLimits } = require('../../config');
 
 module.exports = async (req, res, next) => {
   const {

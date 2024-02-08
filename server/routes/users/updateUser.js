@@ -1,6 +1,6 @@
-const { pool } = require('../../../database');
-const { createJWT } = require('../../../lib/utils');
-const validFieldMappings = require('../../../database').apiFieldMappings.users;
+const { pool } = require('../../database');
+const { createJWT } = require('../../lib/utils');
+const validFieldMappings = require('../../database').apiFieldMappings.users;
 
 module.exports = async (req, res, next) => {
   const { userObject } = req;

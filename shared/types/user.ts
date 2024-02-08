@@ -1,3 +1,9 @@
 export type User = {
-  name: string;
+  readonly id: number,
+  firstName: string | undefined,
+  lastName: string | undefined,
+  email: string,
+  dateCreated: Date,
+  plan: string,
+  subscriptionStatus: string;
 };

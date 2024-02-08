@@ -1,6 +1,6 @@
 import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import cache from '../cache';
-import { CachedOrg } from '../server/types/cache';
+import { CachedOrg } from '../types/cache';
 
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,

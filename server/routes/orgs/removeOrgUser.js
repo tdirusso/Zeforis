@@ -1,5 +1,5 @@
-const { pool, commonQueries } = require('../../../database');
-const { updateStripeSubscription } = require('../../../lib/utils');
+const { pool, commonQueries } = require('../../database');
+const { updateStripeSubscription } = require('../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {

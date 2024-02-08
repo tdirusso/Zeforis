@@ -1,6 +1,6 @@
-const stripe = require('../../../stripe');
-const { pool, commonQueries } = require('../../../database');
-const { stripeSubscriptionPriceId } = require('../../../config');
+const stripe = require('../../stripe');
+const { pool, commonQueries } = require('../../database');
+const { stripeSubscriptionPriceId } = require('../../config');
 
 module.exports = async (req, res, next) => {
 

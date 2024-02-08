@@ -1,12 +1,12 @@
-import { isDev } from '../config';
+import { isDev } from './config';
 import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fileUpload from 'express-fileupload';
-import { initializeDatabase, pool } from '../database';
-import emailService from '../email';
-import slackbot from '../slackbot';
+import { initializeDatabase, pool } from './database';
+import emailService from './email';
+import slackbot from './slackbot';
 import login from './routes/auth/login';
 import authenticate from './routes/auth/authenticate';
 import createEngagement from './routes/engagements/createEngagement';
@@ -59,6 +59,7 @@ import checkOrgOwnerMW from './middlewares/checkOrgOwner';
 import checkAuthMW from './middlewares/checkAuth';
 import errorHandlerMW from './middlewares/errorHandler';
 import checkSlackSignature from './middlewares/checkSlackSignature';
+
 
 import stripeWebhook from './webhooks/stripe';
 

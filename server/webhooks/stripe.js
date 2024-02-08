@@ -1,8 +1,8 @@
-const { pool } = require('../../database');
-const stripe = require('../../stripe');
-const slackbot = require('../../slackbot');
-const cache = require('../../cache');
-const { pricePerAdminMonthly } = require('../../config');
+const { pool } = require('../database');
+const stripe = require('../stripe');
+const slackbot = require('../slackbot');
+const cache = require('../cache');
+const { pricePerAdminMonthly } = require('../config');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

@@ -1,8 +1,8 @@
 const { TokenExpiredError } = require("jsonwebtoken");
-const { pool } = require('../../database');
-const slackbot = require('../../slackbot');
+const { pool } = require('../database');
+const slackbot = require('../slackbot');
 
-const { isDev } = require('../../config');
+const { isDev } = require('../config');
 
 module.exports = async (error, __, res, _) => {
   if (!(error instanceof TokenExpiredError || error.message?.includes('Range Not Satisfiable'))) {

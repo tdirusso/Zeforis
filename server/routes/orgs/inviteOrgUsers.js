@@ -1,9 +1,9 @@
-const emailService = require('../../../email');
+const emailService = require('../../email');
 const validator = require("email-validator");
-const { pool, commonQueries } = require('../../../database');
+const { pool, commonQueries } = require('../../database');
 const { v4: uuidv4 } = require('uuid');
-const { appLimits, isDev } = require('../../../config');
-const { updateStripeSubscription } = require('../../../lib/utils');
+const { appLimits, isDev } = require('../../config');
+const { updateStripeSubscription } = require('../../lib/utils');
 
 module.exports = async (req, res, next) => {
   const {
@@ -126,8 +126,8 @@ module.exports = async (req, res, next) => {
 
       const invitationUrl =
         needsInvitationCode ?
-          `${process.env.REACT_APP_APP_DOMAIN}/accept-invitation?engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}` :
-          `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${Buffer.from(`orgId=${orgId}`).toString('base64')}&engagementId=${engagementId}`;
+          `${process.env.APP_DOMAIN}/accept-invitation?engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}` :
+          `${process.env.APP_DOMAIN}/login?cp=${Buffer.from(`orgId=${orgId}`).toString('base64')}&engagementId=${engagementId}`;
 
       invitationEmails.push({
         to: email,

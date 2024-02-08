@@ -1,4 +1,4 @@
-const cache = require('../../../cache');
+const cache = require('../../cache');
 
 module.exports = async (req, res, next) => {
   const {

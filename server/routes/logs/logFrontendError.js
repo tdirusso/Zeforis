@@ -1,6 +1,6 @@
-const { pool } = require('../../../database');
-const slackbot = require('../../../slackbot');
-const { isDev } = require('../../../config');
+const { pool } = require('../../database');
+const slackbot = require('../../slackbot');
+const { isDev } = require('../../config');
 
 module.exports = async (req, res, next) => {
 
@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
         'INSERT INTO app_logs (type, data) VALUES ("frontend-error", ?)',
         [logData]
       );
-      
+
       await slackbot.post({
         channel: slackbot.channels.errors,
         message: `*Frontend Error*\n${logData}`

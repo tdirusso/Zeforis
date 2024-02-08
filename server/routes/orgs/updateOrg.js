@@ -1,6 +1,6 @@
-const s3 = require('../../../aws/s3');
+const s3 = require('../../aws/s3');
 const sharp = require('sharp');
-const { pool } = require('../../../database');
+const { pool } = require('../../database');
 
 const acceptMimes = ['image/png', 'image/jpeg'];
 
@@ -13,6 +13,7 @@ module.exports = async (req, res, next) => {
 
   const logoFile = req.files?.logoFile;
   const orgId = req.ownedOrg.id;
+
 
   if (!orgId) {
     return res.json({

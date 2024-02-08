@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt');
-const { pool } = require('../../../database');
+const { pool } = require('../../database');
 const { OAuth2Client } = require('google-auth-library');
-const slackbot = require('../../../slackbot');
-const { createJWT } = require('../../../lib/utils');
+const slackbot = require('../../slackbot');
+const { createJWT } = require('../../lib/utils');
 
-const authClient = new OAuth2Client(process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID);
+const authClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
 module.exports = async (req, res, next) => {
   const {
@@ -46,7 +46,7 @@ async function handleCustomPageLogin(req, res) {
   if (googleCredential) {
     const ticket = await authClient.verifyIdToken({
       idToken: googleCredential,
-      audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+      audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -161,7 +161,7 @@ async function handleUniversalLogin(req, res) {
   if (googleCredential) {
     const ticket = await authClient.verifyIdToken({
       idToken: googleCredential,
-      audience: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+      audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();

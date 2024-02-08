@@ -1,4 +1,4 @@
-const { pool, commonQueries } = require('../../../database');
+const { pool, commonQueries } = require('../../database');
 
 module.exports = async (req, res, next) => {
 
