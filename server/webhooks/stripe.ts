@@ -1,16 +1,26 @@
-const { pool } = require('../database');
-const stripe = require('../stripe');
-const slackbot = require('../slackbot');
-const cache = require('../cache');
-const { pricePerAdminMonthly } = require('../config');
+import { pool } from '../database';
+import stripe from '../stripe';
+import slackbot from '../slackbot';
+import cache from '../cache';
+import { pricePerAdminMonthly } from '../config';
+import { Request, Response, NextFunction } from 'express';
+import { RowDataPacket } from 'mysql2/promise';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-module.exports = async (req, res, next) => {
+if (!webhookSecret) {
+  throw new Error('Environment variable missing:  "STRIPE_WEBHOOK_SECRET"');
+}
+
+export default async (req: Request, res: Response, next: NextFunction) => {
 
   let event = req.body;
 
   const signature = req.headers['stripe-signature'];
+
+  if (!signature) {
+    return res.status(401).json({ message: 'Unauthorized request - missing required header:  "stripe-signature"' });
+  }
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -18,9 +28,11 @@ module.exports = async (req, res, next) => {
       signature,
       webhookSecret
     );
-  } catch (error) {
-    console.log(`⚠️  Webhook signature verification failed.`, error.message);
-    return res.sendStatus(400);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log(`Stripe webhook signature verification failed - `, error.message);
+    }
+    return res.status(400).json({ message: 'Stripe webhook signature verification failed.' });
   }
 
   try {
@@ -29,7 +41,7 @@ module.exports = async (req, res, next) => {
         const { customer, plan, quantity } = event.data.object;
 
         if (customer) {
-          const [userResult] = await pool.query(
+          const [userResult] = await pool.query<RowDataPacket[]>(
             'SELECT id, email FROM users WHERE stripe_customerId = ?',
             [customer]
           );
@@ -39,7 +51,7 @@ module.exports = async (req, res, next) => {
           if (user) {
             await pool.query('UPDATE users SET stripe_subscription_status = "canceled", plan = "free" WHERE id = ?', [user.id]);
 
-            const [ownedOrgs] = await pool.query('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
+            const [ownedOrgs] = await pool.query<RowDataPacket[]>('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
 
             ownedOrgs.forEach(({ id }) => {
               let cachedOrgData = cache.get(`org-${id}`);
@@ -66,7 +78,7 @@ module.exports = async (req, res, next) => {
         const { previous_attributes } = event.data;
 
         if (status === 'past_due' && customer) {
-          const [userResult] = await pool.query(
+          const [userResult] = await pool.query<RowDataPacket[]>(
             'SELECT id, email FROM users WHERE stripe_customerId = ?',
             [customer]
           );
@@ -86,7 +98,7 @@ module.exports = async (req, res, next) => {
 
           if (prevQuantity !== quantity) {
 
-            const [userResult] = await pool.query(
+            const [userResult] = await pool.query<RowDataPacket[]>(
               'SELECT email FROM users WHERE stripe_customerId = ?',
               [customer]
             );
@@ -136,7 +148,7 @@ module.exports = async (req, res, next) => {
           const { customer, amount_paid } = event.data.object;
 
           if (customer) {
-            const [userResult] = await pool.query(
+            const [userResult] = await pool.query<RowDataPacket[]>(
               'SELECT id, email FROM users WHERE stripe_customerId = ?',
               [customer]
             );
@@ -146,7 +158,7 @@ module.exports = async (req, res, next) => {
             if (user) {
               await pool.query('UPDATE users SET stripe_subscription_status = "active", plan = "pro" WHERE id = ?', [user.id]);
 
-              const [ownedOrgs] = await pool.query('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
+              const [ownedOrgs] = await pool.query<RowDataPacket[]>('SELECT id FROM orgs WHERE owner_id = ?', [user.id]);
 
               ownedOrgs.forEach(({ id }) => {
                 let cachedOrgData = cache.get(`org-${id}`);

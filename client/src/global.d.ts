@@ -5,5 +5,8 @@ interface Window {
   google?: {
     accounts?: any; // Replace 'any' with the actual type if possible
   },
-  googleButtonInterval: NodeJS.Timeout;
+  googleButtonInterval: NodeJS.Timeout,
+  VANTA?: {
+    TOPOLOGY: any;
+  };
 }

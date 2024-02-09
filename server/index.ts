@@ -60,7 +60,6 @@ import checkAuthMW from './middlewares/checkAuth';
 import errorHandlerMW from './middlewares/errorHandler';
 import checkSlackSignature from './middlewares/checkSlackSignature';
 
-
 import stripeWebhook from './webhooks/stripe';
 
 declare module 'http' {

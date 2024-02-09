@@ -9,7 +9,7 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import './styles.scss';
-import { Button, CircularProgress, Divider, Theme, createTheme, useMediaQuery } from "@mui/material";
+import { Button, CircularProgress, Divider, Paper, Theme, createTheme, useMediaQuery } from "@mui/material";
 import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
@@ -134,6 +134,21 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
       if (!ableToLoadButton) {
         window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
       }
+
+      window.VANTA?.TOPOLOGY({
+        el: ".form-wrapper",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        backgroundColor: '#ffffff',
+        color: window.getComputedStyle(document.body).getPropertyValue('--colors-primary')
+
+      });
+
     } else {
       fetchCustomPageData();
     }
@@ -154,8 +169,9 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
           if (themeConfig.palette?.primary) {
             themeConfig.palette.primary.main = org.brand_color;
           }
-          setTheme(createTheme(themeConfig));
+
           document.title = `${org.name} Portal - Login`;
+          setTheme(createTheme(themeConfig));
           setOrg(org);
           setDoneFetchingCustomPage(true);
         } else {
@@ -175,6 +191,19 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
       if (!ableToLoadButton) {
         window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
       }
+
+      window.VANTA?.TOPOLOGY({
+        el: ".form-wrapper",
+        mouseControls: false,
+        touchControls: false,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        backgroundColor: '#ffffff',
+        color: org?.brand_color
+      });
     }
   }, [doneFetchingCustomPage]);
 
@@ -296,54 +325,56 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         </Box>
       </Box>
       <Box className="form-wrapper">
-        <Box className="inner">
-          <h1>
-            Log in to <span style={{ color: org ? org.brand_color : 'inherit' }}>{orgName}</span>
-          </h1>
-          <Box id="google-signin"></Box>
-          <Box width={formWidth} my='22px'>
-            <Divider />
-          </Box>
+        <Box display="flex" alignItems="center" justifyContent="center" mb='4rem'>
+          <Paper className="inner">
+            <h1>
+              Log in to <span style={{ color: org ? org.brand_color : 'inherit' }}>{orgName}</span>
+            </h1>
+            <Box id="google-signin"></Box>
+            <Box width={formWidth} my='22px'>
+              <Divider />
+            </Box>
 
-          <form onSubmit={handleLogin} style={{ width: formWidth }}>
-            <TextField
-              placeholder="Email"
-              variant="outlined"
-              type="email"
-              name="email"
-              disabled={isLoading}
-              fullWidth
-              autoComplete="email"
-              autoFocus={!isMobile}
-              onChange={e => {
-                setFormErrors({});
-                setEmail(e.target.value);
-              }}
-              error={Boolean(formErrors.email)}
-              helperText={formErrors.email}
-            />
-            <LoadingButton
-              loading={isLoading}
-              disabled={!validator.validate(email) || isLoading}
-              fullWidth
-              size="large"
-              style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
-              variant="contained"
-              type="submit">
-              Sign in
-            </LoadingButton>
-            <Box mt={1} hidden={!Boolean(verificationContent)}>
-              {verificationContent}
-            </Box>
-            <Box
-              hidden={!needsCustomPage}
-              component="a"
-              href="/login"
-              style={{ fontSize: '14px' }}
-              mt={4}>
-              &larr; Go to universal login
-            </Box>
-          </form>
+            <form onSubmit={handleLogin} style={{ width: formWidth }}>
+              <TextField
+                placeholder="Email"
+                variant="outlined"
+                type="email"
+                name="email"
+                disabled={isLoading}
+                fullWidth
+                autoComplete="email"
+                autoFocus={!isMobile}
+                onChange={e => {
+                  setFormErrors({});
+                  setEmail(e.target.value);
+                }}
+                error={Boolean(formErrors.email)}
+                helperText={formErrors.email}
+              />
+              <LoadingButton
+                loading={isLoading}
+                disabled={!validator.validate(email) || isLoading}
+                fullWidth
+                size="large"
+                style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
+                variant="contained"
+                type="submit">
+                Sign in
+              </LoadingButton>
+              <Box mt={1} hidden={!Boolean(verificationContent)}>
+                {verificationContent}
+              </Box>
+              <Box
+                hidden={!needsCustomPage}
+                component="a"
+                href="/login"
+                style={{ fontSize: '14px' }}
+                mt={4}>
+                &larr; Go to universal login
+              </Box>
+            </form>
+          </Paper>
         </Box>
       </Box>
       {
