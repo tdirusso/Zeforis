@@ -2,8 +2,9 @@ import jwt from 'jsonwebtoken';
 import stripe from '../stripe';
 import { commonQueries } from '../database';
 import type { User } from '@shared/types/User';
-import { RowDataPacket } from 'mysql2';
-import { PoolConnection } from 'mysql2/promise';
+import type { RowDataPacket } from 'mysql2';
+import type { PoolConnection } from 'mysql2/promise';
+import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
 type RequestBody = {
   [key: string]: any;
@@ -16,15 +17,11 @@ type FrontendFieldMappings = {
 };
 
 function createJWT(user: User) {
-  if (process.env.SECRET_KEY) {
-    return jwt.sign(
-      { user },
-      process.env.SECRET_KEY,
-      { expiresIn: 36000 }
-    );
-  }
-
-  throw new Error('Environment variable missing:  "SECRET_KEY".');
+  return jwt.sign(
+    { user },
+    getEnvVariable(EnvVariable.SECRET_KEY),
+    { expiresIn: 36000 }
+  );
 }
 
 async function updateStripeSubscription(con: PoolConnection, userId: number, orgId: number) {

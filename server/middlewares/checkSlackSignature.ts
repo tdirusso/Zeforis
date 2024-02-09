@@ -1,6 +1,8 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
+import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const slackSignature = req.headers['x-slack-signature'];
   const slackTimestamp = req.headers['x-slack-request-timestamp'];
   const rawBody = req.rawBody;
@@ -17,7 +19,7 @@ module.exports = (req, res, next) => {
     const signatureBase = `v0:${slackTimestamp}:${rawBodyString}`;
 
     const computedHash = crypto
-      .createHmac('sha256', process.env.SLACK_SIGNING_SECRET)
+      .createHmac('sha256', getEnvVariable(EnvVariable.SLACK_SIGNING_SECRET))
       .update(signatureBase)
       .digest('hex');
 

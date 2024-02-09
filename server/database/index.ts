@@ -1,12 +1,14 @@
 import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import cache from '../cache';
-import { CachedOrg } from '../types/cache';
+import { CachedOrg } from '../types/Cache';
+import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
+
 
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
+  host: getEnvVariable(EnvVariable.MYSQL_HOST),
+  user: getEnvVariable(EnvVariable.MYSQL_USER),
+  password: getEnvVariable(EnvVariable.MYSQL_PASSWORD),
+  database: getEnvVariable(EnvVariable.MYSQL_DATABASE),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

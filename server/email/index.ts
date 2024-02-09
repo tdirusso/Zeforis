@@ -1,7 +1,8 @@
 import sgMail from '@sendgrid/mail';
 import { isDev } from '../config';
+import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
-const defaultEmailSender = process.env.EMAIL_SENDER_INFO || 'info@zeforis.com';
+const defaultEmailSender = getEnvVariable(EnvVariable.EMAIL_SENDER_INFO) || 'info@zeforis.com';
 
 type EmailParameters = {
   to: string,
@@ -22,9 +23,9 @@ class EmailService {
   instance = this;
 
   senders = {
-    info: process.env.EMAIL_SENDER_INFO || defaultEmailSender,
-    support: process.env.EMAIL_SENDER_INFO || defaultEmailSender,
-    error: process.env.EMAIL_SENDER_ERROR || defaultEmailSender
+    info: getEnvVariable(EnvVariable.EMAIL_SENDER_INFO) || defaultEmailSender,
+    support: getEnvVariable(EnvVariable.EMAIL_SENDER_INFO) || defaultEmailSender,
+    error: getEnvVariable(EnvVariable.EMAIL_SENDER_ERROR) || defaultEmailSender
   };
 
   templates = {
@@ -34,11 +35,7 @@ class EmailService {
   };
 
   constructor() {
-    if (process.env.SENDGRID_API_KEY) {
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    } else {
-      throw new Error('SendGrid API key not set.');
-    }
+    sgMail.setApiKey(getEnvVariable(EnvVariable.SENDGRID_API_KEY));
   }
 
   async sendEmail({ to, from, subject, text, html }: EmailParameters) {

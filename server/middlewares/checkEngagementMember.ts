@@ -1,11 +1,20 @@
-const jwt = require('jsonwebtoken');
-const { pool } = require('../database');
+import jwt from 'jsonwebtoken';
+import { pool } from '../database';
+import { Response, NextFunction } from 'express';
+import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
+import { CheckEngagementMemberRequest } from '../types/Request';
+import { JWTToken } from '../types/Token';
+import { RowDataPacket } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: CheckEngagementMemberRequest, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
     return res.json({ message: 'Missing authentication token.' });
+  }
+
+  if (typeof token !== 'string') {
+    return res.status(400).json({ message: 'Incorrect type for header "x-access-token supplied, string required."' });
   }
 
   let { engagementId } = req.body;
@@ -25,19 +34,19 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
 
-    const userId = decoded.user.id;
+    const userId = decoded.user?.id;
 
     if (engagementId) {
-      const [doesEngagementUserExistResult] = await pool.query(
+      const [doesEngagementUserExistResult] = await pool.query<RowDataPacket[]>(
         'SELECT 1 FROM engagement_users WHERE user_id = ? AND engagement_id = ?',
         [userId, engagementId]
       );
 
       if (doesEngagementUserExistResult.length) {
         if (orgId) {
-          const [orgIdForEngagementResult] = await pool.query(
+          const [orgIdForEngagementResult] = await pool.query<RowDataPacket[]>(
             'SELECT org_id FROM engagements WHERE id = ?',
             [engagementId]
           );

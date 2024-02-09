@@ -1,13 +1,15 @@
 import AWS from 'aws-sdk';
+import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
-const ID = process.env.AWS_KEY_ID;
-const SECRET = process.env.AWS_KEY_SECRET;
+const id = getEnvVariable(EnvVariable.AWS_KEY_ID);
+const secret = getEnvVariable(EnvVariable.AWS_KEY_SECRET);
+const bucket = getEnvVariable(EnvVariable.AWS_S3_BUCKET_NAME);
 
 const s3 = new AWS.S3({
-  accessKeyId: ID,
-  secretAccessKey: SECRET,
+  accessKeyId: id,
+  secretAccessKey: secret,
   params: {
-    Bucket: process.env.AWS_S3_BUCKET_NAME
+    Bucket: bucket
   }
 });
 

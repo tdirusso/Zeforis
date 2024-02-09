@@ -71,7 +71,6 @@ declare module 'http' {
 const app = express();
 const port = process.env.PORT || 8080;
 
-
 app.set('trust proxy', 1);
 
 if (isDev) {

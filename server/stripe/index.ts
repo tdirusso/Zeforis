@@ -1,9 +1,6 @@
 import Stripe from 'stripe';
+import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  throw new Error('Environment variable missing:  "STRIPE_SECRET_KEY"');
-}
+const stripeSecretKey = getEnvVariable(EnvVariable.STRIPE_SECRET_KEY);
 
 export default new Stripe(stripeSecretKey, { apiVersion: '2023-08-16' });
