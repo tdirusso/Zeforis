@@ -1,6 +1,7 @@
-const { pool } = require('../../database');
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     widgetId,
     name,

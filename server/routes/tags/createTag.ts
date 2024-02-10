@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name
   } = req.body;
@@ -14,7 +16,7 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const newTag = await pool.query(
+    const newTag = await pool.query<ResultSetHeader>(
       'INSERT INTO tags (name, engagement_id) VALUES (?,?)',
       [name, engagementId]
     );

@@ -1,7 +1,9 @@
-const { pool, commonQueries } = require('../../database');
-const moment = require('moment');
+import { pool, commonQueries } from '../../database';
+import moment from 'moment';
+import { Request, Response, NextFunction } from 'express';
+import { PoolConnection } from 'mysql2/promise';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     action,
     assigneeId,
@@ -123,7 +125,7 @@ module.exports = async (req, res, next) => {
   }
 };
 
-async function updateDateDue(taskIds, dateDue, updaterUserId, connection) {
+async function updateDateDue(taskIds: number[], dateDue: string, updaterUserId: number, connection: PoolConnection) {
   await connection.query(
     'UPDATE tasks SET date_due = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [
@@ -134,21 +136,21 @@ async function updateDateDue(taskIds, dateDue, updaterUserId, connection) {
   );
 }
 
-async function updateAssignees(taskIds, assigneeId, updaterUserId, connection) {
+async function updateAssignees(taskIds: number[], assigneeId: number, updaterUserId: number, connection: PoolConnection) {
   await connection.query(
     'UPDATE tasks SET assigned_to_id = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [assigneeId, updaterUserId, taskIds]
   );
 }
 
-async function updateFolders(taskIds, folderId, updaterUserId, connection) {
+async function updateFolders(taskIds: number[], folderId: number, updaterUserId: number, connection: PoolConnection) {
   await connection.query(
     'UPDATE tasks SET folder_id = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [folderId, updaterUserId, taskIds]
   );
 }
 
-async function updateStatuses(taskIds, status, updaterUserId, connection) {
+async function updateStatuses(taskIds: number[], status: string, updaterUserId: number, connection: PoolConnection) {
   if (status === 'Complete') {
     await connection.query(
       `UPDATE tasks SET status = ?, last_updated_by_id = ?, 
@@ -168,14 +170,14 @@ async function updateStatuses(taskIds, status, updaterUserId, connection) {
   }
 }
 
-async function updateKeyTask(taskIds, isKey, updaterUserId, connection) {
+async function updateKeyTask(taskIds: number[], isKey: string, updaterUserId: number, connection: PoolConnection) {
   await connection.query(
     'UPDATE tasks SET is_key_task = ?, last_updated_by_id = ? WHERE tasks.id IN (?)',
     [isKey === 'yes' ? 1 : 0, updaterUserId, taskIds]
   );
 }
 
-async function updateTags(taskIds, tags, tagAction, connection) {
+async function updateTags(taskIds: number[], tags: { id: number; }[], tagAction: string, connection: PoolConnection) {
   const combinations = taskIds.flatMap(taskId =>
     tags.map(tag => [tag.id, taskId])
   );

@@ -1,8 +1,10 @@
-const stripe = require('../../stripe');
-const { pool, commonQueries } = require('../../database');
-const { stripeSubscriptionPriceId } = require('../../config');
+import stripe from '../../stripe';
+import { pool, commonQueries } from '../../database';
+import { stripeSubscriptionPriceId } from '../../config';
+import { Request, Response, NextFunction } from 'express';
+import Stripe from 'stripe';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
 
   const {
     numAdmins
@@ -74,9 +76,17 @@ module.exports = async (req, res, next) => {
     if (existingSubscriptions.length) {
       for (const existingSubscription of existingSubscriptions) {
         if (existingSubscription.status === 'incomplete') {
-          return res.json({
-            clientSecret: existingSubscription.latest_invoice.payment_intent.client_secret
-          });
+          const latestInvoice = existingSubscription.latest_invoice as Stripe.Invoice;
+
+          if (latestInvoice.payment_intent) {
+            const intent = latestInvoice.payment_intent as Stripe.PaymentIntent;
+
+            return res.json({
+              clientSecret: intent.client_secret
+            });
+          } else {
+            return res.json({ hasSubscription: true });
+          }
         }
       }
 
@@ -95,8 +105,11 @@ module.exports = async (req, res, next) => {
       proration_behavior: 'none'
     });
 
+    const invoice = subscription.latest_invoice as Stripe.Invoice;
+    const intent = invoice.payment_intent as Stripe.PaymentIntent;
+
     return res.json({
-      clientSecret: subscription.latest_invoice.payment_intent.client_secret
+      clientSecret: intent.client_secret
     });
   } catch (error) {
     next(error);

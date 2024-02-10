@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name,
     body = '',
@@ -17,7 +19,7 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const newWidget = await pool.query(
+    const newWidget = await pool.query<ResultSetHeader>(
       `INSERT INTO widgets 
         (
           engagement_id,

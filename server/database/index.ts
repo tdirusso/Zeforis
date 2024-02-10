@@ -3,7 +3,6 @@ import cache from '../cache';
 import { CachedOrg } from '../types/Cache';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
-
 const pool = mysql.createPool({
   host: getEnvVariable(EnvVariable.MYSQL_HOST),
   user: getEnvVariable(EnvVariable.MYSQL_USER),
@@ -24,7 +23,7 @@ const initializeDatabase = async () => {
 };
 
 const commonQueries = {
-  getOrgTaskCount: async (connection: mysql.PoolConnection, orgId: string | number) => {
+  getOrgTaskCount: async (connection: mysql.PoolConnection | mysql.Pool, orgId: string | number) => {
     let cachedOrgData: CachedOrg = cache.get(`org-${orgId}`);
     let orgTaskCount = cachedOrgData?.taskCount;
 
@@ -46,7 +45,7 @@ const commonQueries = {
 
     return orgTaskCount;
   },
-  getOrgOwnerPlan: async (connection: mysql.PoolConnection, orgId: string | number) => {
+  getOrgOwnerPlan: async (connection: mysql.PoolConnection | mysql.Pool, orgId: string | number) => {
     let cachedOrgData: CachedOrg = cache.get(`org-${orgId}`);
     let orgOwnerPlan = cachedOrgData?.ownerPlan;
 
@@ -63,7 +62,7 @@ const commonQueries = {
 
     return orgOwnerPlan;
   },
-  getOrgAdminCount: async (connection: mysql.PoolConnection, orgId: string | number) => {
+  getOrgAdminCount: async (connection: mysql.PoolConnection | mysql.Pool, orgId: string | number) => {
     const [orgAdminCountResult] = await connection.query<RowDataPacket[]>(
       ` 
       SELECT COUNT(DISTINCT user_id) AS adminCount
@@ -77,7 +76,7 @@ const commonQueries = {
 
     return orgAdminCountResult[0].adminCount;
   },
-  getEngagementHiddenFolder: async (connection: mysql.PoolConnection, engagementId: string | number) => {
+  getEngagementHiddenFolder: async (connection: mysql.PoolConnection | mysql.Pool, engagementId: string | number) => {
     let folderId = cache.get(`hiddenFolder-eng${engagementId}`);
 
     if (!folderId) {

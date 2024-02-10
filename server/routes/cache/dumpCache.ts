@@ -1,4 +1,4 @@
-const cache = require('../../cache');
+import cache from '../../cache';
 import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 
