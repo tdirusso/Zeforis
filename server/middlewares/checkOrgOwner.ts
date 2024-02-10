@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { pool } from '../database';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
-import { CheckOrgOwnerRequest } from '../types/Request';
 import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
 
-export default async (req: CheckOrgOwnerRequest, res: Response, next: NextFunction) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
@@ -49,7 +48,7 @@ export default async (req: CheckOrgOwnerRequest, res: Response, next: NextFuncti
 
     if (ownerOfOrgResult.length) {
       req.userId = userId;
-      req.userObject = decoded.user;
+      req.user = decoded.user;
       req.ownedOrg = {
         id: ownerOfOrgResult[0].id,
         name: ownerOfOrgResult[0].name

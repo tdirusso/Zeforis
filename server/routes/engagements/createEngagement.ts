@@ -1,12 +1,15 @@
-const { pool } = require('../../database');
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name
   } = req.body;
 
-  const { userId, userObject } = req;
-  const orgId = req.ownedOrg.id;
+  const { userId, user } = req;
+
+  const orgId = req.ownedOrg?.id;
 
   if (!name) {
     return res.json({
@@ -14,12 +17,24 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  if (!orgId) {
+    return res.json({
+      message: 'Missing orgId.'
+    });
+  }
+
+  if (!user) {
+    return res.json({
+      message: 'Missing user.'
+    });
+  }
+
   const connection = await pool.getConnection();
 
   try {
 
-    if (userObject.plan === 'free') {
-      const [engagementCountResult] = await connection.query(
+    if (user.plan === 'free') {
+      const [engagementCountResult] = await connection.query<RowDataPacket[]>(
         'SELECT EXISTS(SELECT id FROM engagements WHERE org_id = ?) as engagementExists',
         [orgId]
       );
@@ -29,7 +44,7 @@ module.exports = async (req, res, next) => {
       }
     }
 
-    const newEngagement = await connection.query(
+    const newEngagement = await connection.query<ResultSetHeader>(
       'INSERT INTO engagements (name, org_id) VALUES (?,?)',
       [name, orgId]
     );

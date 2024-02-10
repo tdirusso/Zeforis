@@ -1,6 +1,8 @@
-const { pool, commonQueries } = require('../../database');
+import { pool, commonQueries } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { RowDataPacket } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
 
   const { engagementId, orgId } = req;
 
@@ -16,13 +18,13 @@ module.exports = async (req, res, next) => {
 
   try {
 
-    const [engagementDataResult] = await pool.query('CALL getEngagementData(?,?)', [engagementId, orgId]);
+    const [engagementDataResult] = await pool.query<RowDataPacket[]>('CALL getEngagementData(?,?)', [engagementId, orgId]);
 
     const [folders, tags, orgUsers, widgets] = engagementDataResult;
 
     const orgUsersMap = new Map();
 
-    orgUsers.forEach(row => {
+    orgUsers.forEach((row: RowDataPacket) => {
       const {
         engagement_id,
         engagement_name,
@@ -59,7 +61,7 @@ module.exports = async (req, res, next) => {
       }
     });
 
-    const foldersIds = folders.length > 0 ? folders.map(folder => folder.id) : null;
+    const foldersIds = folders.length > 0 ? folders.map((folder: RowDataPacket) => folder.id) : null;
 
     const [tasks] = await connection.query(
       `

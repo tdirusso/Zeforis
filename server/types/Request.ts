@@ -1,29 +1,16 @@
-import { Request } from "express";
+import { User } from "../../shared/types/User";
 
-export interface CheckAuthRequest extends Request {
-  userId?: number,
-  userObject?: {};
-}
-
-export interface CheckEngagementAdminRequest extends Request {
-  userId?: number,
-  userObject?: {};
-  engagementId?: number,
-  orgId?: number;
-}
-
-export interface CheckEngagementMemberRequest extends Request {
-  userId?: number,
-  userObject?: {};
-  engagementId?: number,
-  orgId?: number;
-}
-
-export interface CheckOrgOwnerRequest extends Request {
-  userId?: number,
-  userObject?: {};
-  ownedOrg?: {
-    name: string,
-    id: number;
-  };
+declare global {
+  namespace Express {
+    interface Request {
+      userId: number,
+      user: User,
+      ownedOrg: {
+        name: string,
+        id: number;
+      };
+      engagementId: number;
+      orgId: number;
+    }
+  }
 }

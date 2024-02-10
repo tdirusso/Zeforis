@@ -10,16 +10,16 @@ module.exports = async (req, res, next) => {
 
   const {
     ownedOrg,
-    userObject
+    user
   } = req;
 
-  if (!userObject || !ownedOrg) {
+  if (!user || !ownedOrg) {
     return res.json({
       message: 'Missing user or org data.'
     });
   }
 
-  if (userObject.plan !== 'free') {
+  if (user.plan !== 'free') {
     return res.json({
       message: 'You are already on a paid Zeforis plan.  Please update the subscription instead.'
     });
@@ -43,7 +43,7 @@ module.exports = async (req, res, next) => {
     let customer = null;
 
     const customers = await stripe.customers.list({
-      email: userObject.email,
+      email: user.email,
       limit: 1
     });
 
@@ -51,16 +51,16 @@ module.exports = async (req, res, next) => {
       customer = customers.data[0];
     } else {
       const newCustomer = await stripe.customers.create({
-        email: userObject.email,
-        name: `${userObject.firstName} ${userObject.lastName}`,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`,
         metadata: {
-          'Zeforis User ID': userObject.id,
+          'Zeforis User ID': user.id,
           'Organization ID': ownedOrg.id,
           'Organization Name': ownedOrg.name
         }
       });
 
-      await pool.query('UPDATE users SET stripe_customerId = ? WHERE id = ?', [newCustomer.id, userObject.id]);
+      await pool.query('UPDATE users SET stripe_customerId = ? WHERE id = ?', [newCustomer.id, user.id]);
 
       customer = newCustomer;
     }

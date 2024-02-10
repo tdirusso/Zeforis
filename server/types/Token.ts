@@ -1,6 +1,6 @@
+import { User } from "../../shared/types/User";
+
 export type JWTToken = {
-  user?: {
-    id: number;
-  };
+  user: User;
 };
 

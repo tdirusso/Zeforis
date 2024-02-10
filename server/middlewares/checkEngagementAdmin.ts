@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { pool } from '../database';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2';
-import type { CheckEngagementAdminRequest } from '../types/Request';
 import type { JWTToken } from '../types/Token';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
-export default async (req: CheckEngagementAdminRequest, res: Response, next: NextFunction) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
 
   const token = req.headers['x-access-token'];
 
@@ -48,7 +47,7 @@ export default async (req: CheckEngagementAdminRequest, res: Response, next: Nex
 
       if (doesEngagementAdminExistResult.length) {
         req.userId = userId;
-        req.userObject = decoded.user;
+        req.user = decoded.user;
         req.engagementId = engagementId;
         req.orgId = orgIdForEngagement;
 

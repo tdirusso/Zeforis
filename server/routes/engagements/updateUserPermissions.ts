@@ -1,7 +1,8 @@
-const { pool, commonQueries } = require('../../database');
-const { updateStripeSubscription } = require('../../lib/utils');
+import { pool, commonQueries } from '../../database';
+import { updateStripeSubscription } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     isAdmin = false
   } = req.body;
@@ -11,9 +12,11 @@ module.exports = async (req, res, next) => {
     userId
   } = req.params;
 
-  const { userObject, ownedOrg } = req;
+  const userIdParam = Number(userId);
 
-  if (isAdmin && userObject.plan === 'free') {
+  const { user, ownedOrg } = req;
+
+  if (isAdmin && user.plan === 'free') {
     return res.json({
       message: 'Cannot add more administrators.',
       uiProps: {
@@ -30,7 +33,7 @@ module.exports = async (req, res, next) => {
 
   const updaterUserId = req.userId;
 
-  if (userId === updaterUserId) {
+  if (userIdParam === updaterUserId) {
     return res.json({
       message: 'You cannot update your own permissions.'
     });
@@ -50,7 +53,7 @@ module.exports = async (req, res, next) => {
     const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, ownedOrg.id);
 
     if (orgOwnerPlan !== 'free') {
-      const { success, message } = await updateStripeSubscription(connection, userObject.id, ownedOrg.id);
+      const { success, message } = await updateStripeSubscription(connection, user.id, ownedOrg.id);
 
       if (!success) {
         await connection.rollback();

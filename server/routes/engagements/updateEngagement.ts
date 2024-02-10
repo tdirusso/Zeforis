@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { RowDataPacket } from 'mysql2';
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name,
     engagementId
@@ -19,7 +21,7 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const [engagementResult] = await pool.query(
+    const [engagementResult] = await pool.query<RowDataPacket[]>(
       'SELECT org_id FROM engagements WHERE id = ?',
       [engagementId]
     );

@@ -3,7 +3,7 @@ const { createJWT } = require('../../lib/utils');
 const validFieldMappings = require('../../database').apiFieldMappings.users;
 
 module.exports = async (req, res, next) => {
-  const { userObject } = req;
+  const { user } = req;
   const { userId } = req.params;
   const updateFields = req.body;
 
@@ -40,7 +40,7 @@ module.exports = async (req, res, next) => {
     if (updateResult.affectedRows) {
       return res.json({
         success: true,
-        token: createJWT({ ...userObject })
+        token: createJWT({ ...user })
       });
     }
 

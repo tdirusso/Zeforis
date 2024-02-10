@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { pool } from '../database';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
-import { CheckEngagementMemberRequest } from '../types/Request';
 import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
 
-export default async (req: CheckEngagementMemberRequest, res: Response, next: NextFunction) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
@@ -59,7 +58,7 @@ export default async (req: CheckEngagementMemberRequest, res: Response, next: Ne
         }
 
         req.userId = userId;
-        req.userObject = decoded.user;
+        req.user = decoded.user;
         req.engagementId = engagementId;
         req.orgId = orgId;
         return next();

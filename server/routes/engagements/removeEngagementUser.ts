@@ -1,22 +1,35 @@
-const { pool, commonQueries } = require('../../database');
-const { updateStripeSubscription } = require('../../lib/utils');
+import { pool, commonQueries } from '../../database';
+import { updateStripeSubscription } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
+import { RowDataPacket } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
+  const updaterUserId = req.userId;
+
   const {
     userId,
     engagementId
   } = req.params;
 
-  const updaterUserId = req.userId;
+  const userIdParam = Number(userId);
+
+  if (!userIdParam) {
+    return res.json({ message: 'missing userId param' });
+  }
+
+  if (!req.ownedOrg?.id) {
+    return res.json({ message: 'Missing ownedOrg' });
+  }
+
   const orgId = req.ownedOrg.id;
 
-  if (updaterUserId === userId) {
+  if (updaterUserId === userIdParam) {
     return res.json({ message: 'You cannot remove yourself.' });
   }
 
-  if (!engagementId || !userId) {
+  if (!engagementId) {
     return res.json({
-      message: 'Missing removal parameters.'
+      message: 'Missing engagementId parameter.'
     });
   }
 

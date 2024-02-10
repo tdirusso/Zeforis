@@ -9,8 +9,7 @@ module.exports = async (req, res, next) => {
 
   const { engagementId } = req;
   const creatorUserId = req.userId;
-  const userObject = req.userObject;
-  const { orgId } = userObject;
+  const { orgId } = req;
 
   if (!engagementId || importRows.length === 0) {
     return res.json({

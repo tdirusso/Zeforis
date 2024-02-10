@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import type { JWTToken } from '../types/Token';
-import type { CheckAuthRequest } from '../types/Request';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 
-export default async (req: CheckAuthRequest, res: Response, next: NextFunction) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
@@ -22,7 +21,7 @@ export default async (req: CheckAuthRequest, res: Response, next: NextFunction) 
 
     if (userId) {
       req.userId = userId;
-      req.userObject = decoded.user;
+      req.user = decoded.user;
       return next();
     }
 
