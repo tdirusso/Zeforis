@@ -1,8 +1,9 @@
-const { pool } = require('../../database');
-const slackbot = require('../../slackbot');
-const { isDev } = require('../../config');
+import { pool } from '../../database';
+import slackbot from '../../slackbot';
+import { isDev } from '../../config';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
 
   const {
     errorStack,

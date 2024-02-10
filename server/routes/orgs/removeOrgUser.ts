@@ -1,21 +1,24 @@
-const { pool, commonQueries } = require('../../database');
-const { updateStripeSubscription } = require('../../lib/utils');
+import { pool, commonQueries } from '../../database';
+import { updateStripeSubscription } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     userId
   } = req.params;
 
+  const userIdParam = Number(userId);
+
   const orgId = req.ownedOrg.id;
   const updaterUserId = req.userId;
 
-  if (!userId || !orgId) {
+  if (!userIdParam || !orgId) {
     return res.json({
       message: 'Missing user deletion parameters.'
     });
   }
 
-  if (updaterUserId === userId) {
+  if (updaterUserId === userIdParam) {
     return res.json({ message: 'You cannot remove yourself.' });
   }
 

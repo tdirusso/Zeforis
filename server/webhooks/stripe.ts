@@ -5,8 +5,9 @@ import cache from '../cache';
 import { pricePerAdminMonthly } from '../config';
 import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2/promise';
+import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const webhookSecret = getEnvVariable(EnvVariable.STRIPE_WEBHOOK_SECRET);
 
 if (!webhookSecret) {
   throw new Error('Environment variable missing:  "STRIPE_WEBHOOK_SECRET"');

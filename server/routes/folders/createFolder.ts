@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name,
     isKeyFolder = false,
@@ -16,7 +18,7 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const newFolder = await pool.query(
+    const newFolder = await pool.query<ResultSetHeader>(
       'INSERT INTO folders (name, engagement_id, is_key_folder, parent_id) VALUES (?,?,?,?)',
       [name, engagementId, isKeyFolder, parentId]
     );

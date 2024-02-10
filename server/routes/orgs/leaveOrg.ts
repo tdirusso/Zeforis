@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { RowDataPacket } from 'mysql2';
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     orgId
   } = req.body;
@@ -15,7 +17,7 @@ module.exports = async (req, res, next) => {
 
   try {
 
-    const [isUserOwnerOfOrgResult] = await pool.query(
+    const [isUserOwnerOfOrgResult] = await pool.query<RowDataPacket[]>(
       'SELECT 1 FROM orgs WHERE id = ? AND owner_id = ?',
       [orgId, userId]
     );

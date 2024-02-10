@@ -1,10 +1,16 @@
-const s3 = require('../../aws/s3');
-const sharp = require('sharp');
-const { pool } = require('../../database');
+import s3 from '../../aws/s3';
+import sharp from 'sharp';
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { RowDataPacket } from 'mysql2';
+import fileUpload from 'express-fileupload';
+import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 
 const acceptMimes = ['image/png', 'image/jpeg'];
+const AWSBucket = getEnvVariable(EnvVariable.AWS_S3_BUCKET_NAME);
+const AWSOrgLogosFolder = getEnvVariable(EnvVariable.AWS_S3_ORG_LOGO_FOLDER);
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name,
     brandColor = '#3365f6',
@@ -14,6 +20,11 @@ module.exports = async (req, res, next) => {
   const logoFile = req.files?.logoFile;
   const orgId = req.ownedOrg.id;
 
+  if (Array.isArray(logoFile)) {
+    return res.json({
+      message: 'Provide only one logoFile - received Array.'
+    });
+  }
 
   if (!orgId) {
     return res.json({
@@ -28,7 +39,7 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const [orgResult] = await pool.query(
+    const [orgResult] = await pool.query<RowDataPacket[]>(
       'SELECT logo_url, id FROM orgs WHERE id = ?',
       [orgId]
     );
@@ -61,16 +72,19 @@ module.exports = async (req, res, next) => {
   }
 };
 
-async function updateOrg(name, brandColor, orgId) {
+async function updateOrg(name: string, brandColor: string, orgId: number) {
   await pool.query(
     'UPDATE orgs SET name = ?, brand_color = ? WHERE id = ?',
     [name, brandColor, orgId]
   );
 }
 
-async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl, logoFile) {
+async function updateOrgWithLogoChange(name: string, brandColor: string, orgId: number, existingLogoUrl: string | null | undefined, logoFile: fileUpload.UploadedFile | undefined) {
   if (existingLogoUrl) {
-    await s3.deleteObject({ Key: existingLogoUrl.split('.com/')[1] }).promise();
+    await s3.deleteObject({
+      Key: existingLogoUrl.split('.com/')[1],
+      Bucket: AWSBucket
+    }).promise();
   }
 
   let updatedLogoUrl = null;
@@ -85,12 +99,13 @@ async function updateOrgWithLogoChange(name, brandColor, orgId, existingLogoUrl,
       const resizedLogoSize = Buffer.byteLength(resizedLogoBuffer);
       if (resizedLogoSize <= 250000) { //250,000 bytes -> 250 kb -> 0.25 mb
         const now = Date.now();
-        const uploadFileName = `${process.env.AWS_S3_ORG_LOGO_FOLDER}/${orgId}-${now}.png`;
+        const uploadFileName = `${AWSOrgLogosFolder}/${orgId}-${now}.png`;
 
         const s3ObjectParams = {
           Key: uploadFileName,
           Body: resizedLogoBuffer,
-          ACL: 'public-read'
+          ACL: 'public-read',
+          Bucket: AWSBucket
         };
 
         const s3Result = await s3.upload(s3ObjectParams).promise();

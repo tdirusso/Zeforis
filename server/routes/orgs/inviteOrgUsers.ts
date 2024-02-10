@@ -1,11 +1,41 @@
-const emailService = require('../../email');
-const validator = require("email-validator");
-const { pool, commonQueries } = require('../../database');
-const { v4: uuidv4 } = require('uuid');
-const { appLimits, isDev } = require('../../config');
-const { updateStripeSubscription } = require('../../lib/utils');
+import emailService from '../../email';
+import validator from "email-validator";
+import { pool, commonQueries } from '../../database';
+import { v4 as uuidv4 } from 'uuid';
+import { appLimits, isDev } from '../../config';
+import { updateStripeSubscription } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { User } from '../../../shared/types/User';
+import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 
-module.exports = async (req, res, next) => {
+const appDomain = getEnvVariable(EnvVariable.APP_DOMAIN);
+
+type EmailToUserMap = {
+  [key: string]: {
+    id: number,
+    isNew: boolean,
+    firstName: string,
+    lastName: string,
+    email: string;
+  };
+};
+
+type InvitationEmail = {
+  to: string,
+  from: string,
+  templateId: string,
+  dynamicTemplateData: {
+    invitationUrl: string,
+    orgName: string,
+    engagementName: string,
+    orgColor: string,
+    orgLogo: string;
+  },
+  hideWarnings: boolean;
+};
+
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     usersToInvite = [],
     engagementId,
@@ -35,11 +65,11 @@ module.exports = async (req, res, next) => {
     return res.json({ message: 'Too many users to invite (must be less than 100).' });
   }
 
-  const invalidOrMissingEmails = [];
-  const allEmailsArray = [];
+  const invalidOrMissingEmails: User[] = [];
+  const allEmailsArray: string[] = [];
   let countNewEmails = 0;
 
-  usersToInvite.forEach(user => {
+  usersToInvite.forEach((user: User) => {
     const email = user.email?.toLowerCase();
 
     if (!email || !validator.validate(email)) {
@@ -54,7 +84,7 @@ module.exports = async (req, res, next) => {
   });
 
   if (invalidOrMissingEmails.length) {
-    return res.json({ message: `Missing or invalid emails for the following objects:  ${JSON.stringify(invalidOrMissingEmails)}` });
+    return res.json({ message: `Invalid emails provided for the following users:  ${JSON.stringify(invalidOrMissingEmails)}` });
   }
 
   if (countNewEmails > appLimits.simultaneousEmailInvites) {
@@ -76,12 +106,12 @@ module.exports = async (req, res, next) => {
       return res.json({ message: 'Upgrade to Zeforis Pro to add administrators.' });
     }
 
-    const [allExistingUsers] = await connection.query(
+    const [allExistingUsers] = await connection.query<RowDataPacket[]>(
       'SELECT id, email, first_name, last_name FROM users WHERE email IN (?) AND id != ?',
       [allEmailsArray, updaterUserId]
     );
 
-    const allEmailsToUserMap = {};
+    const allEmailsToUserMap: EmailToUserMap = {};
     const existingUsersEmails = allExistingUsers.map(user => {
       allEmailsToUserMap[user.email] = {
         id: user.id,
@@ -97,7 +127,7 @@ module.exports = async (req, res, next) => {
     const newEmails = allEmailsArray.filter(email => !existingUsersEmails.includes(email));
 
     if (newEmails.length) {
-      const [newUsersResult] = await connection.query(
+      const [newUsersResult] = await connection.query<ResultSetHeader>(
         'INSERT INTO users (email) VALUES ?',
         [newEmails.map(email => [email])]
       );
@@ -114,7 +144,7 @@ module.exports = async (req, res, next) => {
         });
     }
 
-    const invitationEmails = [];
+    const invitationEmails: InvitationEmail[] = [];
 
     const insertEngagementUsersValues = allEmailsArray.map(email => {
       const userDetails = allEmailsToUserMap[email];
@@ -126,8 +156,8 @@ module.exports = async (req, res, next) => {
 
       const invitationUrl =
         needsInvitationCode ?
-          `${process.env.APP_DOMAIN}/accept-invitation?engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}` :
-          `${process.env.APP_DOMAIN}/login?cp=${Buffer.from(`orgId=${orgId}`).toString('base64')}&engagementId=${engagementId}`;
+          `${appDomain}/accept-invitation?engagementId=${engagementId}&userId=${userId}&invitationCode=${invitationCode}&orgId=${orgId}` :
+          `${appDomain}/login?cp=${Buffer.from(`orgId=${orgId}`).toString('base64')}&engagementId=${engagementId}`;
 
       invitationEmails.push({
         to: email,

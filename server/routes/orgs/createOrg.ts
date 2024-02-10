@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name
   } = req.body;
@@ -21,7 +23,7 @@ module.exports = async (req, res, next) => {
 
   try {
 
-    const [ownedOrg] = await pool.query('SELECT name FROM orgs WHERE owner_id = ?', [creatorUserId]);
+    const [ownedOrg] = await pool.query<RowDataPacket[]>('SELECT name FROM orgs WHERE owner_id = ?', [creatorUserId]);
 
     if (ownedOrg.length) {
       return res.json({
@@ -29,7 +31,7 @@ module.exports = async (req, res, next) => {
       });
     }
 
-    const newOrg = await pool.query(
+    const newOrg = await pool.query<ResultSetHeader>(
       'INSERT INTO orgs (name, owner_id, brand_color) VALUES (?,?, "#3365f6")',
       [name, creatorUserId]
     );
