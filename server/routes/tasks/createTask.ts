@@ -1,8 +1,11 @@
-const { pool, commonQueries } = require('../../database');
-const cache = require('../../cache');
-const { appLimits } = require('../../config');
+import { pool, commonQueries } from '../../database';
+import cache from '../../cache';
+import { appLimits } from '../../config';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader } from 'mysql2';
+import { Tag } from '../../../shared/types/Tag';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name,
     description = '',
@@ -29,12 +32,16 @@ module.exports = async (req, res, next) => {
   const connection = await pool.getConnection();
 
   try {
-    let orgTaskCount = null;
+    let orgTaskCount = -1;
 
     const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
     if (orgOwnerPlan === 'free') {
       orgTaskCount = await commonQueries.getOrgTaskCount(connection, orgId);
+
+      if (orgTaskCount === -1) {
+        return res.json({ message: `Could not get task count for orgId ${orgId}` });
+      }
 
       if (orgTaskCount >= appLimits.freePlanTasks) {
         return res.json({
@@ -50,7 +57,7 @@ module.exports = async (req, res, next) => {
       folderId = await commonQueries.getEngagementHiddenFolder(connection, engagementId);
     }
 
-    const newTask = await connection.query(
+    const newTask = await connection.query<ResultSetHeader>(
       `INSERT INTO tasks 
         (
           name,
@@ -73,7 +80,7 @@ module.exports = async (req, res, next) => {
     const newTaskId = newTask[0].insertId;
 
     if (tags.length) {
-      const insertValues = tags.map(tag => [tag.id, newTaskId]);
+      const insertValues = tags.map((tag: Tag) => [tag.id, newTaskId]);
 
       await connection.query(
         'INSERT INTO task_tags (tag_id, task_id) VALUES ?',

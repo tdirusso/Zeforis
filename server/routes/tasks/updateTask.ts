@@ -1,8 +1,10 @@
-const cache = require('../../cache');
-const { pool, commonQueries } = require('../../database');
-const moment = require('moment');
+import { pool, commonQueries } from '../../database';
+import moment from 'moment';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader } from 'mysql2';
+import { Tag } from '../../../shared/types/Tag';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     name,
     description,
@@ -35,7 +37,7 @@ module.exports = async (req, res, next) => {
       folderId = await commonQueries.getEngagementHiddenFolder(connection, engagementId);
     }
 
-    const [updatedTaskResult] = await pool.query(
+    const [updatedTaskResult] = await pool.query<ResultSetHeader>(
       `
         UPDATE tasks SET 
           name = ?,
@@ -70,22 +72,22 @@ module.exports = async (req, res, next) => {
     );
 
     if (updatedTaskResult.affectedRows) {
-      const removedTags = currentTags.filter(tag => {
-        return !tags.some(t => t.id === tag.id);
+      const removedTags = currentTags.filter((tag: Tag) => {
+        return !tags.some((t: Tag) => t.id === tag.id);
       });
 
-      const addedTags = tags.filter(tag => {
-        return !currentTags.some(t => t.id === tag.id);
+      const addedTags = tags.filter((tag: Tag) => {
+        return !currentTags.some((t: Tag) => t.id === tag.id);
       });
 
       if (removedTags.length) {
         await pool.query('DELETE FROM task_tags WHERE task_id = ? AND tag_id IN (?)',
-          [taskId, removedTags.map(t => t.id)]
+          [taskId, removedTags.map((t: Tag) => t.id)]
         );
       }
 
       if (addedTags.length) {
-        const insertValues = addedTags.map(tag => [tag.id, taskId]);
+        const insertValues = addedTags.map((tag: Tag) => [tag.id, taskId]);
 
         await pool.query(
           'INSERT INTO task_tags (tag_id, task_id) VALUES ?',

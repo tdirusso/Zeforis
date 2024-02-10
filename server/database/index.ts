@@ -3,6 +3,10 @@ import cache from '../cache';
 import { CachedOrg } from '../types/Cache';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 
+interface TaskCountRow extends RowDataPacket {
+  taskCount: number;
+}
+
 const pool = mysql.createPool({
   host: getEnvVariable(EnvVariable.MYSQL_HOST),
   user: getEnvVariable(EnvVariable.MYSQL_USER),
@@ -28,7 +32,7 @@ const commonQueries = {
     let orgTaskCount = cachedOrgData?.taskCount;
 
     if (!orgTaskCount) {
-      const [taskCountResult] = await connection.query<RowDataPacket[]>(
+      const [taskCountResult] = await connection.query<TaskCountRow[]>(
         ` 
           SELECT COUNT(DISTINCT tasks.id) AS taskCount
           FROM tasks

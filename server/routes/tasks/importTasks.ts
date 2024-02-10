@@ -1,8 +1,32 @@
-const { pool, commonQueries } = require('../../database');
-const cache = require('../../cache');
-const { appLimits } = require('../../config');
+import { pool, commonQueries } from '../../database';
+import cache from '../../cache';
+import { appLimits } from '../../config';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-module.exports = async (req, res, next) => {
+type ImportRow = {
+  name?: string,
+  description?: string,
+  status?: string,
+  folder?: string;
+  url?: string,
+  isKeyTask?: boolean;
+  tagsArray: string[];
+};
+
+type TaskInsertValue = [
+  string,  // name
+  string,  // description
+  string,  // status
+  number,  // folderId
+  string,  // url
+  number,  // isKeyTask
+  number,  // creatorUserId
+  number,  // updaterUserId
+  string | null // timestamp
+];
+
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     importRows = []
   } = req.body;
@@ -24,10 +48,14 @@ module.exports = async (req, res, next) => {
   try {
     const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
-    let orgTaskCount = null;
+    let orgTaskCount = -1;
 
     if (orgOwnerPlan === 'free') {
       orgTaskCount = await commonQueries.getOrgTaskCount(connection, orgId);
+
+      if (orgTaskCount === -1) {
+        return res.json({ message: `Could not get task count for orgId ${orgId}` });
+      }
 
       if (orgTaskCount >= appLimits.freePlanTasks) {
         await connection.rollback();
@@ -44,26 +72,26 @@ module.exports = async (req, res, next) => {
       }
     }
 
-    const [existingFolders] = await connection.query(
+    const [existingFolders] = await connection.query<RowDataPacket[]>(
       `SELECT id, name FROM folders WHERE engagement_id = ?`,
       [engagementId]
     );
 
-    const [existingTags] = await connection.query(
+    const [existingTags] = await connection.query<RowDataPacket[]>(
       `SELECT id, name FROM tags WHERE engagement_id = ?`,
       [engagementId]
     );
 
-    const folderNameToIdMap = {};
-    const tagNameToIdMap = {};
+    const folderNameToIdMap: { [key: string]: number; } = {};
+    const tagNameToIdMap: { [key: string]: number; } = {};
 
     existingFolders.forEach(({ name, id }) => folderNameToIdMap[name] = id);
     existingTags.forEach(({ name, id }) => tagNameToIdMap[name] = id);
 
-    const newFoldersSet = new Set();
-    const newTagsSet = new Set();
+    const newFoldersSet: Set<string> = new Set();
+    const newTagsSet: Set<string> = new Set();
 
-    importRows.forEach(row => {
+    importRows.forEach((row: ImportRow) => {
       const {
         name,
         folder,
@@ -84,13 +112,13 @@ module.exports = async (req, res, next) => {
     });
 
     const foldersArray = [...newFoldersSet];
-    const tagsArray = [...newTagsSet];
+    const tagsArray: string[] = [...newTagsSet];
 
     const folderInsertVals = foldersArray.map(folder => [folder, engagementId]);
     const tagsInsertVals = tagsArray.map(tag => [tag, engagementId]);
 
     if (folderInsertVals.length > 0) {
-      const insertResult = await connection.query(
+      const insertResult = await connection.query<ResultSetHeader>(
         `INSERT INTO folders (name, engagement_id) VALUES ?`,
         [folderInsertVals]
       );
@@ -100,7 +128,7 @@ module.exports = async (req, res, next) => {
     }
 
     if (tagsInsertVals.length > 0) {
-      const insertResult = await connection.query(
+      const insertResult = await connection.query<ResultSetHeader>(
         `INSERT INTO tags (name, engagement_id) VALUES ?`,
         [tagsInsertVals]
       );
@@ -109,9 +137,9 @@ module.exports = async (req, res, next) => {
       tagsArray.forEach(tag => tagNameToIdMap[tag] = insertId++);
     }
 
-    const taskInsertVals = [];
+    const taskInsertVals: TaskInsertValue[] = [];
 
-    importRows.forEach(row => {
+    importRows.forEach((row: ImportRow) => {
       const {
         name,
         description = '',
@@ -136,7 +164,7 @@ module.exports = async (req, res, next) => {
       }
     });
 
-    const insertResult = await connection.query(
+    const insertResult = await connection.query<ResultSetHeader>(
       `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed)
        VALUES ?`,
       [taskInsertVals]
@@ -144,9 +172,9 @@ module.exports = async (req, res, next) => {
 
     let insertId = insertResult[0].insertId;
 
-    let taskTagsInsertVals = [];
+    let taskTagsInsertVals: number[][] = [];
 
-    importRows.forEach(row => {
+    importRows.forEach((row: ImportRow) => {
       const {
         tagsArray = []
       } = row;
