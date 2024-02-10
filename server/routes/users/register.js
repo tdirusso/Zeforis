@@ -40,24 +40,17 @@ module.exports = async (req, res, next) => {
       const googleEmail = payload.email.toLowerCase();
 
       const [userResult] = await pool.query(
-        'SELECT id, is_verified FROM users WHERE email = ?',
+        'SELECT id FROM users WHERE email = ?',
         [googleEmail]
       );
 
       const user = userResult[0];
 
       if (user) {
-        if (!user.is_verified) {
-          await pool.query(
-            'UPDATE users SET is_verified = 1 WHERE id = ?',
-            [user.id]
-          );
-        }
-
         return res.sendStatus(204);
       } else {
         await pool.query(
-          'INSERT INTO users (first_name, last_name, email, is_verified) VALUES (?,?,?,1)',
+          'INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)',
           [payload.given_name, payload.family_name, googleEmail]);
 
 

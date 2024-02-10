@@ -21,21 +21,6 @@ const getInvitationData = async ({ userId, engagementId, invitationCode }) => {
   return data;
 };
 
-const updatePassword = async (payload) => {
-  const { data } = await request.patch(`users/password`, payload);
-  return data;
-};
-
-const sendPasswordResetLink = async (payload) => {
-  const { data } = await request.post(`users/sendPasswordResetLink`, payload);
-  return data;
-};
-
-const resendVerificationLink = async (payload) => {
-  const { data } = await request.post(`users/resendVerificationLink`, payload);
-  return data;
-};
-
 const closeAccount = async () => {
   const { data } = await request.delete(`users`);
 
@@ -46,9 +31,6 @@ export {
   updateUser,
   register,
   getInvitationData,
-  updatePassword,
-  sendPasswordResetLink,
-  resendVerificationLink,
   batchUpdatePermission,
   closeAccount
 };

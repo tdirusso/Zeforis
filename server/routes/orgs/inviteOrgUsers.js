@@ -77,7 +77,7 @@ module.exports = async (req, res, next) => {
     }
 
     const [allExistingUsers] = await connection.query(
-      'SELECT id, email, is_verified, first_name, last_name FROM users WHERE email IN (?) AND id != ?',
+      'SELECT id, email, first_name, last_name FROM users WHERE email IN (?) AND id != ?',
       [allEmailsArray, updaterUserId]
     );
 
@@ -86,7 +86,6 @@ module.exports = async (req, res, next) => {
       allEmailsToUserMap[user.email] = {
         id: user.id,
         isNew: false,
-        isVerified: user.is_verified,
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email
@@ -105,13 +104,14 @@ module.exports = async (req, res, next) => {
 
       let insertId = newUsersResult.insertId;
 
-      newEmails.forEach(email => allEmailsToUserMap[email] = {
-        id: insertId++,
-        isNew: true,
-        firstName: '',
-        lastName: '',
-        email
-      });
+      newEmails.forEach(email =>
+        allEmailsToUserMap[email] = {
+          id: insertId++,
+          isNew: true,
+          firstName: '',
+          lastName: '',
+          email
+        });
     }
 
     const invitationEmails = [];
@@ -119,7 +119,7 @@ module.exports = async (req, res, next) => {
     const insertEngagementUsersValues = allEmailsArray.map(email => {
       const userDetails = allEmailsToUserMap[email];
       const userId = userDetails.id;
-      const needsInvitationCode = userDetails.isNew || !userDetails.isVerified;
+      const needsInvitationCode = userDetails.isNew;
 
       const invitationCode = needsInvitationCode ? uuidv4().substring(0, 16) : null;
       const role = inviteType === 'admin' ? 'admin' : 'member';

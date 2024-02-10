@@ -38,10 +38,7 @@ import createWidget from './routes/widgets/createWidget';
 import updatedWidget from './routes/widgets/updateWidget';
 import deleteWidget from './routes/widgets/deleteWidget';
 import getInvitationData from './routes/users/getInvitationData';
-import updatePassword from './routes/users/updatePassword';
 import getOrg from './routes/orgs/getOrg';
-import sendPasswordResetLink from './routes/users/sendPasswordResetLink';
-import resendVerificationLink from './routes/users/resendVerificationLink';
 import deleteOrg from './routes/orgs/deleteOrg';
 import leaveEngagement from './routes/engagements/leaveEngagement';
 import leaveOrg from './routes/orgs/leaveOrg';
@@ -136,11 +133,7 @@ const boot = async () => {
   app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
 
-  app.patch('/api/users/password', unAuthenicatedUserRateLimit, updatePassword);
-
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
-  app.post('/api/users/sendPasswordResetLink', unAuthenicatedUserRateLimit, sendPasswordResetLink);
-  app.post('/api/users/resendVerificationLink', unAuthenicatedUserRateLimit, resendVerificationLink);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
   app.delete('/api/users', authenicatedUserRateLimit, checkAuthMW, closeAccount);
 

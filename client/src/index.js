@@ -18,7 +18,6 @@ import FoldersPage from './pages/Home/Folders/FoldersPage';
 import TasksPage from './pages/Home/Tasks';
 import ToolsPage from './pages/Home/Tools';
 import AnalyticsPage from './pages/Home/Analytics';
-import PasswordResetPage from './pages/PasswordReset';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import themeConfig from './theme';
 import CreateOrgPage from './pages/CreateOrg';
@@ -51,7 +50,6 @@ function App() {
             <Route path="register" element={<Suspense fallback={<Loader />}> <RegisterPage /></Suspense>} />
             <Route path="register-success" element={<RegisterSuccessPage />} />
             <Route path="accept-invitation" element={<AcceptInvitationPage />} />
-            <Route path="password-reset" element={<PasswordResetPage />} />
             <Route path="create-org" element={<CreateOrgPage setTheme={setTheme} />} />
 
             <Route path="home/*" element={<HomePage setTheme={setTheme} />}>

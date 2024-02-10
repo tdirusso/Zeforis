@@ -7,7 +7,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
-import { updatePassword, getInvitationData, register } from '../../api/users';
+import { getInvitationData } from '../../api/users';
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, CircularProgress, Divider, useMediaQuery } from "@mui/material";
 import { setActiveOrgId } from "../../api/orgs";
@@ -24,14 +24,13 @@ export default function AcceptInvitationPage() {
   const userId = queryParams.get('userId');
   const orgId = queryParams.get('orgId');
 
-  const password = useRef();
   const firstName = useRef();
   const lastName = useRef();
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${orgId}`)}`;
 
   const [fetchingInvitation, setFetchingInvitation] = useState(false);
-  const [userNeedsPassword, setUserNeedsPassword] = useState(null);
+  const [userNeedsName, setUserNeedsName] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
   const {
@@ -59,7 +58,7 @@ export default function AcceptInvitationPage() {
         });
 
         if (invitation) {
-          if (!Boolean(invitation.userNeedsPassword)) {
+          if (!Boolean(invitation.userNeedsName)) {
             openSnackBar('Invitation accepted.', 'success');
             setActiveOrgId(orgId);
             setActiveEngagementId(engagementId);
@@ -68,7 +67,6 @@ export default function AcceptInvitationPage() {
               window.location.href = customLoginPageUrl;
             }, 1000);
           } else {
-            setUserNeedsPassword(true);
             setFetchingInvitation(false);
           }
         } else {
@@ -81,111 +79,7 @@ export default function AcceptInvitationPage() {
     }
   }, []);
 
-  const tryLoadGoogleButton = () => {
-    if (window.google?.accounts) {
-      clearInterval(window.googleButtonInterval);
-      window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
-        callback: handleGoogleRegistration
-      });
-
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-signin'),
-        {
-          theme: "outline",
-          size: "large",
-          width: isSmallScreen ? 300 : 325,
-          text: 'continue_with'
-        }
-      );
-
-      return true;
-    }
-
-    return false;
-  };
-
-  useEffect(() => {
-    if (userNeedsPassword) {
-      const ableToLoadButton = tryLoadGoogleButton();
-      if (!ableToLoadButton) {
-        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
-      }
-    }
-  }, [userNeedsPassword]);
-
-  const handleUpdatePassword = async e => {
-    e.preventDefault();
-
-    const passwordVal = password.current.value;
-    const firstNameVal = firstName.current.value;
-    const lastNameVal = lastName.current.value;
-
-    if (!firstNameVal || !lastNameVal) {
-      openSnackBar('Please enter your first and last name.');
-      return;
-    }
-
-    if (!passwordVal) {
-      openSnackBar('Please enter a password.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { success, message } = await updatePassword({
-        password: passwordVal,
-        engagementId,
-        userId,
-        invitationCode,
-        type: 'complete-registration',
-        firstName: firstNameVal,
-        lastName: lastNameVal
-      });
-
-      if (success) {
-        openSnackBar('Registration successful.', 'success');
-        localStorage.setItem('openGettingStarted', 'true');
-        setTimeout(() => {
-          window.location.href = customLoginPageUrl;
-        }, 2000);
-      } else {
-        setLoading(false);
-        openSnackBar(message, 'error');
-      }
-    } catch (error) {
-      setLoading(false);
-      openSnackBar(error.message, 'error');
-    }
-  };
-
-  const handleGoogleRegistration = authResponse => {
-    if (authResponse.credential) {
-      setLoading(true);
-
-      setTimeout(async () => {
-        const { success, message } = await register({
-          googleCredential: authResponse.credential
-        });
-
-        if (success) {
-          openSnackBar('Registration successful.', 'success');
-          localStorage.setItem('openGettingStarted', 'true');
-          setTimeout(() => {
-            window.location.href = customLoginPageUrl;
-          }, 2000);
-        } else {
-          setLoading(false);
-          openSnackBar(message, 'error');
-        }
-      }, 1000);
-    } else {
-      openSnackBar('Error signing in with Google (missing credential).');
-    }
-  };
-
-  if (userNeedsPassword === null) {
+  if (userNeedsName === null) {
     return (
       <div className="info-page flex-centered">
         <header style={{ position: 'absolute' }}>
@@ -256,7 +150,7 @@ export default function AcceptInvitationPage() {
             </Box>
             <Divider className="my4"></Divider>
 
-            <form onSubmit={handleUpdatePassword}>
+            <form onSubmit={() => { }}>
               <Box mb={2}>
                 <TextField
                   fullWidth
@@ -275,14 +169,6 @@ export default function AcceptInvitationPage() {
                   disabled={isLoading}
                 />
               </Box>
-              <TextField
-                placeholder="Password"
-                variant="outlined"
-                style={{ marginBottom: '2rem' }}
-                type="password"
-                inputRef={password}
-                disabled={isLoading}
-              />
               <LoadingButton
                 loading={isLoading}
                 disabled={isLoading}

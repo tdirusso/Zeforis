@@ -1,22 +1,14 @@
-import { Box, Button, Menu, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { useOutletContext } from "react-router";
 import { useRef } from "react";
-import { sendPasswordResetLink, updateUser } from "../../../../api/users";
+import { updateUser } from "../../../../api/users";
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import LockResetRoundedIcon from '@mui/icons-material/LockResetRounded';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
-
 export default function Profile() {
   const [isUpdatingName, setUpdatingName] = useState(false);
-  const [isSendingResetLink, setSendingResetLink] = useState(false);
-  const [changePasswordMenuAnchor, setChangePasswordMenuAnchor] = useState(null);
-
-  const changePasswordMenuOpen = Boolean(changePasswordMenuAnchor);
-
   const {
     user,
     setUser,
@@ -63,38 +55,6 @@ export default function Profile() {
       openSnackBar(error.message, 'error');
       setUpdatingName(false);
     }
-  };
-
-  const handleSendPasswordResetLink = () => {
-    setSendingResetLink(true);
-
-    setTimeout(async () => {
-      try {
-        const { success, message, isLinkPending } = await sendPasswordResetLink({
-          email: user.email
-        });
-
-        if (success) {
-          if (isLinkPending) {
-            setChangePasswordMenuAnchor(null);
-            openSnackBar('Reset link already sent - once expired, you can try again.');
-          } else {
-            setChangePasswordMenuAnchor(null);
-            openSnackBar('Password reset link sent.', 'success');
-          }
-
-          setTimeout(() => {
-            setSendingResetLink(false);
-          }, 250);
-        } else {
-          openSnackBar(message, 'error');
-          setSendingResetLink(false);
-        }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
-        setSendingResetLink(false);
-      }
-    }, 1000);
   };
 
   return (
@@ -145,7 +105,7 @@ export default function Profile() {
         </LoadingButton>
       </Box>
 
-      <Box component="h4" mt='4rem'>Email & Password</Box>
+      <Box component="h4" mt='4rem'>Email</Box>
       <Box my={3}>
         <Box maxWidth={600}>
           <TextField
@@ -163,14 +123,6 @@ export default function Profile() {
               )
             }}
           />
-        </Box>
-        <Box my={3}>
-          <Button
-            onClick={e => setChangePasswordMenuAnchor(e.currentTarget)}
-            variant="outlined"
-            startIcon={<LockResetRoundedIcon />}>
-            Change password
-          </Button>
         </Box>
       </Box>
       <Box hidden={hasOrg}>
@@ -197,28 +149,6 @@ export default function Profile() {
         variant="contained">
         Close account
       </Button>
-      <Menu
-        PaperProps={{ style: { maxWidth: 350 } }}
-        anchorEl={changePasswordMenuAnchor}
-        open={changePasswordMenuOpen}
-        onClose={() => setChangePasswordMenuAnchor(null)}>
-        <Box px={2} py={1}>
-          <Typography variant="body2">
-            To change your password, click on the button below to send a password reset link to your email listed above (expires after 1 hour).
-          </Typography>
-          <Box mt={2}>
-            <LoadingButton
-              fullWidth
-              size="small"
-              loading={isSendingResetLink}
-              startIcon={<SendRoundedIcon />}
-              onClick={handleSendPasswordResetLink}
-              variant="contained">
-              Send reset link
-            </LoadingButton>
-          </Box>
-        </Box>
-      </Menu>
     </>
   );
 };

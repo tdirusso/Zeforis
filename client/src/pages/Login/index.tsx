@@ -14,7 +14,6 @@ import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
 import themeConfig from "../../theme";
-import { resendVerificationLink } from "../../api/users";
 import Watermark from "../../components/core/Watermark";
 import { isMobile } from "../../lib/constants";
 import { setActiveEngagementId } from "../../api/engagements";
@@ -43,7 +42,6 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
   const [org, setOrg] = useState<OrgType | null>(null);
   const [isLoading, setLoading] = useState(false);
-  const [verificationContent, setVerificationContent] = useState(<></>);
 
   const {
     isOpen,
@@ -153,10 +151,6 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
       fetchCustomPageData();
     }
 
-    if (searchParams.get('postVerify')) {
-      openSnackBar('Email verified.', 'success');
-    }
-
     async function fetchCustomPageData() {
       try {
         const { org } = await getOrg(orgId);
@@ -225,10 +219,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         orgId
       });
 
-      if (result.unverified) {
-        setLoading(false);
-        setVerificationContent(unverifiedText);
-      } else if (result.token) {
+      if (result.token) {
         if (needsCustomPage && org) {
           setActiveOrgId(orgId);
         }
@@ -244,45 +235,6 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
       }
     }
   };
-
-  const handleResendVerificationLink = () => {
-    if (email) {
-      openSnackBar('Please enter a valid email address');
-      return;
-    }
-
-    setVerificationContent(<CircularProgress size={20} style={{ marginTop: '0.5rem' }} />);
-
-    setTimeout(async () => {
-      try {
-        const { success, message } = await resendVerificationLink({
-          email
-        });
-
-        setVerificationContent(<></>);
-
-        if (success) {
-          openSnackBar('New verification link sent.', 'success');
-        } else {
-          openSnackBar(message, 'error');
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          openSnackBar(error.message, 'error');
-          setVerificationContent(unverifiedText);
-        }
-      }
-    }, 1000);
-  };
-
-  const unverifiedText =
-    <Typography variant="body2">
-      Your email address has not been verified.
-      <br></br>
-      Click the verification link in your email address or
-      <Button style={{ margin: '0 2px' }} size="small" onClick={handleResendVerificationLink}>click here</Button>
-      to resend a verification link.
-    </Typography>;
 
   if (needsCustomPage && !doneFetchingCustomPage) {
     return (
@@ -362,9 +314,6 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
                 type="submit">
                 Sign in
               </LoadingButton>
-              <Box mt={1} hidden={!Boolean(verificationContent)}>
-                {verificationContent}
-              </Box>
               <Box
                 hidden={!needsCustomPage}
                 component="a"

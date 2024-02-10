@@ -1,8 +1,13 @@
-const jwt = require('jsonwebtoken');
-const { pool } = require('../../database');
-const { createJWT } = require('../../lib/utils');
+import jwt from 'jsonwebtoken';
+import { pool } from '../../database';
+import { createJWT } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
+import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
+import { JWTToken } from '../../types/Token';
+import { RowDataPacket } from 'mysql2';
+import { Engagement } from '../../../shared/types/Engagement';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
@@ -11,25 +16,29 @@ module.exports = async (req, res, next) => {
     });
   }
 
+  if (typeof token !== 'string') {
+    return res.status(400).json({ message: 'Incorrect type for header "x-access-token supplied, string required."' });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
 
     const authenticatedUser = decoded.user;
 
     if (authenticatedUser) {
       const userId = authenticatedUser.id;
 
-      const [userDataResult] = await pool.query('CALL getUserData(?)', [userId]);
+      const [userDataResult] = await pool.query<RowDataPacket[]>('CALL getUserData(?)', [userId]);
 
       const [userPlanData, engagementMemberData, ownedOrgsData] = userDataResult;
 
       const userObect = { ...authenticatedUser, ...userPlanData[0] };
 
       const memberOfOrgs = new Map();
-      const memberOfEngagements = [];
-      const adminOfEngagements = [];
+      const memberOfEngagements: Engagement[] = [];
+      const adminOfEngagements: Engagement[] = [];
 
-      ownedOrgsData.forEach(row => {
+      ownedOrgsData.forEach((row: RowDataPacket) => {
         memberOfOrgs.set(row.id, {
           id: row.id,
           name: row.name,
@@ -39,7 +48,7 @@ module.exports = async (req, res, next) => {
         });
       });
 
-      engagementMemberData.forEach(row => {
+      engagementMemberData.forEach((row: RowDataPacket) => {
         const {
           org_id,
           org_name,

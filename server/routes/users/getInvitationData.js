@@ -31,7 +31,7 @@ module.exports = async (req, res, next) => {
     }
 
     const [userResult] = await connection.query(
-      'SELECT id, email, password, first_name FROM users WHERE id = ?',
+      'SELECT id, email, first_name as firstName, last_name as lastName FROM users WHERE id = ?',
       [userId]
     );
 
@@ -44,21 +44,19 @@ module.exports = async (req, res, next) => {
       });
     }
 
-    //User used Google (passwordless) if first name exists and no password
-    const userNeedsPassword = Boolean(!user.password && !user.first_name);
+    const userNeedsName = Boolean(!user.firstName && !user.lastName);
 
-    if (!userNeedsPassword) {
-      await connection.query(
-        'UPDATE engagement_users SET invitation_code = NULL WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
-        [engagementId, userId, invitationCode]
-      );
-    }
+    await connection.query(
+      'UPDATE engagement_users SET invitation_code = NULL WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
+      [engagementId, userId, invitationCode]
+    );
+
 
     connection.release();
 
     return res.json({
       invitation: {
-        userNeedsPassword
+        userNeedsName
       }
     });
   } catch (error) {
