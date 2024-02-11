@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 
 export default function useSnackbar() {
   const [isOpen, setOpen] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [type, setType] = useState(null);
+  const [message, setMessage] = useState('');
+  const [type, setType] = useState('');
   const [snackBarProps, setSnackBarProps] = useState({});
 
   useEffect(() => {

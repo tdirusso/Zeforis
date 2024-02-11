@@ -1,4 +1,5 @@
 import type { Engagement } from './Engagement';
+import type { Org } from './Org';
 
 export type User = {
   readonly id: number,
@@ -10,5 +11,6 @@ export type User = {
   subscriptionStatus?: string,
   adminOfEngagements?: Engagement[];
   memberOfEngagements?: Engagement[];
+  memberOfOrgs?: Org[];
   access?: string;
 };

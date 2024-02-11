@@ -5,7 +5,7 @@ export default function useContextMenu() {
   const [contextMenuProps, setContextMenuProps] = useState({});
   const [mouseCoords, setMouseCoords] = useState({ x: 0, y: 0 });
 
-  const openContextMenu = (event, contextMenuType, props) => {
+  const openContextMenu = (event: React.MouseEvent, contextMenuType: string, props: any) => {
     event.preventDefault();
 
     if (props) {

@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Box, Button, Divider, Fade, Paper, TextField, Typography, createTheme } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Theme, Box, Button, Divider, Fade, Paper, TextField, Typography, createTheme } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Snackbar from '../../components/core/Snackbar';
 import rocketGif from '../../assets/rocket.gif';
@@ -7,15 +7,15 @@ import { createOrg, setActiveOrgId, updateOrg } from '../../api/orgs';
 import useSnackbar from '../../hooks/useSnackbar';
 import { hexToRgb } from '../../lib/utils';
 import themeConfig from '../../theme';
-import { TwitterPicker } from 'react-color';
+import { ColorResult, TwitterPicker } from 'react-color';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import Watermark from '../../components/core/Watermark';
 import { isMobile } from '../../lib/constants';
 
-export default function CreateOrgPage({ setTheme }) {
+export default function CreateOrgPage({ setTheme }: { setTheme: (theme: Theme) => void; }) {
   const [step, setStep] = useState(1);
   const [orgName, setOrgName] = useState('');
-  const [orgId, setOrgId] = useState(null);
+  const [orgId, setOrgId] = useState<undefined | number>();
 
   const {
     isOpen,
@@ -26,7 +26,7 @@ export default function CreateOrgPage({ setTheme }) {
 
   if (!localStorage.getItem('token')) {
     window.location.href = '/login';
-    return;
+    return null;
   }
 
   return (
@@ -44,7 +44,7 @@ export default function CreateOrgPage({ setTheme }) {
             <Step2
               openSnackBar={openSnackBar}
               orgName={orgName}
-              orgId={orgId}
+              orgId={orgId!}
               setTheme={setTheme}
             />
         }
@@ -58,10 +58,18 @@ export default function CreateOrgPage({ setTheme }) {
   );
 };
 
-function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
+type Step1Props = {
+  openSnackBar: (message?: string, type?: string, options?: {}) => void,
+  setStep: StateSetters.Number,
+  orgName: string,
+  setOrgName: StateSetters.String,
+  setOrgId: StateSetters.NumberOrUndefined;
+};
+
+function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }: Step1Props) {
   const [isLoading, setLoading] = useState(false);
 
-  const handleCreateOrg = e => {
+  const handleCreateOrg = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
     if (!orgName) {
@@ -86,9 +94,11 @@ function Step1({ openSnackBar, setStep, orgName, setOrgName, setOrgId }) {
           openSnackBar(message, 'error');
           setLoading(false);
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
-        setLoading(false);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          openSnackBar(error.message, 'error');
+          setLoading(false);
+        }
       }
     }, 2000);
   };
@@ -143,16 +153,24 @@ const colorTransitionStyle = {
   transition: 'color 1s, background 1s'
 };
 
-function Step2({ orgId, orgName, openSnackBar, setTheme }) {
+
+type Step2Props = {
+  openSnackBar: (message?: string, type?: string, options?: {}) => void,
+  orgName: string,
+  orgId: number,
+  setTheme: (theme: Theme) => void;
+};
+
+function Step2({ orgId, orgName, openSnackBar, setTheme }: Step2Props) {
   const [isUpdatingBranding, setUpdatingBranding] = useState(false);
   const [brandColor, setBrandColor] = useState('#3365f6');
   const [logoSrc, setLogoSrc] = useState('');
-  const [logoFile, setLogoFile] = useState(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const fileInput = useRef();
+  const fileInput = useRef<HTMLInputElement>(null);
 
   if (!orgName || !orgId) {
-    return;
+    return null;
   }
 
   const handleUpdateOrgBranding = () => {
@@ -161,11 +179,13 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
     setTimeout(async () => {
       try {
         const fd = new FormData();
-        fd.append('logoFile', logoFile);
+        if (logoFile) {
+          fd.append('logoFile', logoFile);
+        }
         fd.append('name', orgName);
         fd.append('brandColor', brandColor);
-        fd.append('isLogoChanged', true);
-        fd.append('orgId', orgId);
+        fd.append('isLogoChanged', String(true));
+        fd.append('orgId', String(orgId));
 
         const result = await updateOrg(fd);
         const { success, message } = result;
@@ -176,15 +196,17 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
           openSnackBar(message, 'error');
           setUpdatingBranding(false);
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
-        setUpdatingBranding(false);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          openSnackBar(error.message, 'error');
+          setUpdatingBranding(false);
+        }
       }
     }, 1500);
   };
 
-  const handleLogoChange = e => {
-    const imageFile = e.target.files[0];
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const imageFile = e.target.files?.[0];
 
     if (!imageFile) {
       return;
@@ -197,16 +219,23 @@ function Step2({ orgId, orgName, openSnackBar, setTheme }) {
   const handleLogoClear = () => {
     setLogoSrc('');
     setLogoFile(null);
-    fileInput.current.value = null;
+    if (fileInput.current) {
+      fileInput.current.value = '';
+    }
   };
 
-  const handleColorChange = color => {
+  const handleColorChange = (color: ColorResult) => {
     const brandRGB = hexToRgb(brandColor);
-    document.documentElement.style.setProperty('--colors-primary', color.hex);
-    document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
-    themeConfig.palette.primary.main = color.hex;
-    setTheme(createTheme(themeConfig));
-    setBrandColor(color.hex);
+    if (brandRGB) {
+      document.documentElement.style.setProperty('--colors-primary', color.hex);
+      document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
+      if (themeConfig.palette?.primary) {
+        themeConfig.palette.primary.main = color.hex;
+
+      }
+      setTheme(createTheme(themeConfig));
+      setBrandColor(color.hex);
+    }
   };
 
   let pageIcon = <Box

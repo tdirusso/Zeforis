@@ -4,7 +4,7 @@ export default function useDialog() {
   const [dialogToOpen, setDialogToOpen] = useState('');
   const [dialogProps, setDialogProps] = useState({});
 
-  const openDialog = (dialogType, props) => {
+  const openDialog = (dialogType: string, props: any) => {
     setDialogProps(props);
     setDialogToOpen(dialogType);
   };

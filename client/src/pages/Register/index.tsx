@@ -11,17 +11,26 @@ import { Button, Divider, FormControlLabel, Typography, useMediaQuery } from "@m
 import './styles.scss';
 import { isMobile } from "../../lib/constants";
 import validator from 'email-validator';
+import { InputChangeEventHandler } from "src/types/EventHandler";
+
+type FormData = {
+  firstName: string,
+  lastName: string,
+  email: string;
+};
+
+const emptyFormData = {
+  firstName: '',
+  lastName: '',
+  email: ''
+};
 
 export default function RegisterPage() {
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
   const formWidth = isSmallScreen ? 300 : 425;
 
-  const [formData, setFormData] = useState({
-    email: '',
-    firstName: '',
-    lastName: ''
-  });
-  const [formErrors, setFormErrors] = useState({});
+  const [formData, setFormData] = useState<FormData>(emptyFormData);
+  const [formErrors, setFormErrors] = useState<FormData>(emptyFormData);
   const [registerError, setRegisterError] = useState('');
   const [isLoading, setLoading] = useState(false);
 
@@ -34,9 +43,9 @@ export default function RegisterPage() {
 
   const navigate = useNavigate();
 
-  const handleGoogleRegistration = authResponse => {
+  const handleGoogleRegistration = (authResponse: { credential?: string; }) => {
     if (authResponse.credential) {
-      setFormErrors({});
+      setFormErrors(emptyFormData);
       setLoading(true);
 
       setTimeout(async () => {
@@ -83,7 +92,7 @@ export default function RegisterPage() {
     return false;
   };
 
-  const handleRegistration = e => {
+  const handleRegistration = (e: React.FormEvent) => {
     e.preventDefault();
 
     const { email, firstName, lastName } = formData;
@@ -95,7 +104,7 @@ export default function RegisterPage() {
       return;
     }
 
-    setFormErrors({});
+    setFormErrors(emptyFormData);
     setLoading(true);
 
     setTimeout(async () => {
@@ -107,9 +116,9 @@ export default function RegisterPage() {
         });
 
         navigate('/register-success');
-      } catch (error) {
-        if (error.response) {
-          setRegisterError(error.response ? error.response.data.message : 'Something went wrong, please try again.');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setRegisterError(error.message || 'Something went wrong, please try again.');
           setLoading(false);
         }
       }
@@ -119,7 +128,7 @@ export default function RegisterPage() {
   const getFormErrors = () => {
     const { email, firstName, lastName } = formData;
 
-    const newFormErrors = {};
+    const newFormErrors: FormData = emptyFormData;
 
     if (!firstName) {
       newFormErrors.firstName = 'First name is required.';
@@ -143,7 +152,7 @@ export default function RegisterPage() {
     }
   }, []);
 
-  const handleInputChange = e => {
+  const handleInputChange: InputChangeEventHandler = (e) => {
     const { name, value } = e.target;
 
     setFormData({
@@ -151,13 +160,17 @@ export default function RegisterPage() {
       [name]: value,
     });
 
-    setFormErrors(({ [name]: _, ...rest }) => rest);
+    setFormErrors((prevState) => {
+      const copy = { ...prevState };
+      copy[name as keyof FormData] = '';
+      return copy;
+    });
 
     if (e.target.matches(':autofill')) {
       if (name === 'firstName') {
-        document.querySelector('input[name="lastName"]').focus();
+        document.querySelector<HTMLInputElement>('input[name="lastName"]')?.focus();
       } else if (name === 'lastName') {
-        document.querySelector('input[name="email"]').focus();
+        document.querySelector<HTMLInputElement>('input[name="email"]')?.focus();
       }
     }
   };
@@ -204,8 +217,8 @@ export default function RegisterPage() {
                   helperText={formErrors.firstName}
                   name="firstName"
                   onChange={handleInputChange}
-                />}>
-            </FormControlLabel>
+                />}
+            />
 
             <FormControlLabel
               label="Last name"
@@ -221,8 +234,8 @@ export default function RegisterPage() {
                   helperText={formErrors.lastName}
                   name="lastName"
                   onChange={handleInputChange}
-                />}>
-            </FormControlLabel>
+                />}
+            />
 
             <FormControlLabel
               label="Email"
@@ -240,8 +253,8 @@ export default function RegisterPage() {
                   helperText={formErrors.email}
                   onChange={handleInputChange}
                 />
-              }>
-            </FormControlLabel>
+              }
+            />
 
             <Typography
               style={{ fontSize: '14px' }}

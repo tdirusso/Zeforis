@@ -4,7 +4,7 @@ export default function useModal() {
   const [modalToOpen, setModalToOpen] = useState('');
   const [modalProps, setModalProps] = useState({});
 
-  const openModal = (modalType, props) => {
+  const openModal = (modalType: string, props?: any) => {
     setModalProps(props);
     setModalToOpen(modalType);
   };

@@ -9,7 +9,7 @@ import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import './styles.scss';
-import { Button, CircularProgress, Divider, Paper, Theme, createTheme, useMediaQuery } from "@mui/material";
+import { Button, Divider, Paper, Theme, createTheme, useMediaQuery } from "@mui/material";
 import Loader from "../../components/core/Loader";
 import { getOrg, setActiveOrgId } from "../../api/orgs";
 import { hexToRgb } from "../../lib/utils";
@@ -156,15 +156,18 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         const { org } = await getOrg(Number(orgId));
 
         if (org) {
-          const brandRGB: { r: number, g: number, b: number; } | null = hexToRgb(org.brand_color);
-          document.documentElement.style.setProperty('--colors-primary', org.brand_color);
-          document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB?.r}, ${brandRGB?.g}, ${brandRGB?.b}`);
+          document.title = `${org.name} Portal - Login`;
 
-          if (themeConfig.palette?.primary) {
-            themeConfig.palette.primary.main = org.brand_color;
+          const brandRGB = hexToRgb(org.brand_color);
+          if (brandRGB) {
+            document.documentElement.style.setProperty('--colors-primary', org.brand_color);
+            document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB?.r}, ${brandRGB?.g}, ${brandRGB?.b}`);
+
+            if (themeConfig.palette?.primary) {
+              themeConfig.palette.primary.main = org.brand_color;
+            }
           }
 
-          document.title = `${org.name} Portal - Login`;
           setTheme(createTheme(themeConfig));
           setOrg(org);
           setDoneFetchingCustomPage(true);

@@ -5,7 +5,7 @@ export default function useSideNav() {
   const [isSideNavOpen, setSideNavOpen] = useState(initialState === 'true' || !initialState);
 
   const toggleSideNav = () => {
-    localStorage.setItem('sideNavOpen', !isSideNavOpen);
+    localStorage.setItem('sideNavOpen', String(!isSideNavOpen));
     setSideNavOpen(!isSideNavOpen);
   };
 

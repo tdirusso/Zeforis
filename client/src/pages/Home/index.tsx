@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Theme } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
@@ -27,8 +27,9 @@ import useNotification from "../../hooks/useNotification";
 import ActionCenter from "../../components/admin/ActionCenter";
 import useContextMenu from "../../hooks/useContextMenu";
 import ContextMenus from "../../components/core/contextMenus";
+import { Org } from "@shared/types/Org";
 
-export default function Home({ setTheme }) {
+export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }) {
   let activeOrgId = getActiveOrgId();
   let activeEngagementId = getActiveEngagementId();
 
@@ -37,7 +38,7 @@ export default function Home({ setTheme }) {
   const [isReadyToRender, setReadyToRender] = useState(false);
   const [engagement, setEngagement] = useState(null);
   const [engagements, setEngagements] = useState([]);
-  const [org, setOrg] = useState(null);
+  const [org, setOrg] = useState<Org | null>(null);
   const [tasks, setTasks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [tags, setTags] = useState([]);
@@ -100,12 +101,12 @@ export default function Home({ setTheme }) {
 
   useEffect(() => {
     if (user) {
-      let activeOrg = null;
+      let activeOrg: Org | null = null;
 
-      if (user.memberOfOrgs.length === 1) {
+      if (user.memberOfOrgs?.length === 1) {
         activeOrg = user.memberOfOrgs[0];
       } else if (activeOrgId) {
-        activeOrg = user.memberOfOrgs.find(org => org.id === activeOrgId);
+        activeOrg = user.memberOfOrgs?.find(org => org.id === activeOrgId) || null;
       }
 
       if (activeOrg) {
@@ -262,7 +263,7 @@ export default function Home({ setTheme }) {
       setOrg(user.memberOfOrgs[0]);
     } else if (user.memberOfOrgs.length === 0) {
       window.location.href = '/create-org';
-      return;
+      return null;
     } else {
       return (
         <ChooseOrgScreen

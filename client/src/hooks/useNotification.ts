@@ -1,6 +1,7 @@
+import { User } from "@shared/types/User";
 import { useEffect } from "react";
 
-export default function useNotification({ user, openModal, isOrgOwner }) {
+export default function useNotification({ user, openModal, isOrgOwner }: { user: User | null, openModal: (modalType: string, props: any) => void, isOrgOwner: boolean; }) {
 
   useEffect(() => {
     if (user && isOrgOwner) {
@@ -11,7 +12,7 @@ export default function useNotification({ user, openModal, isOrgOwner }) {
   return null;
 };
 
-const checkSubscription = (user, openModal) => {
+const checkSubscription = (user: User, openModal: (modalType: string, props?: any) => void) => {
   const supressedPastDue = sessionStorage.getItem('supressPastDue');
 
   if (!supressedPastDue && user.subscriptionStatus === 'past_due') {

@@ -36,7 +36,7 @@ const LoginPage = lazy(() => import('./pages/Login'));
 const RegisterPage = lazy(() => import('./pages/Register'));
 //const HomePage = lazy(() => import('./pages/Home'));
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 function App() {
   const [theme, setTheme] = useState(createTheme(themeConfig));

@@ -13,16 +13,17 @@ import { Button, CircularProgress, Divider, useMediaQuery } from "@mui/material"
 import { setActiveOrgId } from "../../api/orgs";
 import { setActiveEngagementId } from "../../api/engagements";
 
+
 export default function AcceptInvitationPage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
-  const engagementId = queryParams.get('engagementId');
+  const engagementId = Number(queryParams.get('engagementId'));
   const invitationCode = queryParams.get('invitationCode');
-  const userId = queryParams.get('userId');
-  const orgId = queryParams.get('orgId');
+  const userId = Number(queryParams.get('userId'));
+  const orgId = Number(queryParams.get('orgId'));
 
   const firstName = useRef();
   const lastName = useRef();
@@ -54,7 +55,7 @@ export default function AcceptInvitationPage() {
         const { invitation } = await getInvitationData({
           userId,
           engagementId,
-          invitationCode
+          invitationCode: invitationCode!
         });
 
         if (invitation) {
@@ -72,12 +73,15 @@ export default function AcceptInvitationPage() {
         } else {
           setFetchingInvitation(false);
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
-        setFetchingInvitation(false);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          openSnackBar(error.message, 'error');
+          setFetchingInvitation(false);
+        }
       }
     }
   }, []);
+
 
   if (userNeedsName === null) {
     return (
