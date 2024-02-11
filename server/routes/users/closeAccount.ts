@@ -1,7 +1,9 @@
-const { pool } = require('../../database');
-const stripe = require('../../stripe');
+import { RowDataPacket } from 'mysql2';
+import { pool } from '../../database';
+import stripe from '../../stripe';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req;
 
   if (!userId) {
@@ -11,7 +13,7 @@ module.exports = async (req, res, next) => {
   }
 
   try {
-    const [stripeCustomerIdResult] = await pool.query('SELECT stripe_customerId FROM users WHERE id = ?', [userId]);
+    const [stripeCustomerIdResult] = await pool.query<RowDataPacket[]>('SELECT stripe_customerId FROM users WHERE id = ?', [userId]);
 
     const customerId = stripeCustomerIdResult[0].stripe_customerId;
 

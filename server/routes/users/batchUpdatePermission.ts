@@ -1,7 +1,9 @@
-const { pool, commonQueries } = require('../../database');
-const { updateStripeSubscription } = require('../../lib/utils');
+import { RowDataPacket } from 'mysql2';
+import { pool, commonQueries } from '../../database';
+import { updateStripeSubscription } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     userId,
     isAdmin = false
@@ -37,7 +39,7 @@ module.exports = async (req, res, next) => {
       });
     }
 
-    const [allOrgEngagementsResult] = await connection.query(
+    const [allOrgEngagementsResult] = await connection.query<RowDataPacket[]>(
       'SELECT id FROM engagements WHERE org_id = ?',
       [orgId]
     );

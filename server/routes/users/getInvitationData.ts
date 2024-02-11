@@ -1,6 +1,8 @@
-const { pool } = require('../../database');
+import { RowDataPacket } from 'mysql2';
+import { pool } from '../../database';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     userId,
     engagementId,
@@ -16,7 +18,7 @@ module.exports = async (req, res, next) => {
   const connection = await pool.getConnection();
 
   try {
-    const [invitationResult] = await connection.query(
+    const [invitationResult] = await connection.query<RowDataPacket[]>(
       'SELECT user_id FROM engagement_users WHERE engagement_id = ? AND user_id = ? AND invitation_code = ?',
       [engagementId, userId, invitationCode]
     );
@@ -30,7 +32,7 @@ module.exports = async (req, res, next) => {
       });
     }
 
-    const [userResult] = await connection.query(
+    const [userResult] = await connection.query<RowDataPacket[]>(
       'SELECT id, email, first_name as firstName, last_name as lastName FROM users WHERE id = ?',
       [userId]
     );

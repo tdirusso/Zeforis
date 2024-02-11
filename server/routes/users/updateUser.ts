@@ -1,13 +1,17 @@
-const { pool } = require('../../database');
-const { createJWT } = require('../../lib/utils');
+import { ResultSetHeader } from 'mysql2';
+import { pool } from '../../database';
+import { createJWT } from '../../lib/utils';
 const validFieldMappings = require('../../database').apiFieldMappings.users;
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const { user } = req;
   const { userId } = req.params;
   const updateFields = req.body;
 
-  if (isNaN(userId)) {
+  const userIdParam = Number(userId);
+
+  if (isNaN(userIdParam)) {
     return res.json({ message: `Invalid userId provided: ${userId} - must be a number.` });
   }
 
@@ -35,7 +39,7 @@ module.exports = async (req, res, next) => {
     const query = `UPDATE users SET ${updateClause} WHERE id = ?`;
     const params = [...updateValues, userId];
 
-    const [updateResult] = await pool.query(query, params);
+    const [updateResult] = await pool.query<ResultSetHeader>(query, params);
 
     if (updateResult.affectedRows) {
       return res.json({

@@ -1,10 +1,17 @@
-const { pool, commonQueries } = require('../../database');
-const { updateStripeSubscription } = require('../../lib/utils');
+import { RowDataPacket } from 'mysql2';
+import { pool, commonQueries } from '../../database';
+import { updateStripeSubscription } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
 
-module.exports = async (req, res, next) => {
+type EngagementItem = {
+  id: number,
+  hasAccess: boolean;
+};
+
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     engagements = []
-  } = req.body;
+  }: { engagements: EngagementItem[]; } = req.body;
 
   const {
     userId
@@ -13,7 +20,9 @@ module.exports = async (req, res, next) => {
   const updaterUserId = req.userId;
   const orgId = req.ownedOrg.id;
 
-  if (!userId || isNaN(userId)) {
+  const userIdParam = Number(userId);
+
+  if (!userIdParam || isNaN(userIdParam)) {
     return res.json({ message: 'Invalid userId parameter - must be an integer.' });
   } else if (!orgId) {
     return res.json({ message: 'Missing orgId parameter.' });
@@ -24,26 +33,26 @@ module.exports = async (req, res, next) => {
   const connection = await pool.getConnection();
 
   try {
-    const insertValues = [];
-    const deleteValues = [];
+    const insertValues: [number, number, string][] = [];
+    const deleteValues: number[][] = [];
 
-    const paramErrors = [];
+    const paramErrors: string[] = [];
 
-    const [orgUserExistsResult] = await pool.query(
+    const [orgUserExistsResult] = await pool.query<RowDataPacket[]>(
       `SELECT EXISTS(
         SELECT 1 FROM engagement_users 
         LEFT JOIN engagements ON engagement_users.engagement_id = engagements.id
         WHERE engagements.org_id = ? AND engagement_users.user_id = ?) 
         AS orgUserExists`,
-      [orgId, userId]
+      [orgId, userIdParam]
     );
 
     if (!orgUserExistsResult[0].orgUserExists) {
       connection.release();
-      return res.json({ message: `userId ${userId} does not exist in orgId ${orgId}` });
+      return res.json({ message: `userId ${userIdParam} does not exist in orgId ${orgId}` });
     }
 
-    const [engagementsResult] = await pool.query('SELECT id, org_id FROM engagements WHERE id IN (?)', [engagements.map(({ id }) => id)]);
+    const [engagementsResult] = await pool.query<RowDataPacket[]>('SELECT id, org_id FROM engagements WHERE id IN (?)', [engagements.map(({ id }) => id)]);
 
     const engagementIdsMap = new Map(engagementsResult.map(({ id, org_id }) => [id, org_id]));
 
@@ -55,7 +64,7 @@ module.exports = async (req, res, next) => {
       if (engagementIdsMap.get(id) !== orgId) paramErrors.push(`engagementId ${id} does not belong to orgId ${orgId}`);
 
       if (hasAccess) {
-        insertValues.push([id, userId, 'member']);
+        insertValues.push([id, userIdParam, 'member']);
       } else {
         deleteValues.push([id]);
       }
@@ -84,12 +93,12 @@ module.exports = async (req, res, next) => {
               (SELECT id FROM engagements WHERE org_id = ?)
             )
         `,
-        [userId, orgId]
+        [userIdParam, orgId]
       );
 
       await connection.query(
         'DELETE FROM engagement_users WHERE engagement_id IN (?) AND user_id = ?',
-        [deleteValues, userId]
+        [deleteValues, userIdParam]
       );
 
       const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);

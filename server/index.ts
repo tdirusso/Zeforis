@@ -14,7 +14,6 @@ import getEngagement from './routes/engagements/getEngagementData';
 import createFolder from './routes/folders/createFolder';
 import updateEngagement from './routes/engagements/updateEngagement';
 import register from './routes/users/register';
-import verify from './routes/users/verify';
 import inviteOrgUsers from './routes/orgs/inviteOrgUsers';
 import removeEngagementUser from './routes/engagements/removeEngagementUser';
 import updateUser from './routes/users/updateUser';
@@ -130,7 +129,7 @@ const boot = async () => {
   app.post('/api/authenticate', authenicatedUserRateLimit, authenticate);
   app.post('/api/register', unAuthenicatedUserRateLimit, register);
 
-  app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
+  //app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
 
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);

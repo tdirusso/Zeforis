@@ -1,15 +1,16 @@
-const emailService = require('../../email');
-const validator = require("email-validator");
-const { v4: uuidv4 } = require('uuid');
-const { OAuth2Client } = require('google-auth-library');
-const slackbot = require('../../slackbot');
-
-const { pool } = require('../../database');
-const { getMissingFields } = require('../../lib/utils');
+import emailService from '../../email';
+import validator from "email-validator";
+import { v4 as uuidv4 } from 'uuid';
+import { OAuth2Client } from 'google-auth-library';
+import slackbot from '../../slackbot';
+import { pool } from '../../database';
+import { getMissingFields } from '../../lib/utils';
+import { Request, Response, NextFunction } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 const authClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
   const {
     email,
     firstName,
@@ -37,9 +38,14 @@ module.exports = async (req, res, next) => {
       });
 
       const payload = ticket.getPayload();
+
+      if (!payload?.email) {
+        return res.status(400).json({ message: 'Missing email from Google credential.' });
+      }
+
       const googleEmail = payload.email.toLowerCase();
 
-      const [userResult] = await pool.query(
+      const [userResult] = await pool.query<RowDataPacket[]>(
         'SELECT id FROM users WHERE email = ?',
         [googleEmail]
       );
@@ -64,7 +70,7 @@ module.exports = async (req, res, next) => {
     } else {
       const lcEmail = email.toLowerCase();
 
-      const [existsResult] = await pool.query('SELECT 1 FROM users WHERE email = ?', [lcEmail]);
+      const [existsResult] = await pool.query<RowDataPacket[]>('SELECT 1 FROM users WHERE email = ?', [lcEmail]);
 
       if (existsResult.length) {
         return res.status(409).json({
@@ -74,7 +80,7 @@ module.exports = async (req, res, next) => {
 
       const verificationCode = uuidv4().substring(0, 16);
 
-      const createUserResult = await pool.query(
+      const createUserResult = await pool.query<ResultSetHeader>(
         'INSERT INTO users (first_name, last_name, email, verification_code) VALUES (?,?,?,?)',
         [firstName, lastName, lcEmail, verificationCode]);
 
@@ -94,13 +100,13 @@ module.exports = async (req, res, next) => {
   }
 };
 
-async function sendVerifyEmail(userId, verificationCode, email) {
+async function sendVerifyEmail(userId: number, verificationCode: string, email: string) {
   const verificationUrl = `${process.env.API_DOMAIN}/api/users/${userId}/verify?verificationCode=${verificationCode}`;
 
   await emailService.sendEmailFromTemplate({
     to: email,
     from: emailService.senders.info,
-    templateId: emailService.templates.emailVerification,
+    templateId: 'TODO HERE',
     templateData: {
       verificationUrl
     }
