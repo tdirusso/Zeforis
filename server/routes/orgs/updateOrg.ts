@@ -5,10 +5,12 @@ import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2';
 import fileUpload from 'express-fileupload';
 import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
+import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 
 const acceptMimes = ['image/png', 'image/jpeg'];
 const AWSBucket = getEnvVariable(EnvVariable.AWS_S3_BUCKET_NAME);
 const AWSOrgLogosFolder = getEnvVariable(EnvVariable.AWS_S3_ORG_LOGO_FOLDER);
+const AWSBucketRegion = getEnvVariable(EnvVariable.AWS_S3_BUCKET_REGION);
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -81,10 +83,12 @@ async function updateOrg(name: string, brandColor: string, orgId: number) {
 
 async function updateOrgWithLogoChange(name: string, brandColor: string, orgId: number, existingLogoUrl: string | null | undefined, logoFile: fileUpload.UploadedFile | undefined) {
   if (existingLogoUrl) {
-    await s3.deleteObject({
-      Key: existingLogoUrl.split('.com/')[1],
-      Bucket: AWSBucket
-    }).promise();
+    const command = new DeleteObjectCommand({
+      Bucket: AWSBucket,
+      Key: existingLogoUrl.split('.com/')[1]
+    });
+
+    await s3.send(command);
   }
 
   let updatedLogoUrl = null;
@@ -101,16 +105,14 @@ async function updateOrgWithLogoChange(name: string, brandColor: string, orgId: 
         const now = Date.now();
         const uploadFileName = `${AWSOrgLogosFolder}/${orgId}-${now}.png`;
 
-        const s3ObjectParams = {
+        const command = new PutObjectCommand({
           Key: uploadFileName,
           Body: resizedLogoBuffer,
-          ACL: 'public-read',
           Bucket: AWSBucket
-        };
+        });
 
-        const s3Result = await s3.upload(s3ObjectParams).promise();
-
-        updatedLogoUrl = s3Result.Location;
+        await s3.send(command);
+        updatedLogoUrl = `https://${AWSBucket}.s3.${AWSBucketRegion}.amazonaws.com/${uploadFileName}`;
       }
     }
   }
