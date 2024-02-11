@@ -1,12 +1,12 @@
 import request from '../lib/request';
 
-const login = async (payload) => {
+const login = async (payload: unknown) => {
   const { data } = await request.post(`login`, payload);
 
   return data;
 };
 
-const logout = (logoutPageUrl) => {
+const logout = (logoutPageUrl: string) => {
   deleteToken();
   window.location.href = logoutPageUrl;
 };
@@ -25,7 +25,7 @@ const getToken = () => {
   return localStorage.getItem('token');
 };
 
-const setToken = (token) => {
+const setToken = (token: string) => {
   localStorage.setItem('token', token);
 };
 

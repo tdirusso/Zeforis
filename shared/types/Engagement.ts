@@ -1,4 +1,4 @@
-export type Engagement = {
+export interface Engagement {
   readonly id?: number,
   name?: string,
   orgId?: number,

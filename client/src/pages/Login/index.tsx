@@ -81,9 +81,9 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         if (result.token) {
           if (needsCustomPage && org) {
             if (engagementIdParam) {
-              setActiveEngagementId(engagementIdParam);
+              setActiveEngagementId(Number(engagementIdParam));
             }
-            setActiveOrgId(orgId);
+            setActiveOrgId(Number(orgId));
           }
           window.location.href = '/home/dashboard';
         } else {
@@ -153,7 +153,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
 
     async function fetchCustomPageData() {
       try {
-        const { org } = await getOrg(orgId);
+        const { org } = await getOrg(Number(orgId));
 
         if (org) {
           const brandRGB: { r: number, g: number, b: number; } | null = hexToRgb(org.brand_color);
@@ -221,7 +221,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
 
       if (result.token) {
         if (needsCustomPage && org) {
-          setActiveOrgId(orgId);
+          setActiveOrgId(Number(orgId));
         }
         window.location.href = '/home/dashboard';
       } else {

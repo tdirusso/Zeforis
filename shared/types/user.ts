@@ -1,3 +1,5 @@
+import type { Engagement } from './Engagement';
+
 export type User = {
   readonly id: number,
   firstName?: string | undefined,
@@ -5,5 +7,8 @@ export type User = {
   email: string,
   dateCreated?: Date,
   plan?: string,
-  subscriptionStatus?: string;
+  subscriptionStatus?: string,
+  adminOfEngagements?: Engagement[];
+  memberOfEngagements?: Engagement[];
+  access?: string;
 };
