@@ -9,7 +9,8 @@ interface Window {
   googleButtonInterval: NodeJS.Timeout,
   VANTA?: {
     TOPOLOGY: any;
-  };
+  },
+  updateOpenFolderStates?: NodeJS.Timeout;
 }
 
 namespace StateSetters {

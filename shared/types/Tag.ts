@@ -3,3 +3,7 @@ export type Tag = {
   name?: string,
   engagementId?: number;
 };
+
+export type TagsMap = {
+  [key: number]: Tag;
+};

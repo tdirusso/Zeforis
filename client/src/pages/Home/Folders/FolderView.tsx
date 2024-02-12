@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import './styles.scss';
 import StarIcon from '@mui/icons-material/Star';
-import { useEffect, useMemo, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { statuses } from "../../../lib/constants";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
@@ -36,8 +36,20 @@ import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
+import { AppContext } from "src/types/AppContext";
+import { Tag } from "@shared/types/Tag";
+import { User } from "@shared/types/User";
+import { Task } from "@shared/types/Task";
+import { Folder } from "@shared/types/Folder";
 
-export default function FolderView({ folderId }) {
+type TempAssignee = {
+  firstName?: string | null,
+  lastName?: string | null,
+  id: number | null;
+  role?: string;
+};
+
+export default function FolderView({ folderId }: { folderId: number; }) {
 
   const {
     engagement,
@@ -54,9 +66,9 @@ export default function FolderView({ folderId }) {
     openModal,
     folders,
     openContextMenu
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
-  const theme = useTheme(); // Get the current theme
+  const theme = useTheme();
 
   const navigate = useNavigate();
 
@@ -64,42 +76,42 @@ export default function FolderView({ folderId }) {
   const folder = foldersMap[folderId];
 
   const [isBulkEditMode, setBulkEditMode] = useState(false);
-  const [selectedTasks, setSelectedTasks] = useState([]);
+  const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState('name');
-  const [editingTask, setEditingTask] = useState(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isEditingName, setEditingName] = useState(false);
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
-  const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
-  const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
-  const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
-  const [folderMenuAnchor, setFolderMenuAnchor] = useState(null);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<Element | null>(null);
+  const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState<Element | null>(null);
+  const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState<Element | null>(null);
+  const [tagsMenuAnchor, setTagsMenuAnchor] = useState<Element | null>(null);
+  const [folderMenuAnchor, setFolderMenuAnchor] = useState<Element | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [tempAssignee, setTempAssignee] = useState(null);
-  const [tempSelectedTags, setTempSelectedTags] = useState([]);
-  const [tagIdToRemove, setTagIdToRemove] = useState(null);
+  const [tempAssignee, setTempAssignee] = useState<TempAssignee | null>(null);
+  const [tempSelectedTags, setTempSelectedTags] = useState<Tag[]>([]);
+  const [tagIdToRemove, setTagIdToRemove] = useState<number | null>(null);
   const [doUpdate, setDoUpdate] = useState(false);
 
   const [filterName, setFilterName] = useState('');
-  const [filterTags, setFilterTags] = useState([]);
-  const [filterAssignedTo, setFilterAssignedTo] = useState(null);
+  const [filterTags, setFilterTags] = useState<Tag[]>([]);
+  const [filterAssignedTo, setFilterAssignedTo] = useState<User | null>(null);
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const [bulkEditAction, setBulkEditAction] = useState(null);
-  const [bulkStatusValue, setBulkStatusValue] = useState(null);
-  const [bulkDueValue, setBulkDueValue] = useState(null);
-  const [bulkFolderValue, setBulkFolderValue] = useState(null);
-  const [bulkAssigneeValue, setBulkAssigneeValue] = useState(null);
+  const [bulkEditAction, setBulkEditAction] = useState<string | null>(null);
+  const [bulkStatusValue, setBulkStatusValue] = useState<string | null>(null);
+  const [bulkDueValue, setBulkDueValue] = useState<string | null>(null);
+  const [bulkFolderValue, setBulkFolderValue] = useState<number | null>(null);
+  const [bulkAssigneeValue, setBulkAssigneeValue] = useState<number | null>(null);
   const [bulkTagAction, setBulkTagAction] = useState('add');
 
   const [addingTask, setAddingTask] = useState(false);
   const [addingTaskLoading, setAddingTaskLoading] = useState(false);
 
   const folderTasks = useMemo(() => {
-    let theTasks = folder.tasks;
+    let theTasks = folder.tasks || [];
     const lcFilterName = filterName?.toLowerCase();
 
     theTasks = theTasks.filter(task => {
-      let tagIds;
+      let tagIds: string[] = [];
 
       if (filterTags.length) {
         tagIds = task.tags?.split(',').filter(Boolean).map(id => String(id)) || [];
@@ -133,7 +145,7 @@ export default function FolderView({ folderId }) {
         }).sort((a, b) => {
           // Now sort by the due date
           if (!a.date_due || !b.date_due) return 1;
-          return new Date(a.date_due) - new Date(b.date_due);
+          return new Date(a.date_due).getTime() - new Date(b.date_due).getTime();
         });
         break;
       case 'dateDueReverse':
@@ -145,7 +157,7 @@ export default function FolderView({ folderId }) {
         }).sort((a, b) => {
           // Now sort by the due date
           if (!a.date_due || !b.date_due) return 1;
-          return new Date(a.date_due) - new Date(b.date_due);
+          return new Date(a.date_due).getTime() - new Date(b.date_due).getTime();
         }).reverse();
         break;
       case 'assignee':
@@ -186,8 +198,8 @@ export default function FolderView({ folderId }) {
   const tagsMenuOpen = Boolean(tagsMenuAnchor);
   const folderMenuOpen = Boolean(folderMenuAnchor);
 
-  const nameRef = useRef(null);
-  const addingTaskNameRef = useRef(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const addingTaskNameRef = useRef<HTMLInputElement>(null);
 
   const now = moment();
   const tomorrow = moment().add(1, 'day');
@@ -202,14 +214,14 @@ export default function FolderView({ folderId }) {
   ) || [];
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
 
-      if (nameRef.current && !nameRef.current.contains(event.target)) {
+      if (nameRef.current && !nameRef.current.contains(event.target as Node)) {
         setEditingName(false);
         setEditingTask(null);
       }
 
-      if (addingTaskNameRef.current && !addingTaskNameRef.current.contains(event.target)) {
+      if (addingTaskNameRef.current && !addingTaskNameRef.current.contains(event.target as Node)) {
         setAddingTask(false);
       }
     };
@@ -223,84 +235,88 @@ export default function FolderView({ folderId }) {
 
   useEffect(() => {
     async function handleUpdateTask() {
-      try {
-        const currentTags = editingTaskTagIds.map(tagId => ({
-          id: Number(tagId),
-          name: tagsMap[tagId].name
-        }));
+      if (editingTask) {
+        try {
+          const currentTags = editingTaskTagIds.map(tagId => ({
+            id: Number(tagId),
+            name: tagsMap[tagId].name
+          }));
 
-        let allTags = tempSelectedTags.length === 0 ?
-          currentTags :
-          [...currentTags, ...tempSelectedTags];
+          let allTags = tempSelectedTags.length === 0 ?
+            currentTags :
+            [...currentTags, ...tempSelectedTags];
 
-        if (tagIdToRemove) {
-          allTags = allTags.filter(tag => tag.id !== tagIdToRemove);
-        }
-
-        const { message, success } = await updateTask({
-          name: editingTask.task_name,
-          description: editingTask.description,
-          linkUrl: editingTask.link_url,
-          status: editingTask.status,
-          assignedToId: editingTask.assigned_to_id,
-          folderId: folder.id,
-          engagementId: engagementId,
-          isKeyTask: editingTask.is_key_task,
-          dateDue: editingTask.date_due,
-          taskId: editingTask.task_id,
-          currentTags,
-          tags: allTags
-        });
-
-        if (success) {
-          const now = new Date().toISOString();
-          let dateCompletedToSet = null;
-
-          if (editingTask.status === 'Complete') {
-            if (editingTask.date_completed) {
-              dateCompletedToSet = editingTask.date_completed;
-            } else {
-              dateCompletedToSet = now;
-            }
+          if (tagIdToRemove) {
+            allTags = allTags.filter(tag => tag.id !== tagIdToRemove);
           }
 
-          const updatedTaskObject = {
-            ...(delete editingTask.currentTags && editingTask),
-            date_completed: dateCompletedToSet,
-            date_last_updated: now,
-            tags: allTags.length > 0 ? allTags.map(t => t.id).join(',') : null
-          };
+          const { message, success } = await updateTask({
+            name: editingTask.task_name,
+            description: editingTask.description,
+            linkUrl: editingTask.link_url,
+            status: editingTask.status,
+            assignedToId: editingTask.assigned_to_id,
+            folderId: folder.id,
+            engagementId: engagementId,
+            isKeyTask: editingTask.is_key_task,
+            dateDue: editingTask.date_due,
+            taskId: editingTask.task_id,
+            currentTags,
+            tags: allTags
+          });
 
-          tasksMap[editingTask.task_id] = updatedTaskObject;
+          if (success) {
+            const now = new Date().toISOString();
+            let dateCompletedToSet = null;
 
-          setTasks(Object.values(tasksMap));
-          setDoUpdate(false);
-          setEditingName(false);
-          setTempSelectedTags([]);
-          setTagIdToRemove(null);
-          setTimeout(() => {
+            if (editingTask.status === 'Complete') {
+              if (editingTask.date_completed) {
+                dateCompletedToSet = editingTask.date_completed;
+              } else {
+                dateCompletedToSet = now;
+              }
+            }
+
+            const updatedTaskObject: Task = {
+              ...editingTask,
+              date_completed: dateCompletedToSet,
+              date_last_updated: now,
+              tags: allTags.length > 0 ? allTags.map(t => t.id).join(',') : null
+            };
+
+            tasksMap[editingTask.task_id] = updatedTaskObject;
+
+            setTasks(Object.values(tasksMap));
+            setDoUpdate(false);
+            setEditingName(false);
+            setTempSelectedTags([]);
+            setTagIdToRemove(null);
+            setTimeout(() => {
+              setEditingTask(null);
+            }, 300);
+            openSnackBar('Saved.', 'success');
+          } else {
             setEditingTask(null);
-          }, 300);
-          openSnackBar('Saved.', 'success');
-        } else {
-          setEditingTask(null);
-          setDoUpdate(false);
-          setTempSelectedTags([]);
-          setTagIdToRemove(null);
-          openSnackBar(message, 'error');
+            setDoUpdate(false);
+            setTempSelectedTags([]);
+            setTagIdToRemove(null);
+            openSnackBar(message, 'error');
+          }
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            setEditingTask(null);
+            setDoUpdate(false);
+            setTempSelectedTags([]);
+            setTagIdToRemove(null);
+            openSnackBar(error.message, 'error');
+          }
         }
-      } catch (error) {
-        setEditingTask(null);
-        setDoUpdate(false);
-        setTempSelectedTags([]);
-        setTagIdToRemove(null);
-        openSnackBar(error.message, 'error');
       }
     }
 
     async function handleBulkUpdateTasks() {
       try {
-        const { updatedTasks, message } = await batchUpdateTasks({
+        const { updatedTasks, message }: { updatedTasks: Task[], message: string; } = await batchUpdateTasks({
           engagementId,
           taskIds: selectedTasks,
           action: bulkEditAction,
@@ -332,9 +348,11 @@ export default function FolderView({ folderId }) {
           setDoUpdate(false);
           openSnackBar(message, 'error');
         }
-      } catch (error) {
-        setDoUpdate(false);
-        openSnackBar(error.message, 'error');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setDoUpdate(false);
+          openSnackBar(error.message, 'error');
+        }
       }
     }
 
@@ -347,7 +365,7 @@ export default function FolderView({ folderId }) {
     }
   }, [doUpdate]);
 
-  const handleSelectAll = (_, isChecked) => {
+  const handleSelectAll = (_: React.ChangeEvent, isChecked: boolean) => {
     if (isChecked) {
       setSelectedTasks(folderTasks.map(({ task_id }) => task_id));
     } else {
@@ -355,7 +373,7 @@ export default function FolderView({ folderId }) {
     }
   };
 
-  const handleTaskSelection = taskId => {
+  const handleTaskSelection = (taskId: number) => {
     if (isBulkEditMode) {
       if (selectedTasks.includes(taskId)) {
         setSelectedTasks(selectedTasks.filter(id => id !== taskId));
@@ -365,21 +383,21 @@ export default function FolderView({ folderId }) {
     }
   };
 
-  const handleEditNameClick = task => {
+  const handleEditNameClick = (task: Task) => {
     setEditingTask(task);
     setEditingName(true);
   };
 
-  const handleStatusClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleStatusClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
     }
 
     setStatusMenuAnchor(e.currentTarget);
   };
 
-  const handleAssigneeClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleAssigneeClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && editingTask && task) {
       setEditingTask(task);
 
       setTempAssignee(
@@ -397,7 +415,7 @@ export default function FolderView({ folderId }) {
   };
 
   const handleAssignToMe = () => {
-    if (!isBulkEditMode) {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({
         ...editingTask,
         assigned_to_id: user.id,
@@ -412,9 +430,9 @@ export default function FolderView({ folderId }) {
     setDoUpdate(true);
   };
 
-  const handleAssigneeChange = (_, newVal) => {
+  const handleAssigneeChange = (_: React.SyntheticEvent<Element, Event>, newVal: TempAssignee | null) => {
     if (newVal) {
-      if (!isBulkEditMode) {
+      if (!isBulkEditMode && editingTask) {
         setEditingTask({
           ...editingTask,
           assigned_to_id: newVal.id,
@@ -432,7 +450,7 @@ export default function FolderView({ folderId }) {
   };
 
   const handleClearAssignee = () => {
-    if (!isBulkEditMode) {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({
         ...editingTask,
         assigned_to_id: null,
@@ -450,7 +468,7 @@ export default function FolderView({ folderId }) {
   };
 
   const handleClearDateDue = () => {
-    if (!isBulkEditMode) {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({ ...editingTask, date_due: null });
       setDateDueMenuAnchor(null);
     } else {
@@ -461,34 +479,34 @@ export default function FolderView({ folderId }) {
     setDoUpdate(true);
   };
 
-  const handleDateDueClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleDateDueClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
     }
 
     setDateDueMenuAnchor(e.currentTarget);
   };
 
-  const handleToggleKeyTask = (task) => {
+  const handleToggleKeyTask = (task: Task) => {
     setEditingTask({ ...task, is_key_task: !task.is_key_task });
     setDoUpdate(true);
   };
 
-  const handleNameSubmit = e => {
-    if (e && e.key === 'Enter') {
+  const handleNameSubmit = (e: React.KeyboardEvent) => {
+    if (e && e.key && e.key === 'Enter') {
       e.preventDefault();
-      if (!nameRef.current.value) {
+      if (!nameRef.current?.value) {
         openSnackBar('Task name cannot be empty.');
         return;
-      } else {
+      } else if (editingTask) {
         setEditingTask({ ...editingTask, task_name: nameRef.current.value });
         setDoUpdate(true);
       }
     }
   };
 
-  const handleStatusSubmit = (newStatus) => {
-    if (!isBulkEditMode) {
+  const handleStatusSubmit = (newStatus: string) => {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({ ...editingTask, status: newStatus });
       setStatusMenuAnchor(null);
     } else {
@@ -499,28 +517,28 @@ export default function FolderView({ folderId }) {
     setDoUpdate(true);
   };
 
-  const handleDateDueSubmit = newDate => {
-    if (!isBulkEditMode) {
-      setEditingTask({ ...editingTask, date_due: newDate.toISOString() });
+  const handleDateDueSubmit = (newDate: Moment | null) => {
+    if (!isBulkEditMode && editingTask) {
+      setEditingTask({ ...editingTask, date_due: newDate?.toISOString() || null });
       setDateDueMenuAnchor(null);
     } else {
       setBulkEditAction('dateDue');
-      setBulkDueValue(newDate.toISOString());
+      setBulkDueValue(newDate?.toISOString() || null);
     }
 
     setDoUpdate(true);
   };
 
-  const handleAddTagClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleAddTagClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
     }
 
     setTagsMenuAnchor(e.currentTarget);
   };
 
-  const handleCreateTag = async e => {
-    const newTagValue = e.target.value;
+  const handleCreateTag = async (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const newTagValue = (e.target as HTMLInputElement).value;
 
     if (newTagValue) {
       const result = await createTag({
@@ -551,13 +569,13 @@ export default function FolderView({ folderId }) {
     }
   };
 
-  const handleRemoveTag = async (tagId, task) => {
+  const handleRemoveTag = async (tagId: string, task: Task) => {
     setTagIdToRemove(Number(tagId));
     setEditingTask(task);
     setDoUpdate(true);
   };
 
-  const handleFolderSubmit = (_, folderVal) => {
+  const handleFolderSubmit = (_: React.SyntheticEvent<Element, Event>, folderVal: Folder | null) => {
     if (folderVal) {
       setBulkFolderValue(folderVal.id);
       setBulkEditAction('folder');
@@ -574,8 +592,8 @@ export default function FolderView({ folderId }) {
 
   useEffect(() => {
     if (isEditingName) {
-      nameRef.current.focus();
-      nameRef.current.setSelectionRange(1000, 1000);
+      nameRef.current?.focus();
+      nameRef.current?.setSelectionRange(1000, 1000);
     }
   }, [isEditingName]);
 
@@ -584,11 +602,11 @@ export default function FolderView({ folderId }) {
     setBulkEditMode(prev => !prev);
   };
 
-  const handleCreateTask = async e => {
+  const handleCreateTask = async (e: React.KeyboardEvent) => {
     if (e && e.key === 'Enter') {
       e.preventDefault();
 
-      const newTaskName = addingTaskNameRef.current.value;
+      const newTaskName = addingTaskNameRef.current?.value;
 
       if (!newTaskName) {
         openSnackBar('Task name cannot be empty.');
@@ -620,7 +638,7 @@ export default function FolderView({ folderId }) {
               link_url: '',
               assigned_to_id: null,
               date_completed: null,
-              is_key_task: 0,
+              is_key_task: false,
               date_due: null,
               date_last_updated: now,
               tags: null,
@@ -635,7 +653,7 @@ export default function FolderView({ folderId }) {
 
             addingTaskNameRef.current.value = '';
             setTimeout(() => {
-              addingTaskNameRef.current.focus();
+              addingTaskNameRef.current?.focus();
             }, 250);
           } else {
             if (uiProps && uiProps.alertType === 'upgrade') {
@@ -650,9 +668,11 @@ export default function FolderView({ folderId }) {
             }
             setAddingTaskLoading(false);
           }
-        } catch (error) {
-          openSnackBar(error.message, 'error');
-          setAddingTaskLoading(false);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            openSnackBar(error.message, 'error');
+            setAddingTaskLoading(false);
+          }
         }
       }
     }
@@ -677,7 +697,7 @@ export default function FolderView({ folderId }) {
         <Box className="flex-ac folder-tasks-controls">
           <Box className="flex-ac" gap='8px'>
             <Tooltip title="Toggle bulk edit" placement="left">
-              <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
+              <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : 'default'}>
                 <EditNoteRoundedIcon />
               </IconButton>
             </Tooltip>
@@ -814,9 +834,8 @@ export default function FolderView({ folderId }) {
                         size="small"
                         className={name}
                         label={name}
-                        style={{ cursor: 'pointer' }}>
-                      </Chip>
-
+                        style={{ cursor: 'pointer' }}
+                      />
                     </MenuItem>)
                 }
               </Select>
@@ -834,7 +853,7 @@ export default function FolderView({ folderId }) {
                 options={[...engagementAdmins, ...engagementMembers]}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.role}
+                groupBy={(option) => option.role || ''}
                 onChange={(_, newVal) => setFilterAssignedTo(newVal)}
                 value={filterAssignedTo}
                 renderInput={(params) => (
@@ -864,7 +883,7 @@ export default function FolderView({ folderId }) {
                 options={tags}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                 isOptionEqualToValue={(option, value) => option.name === value.name}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => option.name!}
                 filterSelectedOptions
                 disableCloseOnSelect
                 size="small"
@@ -1076,7 +1095,7 @@ export default function FolderView({ folderId }) {
                           }
                         </Box>
                         {
-                          isEditingName && editingTask.task_id === task.task_id ?
+                          isEditingName && editingTask?.task_id === task.task_id ?
                             <TextField
                               multiline
                               variant="standard"
@@ -1113,8 +1132,8 @@ export default function FolderView({ folderId }) {
                         size="small"
                         label={task.status}
                         onClick={e => handleStatusClick(e, task)}
-                        className={task.status}>
-                      </Chip>
+                        className={task.status}
+                      />
                     </Box>
                     <Box className="task-assigned-cell">
                       {
@@ -1126,7 +1145,7 @@ export default function FolderView({ folderId }) {
                               className="assigned-btn">
                               {
                                 <Avatar>
-                                  {task.assigned_first[0]}{task.assigned_last[0]}
+                                  {task.assigned_first?.[0]}{task.assigned_last?.[0]}
                                 </Avatar>
                               }
                             </IconButton>
@@ -1170,7 +1189,7 @@ export default function FolderView({ folderId }) {
                           onDelete={() => handleRemoveTag(tagId, task)}
                           className="chip"
                           key={tagId}
-                          label={tagsMap[tagId].name}
+                          label={tagsMap[Number(tagId)].name}
                           size="small"
                         />)}
                       <Chip
@@ -1257,7 +1276,7 @@ export default function FolderView({ folderId }) {
               options={isBulkEditMode ? tags : availableTags}
               renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
               isOptionEqualToValue={(option, value) => option.name === value.name}
-              getOptionLabel={(option) => option.name}
+              getOptionLabel={(option) => option.name || ''}
               filterSelectedOptions
               disableCloseOnSelect
               onKeyDown={e => e.key === 'Enter' ? handleCreateTag(e) : null}
@@ -1330,7 +1349,7 @@ export default function FolderView({ folderId }) {
             <StaticDatePicker
               disabled={bulkEditAction === 'dateDue'}
               value={editingTask?.date_due}
-              renderInput={() => { }}
+              renderInput={() => <></>}
               onChange={handleDateDueSubmit}
               displayStaticWrapperAs="desktop"
             />
@@ -1361,7 +1380,7 @@ export default function FolderView({ folderId }) {
               renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
               getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              groupBy={(option) => option.role}
+              groupBy={(option) => option.role || ''}
               onChange={handleAssigneeChange}
               value={tempAssignee}
               renderInput={(params) => (

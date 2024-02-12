@@ -1,5 +1,6 @@
 main {
-  transition: margin 200ms;
+  background-color: #f3f4f9;
+  transition: margin 200ms, background-color 250ms, color 250ms;
   padding: 0 2.5rem;
 
   .content {
@@ -7,6 +8,11 @@ main {
     padding-top: 1rem;
     padding-bottom: 2.5rem;
   }
+}
+
+body.dark main {
+  color: white;
+  background-color: var(--colors-body-background-dark);
 }
 
 .custom-tab {

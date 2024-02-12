@@ -27,29 +27,13 @@ import useNotification from "../../hooks/useNotification";
 import ActionCenter from "../../components/admin/ActionCenter";
 import useContextMenu from "../../hooks/useContextMenu";
 import ContextMenus from "../../components/core/contextMenus";
-import { Org } from "@shared/types/Org";
+import { Org, OrgUsersMap } from "@shared/types/Org";
 import { Engagement } from "@shared/types/Engagement";
-import { Task } from "@shared/types/Task";
-import { Folder } from "@shared/types/Folder";
-import { Tag } from "@shared/types/Tag";
+import { Task, TasksMap } from "@shared/types/Task";
+import { Folder, FoldersMap } from "@shared/types/Folder";
+import { Tag, TagsMap } from "@shared/types/Tag";
 import { User } from "@shared/types/User";
 import { Widget } from "@shared/types/Widget";
-
-type FoldersMap = {
-  [key: number]: Folder;
-};
-
-type TasksMap = {
-  [key: number]: Task;
-};
-
-type TagsMap = {
-  [key: number]: Tag;
-};
-
-type OrgUsersMap = {
-  [key: number]: User;
-};
 
 export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }) {
   let activeOrgId = getActiveOrgId();
@@ -343,7 +327,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
       </Box>
     );
   }
-  //  tasks.sort((a, b) => (a.task_name && b.task_name) ? a.task_name.localeCompare(b.task_name) : 0);
+
   const context = {
     engagement,
     engagements,

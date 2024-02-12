@@ -7,6 +7,7 @@ import TasksCompletedChart from "../../../components/core/analytics/TasksComplet
 import StatusBreakdownChart from "../../../components/core/analytics/StatusBreakdownChart";
 import UpcomingBreakdownChart from "../../../components/core/analytics/UpcomingBreakdownChart";
 import TaskStats from "../../../components/core/dashboard/TaskStats";
+import { AppContext } from "src/types/AppContext";
 
 const statusColors = statuses.map(({ color }) => color);
 
@@ -36,12 +37,48 @@ const _3weekFromNowEnd = moment().add(3, 'weeks').endOf('week');
 const _4weekFromNowEnd = moment().add(4, 'weeks').endOf('week');
 const _5weekFromNowEnd = moment().add(5, 'weeks').endOf('week');
 
+type StatusCount = {
+  [key: string]: {
+    total: 0,
+    dueThisWeek: 0,
+    due1Week: 0,
+    due2Week: 0,
+    due3Week: 0,
+    due4Week: 0,
+    due5Week: 0;
+  };
+};
+
+type AnalyticsData = {
+  completed5WeeksAgo: number,
+  completed4WeeksAgo: number,
+  completed3WeeksAgo: number,
+  completed2WeeksAgo: number,
+  completed1WeeksAgo: number,
+  completedThisWeek: number,
+  statusCount: StatusCount;
+  numTasksInProgress: number,
+  numTasksCompleted: number,
+  numTasksPastDue: number;
+};
+
 export default function AnalyticsPage() {
   const {
     tasks,
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
-  const [analyticsData, setAnalyticsData] = useState({});
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
+    completed5WeeksAgo: 0,
+    completed4WeeksAgo: 0,
+    completed3WeeksAgo: 0,
+    completed2WeeksAgo: 0,
+    completed1WeeksAgo: 0,
+    completedThisWeek: 0,
+    statusCount: {},
+    numTasksInProgress: 0,
+    numTasksCompleted: 0,
+    numTasksPastDue: 0
+  });
 
   let completed5WeeksAgo = 0;
   let completed4WeeksAgo = 0;
@@ -54,9 +91,9 @@ export default function AnalyticsPage() {
   let numTasksCompleted = 0;
   let numTasksPastDue = 0;
 
-  const statusCount = {};
-
   useEffect(() => {
+    const statusCount: StatusCount = {};
+
     statuses.forEach(({ name }) => {
       statusCount[name] = {
         total: 0,
@@ -83,7 +120,8 @@ export default function AnalyticsPage() {
       if (dateDue && (dateDue < now && task.status !== 'Complete')) {
         numTasksPastDue++;
       }
-      statusCount[task.status].total++;
+
+      statusCount[task.status]!.total++;
       if (task.status === 'Complete' && task.date_completed) {
         const dateCompleted = moment(task.date_completed);
 
@@ -105,17 +143,17 @@ export default function AnalyticsPage() {
       if (task.date_due) {
         const dateDue = moment(task.date_due);
         if (dateDue.isBetween(_thisWeekStart, _thisWeekEnd)) {
-          statusCount[task.status].dueThisWeek++;
+          statusCount[task.status]!.dueThisWeek++;
         } else if (dateDue.isBetween(_1weekFromNowStart, _1weekFromNowEnd)) {
-          statusCount[task.status].due1Week++;
+          statusCount[task.status]!.due1Week++;
         } else if (dateDue.isBetween(_2weekFromNowStart, _2weekFromNowEnd)) {
-          statusCount[task.status].due2Week++;
+          statusCount[task.status]!.due2Week++;
         } else if (dateDue.isBetween(_3weekFromNowStart, _3weekFromNowEnd)) {
-          statusCount[task.status].due3Week++;
+          statusCount[task.status]!.due3Week++;
         } else if (dateDue.isBetween(_4weekFromNowStart, _4weekFromNowEnd)) {
-          statusCount[task.status].due4Week++;
+          statusCount[task.status]!.due4Week++;
         } else if (dateDue.isBetween(_5weekFromNowStart, _5weekFromNowEnd)) {
-          statusCount[task.status].due5Week++;
+          statusCount[task.status]!.due5Week++;
         }
       }
     });
@@ -146,7 +184,7 @@ export default function AnalyticsPage() {
   );
 };
 
-function AnalyticsCharts(props) {
+function AnalyticsCharts(props: { analyticsData: AnalyticsData; }) {
 
   const themeMode = useTheme().palette.mode;
 

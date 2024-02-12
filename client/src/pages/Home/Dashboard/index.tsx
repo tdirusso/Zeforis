@@ -2,9 +2,11 @@ import { useOutletContext } from "react-router-dom";
 import KeyFolders from "../../../components/core/dashboard/KeyFolders";
 import KeyTasks from "../../../components/core/dashboard/KeyTasks";
 import UpcomingTasks from "../../../components/core/dashboard/UpcomingTasks";
-import './styles.css';
+import './styles.scss';
 import Widgets from "../../../components/core/dashboard/Widgets";
 import { useEffect } from "react";
+import { AppContext } from "src/types/AppContext";
+import { Task } from "@shared/types/Task";
 
 export default function Dashboard() {
 
@@ -14,7 +16,7 @@ export default function Dashboard() {
     openDrawer,
     widgets,
     isAdmin
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   useEffect(() => {
     const isGettingStarted = localStorage.getItem('openGettingStarted');
@@ -25,7 +27,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  const keyTasks = [];
+  const keyTasks: Task[] = [];
   const keyFolders = folders.filter(folder => Boolean(folder.is_key_folder));
 
   tasks.forEach(task => {
@@ -35,7 +37,10 @@ export default function Dashboard() {
   });
 
   const tasksSortedByDate = [...tasks].sort((a, b) => {
-    return new Date(a.date_due) - new Date(b.date_due);
+    if (a.date_due && b.date_due) {
+      return new Date(a.date_due).getTime() - new Date(b.date_due).getTime();
+    }
+    return 0;
   }).filter(t => t.date_due);
 
   return (

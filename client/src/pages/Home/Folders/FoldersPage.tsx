@@ -1,8 +1,8 @@
 import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Menu, MenuItem, Typography } from "@mui/material";
 import './styles.scss';
-import { useOutletContext, useSearchParams } from "react-router-dom";
+import { useOutlet, useOutletContext, useSearchParams } from "react-router-dom";
 import Divider from '@mui/material/Divider';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { MouseEventHandler, SyntheticEvent, useEffect, useRef, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import SearchIcon from '@mui/icons-material/Search';
 import ListSubheader from '@mui/material/ListSubheader';
@@ -22,37 +22,38 @@ import { TransitionGroup } from "react-transition-group";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 import FolderView from "./FolderView";
+import { AppContext } from "src/types/AppContext";
+import { Folder } from "@shared/types/Folder";
+
+type FolderStates = {
+  [key: number]: boolean;
+};
 
 export default function FoldersPage() {
   const {
     folders,
     isAdmin,
-    openDrawer,
     foldersMap,
-    openSnackBar,
-    engagement,
-    setFolders,
-    openModal
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
-  const [keyFolders, setKeyFolders] = useState([]);
-  const [otherFolders, setOtherFolders] = useState([]);
-  const [openStates, setOpenStates] = useState({});
+  const [keyFolders, setKeyFolders] = useState<Folder[]>([]);
+  const [otherFolders, setOtherFolders] = useState<Folder[]>([]);
+  const [openStates, setOpenStates] = useState<{ [key: number]: boolean; }>({});
   const [renderReady, setRenderReady] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams({ folderQ: '' });
 
-  const viewingFolderId = searchParams.get('viewingFolderId');
-  const query = searchParams.get('folderQ');
+  const viewingFolderId = Number(searchParams.get('viewingFolderId')) || null;
+  const query = searchParams.get('folderQ') || '';
 
-  const setViewingFolderId = id => {
+  const setViewingFolderId = (id: number) => {
     setSearchParams(prev => {
-      prev.set('viewingFolderId', id);
+      prev.set('viewingFolderId', String(id));
       return prev;
     }, { replace: true });
   };
 
-  const setQuery = value => {
+  const setQuery = (value: string) => {
     setSearchParams(prev => {
       prev.set('folderQ', value);
       return prev;
@@ -62,7 +63,7 @@ export default function FoldersPage() {
   const prevFolders = useRef(folders);
   const prevQuery = useRef(query);
 
-  const openAllAncestors = (folderId, statesObj) => {
+  const openAllAncestors = (folderId: number, statesObj: FolderStates) => {
     let currentFolder = foldersMap[folderId];
 
     while (currentFolder && currentFolder.parent_id) {
@@ -73,10 +74,10 @@ export default function FoldersPage() {
     statesObj[currentFolder.id] = true;
   };
 
-  const openAllChildren = (folderId, statesObj) => {
-    const childrenToOpen = [];
+  const openAllChildren = (folderId: number, statesObj: FolderStates) => {
+    const childrenToOpen: number[] = [];
 
-    const findChildren = (parentId) => {
+    const findChildren = (parentId: number) => {
       folders.forEach((folder) => {
         if (folder.parent_id === parentId) {
           childrenToOpen.push(folder.id);
@@ -127,9 +128,9 @@ export default function FoldersPage() {
     }
 
     if ((queryUpdated || foldersUpdated) || !renderReady) {
-      const tempOpenStates = {};
-      let filteredKeyFolders = [];
-      let filteredOtherFolders = [];
+      const tempOpenStates: FolderStates = {};
+      let filteredKeyFolders: Folder[] = [];
+      let filteredOtherFolders: Folder[] = [];
 
       const lcQuery = query?.toLowerCase();
 
@@ -201,15 +202,8 @@ export default function FoldersPage() {
               handleCollapseAll={handleCollapseAll}
               setQuery={setQuery}
               isAdmin={isAdmin}
-              openDrawer={openDrawer}
               viewingFolderId={viewingFolderId}
               setViewingFolderId={setViewingFolderId}
-              foldersMap={foldersMap}
-              openSnackBar={openSnackBar}
-              engagement={engagement}
-              setFolders={setFolders}
-              openModal={openModal}
-              renderReady={renderReady}
             />
             {
               viewingFolderId ?
@@ -225,8 +219,24 @@ export default function FoldersPage() {
   );
 };
 
+type FolderListProps = {
+  keyFolders: Folder[],
+  otherFolders: Folder[];
+  allFolders: Folder[];
+  openStates: FolderStates,
+  setOpenStates: React.Dispatch<React.SetStateAction<{
+    [key: number]: boolean;
+  }>>,
+  query: string,
+  handleExpandAll: () => void,
+  handleCollapseAll: () => void,
+  setQuery: (value: string) => void,
+  viewingFolderId: number | null,
+  setViewingFolderId: (value: number) => void;
+  isAdmin: boolean;
+};
 
-function FolderList(props) {
+function FolderList(props: FolderListProps) {
   const {
     keyFolders,
     otherFolders,
@@ -238,28 +248,31 @@ function FolderList(props) {
     handleCollapseAll,
     setQuery,
     isAdmin,
-    openDrawer,
     viewingFolderId,
     setViewingFolderId,
+  } = props;
+
+  const {
+    openDrawer,
     openSnackBar,
     engagement,
     setFolders,
     openModal
-  } = props;
+  } = useOutletContext<AppContext>();
 
-  const [selectedFolderId, setSelectedFolderId] = useState(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
   const [dblClickFlag, setDblClickFlag] = useState(false);
-  const [addFolderPopup, setAddFolderPopup] = useState(null);
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState(null);
-  const [editFolderId, setEditFolderId] = useState(null);
+  const [addFolderPopup, setAddFolderPopup] = useState<Element | null>(null);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<Element | null>(null);
+  const [editFolderId, setEditFolderId] = useState<number | null>(null);
   const [addingFolder, setAddingFolder] = useState(false);
 
   const addFolderPopupOpen = Boolean(addFolderPopup);
   const moreMenuOpen = Boolean(moreMenuAnchor);
 
-  const newFolderName = useRef();
+  const newFolderName = useRef<HTMLInputElement>();
 
-  const handleFolderClick = (folderId, hasNestedFolders) => {
+  const handleFolderClick = (folderId: number, hasNestedFolders: boolean) => {
     if (hasNestedFolders) {
       if (selectedFolderId === folderId && dblClickFlag === true) {
         clearTimeout(window.updateOpenFolderStates);
@@ -286,20 +299,20 @@ function FolderList(props) {
     }
   };
 
-  const handleAddNewFolderClick = (e, folderId) => {
+  const handleAddNewFolderClick = (e: SyntheticEvent, folderId: number) => {
     e.stopPropagation();
     setEditFolderId(folderId);
     setAddFolderPopup(e.currentTarget);
   };
 
-  const handleMoreMenuClick = (e, folderId) => {
+  const handleMoreMenuClick = (e: SyntheticEvent, folderId: number) => {
     e.stopPropagation();
     setEditFolderId(folderId);
     setMoreMenuAnchor(e.currentTarget);
   };
 
   const handleAddFolder = async () => {
-    const folderName = newFolderName.current.value;
+    const folderName = newFolderName.current?.value;
 
     if (!folderName) {
       openSnackBar("Folder name can't be blank.");
@@ -329,9 +342,11 @@ function FolderList(props) {
         openSnackBar(message, 'error');
         setAddingFolder(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setAddingFolder(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setAddingFolder(false);
+      }
     }
   };
 
@@ -467,7 +482,6 @@ function FolderList(props) {
                       handleFolderClick={handleFolderClick}
                       allFolders={allFolders}
                       openStates={openStates}
-                      setOpenStates={setOpenStates}
                       query={query}
                       viewingFolderId={viewingFolderId}
                       handleAddNewFolderClick={handleAddNewFolderClick}
@@ -493,7 +507,6 @@ function FolderList(props) {
                       handleFolderClick={handleFolderClick}
                       allFolders={allFolders}
                       openStates={openStates}
-                      setOpenStates={setOpenStates}
                       query={query}
                       viewingFolderId={viewingFolderId}
                       handleAddNewFolderClick={handleAddNewFolderClick}
@@ -592,7 +605,7 @@ function FolderList(props) {
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick, depth = 1) {
+function renderNestedFolders(folders: Folder[], parentFolderId: number, handleFolderClick: (folderId: number, hasNestedFolders: boolean) => void, openStates: FolderStates, selectedFolderId: number | null, query: string, viewingFolderId: number | null, handleAddNewFolderClick: (e: SyntheticEvent, folderId: number) => void, handleMoreMenuClick: (e: SyntheticEvent, folderId: number) => void, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 
@@ -642,7 +655,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
               {
                 hasNestedFolders ?
                   <Collapse in={openStates[folder.id]} timeout="auto">
-                    {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick, depth)}
+                    {renderNestedFolders(folders, folder.id, handleFolderClick, openStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick, depth)}
                   </Collapse> : null
               }
             </Collapse>
@@ -653,7 +666,7 @@ function renderNestedFolders(folders, parentFolderId, handleFolderClick, openSta
   );
 }
 
-function renderFolderName(lcQuery, name) {
+function renderFolderName(lcQuery: string, name: string) {
   if (lcQuery) {
     const regex = new RegExp(`(${lcQuery.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'i');
     const parts = name.split(regex);
@@ -674,8 +687,20 @@ function renderFolderName(lcQuery, name) {
   }
 };
 
+type FolderListItemProps = {
+  name: string,
+  id: number,
+  selectedFolderId: number | null,
+  handleFolderClick: (folderId: number, hasNestedFolders: boolean) => void,
+  allFolders: Folder[],
+  openStates: FolderStates,
+  query: string,
+  viewingFolderId: number | null,
+  handleAddNewFolderClick: (e: SyntheticEvent, folderId: number) => void,
+  handleMoreMenuClick: (e: SyntheticEvent, folderId: number) => void;
+};
 
-export function FolderListItem(props) {
+export function FolderListItem(props: FolderListItemProps) {
   const {
     name,
     id,
@@ -683,7 +708,6 @@ export function FolderListItem(props) {
     handleFolderClick,
     allFolders,
     openStates,
-    setOpenStates,
     query,
     viewingFolderId,
     handleAddNewFolderClick,
@@ -737,7 +761,7 @@ export function FolderListItem(props) {
       {
         hasNestedFolders ?
           <Collapse in={openStates[id]} timeout="auto">
-            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, setOpenStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick)}
+            {renderNestedFolders(allFolders, id, handleFolderClick, openStates, selectedFolderId, query, viewingFolderId, handleAddNewFolderClick, handleMoreMenuClick)}
           </Collapse>
           : null
       }
@@ -745,7 +769,12 @@ export function FolderListItem(props) {
   );
 }
 
-function ExpandCollapseButtonGroup({ handleExpandAll, handleCollapseAll }) {
+type ExpandCollapseButtonGroupProps = {
+  handleExpandAll: () => void,
+  handleCollapseAll: () => void;
+};
+
+function ExpandCollapseButtonGroup({ handleExpandAll, handleCollapseAll }: ExpandCollapseButtonGroupProps) {
   return (
     <ButtonGroup variant="outlined" style={{ marginLeft: -10 }}>
       <Tooltip title="Expand all">
