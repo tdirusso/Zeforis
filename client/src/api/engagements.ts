@@ -2,10 +2,6 @@ import { Engagement } from '@shared/types/Engagement';
 import request from '../lib/request';
 import { User } from '@shared/types/User';
 
-interface UserEngagement extends Engagement {
-  access: string;
-}
-
 const createEngagement = async (payload: unknown) => {
   const { data } = await request.post(`engagements`, payload);
 
@@ -27,7 +23,7 @@ const getActiveEngagementId = () => {
 };
 
 const getUserEngagementsForOrg = (user: User, activeOrgId: number) => {
-  const result: UserEngagement[] = [];
+  const result: Engagement[] = [];
 
   if (user.adminOfEngagements?.length) {
     user.adminOfEngagements.forEach(engagement => {

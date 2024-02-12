@@ -1,0 +1,22 @@
+export type Task = {
+  readonly task_id: number,
+  task_name?: string,
+  description?: string,
+  date_created?: Date,
+  created_by_id?: number,
+  status?: string,
+  folder_id: number,
+  link_url?: string,
+  assigned_to_id?: number,
+  date_completed?: Date,
+  is_key_task?: boolean,
+  date_due?: Date,
+  date_last_updated?: Date,
+  tags?: string,
+  assigned_first?: string,
+  assigned_last?: string,
+  created_first?: string,
+  created_last?: string,
+  updated_by_first?: string,
+  updated_by_last?: string;
+};

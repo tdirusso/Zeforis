@@ -162,10 +162,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
           if (brandRGB) {
             document.documentElement.style.setProperty('--colors-primary', org.brand_color);
             document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB?.r}, ${brandRGB?.g}, ${brandRGB?.b}`);
-
-            if (themeConfig.palette?.primary) {
-              themeConfig.palette.primary.main = org.brand_color;
-            }
+            themeConfig.palette!.primary!.main = org.brand_color;
           }
 
           setTheme(createTheme(themeConfig));

@@ -1,8 +1,9 @@
 import { ThemeOptions, createTheme } from "@mui/material";
 import themeConfig, { darkThemeOverrides } from "../theme";
 import { Theme } from "@mui/material";
+import { AppTheme } from "./constants";
 
-function hexToRgb(hex: string) {
+function hexToRgb(hex = AppTheme.Colors.primary) {
   var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, function (m, r, g, b) {
     return r + r + g + g + b + b;
@@ -16,7 +17,7 @@ function hexToRgb(hex: string) {
   } : null;
 }
 
-function updateTheme(setTheme: (theme: Theme) => void, mode: string) {
+function updateTheme(setTheme: (theme: Theme) => void, mode?: string) {
   if (!mode) {
     mode = localStorage.getItem('theme') || 'light';
   }

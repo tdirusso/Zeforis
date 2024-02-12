@@ -1,3 +1,9 @@
+const AppTheme = {
+  Colors: {
+    primary: window.getComputedStyle(document.body).getPropertyValue('--colors-primary')
+  }
+};
+
 const statuses = [
   { name: 'New', color: '#273bce' },
   { name: 'In Progress', color: '#ffa500' },
@@ -32,5 +38,6 @@ export {
   isMobile,
   appLimits,
   pricePerAdminMonthly,
-  stripeCustomerPortalUrl
+  stripeCustomerPortalUrl,
+  AppTheme
 };

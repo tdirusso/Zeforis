@@ -13,4 +13,5 @@ export type User = {
   memberOfEngagements?: Engagement[];
   memberOfOrgs?: Org[];
   access?: string;
+  role?: string;
 };

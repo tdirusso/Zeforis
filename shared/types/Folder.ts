@@ -1,3 +1,5 @@
+import { Task } from "./Task";
+
 export type Folder = {
   readonly id: number,
   name?: string,
@@ -5,4 +7,5 @@ export type Folder = {
   dateCreated?: Date,
   isKeyFolder?: boolean;
   parentId?: number;
+  tasks?: Task[];
 };
