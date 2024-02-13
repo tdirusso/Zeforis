@@ -7,10 +7,11 @@ import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
+import { AppContext } from "src/types/AppContext";
 
 export default function Settings() {
 
-  const context = useOutletContext();
+  const context: AppContext = useOutletContext();
 
   const {
     isOrgOwner,

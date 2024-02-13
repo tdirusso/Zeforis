@@ -46,12 +46,16 @@ import CheckIcon from '@mui/icons-material/Check';
 import moment from 'moment';
 import { useOutletContext, useParams } from 'react-router-dom';
 import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
+import { AppContext } from 'src/types/AppContext';
+import { Tag } from '@shared/types/Tag';
+import { Folder } from '@shared/types/Folder';
+import { User } from '@shared/types/User';
+import { Task } from '@shared/types/Task';
 
-export default function TaskPage(props) {
+export default function TaskPage() {
+
   const {
-    isOpen,
     isAdmin,
-    close,
     folders,
     engagementMembers,
     engagementAdmins,
@@ -64,34 +68,42 @@ export default function TaskPage(props) {
     user,
     tasksMap,
     tagsMap
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const palette = useTheme().palette;
 
-  const { taskId } = useParams();
-
-  const task = tasksMap[taskId];
-
-  const engagementId = engagement.id;
-
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [assignedTo, setAssignedTo] = useState(null);
-  const [folder, setFolder] = useState(null);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [assignedTo, setAssignedTo] = useState<User | null>(null);
+  const [folder, setFolder] = useState<Folder | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [copyButtonText, setCopyButtonText] = useState('Copy Link');
   const [membersAndAdmins] = useState([...engagementAdmins, ...engagementMembers]);
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
-  const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
-  const [dateDue, setDateDue] = useState(null);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<Element | null>(null);
+  const [deleteMenuAnchor, setDeleteMenuAnchor] = useState<Element | null>(null);
+  //const [dateDue, setDateDue] = useState<string | null>(null);
   const [isKeyTask, setIsKeyTask] = useState(false);
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [isDeleting, setDeleting] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState([]);
 
   const descriptionTextarea = useRef();
+
+  const { taskId } = useParams();
+
+  if (!taskId) {
+    return null;
+  }
+
+  const task = tasksMap[Number(taskId)];
+
+  if (!task) {
+    return null;
+  }
+
+  const engagementId = engagement.id;
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const deleteMenuOpen = Boolean(deleteMenuAnchor);
@@ -100,55 +112,47 @@ export default function TaskPage(props) {
 
   const curTags = curTagsIds.map(tagId => ({
     id: Number(tagId),
-    name: tagsMap[tagId].name
+    name: tagsMap[Number(tagId)].name
   }));
 
   const handleCopyLink = () => {
-    window.navigator.clipboard.writeText(task.link_url);
+    window.navigator.clipboard.writeText(task.link_url || '');
     setCopyButtonText('Copied');
     setTimeout(() => {
       setCopyButtonText('Copy Link');
     }, 500);
   };
 
-  const handleClose = () => {
-    close();
-    setTimeout(() => {
-      descriptionTextarea.current.style.height = 'auto';
-      setFormErrors([]);
-    }, 500);
-  };
-
-  const handleCreateTag = async e => {
+  const handleCreateTag = async (e: React.KeyboardEvent<HTMLDivElement>) => {
     const key = e.key;
-    const newTagValue = e.target.value;
+    const newTagValue = (e.target as HTMLInputElement).value;
 
     if (key === 'Enter' && newTagValue) {
-      const result = await createTag({
+      const { success, tag, message }: { success: boolean, tag: Tag, message: string; } = await createTag({
         name: newTagValue,
         engagementId
       });
 
-      if (result.success) {
-        const newTag = result.tag;
+      if (success) {
+        const newTag = tag;
         setTags(tags => [...tags, newTag]);
         setSelectedTags(tags => [...tags, newTag]);
       } else {
-        openSnackBar(result.message, 'error');
+        openSnackBar(message, 'error');
       }
     }
   };
 
-  const handleStatusChange = status => {
+  const handleStatusChange = (status: string) => {
     setStatus(status);
     setStatusMenuAnchor(null);
   };
 
-  const handleIsKeyChange = (_, val) => {
+  const handleIsKeyChange = (_: React.ChangeEvent<HTMLInputElement>, val: boolean) => {
     setIsKeyTask(val);
   };
 
-  const handleTagsChange = (_, newTagsArray) => {
+  const handleTagsChange = (_: React.SyntheticEvent<Element, Event>, newTagsArray: Tag[]) => {
     setSelectedTags(newTagsArray);
   };
 
@@ -163,15 +167,15 @@ export default function TaskPage(props) {
     }
 
     if (errors.length) {
-      setFormErrors(errors);
+      //setFormErrors(errors);
       openSnackBar('Task name and folder are required.');
       return;
     }
 
-    if (dateDue && !dateDue.isValid()) {
-      openSnackBar('Due date is invalid.');
-      return;
-    }
+    // if (dateDue && !dateDue.isValid()) {
+    //   openSnackBar('Due date is invalid.');
+    //   return;
+    // }
 
     setLoading(true);
 
@@ -186,7 +190,7 @@ export default function TaskPage(props) {
         engagementId,
         tags: selectedTags,
         isKeyTask,
-        dateDue,
+        // dateDue,
         taskId: task.task_id,
         currentTags: curTags
       });
@@ -203,41 +207,40 @@ export default function TaskPage(props) {
           }
         }
 
-        const newTaskObject = {
-          task_id: task.task_id,
-          task_name: name,
-          description,
-          date_created: task.date_created,
-          created_by_id: task.created_by_id,
-          status: status,
-          folder_id: folderId,
-          link_url: linkUrl,
-          assigned_to_id: assignedToId,
-          date_completed: dateCompletedToSet,
-          is_key_task: Number(isKeyTask),
-          date_due: dateDue ? dateDue.toISOString() : null,
-          date_last_updated: now,
-          tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
-          assigned_first: assignedTo?.firstName || null,
-          assigned_last: assignedTo?.lastName || null,
-          created_first: task.created_first,
-          created_last: task.created_last,
-          updated_by_first: user.firstName,
-          updated_by_last: user.lastName
-        };
+        // const newTaskObject:Task = {
+        //   task_id: task.task_id,
+        //   task_name: name,
+        //   description,
+        //   date_created: task.date_created,
+        //   created_by_id: task.created_by_id,
+        //  // status: status,
+        //  // folder_id: folderId,
+        //   link_url: linkUrl,
+        //   assigned_to_id: assignedToId,
+        //   date_completed: dateCompletedToSet,
+        //  // is_key_task: Number(isKeyTask),
+        //  // date_due: dateDue ? dateDue.toISOString() : null,
+        //   date_last_updated: now,
+        //   tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
+        //   assigned_first: assignedTo?.firstName || null,
+        //   assigned_last: assignedTo?.lastName || null,
+        //   created_first: task.created_first,
+        //   created_last: task.created_last,
+        //   updated_by_first: user.firstName,
+        //   updated_by_last: user.lastName
+        // };
 
-        tasksMap[task.task_id] = newTaskObject;
+        // tasksMap[task.task_id] = newTaskObject;
         setTasks(Object.values(tasksMap));
         setLoading(false);
-        handleClose();
         openSnackBar('Task successfully updated.', 'success');
       } else {
         setLoading(false);
         openSnackBar(message, 'error');
       }
     } catch (error) {
-      setLoading(false);
-      openSnackBar(error.message, 'error');
+      // setLoading(false);
+      // openSnackBar(error.message, 'error');
     }
   };
 
@@ -256,7 +259,6 @@ export default function TaskPage(props) {
       if (success) {
         openSnackBar(`Successully deleted.`, 'success');
         delete tasksMap[task.task_id];
-        handleClose();
         setDeleteMenuAnchor(null);
         setDeleting(false);
         setTasks(Object.values(tasksMap));
@@ -265,30 +267,30 @@ export default function TaskPage(props) {
         setDeleting(false);
       }
     } catch (error) {
-      openSnackBar(error.message, 'error');
-      setDeleting(false);
+      // openSnackBar(error.message, 'error');
+      // setDeleting(false);
     }
   };
 
-  const handleNameChange = e => {
-    setName(e.target.value);
-    if (e.target.value && formErrors.includes('name')) {
-      setFormErrors(prev => prev.filter(er => er !== 'name'));
-    }
-  };
+  // const handleNameChange = e => {
+  //   setName(e.target.value);
+  //   if (e.target.value && formErrors.includes('name')) {
+  //     setFormErrors(prev => prev.filter(er => er !== 'name'));
+  //   }
+  // };
 
-  const handleFolderChange = (_, newVal) => {
-    setFolder(newVal);
-    if (newVal && formErrors.includes('folder')) {
-      setFormErrors(prev => prev.filter(er => er !== 'folder'));
-    }
-  };
+  // const handleFolderChange = (_, newVal) => {
+  //   setFolder(newVal);
+  //   if (newVal && formErrors.includes('folder')) {
+  //     setFormErrors(prev => prev.filter(er => er !== 'folder'));
+  //   }
+  // };
 
 
-  const handleEditNameClick = task => {
-    //  setEditingTask(task);
-    // setEditingName(true);
-  };
+  // const handleEditNameClick = task => {
+  //   //  setEditingTask(task);
+  //   // setEditingName(true);
+  // };
 
   return (
     <Grid item xs={12} md={8} style={{ margin: '0 auto' }}>
@@ -332,7 +334,8 @@ export default function TaskPage(props) {
             <Box
               className="name-text"
               width='100%'
-              onClick={() => handleEditNameClick(task)}>
+            //onClick={() => handleEditNameClick(task)}
+            >
               {task.task_name}
             </Box>
             {/* <TextField
@@ -363,8 +366,8 @@ export default function TaskPage(props) {
               cursor: isAdmin ? 'pointer' : 'unset'
             }}
             onDelete={isAdmin ? e => setStatusMenuAnchor(e.currentTarget) : () => { }}
-            className={task.status}>
-          </Chip>
+            className={task.status}
+          />
           <Menu
             anchorEl={statusMenuAnchor}
             open={statusMenuOpen}
@@ -412,7 +415,8 @@ export default function TaskPage(props) {
           <Box
             // className="name-text"
             width='100%'
-            onClick={() => handleEditNameClick(task)}>
+          //onClick={() => handleEditNameClick(task)}
+          >
             {
               !task.description ? <span style={{
                 color: palette.grey[400]
@@ -483,11 +487,11 @@ export default function TaskPage(props) {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={folder}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                onChange={handleFolderChange}
+                //onChange={handleFolderChange}
                 renderInput={(params) => (
                   <TextField
                     placeholder='Folder'
-                    error={formErrors.includes('folder')}
+                    // error={formErrors.includes('folder')}
                     {...params}
                     InputProps={{
                       ...params.InputProps,
@@ -512,7 +516,7 @@ export default function TaskPage(props) {
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.role}
+                groupBy={(option) => option.role || ''}
                 onChange={(_, val) => setAssignedTo(val)}
                 value={assignedTo}
                 renderInput={(params) => (
@@ -538,21 +542,23 @@ export default function TaskPage(props) {
               <DatePicker
                 disabled={isLoading}
                 readOnly={!isAdmin}
-                format="MM/DD/YYYY"
-                value={dateDue}
+                inputFormat="MM/DD/YYYY"
+                value={null}
                 InputProps={{
                   style: {
                     flexDirection: 'row-reverse'
                   }
                 }}
-                onChange={value => setDateDue(value)}
-                onAccept={value => setDateDue(value)}
+                //onChange={value => setDateDue(value)}
+                onChange={value => { }}
+                onAccept={value => { }}
+                //onAccept={value => setDateDue(value)}
                 renderInput={(params) => <TextField
                   {...params}
                   fullWidth
                   helperText='Date due'
                 />}
-              ></DatePicker>
+              />
             </LocalizationProvider>
           </Box>
         </Box>
@@ -569,7 +575,7 @@ export default function TaskPage(props) {
                 options={tags}
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
                 isOptionEqualToValue={(option, value) => option.name === value.name}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => option.name!}
                 filterSelectedOptions
                 disableCloseOnSelect
                 onKeyDown={handleCreateTag}
@@ -611,7 +617,7 @@ export default function TaskPage(props) {
   );
 };
 
-function NoTaskFoundMessage({ taskId }) {
+function NoTaskFoundMessage({ taskId }: { taskId: number; }) {
   return (
     <Grid item md={6} xs={12} style={{ margin: '0 auto' }}>
       <Paper style={{ textAlign: 'center' }}>
