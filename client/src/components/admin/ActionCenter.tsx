@@ -11,8 +11,21 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import { User } from "@shared/types/User";
 
-export default function ActionCenter(props) {
+type ActionCenterProps = {
+  openDrawer: (drawerType: string, props?: any) => void,
+  openDialog: (dialogType: string, props?: any) => void,
+  openModal: (modalType: string, props?: any) => void,
+  user: User,
+  isOrgOwner: boolean;
+};
+
+interface Actions {
+  [key: string]: React.ReactNode;
+}
+
+export default function ActionCenter(props: ActionCenterProps) {
   const {
     openDrawer,
     openDialog,
@@ -21,7 +34,7 @@ export default function ActionCenter(props) {
     isOrgOwner
   } = props;
 
-  const actions = {
+  const actions: Actions = {
     newEngagement:
       <Grow in key="newEngagement">
         <Paper
@@ -92,7 +105,7 @@ export default function ActionCenter(props) {
   return (
     <Box className="action-center">
       {
-        Object.keys(actions).map(action => pinnedActions.includes(action) ? actions[action] : null)
+        Object.keys(actions).map((action: keyof Actions) => pinnedActions.includes(String(action)) ? actions[action] : null)
       }
 
       <ActionMenu
@@ -108,8 +121,17 @@ export default function ActionCenter(props) {
   );
 };
 
+type ActionMenuProps = {
+  pinnedActions: string[],
+  setPinnedActions: React.Dispatch<React.SetStateAction<string[]>>,
+  openDrawer: ActionCenterProps['openDrawer'],
+  openDialog: ActionCenterProps['openDialog'],
+  isOrgOwner: ActionCenterProps['isOrgOwner'],
+  openModal: ActionCenterProps['openModal'],
+  user: ActionCenterProps['user'];
+};
 
-function ActionMenu(props) {
+function ActionMenu(props: ActionMenuProps) {
 
   const {
     pinnedActions,
@@ -121,10 +143,10 @@ function ActionMenu(props) {
     user
   } = props;
 
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -132,13 +154,13 @@ function ActionMenu(props) {
     setAnchorEl(null);
   };
 
-  const handlePinAction = (action, e) => {
+  const handlePinAction = (action: string, e: React.MouseEvent) => {
     e.stopPropagation();
     localStorage.setItem('pinnedActions', `${pinnedActions.join(',')},${action}`);
     setPinnedActions(prev => [...prev, action]);
   };
 
-  const handleUnpinAction = (action, e) => {
+  const handleUnpinAction = (action: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const newPinnedActions = pinnedActions.filter(ac => action !== ac);
     localStorage.setItem('pinnedActions', newPinnedActions.join(','));

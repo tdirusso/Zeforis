@@ -2,18 +2,34 @@ import Chart from "react-apexcharts";
 import moment from 'moment';
 import { useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
-import apexchart from "apexcharts";
+import apexchart, { ApexOptions } from "apexcharts";
+import { AppContext } from "src/types/AppContext";
 
 const _2weekFromNowStart = moment().add(2, 'weeks').startOf('week');
 const _3weekFromNowStart = moment().add(3, 'weeks').startOf('week');
 const _4weekFromNowStart = moment().add(4, 'weeks').startOf('week');
 const _5weekFromNowStart = moment().add(5, 'weeks').startOf('week');
 
-export default function UpcomingBreakdownChart(props) {
+type UpcomingBreakdownChartProps = {
+  statusColors: string[],
+  statusCount: {
+    [key: string]: {
+      dueThisWeek: number,
+      due1Week: number,
+      due2Week: number,
+      due3Week: number,
+      due4Week: number,
+      due5Week: number;
+    };
+  },
+  theme: string;
+};
+
+export default function UpcomingBreakdownChart(props: UpcomingBreakdownChartProps) {
 
   const {
     org
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const {
     statusColors,
@@ -21,7 +37,7 @@ export default function UpcomingBreakdownChart(props) {
     theme
   } = props;
 
-  const options = {
+  const options: ApexOptions = {
     plotOptions: {
       bar: {
         borderRadius: 7,
@@ -76,11 +92,11 @@ export default function UpcomingBreakdownChart(props) {
       }
     },
     theme: {
-      mode: theme
+      mode: theme === 'dark' ? 'dark' : 'light'
     }
   };
 
-  options.colors = org.brandColor;
+  options.colors = [org.brandColor];
 
   useEffect(() => {
     if (statusColors && statusCount) {

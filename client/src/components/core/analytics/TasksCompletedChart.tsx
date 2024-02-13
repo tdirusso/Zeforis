@@ -2,21 +2,27 @@ import Chart from "react-apexcharts";
 import moment from 'moment';
 import { useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
-import apexchart from "apexcharts";
+import apexchart, { ApexOptions } from "apexcharts";
+import { AppContext } from "src/types/AppContext";
 
 const _5weeksAgoStart = moment().subtract(5, 'weeks').startOf('week');
 const _4weeksAgoStart = moment().subtract(4, 'weeks').startOf('week');
 const _3weeksAgoStart = moment().subtract(3, 'weeks').startOf('week');
 const _2weeksAgoStart = moment().subtract(2, 'weeks').startOf('week');
 
-export default function TasksCompletedChart({ series, theme }) {
+type TasksCompletedChartProps = {
+  theme: string,
+  series: number[];
+};
+
+export default function TasksCompletedChart({ series, theme }: TasksCompletedChartProps) {
 
   const {
     org
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
 
-  const options = {
+  const options: ApexOptions = {
     series: [
       {
         name: 'Tasks completed',
@@ -65,7 +71,7 @@ export default function TasksCompletedChart({ series, theme }) {
       }
     },
     theme: {
-      mode: theme
+      mode: theme === 'dark' ? 'dark' : 'light'
     },
     plotOptions: {
       bar: {
@@ -86,7 +92,7 @@ export default function TasksCompletedChart({ series, theme }) {
     }
   };
 
-  options.colors = org.brandColor;
+  options.colors = [org.brandColor];
 
   useEffect(() => {
     apexchart.exec('tasks-completed', 'updateSeries', [{ data: series }]);

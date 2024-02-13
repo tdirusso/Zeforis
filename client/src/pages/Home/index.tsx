@@ -426,7 +426,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
             />
 
             {
-              isAdmin ?
+              user && isAdmin ?
                 <ActionCenter
                   openDialog={openDialog}
                   openDrawer={openDrawer}

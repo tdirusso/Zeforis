@@ -1,9 +1,19 @@
 import Chart from "react-apexcharts";
 import { useEffect } from "react";
-import apexchart from "apexcharts";
+import apexchart, { ApexOptions } from "apexcharts";
 import '../styles/analytics.scss';
 
-export default function StatusBreakdownChart(props) {
+type StatusBreakdownChartProps = {
+  statusColors: string[],
+  statusCount: {
+    [key: string]: {
+      total: number;
+    };
+  },
+  theme: string;
+};
+
+export default function StatusBreakdownChart(props: StatusBreakdownChartProps) {
 
   const {
     statusColors,
@@ -11,7 +21,7 @@ export default function StatusBreakdownChart(props) {
     theme
   } = props;
 
-  const options = {
+  const options: ApexOptions = {
     series: [
       {
         data: []
@@ -57,7 +67,7 @@ export default function StatusBreakdownChart(props) {
       }
     }],
     theme: {
-      mode: theme
+      mode: theme === 'dark' ? 'dark' : 'light'
     }
   };
 
