@@ -8,6 +8,8 @@ import { createWidget, deleteWidget, updateWidget } from "../../../api/widgets";
 import './styles.scss';
 import Quill from "quill";
 import ImageCompress from 'quill-image-compress';
+import { AppContext } from "src/types/AppContext";
+import { Widget } from "@shared/types/Widget";
 
 export default function WidgetsTab() {
 
@@ -16,18 +18,18 @@ export default function WidgetsTab() {
     openSnackBar,
     widgets,
     setWidgets
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const [widgetName, setWidgetName] = useState('');
   const [widgetBody, setWidgetBody] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-  const [bgColorMenu, setBgColorMenu] = useState(null);
+  const [bgColorMenu, setBgColorMenu] = useState<HTMLDivElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [deleteMenuAnchor, setDeleteMenuAnchor] = useState(null);
-  const [selectedWidget, setSelectedWidget] = useState(null);
+  const [deleteMenuAnchor, setDeleteMenuAnchor] = useState<HTMLButtonElement | null>(null);
+  const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
 
-  const widgetEditor = useRef();
+  const widgetEditor = useRef<Element>(null);
 
   const bgColorMenuOpen = Boolean(bgColorMenu);
 
@@ -36,38 +38,40 @@ export default function WidgetsTab() {
   useEffect(() => {
     Quill.register('modules/imageCompress', ImageCompress);
 
-    window.quillEditor = new Quill(widgetEditor.current, {
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline'],
-          ['link', 'image'],
-          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-          [{ 'align': [] }],
-          [{ 'color': [] }, { 'background': [] }],
-        ],
-        imageCompress: {
-          quality: 0.7,
-          maxWidth: 250,
-          maxHeight: 200,
-          imageType: 'image/jpeg',
-          debug: false,
-          suppressErrorLogging: true,
-          insertIntoEditor: undefined,
-        }
-      },
-      placeholder: 'Compose your widget...',
-      theme: 'snow'
-    });
+    if (widgetEditor.current) {
+      window.quillEditor = new Quill(widgetEditor.current, {
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            ['link', 'image'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'align': [] }],
+            [{ 'color': [] }, { 'background': [] }],
+          ],
+          imageCompress: {
+            quality: 0.7,
+            maxWidth: 250,
+            maxHeight: 200,
+            imageType: 'image/jpeg',
+            debug: false,
+            suppressErrorLogging: true,
+            insertIntoEditor: undefined,
+          }
+        },
+        placeholder: 'Compose your widget...',
+        theme: 'snow'
+      });
 
-    window.quillEditor.on('text-change', () => {
-      setWidgetBody(window.quillEditor.root.innerHTML);
-    });
+      window.quillEditor.on('text-change', () => {
+        setWidgetBody(window.quillEditor.root.innerHTML);
+      });
+    }
   }, []);
 
   useEffect(() => {
     if (selectedWidget) {
-      if (selectedWidget.id === 'new') {
+      if (selectedWidget.id === -1) {
         setWidgetName('');
         setWidgetBody('');
         setBackgroundColor('#FFFFFF');
@@ -75,7 +79,7 @@ export default function WidgetsTab() {
         window.quillEditor.root.innerHTML = '';
       } else {
         setWidgetName(selectedWidget.name);
-        setWidgetBody(selectedWidget.body);
+        setWidgetBody(selectedWidget.body || '');
         setBackgroundColor(selectedWidget.backgroundColor);
         setIsEnabled(Boolean(selectedWidget.isEnabled));
         window.quillEditor.clipboard.dangerouslyPasteHTML(selectedWidget.body);
@@ -109,15 +113,22 @@ export default function WidgetsTab() {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleUpdateWidget = async () => {
     if (!widgetName) {
       openSnackBar('Please enter a name for the widget.');
+      return;
+    }
+
+    if (!selectedWidget) {
+      openSnackBar('Please select a widget to edit.');
       return;
     }
 
@@ -151,13 +162,20 @@ export default function WidgetsTab() {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleDeleteWidget = async () => {
+    if (!selectedWidget) {
+      openSnackBar('No widget selected.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -177,9 +195,11 @@ export default function WidgetsTab() {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
@@ -202,7 +222,13 @@ export default function WidgetsTab() {
               <ListSubheader className="px0">
                 <ListItemButton
                   disabled={loading}
-                  onClick={() => setSelectedWidget({ id: 'new' })}>
+                  onClick={() => setSelectedWidget({
+                    id: -1,
+                    engagementId: engagement.id,
+                    name: '',
+                    backgroundColor: '#ffffff',
+                    isEnabled: true
+                  })}>
                   <ListItemText style={{ color: '#bebebe' }}>
                     + New Widget
                   </ListItemText>
@@ -240,8 +266,8 @@ export default function WidgetsTab() {
                     disabled={loading}
                     checked={isEnabled}
                     onChange={(_, val) => setIsEnabled(val)} />}
-                  label="Enabled">
-                </FormControlLabel>
+                  label="Enabled"
+                />
               </FormGroup>
             </Box>
             <Box mb={2}>
@@ -281,11 +307,11 @@ export default function WidgetsTab() {
               <LoadingButton
                 size="large"
                 loading={loading}
-                onClick={selectedWidget?.id === 'new' ? handleCreateWidget : handleUpdateWidget}
+                onClick={selectedWidget?.id === -1 ? handleCreateWidget : handleUpdateWidget}
                 variant="contained">
                 Save
               </LoadingButton>
-              <Tooltip title="Delete Widget" hidden={selectedWidget?.id === 'new'}>
+              <Tooltip title="Delete Widget" hidden={selectedWidget?.id === -1}>
                 <IconButton
                   onClick={e => setDeleteMenuAnchor(e.currentTarget)}
                   disabled={loading}

@@ -8,7 +8,7 @@ import Select from '@mui/material/Select';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import moment from "moment";
+import moment, { Moment } from "moment";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -16,30 +16,50 @@ import Checkbox from '@mui/material/Checkbox';
 import { statuses } from "../../../lib/constants";
 import { useOutletContext } from "react-router-dom";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { AppContext } from "src/types/AppContext";
+import { Task } from "@shared/types/Task";
 
 const statusesArray = statuses.map(({ name }) => name);
+
+type MainTaskCondition =
+  | ((taskDateDue: string | null) => boolean) // For 'date-due' case
+  | ((_: string | null, taskDateUpdated: string | null) => boolean) // For 'date-updated' case
+  | ((taskDateDue: string | null, taskDateUpdated: string) => boolean);
+
+type ReportData = {
+  statusToTaskMap: {
+    [key: string]: Task[];
+  },
+  start: Moment,
+  end: Moment,
+  displayDescription?: boolean;
+};
 
 export default function ReportGeneratorTab() {
 
   const [isLoading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState('this-week');
   const [taskCriteria, setTaskCriteria] = useState('date-due');
-  const [dateRangeStart, setDateRangeStart] = useState(null);
-  const [dateRangeEnd, setDateRangeEnd] = useState(null);
-  const [dateMinRangeEnd, setDateMinRangeEnd] = useState(null);
+  const [dateRangeStart, setDateRangeStart] = useState<Moment | null>(moment());
+  const [dateRangeEnd, setDateRangeEnd] = useState<Moment | null>(moment().add(7, 'days'));
+  const [dateMinRangeEnd, setDateMinRangeEnd] = useState<Moment | null>(moment().add(1, 'days'));
   const [includeStatuses, setIncludeStatuses] = useState(statusesArray);
   const [includeDescriptions, setIncludeDescriptions] = useState(true);
-  const [reportData, setReportData] = useState(null);
+  const [reportData, setReportData] = useState<ReportData>({
+    statusToTaskMap: {},
+    start: moment(),
+    end: moment().add(7, 'days'),
+  });
   const [isComplete, setComplete] = useState(false);
 
   const {
     openSnackBar,
     tasks
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const generateReport = () => {
-    let momentRangeStart;
-    let momentRangeEnd;
+    let momentRangeStart: Moment;
+    let momentRangeEnd: Moment;
 
     if (dateRange === 'custom') {
       momentRangeStart = moment(dateRangeStart);
@@ -64,27 +84,27 @@ export default function ReportGeneratorTab() {
 
     setLoading(true);
 
-    let mainTaskCondition;
+    let mainTaskCondition: MainTaskCondition;
 
     switch (taskCriteria) {
       case 'date-due':
-        mainTaskCondition = (taskDateDue) =>
-          taskDateDue && moment(taskDateDue).isBetween(momentRangeStart, momentRangeEnd);
+        mainTaskCondition = (taskDateDue: string | null) =>
+          Boolean(taskDateDue && moment(taskDateDue).isBetween(momentRangeStart, momentRangeEnd));
         break;
       case 'date-updated':
-        mainTaskCondition = (_, taskDateUpdated) =>
-          taskDateUpdated && moment(taskDateUpdated).isBetween(momentRangeStart, momentRangeEnd);
+        mainTaskCondition = (_: string | null, taskDateUpdated: string) =>
+          Boolean(taskDateUpdated && moment(taskDateUpdated).isBetween(momentRangeStart, momentRangeEnd));
         break;
       case 'both':
-        mainTaskCondition = (taskDateDue, taskDateUpdated) =>
-          (taskDateDue && moment(taskDateDue).isBetween(momentRangeStart, momentRangeEnd)) ||
-          (taskDateUpdated && moment(taskDateUpdated).isBetween(momentRangeStart, momentRangeEnd));
+        mainTaskCondition = (taskDateDue: string | null, taskDateUpdated: string) =>
+          Boolean((taskDateDue && moment(taskDateDue).isBetween(momentRangeStart, momentRangeEnd)) ||
+            (taskDateUpdated && moment(taskDateUpdated).isBetween(momentRangeStart, momentRangeEnd)));
         break;
       default:
         break;
     }
 
-    const statusToTaskMap = {};
+    const statusToTaskMap: { [key: string]: Task[]; } = {};
 
     const filteredStatuses = statuses.filter(({ name }) => includeStatuses.includes(name)).reverse();
 
@@ -110,8 +130,8 @@ export default function ReportGeneratorTab() {
     }, 1000);
   };
 
-  const handleDateRangeStartChange = momentEvent => {
-    if (momentEvent?._isValid) {
+  const handleDateRangeStartChange = (momentEvent: Moment | null) => {
+    if (momentEvent?.isValid()) {
       setDateMinRangeEnd(moment(momentEvent).add(1, 'days'));
     }
     setDateRangeStart(momentEvent);
@@ -152,7 +172,7 @@ export default function ReportGeneratorTab() {
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
                   disabled={isLoading}
-                  format="MM/DD/YYYY"
+                  inputFormat="MM/DD/YYYY"
                   value={dateRangeStart}
                   onChange={handleDateRangeStartChange}
                   renderInput={(params) => <TextField
@@ -163,7 +183,7 @@ export default function ReportGeneratorTab() {
                 ></DatePicker>
                 <DatePicker
                   disabled={isLoading}
-                  format="MM/DD/YYYY"
+                  inputFormat="MM/DD/YYYY"
                   value={dateRangeEnd}
                   minDate={dateMinRangeEnd}
                   onChange={value => setDateRangeEnd(value)}
@@ -232,7 +252,13 @@ export default function ReportGeneratorTab() {
                 label="Choose statuses"
                 labelId="to-label"
                 multiple
-                onChange={e => setIncludeStatuses(e.target.value)}
+                onChange={e => {
+                  if (typeof e.target.value === 'string') {
+                    setIncludeStatuses([e.target.value]);
+                  } else {
+                    setIncludeStatuses(e.target.value);
+                  }
+                }}
                 disabled={isLoading}>
                 {
                   statuses.map(({ name }) =>
@@ -278,7 +304,12 @@ export default function ReportGeneratorTab() {
   );
 };
 
-function ReportDataPage(props) {
+type ReportDataPageProps = {
+  reportData: ReportData,
+  setComplete: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function ReportDataPage(props: ReportDataPageProps) {
   const {
     setComplete,
     reportData: {
@@ -289,25 +320,27 @@ function ReportDataPage(props) {
     }
   } = props;
 
-  const reportContainer = useRef();
+  const reportContainer = useRef<HTMLDivElement>(null);
   const [copyButtonText, setCopyButtonText] = useState('Copy Report');
 
   const {
     org,
     engagement
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const copyReport = async () => {
-    await window.navigator.clipboard.write([
-      new ClipboardItem({
-        'text/html': new Blob([reportContainer.current.innerHTML], { type: 'text/html' }),
-        'text/plain': new Blob([reportContainer.current.innerHTML], { type: 'text/plain' })
-      })
-    ]);
-    setCopyButtonText('Copied!');
-    setTimeout(() => {
-      setCopyButtonText('Copy Report');
-    }, 750);
+    if (reportContainer.current) {
+      await window.navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([reportContainer.current.innerHTML], { type: 'text/html' }),
+          'text/plain': new Blob([reportContainer.current.innerHTML], { type: 'text/plain' })
+        })
+      ]);
+      setCopyButtonText('Copied!');
+      setTimeout(() => {
+        setCopyButtonText('Copy Report');
+      }, 750);
+    }
   };
 
   return (
@@ -372,7 +405,6 @@ function ReportDataPage(props) {
                     </Box>
                   );
                 }
-
                 return null;
               })
             }

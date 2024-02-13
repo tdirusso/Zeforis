@@ -1,6 +1,7 @@
 declare module '*.jpg';
 declare module '*.png';
 declare module '*.gif';
+declare module '*.csv';
 
 interface Window {
   google?: {
@@ -10,7 +11,8 @@ interface Window {
   VANTA?: {
     TOPOLOGY: any;
   },
-  updateOpenFolderStates?: NodeJS.Timeout;
+  updateOpenFolderStates?: NodeJS.Timeout,
+  quillEditor?: any;
 }
 
 namespace StateSetters {

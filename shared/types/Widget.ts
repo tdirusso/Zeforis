@@ -1,7 +1,7 @@
 export type Widget = {
   readonly id: number,
   readonly engagementId: number,
-  name?: string;
+  name: string;
   body?: string,
   isEnabled: boolean,
   backgroundColor: string;

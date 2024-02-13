@@ -4,20 +4,21 @@ import { useOutletContext } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import { useEffect, useRef, useState } from "react";
 import moment from 'moment';
+import { AppContext } from "src/types/AppContext";
 
 export default function ExportTab() {
 
-  const [csvData, setCsvData] = useState('');
+  const [csvData, setCsvData] = useState<string[][]>([[]]);
   const [loading, setLoading] = useState(false);
 
-  const downloadRef = useRef();
+  const downloadRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement; }>(null);
 
   const {
     tasks,
     engagement,
     foldersMap,
     tagsMap
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const handleExport = () => {
     setLoading(true);
@@ -46,8 +47,8 @@ export default function ExportTab() {
         status,
         link_url,
         assigned_to_id,
-        assigned_to_first,
-        assigned_to_last,
+        assigned_first,
+        assigned_last,
         tags,
         is_key_task,
         created_first,
@@ -65,8 +66,8 @@ export default function ExportTab() {
         status,
         description || '',
         link_url || '',
-        assigned_to_id ? `${assigned_to_first} ${assigned_to_last}` : '',
-        tags?.split(',').map(tagId => tagsMap[tagId]?.name || '').join(', ') || '',
+        assigned_to_id ? `${assigned_first} ${assigned_last}` : '',
+        tags?.split(',').map(tagId => tagsMap[Number(tagId)]?.name || '').join(', ') || '',
         is_key_task ? 'Yes' : 'No',
         `${created_first} ${created_last}`,
         date_due ? moment(date_due).format('MM/DD/YYYY') : '',
@@ -82,7 +83,7 @@ export default function ExportTab() {
 
   useEffect(() => {
     if (csvData) {
-      downloadRef.current.link.click();
+      downloadRef.current?.link.click();
     }
   }, [csvData]);
 

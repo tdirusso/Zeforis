@@ -8,7 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { statuses } from "../../../lib/constants";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Papa from "papaparse";
@@ -19,9 +19,37 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useOutletContext } from "react-router-dom";
 import { importTasks } from "../../../api/tasks";
 import './styles.scss';
+import { AppContext } from "src/types/AppContext";
 
 const statusesString = statuses.map(({ name }) => name).join(', ');
 const statusesSet = new Set(statuses.map(({ name }) => name.toLowerCase()));
+
+type ImportRow = {
+  name: string,
+  description: string,
+  status: string,
+  folder: string,
+  tagsArray: string[],
+  url: string,
+  isKeyTask: string;
+};
+
+type ImportData = {
+  errors: string[],
+  tagsToCreate?: string[],
+  foldersToCreate?: Set<string>,
+  importRows?: ImportRow[];
+};
+
+type TaskRow = {
+  name: string,
+  folder: string,
+  description: string,
+  status: string,
+  url: string,
+  is_key_task: string,
+  tags: string;
+};
 
 export default function ImportTab() {
 
@@ -30,31 +58,36 @@ export default function ImportTab() {
     folders,
     openSnackBar,
     engagement
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const engagementId = engagement.id;
 
-  const [importData, setImportData] = useState(null);
+  const [importData, setImportData] = useState<ImportData>({
+    errors: [],
+    tagsToCreate: [],
+    foldersToCreate: new Set(),
+    importRows: []
+  });
   const [createNewFolders, setCreateNewFolders] = useState(true);
   const [createNewTags, setCreateNewTags] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const [folderNames] = useState(new Set(folders.map(({ name }) => name)));
   const [tagNames] = useState(new Set(tags.map(({ name }) => name)));
-  const [csvData, setCsvData] = useState(null);
+  const [csvData, setCsvData] = useState<Papa.ParseResult<TaskRow> | null>(null);
 
-  const fileRef = useRef();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (csvData) {
-      const errors = [];
+      const errors: string[] = [];
 
       const { meta, data } = csvData;
 
-      if (!meta.fields.includes('name')) {
+      if (!meta?.fields?.includes('name')) {
         errors.push('Uploaded file does not contain a "name" header column.');
       }
 
-      if (!meta.fields.includes('folder')) {
+      if (!meta?.fields?.includes('folder')) {
         errors.push('Uploaded file does not contain a "folder" header column.');
       }
 
@@ -63,9 +96,9 @@ export default function ImportTab() {
         return;
       }
 
-      const tagsToCreate = [];
-      const foldersToCreate = new Set();
-      const importRows = [];
+      const tagsToCreate: string[] = [];
+      const foldersToCreate = new Set<string>();
+      const importRows: ImportRow[] = [];
 
       data.forEach((row, index) => {
         let name = row.name?.trim();
@@ -100,7 +133,7 @@ export default function ImportTab() {
           if (createNewTags) {
             tagsArray.forEach(tag => {
               if (!tagNames.has(tag)) {
-                tagsToCreate.push(row.folder);
+                tagsToCreate.push(tag);
               }
             });
           } else {
@@ -133,13 +166,12 @@ export default function ImportTab() {
   }, [csvData, createNewFolders, createNewTags]);
 
   const handleImport = async () => {
-
-    if (!importData || importData.importRows.length === 0) {
+    if (!importData || importData.importRows?.length === 0) {
       openSnackBar('Please upload a file with more than 1 task to import.');
       return;
     }
 
-    if (importData.errors.length > 0) {
+    if (importData.errors?.length > 0) {
       openSnackBar('Please resolve the errors displayed in the preview.');
       return;
     }
@@ -161,18 +193,20 @@ export default function ImportTab() {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
 
   };
 
-  const handleFileChange = e => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
 
     if (file) {
-      Papa.parse(file, {
+      Papa.parse<TaskRow>(file, {
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
@@ -306,7 +340,11 @@ export default function ImportTab() {
           <Button
             size="large"
             variant="outlined"
-            onClick={() => fileRef.current.value = null}
+            onClick={() => {
+              if (fileRef.current) {
+                fileRef.current.value = '';
+              }
+            }}
             startIcon={<UploadFileIcon />}
             disabled={isLoading}
             component="label">
@@ -345,7 +383,7 @@ export default function ImportTab() {
   );
 };
 
-function ImportData({ importData }) {
+function ImportData({ importData }: { importData: ImportData; }) {
 
   const {
     errors,
@@ -384,9 +422,9 @@ function ImportData({ importData }) {
       </Typography>
       <Box>
         <ul>
-          <li style={{ color: '#4caf50' }}><b>{importRows.length} tasks</b> will be imported</li>
-          <li style={{ color: '#4caf50' }}><b>{foldersToCreate.size} folders</b> will be created</li>
-          <li style={{ color: '#4caf50' }}><b>{tagsToCreate.length} tags</b> will be created</li>
+          <li style={{ color: '#4caf50' }}><b>{importRows?.length} tasks</b> will be imported</li>
+          <li style={{ color: '#4caf50' }}><b>{foldersToCreate?.size} folders</b> will be created</li>
+          <li style={{ color: '#4caf50' }}><b>{tagsToCreate?.length} tags</b> will be created</li>
         </ul>
       </Box>
     </Box>
