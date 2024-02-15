@@ -227,7 +227,8 @@ export default function WidgetsTab() {
                     engagementId: engagement.id,
                     name: '',
                     backgroundColor: '#ffffff',
-                    isEnabled: true
+                    isEnabled: true,
+                    body: ''
                   })}>
                   <ListItemText style={{ color: '#bebebe' }}>
                     + New Widget

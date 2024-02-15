@@ -2,15 +2,20 @@ import { Paper, Grid, Divider, Tooltip, IconButton, Grow, Collapse } from "@mui/
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import React, { useState } from "react";
 import './styles.scss';
+import { Widget } from "@shared/types/Widget";
 
-export default function Widgets({ widgets }) {
+type WidgetsProps = {
+  widgets: Widget[];
+};
+
+export default function Widgets({ widgets }: WidgetsProps) {
   const showDashboardWidgetsValue = localStorage.getItem('showDashboardWidgets');
   const showWidgetsOnLoad = showDashboardWidgetsValue === null || showDashboardWidgetsValue === 'true';
 
   const [expanded, setExpanded] = useState(showWidgetsOnLoad);
 
   const toggleWidgets = () => {
-    localStorage.setItem('showDashboardWidgets', !expanded);
+    localStorage.setItem('showDashboardWidgets', String(!expanded));
     setExpanded(!expanded);
   };
 

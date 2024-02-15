@@ -3,8 +3,14 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import './styles.scss';
+import { Task } from "@shared/types/Task";
+import { AppContext } from "src/types/AppContext";
 
-export default function KeyTasks({ tasks }) {
+type KeyTasksProps = {
+  tasks: Task[];
+};
+
+export default function KeyTasks({ tasks }: KeyTasksProps) {
   const tasksLength = tasks.length;
 
   const theme = useTheme();
@@ -59,17 +65,32 @@ function NoKeyTasksMessage() {
   );
 }
 
-const KeyTasksList = ({ tasks, buttonColor }) => tasks.map(task =>
-  <KeyTaskRow
-    buttonColor={buttonColor}
-    task={task}
-    key={task.task_id} />
-);
+type KeyTasksListProps = {
+  tasks: Task[],
+  buttonColor: string;
+};
 
-function KeyTaskRow({ task, buttonColor }) {
+const KeyTasksList = ({ tasks, buttonColor }: KeyTasksListProps) =>
+  <>
+    {
+      tasks.map(task =>
+        <KeyTaskRow
+          buttonColor={buttonColor}
+          task={task}
+          key={task.task_id} />
+      )
+    }
+  </>;
+
+type KeyTaskRowProps = {
+  task: Task,
+  buttonColor: string;
+};
+
+function KeyTaskRow({ task, buttonColor }: KeyTaskRowProps) {
   const {
     openDrawer
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
 

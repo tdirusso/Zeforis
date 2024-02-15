@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { ContextMenuProps } from ".";
 
-export default function TaskContextMenu(props) {
+export default function TaskContextMenu(props: ContextMenuProps) {
   const {
-    close,
+    closeContextMenu,
     isOpen,
     mouseCoords,
     openDrawer,
@@ -23,21 +24,21 @@ export default function TaskContextMenu(props) {
         left: mouseCoords.x
       }}
       anchorReference="anchorPosition"
-      open={isOpen}
+      open={Boolean(isOpen)}
       onClose={() => {
-        close();
+        closeContextMenu();
       }}>
       <MenuItem
         dense
         onClick={() => {
-          openDrawer('task', { taskProp: task });
-          close();
+          openDrawer && openDrawer('task', { taskProp: task });
+          closeContextMenu();
         }}>
         <EastRoundedIcon fontSize="small" />
         Quick view
       </MenuItem>
       <MenuItem
-        onClick={close}
+        onClick={closeContextMenu}
         style={{ color: 'inherit' }}
         dense
         component={Link}
@@ -51,7 +52,7 @@ export default function TaskContextMenu(props) {
           <Box>
             <MenuItem
               onClick={() => {
-                close();
+                closeContextMenu();
               }}
               style={{ color: 'inherit' }}
               dense
@@ -70,8 +71,8 @@ export default function TaskContextMenu(props) {
       <MenuItem
         dense
         onClick={() => {
-          openModal('delete-tasks', { taskIds: [task.task_id] });
-          close();
+          openModal && openModal('delete-tasks', { taskIds: [task.task_id] });
+          closeContextMenu();
         }}>
         <ListItemText
           inset

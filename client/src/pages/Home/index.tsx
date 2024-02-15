@@ -418,7 +418,6 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
             />
 
             <ContextMenus
-              {...context}
               contextMenuProps={contextMenuProps}
               mouseCoords={mouseCoords}
               contextMenuToOpen={contextMenuToOpen}

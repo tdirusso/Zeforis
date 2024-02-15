@@ -4,7 +4,15 @@ import CheckIcon from '@mui/icons-material/Check';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import CountUp from 'react-countup';
 
-export default function TaskStats({ analyticsData }) {
+type TaskStatsProps = {
+  analyticsData: {
+    numTasksInProgress: number,
+    numTasksCompleted: number,
+    numTasksPastDue: number;
+  };
+};
+
+export default function TaskStats({ analyticsData }: TaskStatsProps) {
 
   const {
     numTasksInProgress = 0,

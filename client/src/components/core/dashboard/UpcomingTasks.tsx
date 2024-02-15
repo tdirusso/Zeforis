@@ -2,11 +2,17 @@ import { Box, Paper, Typography, Button, Grid, Chip, Tooltip, IconButton, useMed
 import { useNavigate, useOutletContext } from "react-router-dom";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import { Task } from "@shared/types/Task";
+import { AppContext } from "src/types/AppContext";
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export default function UpcomingTasks({ tasks }) {
+type UpcomingTasksProps = {
+  tasks: Task[];
+};
+
+export default function UpcomingTasks({ tasks }: UpcomingTasksProps) {
   const tasksLength = tasks.length;
 
   const navigate = useNavigate();
@@ -61,15 +67,27 @@ function NoUpcomingTasksMessage() {
   );
 }
 
-const UpcomingTasksList = ({ tasks, buttonColor }) => tasks.map(task =>
-  <UpcomingTaskRow task={task} key={task.task_id} buttonColor={buttonColor}
-  />
-);
+type UpcomingTasksListProps = {
+  tasks: Task[],
+  buttonColor: string;
+};
 
-function UpcomingTaskRow({ task, buttonColor }) {
+const UpcomingTasksList = ({ tasks, buttonColor }: UpcomingTasksListProps) =>
+  <>
+    {
+      tasks.map(task =>
+        <UpcomingTaskRow task={task} key={task.task_id} buttonColor={buttonColor}
+        />
+      )
+    }
+  </>;
+
+
+
+function UpcomingTaskRow({ task, buttonColor }: { task: Task, buttonColor: string; }) {
   const {
     openDrawer
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
 
@@ -79,7 +97,7 @@ function UpcomingTaskRow({ task, buttonColor }) {
     taskName = taskName.substring(0, 40) + '...';
   }
 
-  const dateDue = new Date(task.date_due);
+  const dateDue = new Date(task.date_due || '');
   const dateDueDay = days[dateDue.getDay()];
   const dateDueMonth = months[dateDue.getMonth()];
 
