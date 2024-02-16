@@ -39,7 +39,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   let activeOrgId = getActiveOrgId();
   let activeEngagementId = getActiveEngagementId();
 
-  const { user, authError, setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const [isDataFetched, setDataFetched] = useState(false);
   const [isReadyToRender, setReadyToRender] = useState(false);
   const [engagement, setEngagement] = useState<Engagement | null>(null);
@@ -66,7 +66,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
     openSnackBar,
     type,
     message,
-    snackBarProps
+    snackbarProps
   } = useSnackbar();
 
   const {
@@ -148,10 +148,8 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
       }
 
       setTriedOrgAndEngagement(true);
-    } else if (authError) {
-      openSnackBar(authError, 'error');
     }
-  }, [user, authError]);
+  }, [user]);
 
   useEffect(() => {
     if (triedOrgAndEngagement) {
@@ -280,9 +278,6 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
     } else {
       return (
         <ChooseOrgScreen
-          open={true}
-          setOpen={() => { }}
-          orgs={user.memberOfOrgs}
           user={user}
         />
       );
@@ -366,7 +361,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   return (
     <Box>
       <SideNav
-        org={org}
+        org={org!}
         engagement={engagement}
         isSideNavOpen={isSideNavOpen}
         isAdmin={isAdmin}
@@ -383,9 +378,8 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
           }}>
           <Grid container spacing={3}>
             <Header
-              isAdmin={isAdmin}
-              user={user}
-              org={org}
+              user={user!}
+              org={org!}
               engagement={engagement}
               openModal={openModal}
               openDrawer={openDrawer}
@@ -393,7 +387,6 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
               toggleSideNav={toggleSideNav}
               isSideNavOpen={isSideNavOpen}
               setTheme={setTheme}
-              isOrgOwner={isOrgOwner}
             />
 
             <Modals
@@ -445,7 +438,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
         isOpen={isOpen}
         type={type}
         message={message}
-        snackBarProps={snackBarProps}
+        snackbarProps={snackbarProps}
       />
     </Box>
   );

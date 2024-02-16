@@ -1,10 +1,11 @@
+import { AlertColor } from '@mui/material';
 import { useState, useEffect } from 'react';
 
 export default function useSnackbar() {
   const [isOpen, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [type, setType] = useState('');
-  const [snackBarProps, setSnackBarProps] = useState({});
+  const [type, setType] = useState<AlertColor>('warning');
+  const [snackbarProps, setSnackbarProps] = useState({});
 
   useEffect(() => {
     if (isOpen === true) {
@@ -14,10 +15,10 @@ export default function useSnackbar() {
     }
   }, [isOpen]);
 
-  const openSnackBar = (message = 'Something went wrong...', type = 'warning', options = {}) => {
+  const openSnackBar = (message = 'Something went wrong...', type: AlertColor = 'warning', options = {}) => {
     setMessage(message);
     setType(type);
-    setSnackBarProps(options);
+    setSnackbarProps(options);
     setOpen(true);
   };
 
@@ -25,7 +26,7 @@ export default function useSnackbar() {
     isOpen,
     message,
     type,
-    snackBarProps,
+    snackbarProps,
     openSnackBar
   };
 };

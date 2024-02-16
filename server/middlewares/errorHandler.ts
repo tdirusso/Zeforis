@@ -6,7 +6,13 @@ import { NextFunction, Request, Response } from 'express';
 
 export default async function errorHandler(error: unknown, _: Request, res: Response, __: NextFunction) {
   if (error instanceof Error) {
-    if (!(error instanceof TokenExpiredError || error.message?.includes('Range Not Satisfiable'))) {
+    if (error instanceof TokenExpiredError) {
+      return res.status(401).json({
+        message: 'Session expired.'
+      });
+    }
+
+    if (!error.message?.includes('Range Not Satisfiable')) {
       console.error('Application error:', error);
       await handleServerError(error);
     }

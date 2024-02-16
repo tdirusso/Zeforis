@@ -1,13 +1,22 @@
 import MUISnackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import Alert, { AlertColor } from '@mui/material/Alert';
 import { Button } from '@mui/material';
 
-export default function Snackbar({ isOpen, message, type, snackBarProps = {} }) {
+type SnackbarProps = {
+  isOpen: boolean,
+  message?: string,
+  type?: AlertColor,
+  snackbarProps?: {
+    [key: string | number]: any;
+  };
+};
+
+export default function Snackbar({ isOpen, message, type, snackbarProps = {} }: SnackbarProps) {
 
   const {
     actionHandler,
     actionName
-  } = snackBarProps;
+  } = snackbarProps;
 
   const action =
     <Button

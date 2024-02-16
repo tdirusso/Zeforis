@@ -1,26 +1,33 @@
-import { Component } from "react";
+import { Component, ReactNode } from "react";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Box, Button, Paper, Typography } from "@mui/material";
 import Watermark from "./Watermark";
 import { logFrontendError } from "../../api/logs";
 
-export class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null
-    };
-  }
+interface ErrorBoundaryProps {
+  children?: ReactNode;
+}
 
-  static getDerivedStateFromError(error) {
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+
+  public state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
+
+  public static getDerivedStateFromError(error: Error) {
     return {
       hasError: true,
       error
     };
   }
 
-  async componentDidCatch(error, info) {
+  async componentDidCatch(error: Error, info: React.ErrorInfo) {
     try {
       await logFrontendError({
         errorStack: error.stack,
@@ -31,16 +38,16 @@ export class ErrorBoundary extends Component {
     }
   }
 
-  render() {
+  public render() {
     if (this.state.hasError) {
-      return this.props.fallback || <DefaultErrorFallback error={this.state.error} />;
+      return <DefaultErrorFallback error={this.state.error} />;
     }
 
     return this.props.children;
   }
 }
 
-function DefaultErrorFallback({ error }) {
+function DefaultErrorFallback({ error }: { error: Error | null; }) {
   return (
     <Paper
       style={{ height: '100vh' }}
@@ -63,7 +70,7 @@ function DefaultErrorFallback({ error }) {
             <br></br>
             If you continue to see this message, please
             <a
-              href={`mailto:info@zeforis.com?subject=Error using Zeforis Application&body=I encountered the following error: %0D%0A%0D%0A${error.stack}`}> click here </a>
+              href={`mailto:info@zeforis.com?subject=Error using Zeforis Application&body=I encountered the following error: %0D%0A%0D%0A${error?.stack}`}> click here </a>
             to contact us.
           </Typography>
         </Box>

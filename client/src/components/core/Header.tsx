@@ -18,9 +18,25 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { updateTheme } from "../../lib/utils";
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import { User } from "@shared/types/User";
+import { Org } from "@shared/types/Org";
+import { Engagement } from "@shared/types/Engagement";
+import { AppContext } from "src/types/AppContext";
 
-export default function Header(props) {
-  const [anchorEl, setAnchorEl] = useState(null);
+type HeaderProps = {
+  user: User,
+  org: Org,
+  engagement: Engagement,
+  openModal: AppContext['openModal'],
+  openDrawer: AppContext['openDrawer'],
+  toggleSideNav: () => void,
+  isSideNavOpen: boolean,
+  openDialog: AppContext['openDialog'],
+  setTheme: AppContext['setTheme'];
+};
+
+export default function Header(props: HeaderProps) {
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [themeVal, setThemeVal] = useState(localStorage.getItem('theme') || 'light');
 
   const navigate = useNavigate();
@@ -41,7 +57,7 @@ export default function Header(props) {
 
   const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
 
-  const handleMenuClick = (e) => {
+  const handleMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
   };
 
@@ -64,7 +80,7 @@ export default function Header(props) {
     openDrawer('getting-started');
   };
 
-  const handleThemeChange = (_, newThemeMode) => {
+  const handleThemeChange = (_: React.MouseEvent, newThemeMode: string) => {
     if (newThemeMode) {
       setThemeVal(newThemeMode);
       updateTheme(setTheme, newThemeMode);

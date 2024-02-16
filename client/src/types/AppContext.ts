@@ -1,4 +1,4 @@
-import { Theme } from "@mui/material";
+import { AlertColor, Theme } from "@mui/material";
 import { Engagement } from "@shared/types/Engagement";
 import { Folder, FoldersMap } from "@shared/types/Folder";
 import { Org, OrgUsersMap } from "@shared/types/Org";
@@ -35,7 +35,7 @@ export type AppContext = {
   setOrgUsers: React.Dispatch<React.SetStateAction<User[]>>,
   setWidgets: React.Dispatch<React.SetStateAction<Widget[]>>,
   setUser: React.Dispatch<React.SetStateAction<User | null>>,
-  openSnackBar: (message?: string, type?: string, options?: {}) => void,
+  openSnackBar: (message?: string, type?: AlertColor, options?: {}) => void,
   openModal: (modalType: string, props?: any) => void,
   openDrawer: (drawerType: string, props?: any) => void,
   openDialog: (dialogType: string, props?: any) => void,

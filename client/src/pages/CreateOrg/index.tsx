@@ -11,6 +11,7 @@ import { ColorResult, TwitterPicker } from 'react-color';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import Watermark from '../../components/core/Watermark';
 import { isMobile } from '../../lib/constants';
+import { AppContext } from 'src/types/AppContext';
 
 export default function CreateOrgPage({ setTheme }: { setTheme: (theme: Theme) => void; }) {
   const [step, setStep] = useState(1);
@@ -59,7 +60,7 @@ export default function CreateOrgPage({ setTheme }: { setTheme: (theme: Theme) =
 };
 
 type Step1Props = {
-  openSnackBar: (message?: string, type?: string, options?: {}) => void,
+  openSnackBar: AppContext['openSnackBar'],
   setStep: StateSetters.Number,
   orgName: string,
   setOrgName: StateSetters.String,
@@ -155,7 +156,7 @@ const colorTransitionStyle = {
 
 
 type Step2Props = {
-  openSnackBar: (message?: string, type?: string, options?: {}) => void,
+  openSnackBar: AppContext['openSnackBar'];
   orgName: string,
   orgId: number,
   setTheme: (theme: Theme) => void;

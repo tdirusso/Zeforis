@@ -3,22 +3,25 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Paper, Zoom } from '@mui/material';
 import { setActiveOrgId } from '../../api/orgs';
+import { User } from '@shared/types/User';
 
-export default function ChooseOrgScreen(props) {
+export default function ChooseOrgScreen(props: { user: User; }) {
   const {
     user
   } = props;
 
-  const [orgId, setOrgId] = useState();
+  const [orgId, setOrgId] = useState<number>();
   const [isLoadingOrg, setLoadingOrg] = useState(false);
 
-  const handleLoadOrg = orgId => {
-    setLoadingOrg(true);
-    setOrgId(orgId);
+  const handleLoadOrg = (orgId: number) => {
+    if (orgId) {
+      setLoadingOrg(true);
+      setOrgId(orgId);
+    }
   };
 
   useEffect(() => {
-    if (isLoadingOrg) {
+    if (isLoadingOrg && orgId) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         window.location.reload();
@@ -46,7 +49,7 @@ export default function ChooseOrgScreen(props) {
             mt={3}
             maxWidth={1200}>
             {
-              user.memberOfOrgs.map((org, index) => {
+              user.memberOfOrgs?.map((org, index) => {
                 return (
                   <Zoom key={org.id} appear in style={{ transitionDelay: `${index * 50}ms` }}>
                     <Paper

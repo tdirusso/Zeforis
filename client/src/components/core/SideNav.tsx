@@ -9,9 +9,19 @@ import BuildIcon from '@mui/icons-material/Build';
 import Watermark from "./Watermark";
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import { Engagement } from "@shared/types/Engagement";
+import { Org } from "@shared/types/Org";
+
+type SideNavProps = {
+  engagement: Engagement,
+  org: Org,
+  isSideNavOpen: boolean,
+  isAdmin: boolean,
+  toggleSideNav: () => void;
+};
 
 
-export default function SideNav(props) {
+export default function SideNav(props: SideNavProps) {
 
   const isSmallScreen = useMediaQuery('(max-width: 900px)');
 

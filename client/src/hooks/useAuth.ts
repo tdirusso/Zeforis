@@ -5,7 +5,6 @@ import { User } from "@shared/types/User";
 export default function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const token = getToken();
@@ -17,14 +16,15 @@ export default function useAuth() {
     }
 
     async function authenticateUser() {
-      const { user, message } = await authenticate();
+      try {
+        const { user } = await authenticate();
 
-      if (user) {
-        setUser(user);
-        setLoading(false);
-      } else {
-        setError(message);
-        window.location.href = ('/login');
+        if (user) {
+          setUser(user);
+          setLoading(false);
+        }
+      } catch (error: unknown) {
+        //User will be redirected to login via Axios response interceptor
       }
     }
   }, []);
@@ -33,6 +33,5 @@ export default function useAuth() {
     user,
     setUser,
     isUserLoading: isLoading,
-    authError: error
   };
 }

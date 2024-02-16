@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { getToken, setToken } from '../api/auth';
+import { EnvVariable, getEnvVariable } from 'src/types/EnvVariable';
 
-const apiEndpoint = process.env.REACT_APP_API_DOMAIN + '/api/';
+
+const apiEndpoint = getEnvVariable(EnvVariable.REACT_APP_API_DOMAIN) + '/api/';
 
 const axiosClient = axios.create({
   baseURL: apiEndpoint,
@@ -18,14 +20,12 @@ axiosClient.interceptors.response.use(response => {
     setToken(response.data.token);
   }
 
-  if (response.data?.message) {
-    if (response.data.message === 'jwt expired') {
-      alert('Session expired.');
-      window.location.href = '/login';
-    }
-  }
-
   return response;
+}, error => {
+  if (error.response.status === 401) {
+    alert('Session expired');
+    window.location.replace('/login');
+  }
 });
 
 export default axiosClient;
