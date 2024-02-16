@@ -5,6 +5,7 @@ import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { useOutletContext } from "react-router";
 import { deleteActiveEngagementId, leaveEngagement, updateEngagement } from "../../../../api/engagements";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { AppContext } from "src/types/AppContext";
 
 export default function About() {
   const {
@@ -15,10 +16,10 @@ export default function About() {
     setEngagement,
     isOrgOwner,
     org
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const [engagementName, setEngagementName] = useState(engagement.name);
-  const [confirmLeaveEngagementMenu, setConfirmLeaveEngagementMenu] = useState(null);
+  const [confirmLeaveEngagementMenu, setConfirmLeaveEngagementMenu] = useState<Element | null>(null);
   const [loading, setLoading] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
@@ -47,9 +48,11 @@ export default function About() {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
@@ -77,9 +80,11 @@ export default function About() {
         openSnackBar(message, 'error');
         setLeaving(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLeaving(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLeaving(false);
+      }
     }
   };
 

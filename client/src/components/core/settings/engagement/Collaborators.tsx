@@ -9,6 +9,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
 import { removeEngagementUser } from "../../../../api/engagements";
+import { AppContext } from "src/types/AppContext";
+import { User } from "@shared/types/User";
 
 export default function Collaborators() {
 
@@ -25,17 +27,17 @@ export default function Collaborators() {
     openModal,
     tasks,
     setTasks
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const engagementId = engagement.id;
 
-  const [userToRemove, setUserToRemove] = useState(null);
+  const [userToRemove, setUserToRemove] = useState<User | null>(null);
   const [isRemovingUser, setRemovingUser] = useState(false);
-  const [removeUserMenuAnchor, setRemoveUserMenuAnchor] = useState(null);
+  const [removeUserMenuAnchor, setRemoveUserMenuAnchor] = useState<Element | null>(null);
 
   const removeUserMenuOpen = Boolean(removeUserMenuAnchor);
 
-  const openRemoveEngagementUserConfirmatiom = (e, userObject) => {
+  const openRemoveEngagementUserConfirmatiom = (e: React.MouseEvent<HTMLButtonElement>, userObject: User) => {
     setRemoveUserMenuAnchor(e.currentTarget);
     setUserToRemove(userObject);
   };
@@ -43,8 +45,12 @@ export default function Collaborators() {
   const handleRemoveEngagementUser = async () => {
     setRemovingUser(true);
 
+    if (!userToRemove) {
+      return;
+    }
+
     const willBeRemovedFromOrg =
-      userToRemove.memberOfEngagements.length + userToRemove.adminOfEngagements.length === 1;
+      (userToRemove.memberOfEngagements || []).length + (userToRemove.adminOfEngagements || []).length === 1;
 
     try {
       const result = await removeEngagementUser(engagementId, userToRemove.id);
@@ -57,8 +63,8 @@ export default function Collaborators() {
           setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== userToRemove.id));
         } else {
           const theUser = orgUsersMap[userToRemove.id];
-          theUser.memberOfEngagements = theUser.memberOfEngagements.filter(engagement => engagement.id !== engagementId);
-          theUser.adminOfEngagements = theUser.adminOfEngagements.filter(engagement => engagement.id !== engagementId);
+          theUser.memberOfEngagements = (theUser.memberOfEngagements || []).filter(engagement => engagement.id !== engagementId);
+          theUser.adminOfEngagements = (theUser.adminOfEngagements || []).filter(engagement => engagement.id !== engagementId);
           setOrgUsers(Object.values(orgUsersMap));
         }
 
@@ -77,9 +83,11 @@ export default function Collaborators() {
         openSnackBar(resultMessage, 'error');
         setRemovingUser(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setRemovingUser(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setRemovingUser(false);
+      }
     }
   };
 

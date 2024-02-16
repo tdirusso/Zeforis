@@ -7,6 +7,8 @@ import { updateUser } from "../../../../api/users";
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { AppContext } from "src/types/AppContext";
+
 export default function Profile() {
   const [isUpdatingName, setUpdatingName] = useState(false);
   const {
@@ -14,17 +16,16 @@ export default function Profile() {
     setUser,
     openSnackBar,
     openModal
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
-  const firstName = useRef();
-  const lastName = useRef();
-  const email = useRef();
+  const firstName = useRef<HTMLInputElement>(null);
+  const lastName = useRef<HTMLInputElement>(null);
 
-  const hasOrg = user.memberOfOrgs.some(org => org.ownerId === user.id);
+  const hasOrg = Boolean(user.memberOfOrgs?.some(org => org.ownerId === user.id));
 
   const handleProfileUpdate = async () => {
-    const firstNameVal = firstName.current.value;
-    const lastNameVal = lastName.current.value;
+    const firstNameVal = firstName.current?.value;
+    const lastNameVal = lastName.current?.value;
 
     if (!firstNameVal || !lastNameVal) {
       openSnackBar('Please enter a first and last name.', 'error');
@@ -51,9 +52,11 @@ export default function Profile() {
         openSnackBar(message, 'error');
         setUpdatingName(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setUpdatingName(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setUpdatingName(false);
+      }
     }
   };
 
@@ -111,7 +114,6 @@ export default function Profile() {
           <TextField
             variant="standard"
             label="Email"
-            inputRef={email}
             fullWidth
             defaultValue={user.email}
             disabled

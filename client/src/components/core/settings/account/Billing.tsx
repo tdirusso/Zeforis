@@ -15,19 +15,21 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import AlertTitle from "@mui/material/AlertTitle/AlertTitle";
 import '../styles.scss';
+import { AppContext } from "src/types/AppContext";
+import { EnvVariable, getEnvVariable } from "src/types/EnvVariable";
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK);
+const stripePromise = loadStripe(getEnvVariable(EnvVariable.REACT_APP_STRIPE_PK));
 
 export default function Billing() {
   const isPaymentSuccess = window.location.search.includes('isPaymentSuccess');
 
   const {
     user
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const {
     plan,
-    subscriptionStatus
+    subscriptionStatus = null
   } = user;
 
   const getBillingInfo = () => {
@@ -51,7 +53,7 @@ export default function Billing() {
   );
 };
 
-function ProPlanInfo({ status }) {
+function ProPlanInfo({ status }: { status: string | null; }) {
   return (
     <Box>
       <Box component="h3">
@@ -93,17 +95,16 @@ function ProPlanInfo({ status }) {
   );
 }
 
-function FreePlanInfo({ status }) {
+function FreePlanInfo({ status }: { status: string | null; }) {
   const {
     org,
     orgUsers,
-    openSnackBar
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   let numOrgAdmins = 0;
 
   orgUsers.forEach(({ adminOfEngagements }) =>
-    adminOfEngagements.length > 0 ? numOrgAdmins++ : null
+    adminOfEngagements && adminOfEngagements.length > 0 ? numOrgAdmins++ : null
   );
 
   const [numAdmins, setNumAdmins] = useState(numOrgAdmins);
@@ -112,11 +113,11 @@ function FreePlanInfo({ status }) {
   var styles = window.getComputedStyle(document.body);
 
   const options = {
-    mode: 'subscription',
+    mode: 'subscription' as const,
     amount: (numAdmins * pricePerAdminMonthly) * 100,
     currency: 'usd',
     appearance: {
-      theme: document.body.classList.contains('dark') ? 'night' : 'stripe',
+      theme: document.body.classList.contains('dark') ? 'night' as const : 'stripe' as const,
       variables: {
         colorPrimary: styles.getPropertyValue('--colors-primary'),
         fontFamily: 'Inter, sans-serif',
@@ -124,9 +125,9 @@ function FreePlanInfo({ status }) {
     },
   };
 
-  const handleManualAdminCountChange = e => {
+  const handleManualAdminCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = Number(e.target.value);
-    if (newVal >= numOrgAdmins && newVal <= e.target.max) {
+    if (newVal >= numOrgAdmins && newVal <= Number(e.target.max)) {
       setNumAdmins(newVal);
     }
   };
@@ -166,10 +167,8 @@ function FreePlanInfo({ status }) {
       <Box className="payment-content">
         <Elements stripe={stripePromise} options={options}>
           <CheckoutForm
-            org={org}
             isLoading={isLoading}
             setLoading={setLoading}
-            openSnackBar={openSnackBar}
             numAdmins={numAdmins}
           />
         </Elements>
@@ -189,7 +188,7 @@ function FreePlanInfo({ status }) {
               valueLabelDisplay="auto"
               min={0}
               max={20}
-              onChange={(_, val) => val >= numOrgAdmins ? setNumAdmins(val) : null}
+              onChange={(_, val) => Number(val) >= numOrgAdmins ? setNumAdmins(Number(val)) : null}
               value={numAdmins}
             />
             <Box className="flex-ac" justifyContent='space-between'>
@@ -267,12 +266,20 @@ function FreePlanInfo({ status }) {
   );
 }
 
-function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
+type CheckoutFormProps = {
+  isLoading: boolean,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  numAdmins: number;
+};
+
+function CheckoutForm({ isLoading, setLoading, numAdmins }: CheckoutFormProps) {
   const [subscriptionFoundModalOpen, setSubscriptionFoundModalOpen] = useState(false);
 
   const {
-    user
-  } = useOutletContext();
+    user,
+    openSnackBar,
+    org
+  } = useOutletContext<AppContext>();
 
   const stripe = useStripe();
   const elements = useElements();
@@ -280,6 +287,11 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
   const handlePurchase = async () => {
     if (numAdmins <= 0 || numAdmins >= 10000) {
       openSnackBar('Number of administrators must be between 1 and 10,000.');
+      return;
+    }
+
+    if (!elements || !stripe) {
+      openSnackBar('Stripe / Stripe Elements could not be loaded - please contact support.');
       return;
     }
 
@@ -327,9 +339,11 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
@@ -364,7 +378,13 @@ function CheckoutForm({ isLoading, setLoading, openSnackBar, org, numAdmins }) {
   );
 }
 
-function SubscriptionFoundModal(props) {
+type SubscriptionFoundModalProps = {
+  subscriptionFoundModalOpen: boolean,
+  setSubscriptionFoundModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  email: string;
+};
+
+function SubscriptionFoundModal(props: SubscriptionFoundModalProps) {
   const {
     subscriptionFoundModalOpen,
     setSubscriptionFoundModalOpen,

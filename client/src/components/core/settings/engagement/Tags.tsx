@@ -5,6 +5,12 @@ import { createTag, deleteTag, updateTag } from "../../../../api/tags";
 import { LoadingButton } from "@mui/lab";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { isMobile } from "../../../../lib/constants";
+import { AppContext } from "src/types/AppContext";
+import { Tag } from "@shared/types/Tag";
+
+type TaskTagCounts = {
+  [tagId: string]: number;
+};
 
 export default function Tags() {
 
@@ -16,9 +22,9 @@ export default function Tags() {
     setTags,
     tasks,
     setTasks
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
-  const taskTagCounts = {};
+  const taskTagCounts: TaskTagCounts = {};
 
   tasks.forEach(task => {
     if (task.tags) {
@@ -29,23 +35,23 @@ export default function Tags() {
     }
   });
 
-  const [editTagMenuAnchor, setEditTagMenuAnchor] = useState(null);
-  const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState(null);
-  const [newTagMenuAnchor, setNewTagMenuAnchor] = useState(null);
+  const [editTagMenuAnchor, setEditTagMenuAnchor] = useState<Element | null>(null);
+  const [deleteTagMenuAnchor, setDeleteTagMenuAnchor] = useState<Element | null>(null);
+  const [newTagMenuAnchor, setNewTagMenuAnchor] = useState<Element | null>(null);
   const [newTagName, setNewTagName] = useState('');
   const [updatingTag, setUpdatingTag] = useState(false);
   const [deletingTag, setDeletingTag] = useState(false);
   const [creatingTag, setCreatingTag] = useState(false);
 
-  const [tagToDelete, setTagToDelete] = useState(null);
-  const [tagToEdit, setTagToEdit] = useState(null);
+  const [tagToDelete, setTagToDelete] = useState<Tag | null>(null);
+  const [tagToEdit, setTagToEdit] = useState<Tag | null>(null);
   const [editingTagName, setEditingTagName] = useState('');
 
   const editTagMenuOpen = Boolean(editTagMenuAnchor);
   const deleteTagMenuOpen = Boolean(deleteTagMenuAnchor);
   const newTagMenuOpen = Boolean(newTagMenuAnchor);
 
-  const handleEditTag = (e, tag) => {
+  const handleEditTag = (e: React.MouseEvent<HTMLDivElement>, tag: Tag) => {
     setTagToEdit(tag);
     setEditingTagName(tag.name);
     setEditTagMenuAnchor(e.currentTarget);
@@ -54,6 +60,10 @@ export default function Tags() {
   const handleUpdateTag = async () => {
     if (!editingTagName) {
       openSnackBar('Please enter a tag name.');
+      return;
+    }
+
+    if (!tagToEdit) {
       return;
     }
 
@@ -76,15 +86,21 @@ export default function Tags() {
         openSnackBar(message, 'error');
         setUpdatingTag(false);
       }
-    } catch (error) {
-      setUpdatingTag(false);
-      openSnackBar(error.message, 'error');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setUpdatingTag(false);
+        openSnackBar(error.message, 'error');
+      }
     }
   };
 
 
   const handleDeleteTag = async () => {
     setDeletingTag(true);
+
+    if (!tagToDelete) {
+      return;
+    }
 
     try {
       const result = await deleteTag({
@@ -96,12 +112,12 @@ export default function Tags() {
       const resultMessage = result.message;
 
       if (success) {
-        delete tagsMap[tagToDelete];
+        delete tagsMap[tagToDelete.id];
 
         const tasksClone = [...tasks];
         tasksClone.forEach(task => {
           if (task.tags) {
-            task.tags = task.tags.replace(tagToDelete.id, '') || null;
+            task.tags = task.tags.replace(String(tagToDelete.id), '') || null;
           }
         });
 
@@ -114,9 +130,11 @@ export default function Tags() {
         openSnackBar(resultMessage, 'error');
         setDeletingTag(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setDeletingTag(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setDeletingTag(false);
+      }
     }
   };
 
@@ -144,14 +162,16 @@ export default function Tags() {
         setCreatingTag(false);
         openSnackBar(message, 'error');
       }
-    } catch (error) {
-      setCreatingTag(false);
-      openSnackBar(error.message, 'error');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setCreatingTag(false);
+        openSnackBar(error.message, 'error');
+      }
     }
   };
 
 
-  const openDeleteTagConfirmation = (e, tag) => {
+  const openDeleteTagConfirmation = (e: React.MouseEvent<HTMLButtonElement>, tag: Tag) => {
     setTagToDelete(tag);
     setDeleteTagMenuAnchor(e.currentTarget);
   };
@@ -172,8 +192,8 @@ export default function Tags() {
             variant="outlined"
             deleteIcon={<AddCircleIcon />}
             onClick={e => setNewTagMenuAnchor(e.currentTarget)}
-            onDelete={e => setNewTagMenuAnchor(e.currentTarget)}>
-          </Chip>
+            onDelete={e => setNewTagMenuAnchor(e.currentTarget)}
+          />
         </Box>
         <Box display="flex" flexWrap='wrap'>
           {
@@ -190,8 +210,8 @@ export default function Tags() {
                       marginRight: '1rem'
                     }}
                     onClick={e => handleEditTag(e, tag)}
-                    onDelete={e => openDeleteTagConfirmation(e, tag)}>
-                  </Chip>
+                    onDelete={e => openDeleteTagConfirmation(e, tag)}
+                  />
                 </Box>
                 <Box position="relative" bottom="3px" left="14px">
                   <Typography

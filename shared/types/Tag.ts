@@ -1,6 +1,6 @@
 export type Tag = {
   readonly id: number,
-  name?: string,
+  name: string,
   engagementId?: number;
 };
 

@@ -8,7 +8,7 @@ export type User = {
   email: string,
   dateCreated?: Date,
   plan?: string,
-  subscriptionStatus?: string,
+  subscriptionStatus?: string | null,
   adminOfEngagements?: Engagement[];
   memberOfEngagements?: Engagement[];
   memberOfOrgs?: Org[];
