@@ -5,12 +5,25 @@ import CloseIcon from '@mui/icons-material/Close';
 import Watermark from '../core/Watermark';
 import { SwapHorizOutlined } from '@mui/icons-material';
 import { setActiveOrgId } from '../../api/orgs';
+import { Org } from '@shared/types/Org';
+import { User } from '@shared/types/User';
+import { TransitionProps } from '@mui/material/transitions';
 
-const fixedTransition = forwardRef(function Transition(props, ref) {
+const fixedTransition = forwardRef(function Transition(props: TransitionProps & {
+  children: React.ReactElement<any, any>;
+},
+  ref: React.Ref<unknown>) {
   return <Grow ref={ref} {...props} timeout={{ enter: 0 }} />;
 });
 
-export default function NoEngagementsDialog(props) {
+type NoEngagementsDialogProps = {
+  org: Org,
+  isOpen: boolean,
+  close?: () => void,
+  user: User;
+};
+
+export default function NoEngagementsDialog(props: NoEngagementsDialogProps) {
   const {
     org,
     isOpen,
@@ -18,19 +31,19 @@ export default function NoEngagementsDialog(props) {
     user
   } = props;
 
-  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
+  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState<Element | null>(null);
   const [isLoadingOrg, setLoadingOrg] = useState(false);
-  const [orgId, setOrgId] = useState();
+  const [orgId, setOrgId] = useState<number>();
 
   const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
 
-  const handleLoadOrg = orgId => {
+  const handleLoadOrg = (orgId: number) => {
     setLoadingOrg(true);
     setOrgId(orgId);
   };
 
   useEffect(() => {
-    if (isLoadingOrg) {
+    if (isLoadingOrg && orgId) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         deleteActiveEngagementId();
@@ -40,7 +53,9 @@ export default function NoEngagementsDialog(props) {
   }, [orgId]);
 
   const handleClose = () => {
-    close();
+    if (close) {
+      close();
+    }
   };
 
   let pageIcon = <Box
@@ -119,7 +134,7 @@ export default function NoEngagementsDialog(props) {
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>
         {
-          user.memberOfOrgs.map(({ id, name }) => {
+          user.memberOfOrgs?.map(({ id, name }) => {
             return (
               <MenuItem
                 disabled={id === org.id}

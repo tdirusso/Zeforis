@@ -21,6 +21,13 @@ const theme: ThemeOptions = {
     fontFamily: 'Inter',
   },
   components: {
+    MuiTouchRipple: {
+      styleOverrides: {
+        ripple: {
+          animationDuration: '250ms !important'
+        }
+      }
+    },
     MuiFormHelperText: {
       styleOverrides: {
         root: {

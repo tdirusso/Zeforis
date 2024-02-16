@@ -90,7 +90,6 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
 
   const {
     dialogToOpen,
-    dialogProps,
     openDialog,
     closeDialog
   } = useDialog();
@@ -290,15 +289,15 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
         {
           isOrgOwner ?
             <CreateEngagementDialog
-              org={org}
+              org={org!}
               openSnackBar={openSnackBar}
               isOpen={true}
-              user={user}
+              user={user!}
             /> :
             <NoEngagementsDialog
-              org={org}
+              org={org!}
               isOpen={true}
-              user={user}
+              user={user!}
             />
         }
         <Snackbar
@@ -315,8 +314,8 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
       <Box className="flex-centered" style={{ height: '100vh' }}>
         <ChooseEngagementDialog
           engagements={engagements}
-          org={org}
-          user={user}
+          org={org!}
+          user={user!}
           isOpen={true}
         />
       </Box>
@@ -404,10 +403,15 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
             />
 
             <Dialogs
-              {...context}
-              {...dialogProps}
               dialogToOpen={dialogToOpen}
               closeDialog={closeDialog}
+              openDialog={openDialog}
+              openModal={openModal}
+              openSnackBar={openSnackBar}
+              engagement={engagement}
+              engagements={engagements}
+              org={org!}
+              user={user!}
             />
 
             <ContextMenus

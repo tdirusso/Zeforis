@@ -183,7 +183,6 @@ function ActionMenu(props: ActionMenuProps) {
       openModal('upgrade');
     } else {
       openDialog('create-engagement');
-
     }
   };
 

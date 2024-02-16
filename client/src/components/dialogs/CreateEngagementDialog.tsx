@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { FormEvent, forwardRef, useEffect, useRef, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Divider, Fade, Grow, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createEngagement, deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
@@ -7,40 +7,58 @@ import Watermark from '../core/Watermark';
 import { SwapHorizOutlined } from '@mui/icons-material';
 import { setActiveOrgId } from '../../api/orgs';
 import { isMobile } from '../../lib/constants';
+import { Org } from '@shared/types/Org';
+import { User } from '@shared/types/User';
+import { AppContext } from 'src/types/AppContext';
+import { TransitionProps } from '@mui/material/transitions';
 
-const toggleableTransition = forwardRef(function Transition(props, ref) {
+const toggleableTransition = forwardRef(function Transition(props: TransitionProps & {
+  children: React.ReactElement<any, any>;
+},
+  ref: React.Ref<unknown>) {
   return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 300 }} />;
 });
 
-const fixedTransition = forwardRef(function Transition(props, ref) {
+const fixedTransition = forwardRef(function Transition(props: TransitionProps & {
+  children: React.ReactElement<any, any>;
+},
+  ref: React.Ref<unknown>) {
   return <Grow ref={ref} {...props} timeout={{ enter: 0 }} />;
 });
 
-export default function CreateEngagementDialog(props) {
+type CreateEngagementDialogProps = {
+  isOpen: boolean,
+  closeDialog?: () => void,
+  org: Org,
+  user: User,
+  openSnackBar: AppContext['openSnackBar'];
+};
+
+export default function CreateEngagementDialog(props: CreateEngagementDialogProps) {
   const {
     org,
     openSnackBar,
     isOpen,
-    close,
+    closeDialog,
     user
   } = props;
 
-  const name = useRef();
+  const name = useRef<HTMLInputElement>(null);
 
-  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
+  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState<Element | null>(null);
   const [isLoadingOrg, setLoadingOrg] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [orgId, setOrgId] = useState();
+  const [orgId, setOrgId] = useState<number>();
 
   const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
 
-  const handleLoadOrg = orgId => {
+  const handleLoadOrg = (orgId: number) => {
     setLoadingOrg(true);
     setOrgId(orgId);
   };
 
   useEffect(() => {
-    if (isLoadingOrg) {
+    if (isLoadingOrg && orgId) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         deleteActiveEngagementId();
@@ -49,10 +67,10 @@ export default function CreateEngagementDialog(props) {
     }
   }, [orgId]);
 
-  const handleCreateEngagement = e => {
+  const handleCreateEngagement = (e: FormEvent) => {
     e.preventDefault();
 
-    const nameVal = name.current.value;
+    const nameVal = name.current?.value;
 
     if (!nameVal) {
       openSnackBar('Please enter a name for the engagement.');
@@ -72,7 +90,7 @@ export default function CreateEngagementDialog(props) {
           setActiveEngagementId(engagement.id);
           openSnackBar('Engagement created.', 'success');
 
-          if (!close) {
+          if (!closeDialog) {
             localStorage.setItem('openGettingStarted', 'true');
           }
 
@@ -83,15 +101,19 @@ export default function CreateEngagementDialog(props) {
           openSnackBar(message, 'error');
           setLoading(false);
         }
-      } catch (error) {
-        openSnackBar(error.message, 'error');
-        setLoading(false);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          openSnackBar(error.message, 'error');
+          setLoading(false);
+        }
       }
     }, 1500);
   };
 
   const handleClose = () => {
-    close();
+    if (closeDialog) {
+      closeDialog();
+    }
   };
 
   let pageIcon = <Box
@@ -110,13 +132,13 @@ export default function CreateEngagementDialog(props) {
     <Dialog
       open={isOpen}
       onClose={handleClose}
-      TransitionComponent={close ? toggleableTransition : fixedTransition}
+      TransitionComponent={closeDialog ? toggleableTransition : fixedTransition}
       fullScreen>
       <Fade appear in timeout={{ enter: 400 }}>
         <Box className="flex-centered" style={{ height: '100%' }}>
           <Box textAlign="center" mb={'100px'} maxWidth={600}>
             <IconButton
-              hidden={!close}
+              hidden={!closeDialog}
               size='large'
               onClick={handleClose}
               style={{
@@ -178,7 +200,7 @@ export default function CreateEngagementDialog(props) {
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>
         {
-          user.memberOfOrgs.map(({ id, name }) => {
+          user.memberOfOrgs?.map(({ id, name }) => {
             return (
               <MenuItem
                 disabled={id === org.id}

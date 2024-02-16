@@ -1,5 +1,5 @@
 import DialogContent from '@mui/material/DialogContent';
-import { forwardRef, useEffect, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, forwardRef, useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Dialog, Grow, IconButton, InputAdornment, Menu, MenuItem, Paper, TextField, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,19 +7,38 @@ import './styles.scss';
 import { SwapHorizOutlined } from "@mui/icons-material";
 import { deleteActiveEngagementId, setActiveEngagementId } from '../../api/engagements';
 import { setActiveOrgId } from '../../api/orgs';
+import { Engagement } from '@shared/types/Engagement';
+import { Org } from '@shared/types/Org';
+import { User } from '@shared/types/User';
+import { TransitionProps } from '@mui/material/transitions';
 
-const toggleableTransition = forwardRef(function Transition(props, ref) {
+const toggleableTransition = forwardRef(function Transition(props: TransitionProps & {
+  children: React.ReactElement<any, any>;
+},
+  ref: React.Ref<unknown>) {
   return <Grow ref={ref} {...props} timeout={{ exit: 300, enter: 600 }} />;
 });
 
-const fixedTransition = forwardRef(function Transition(props, ref) {
+const fixedTransition = forwardRef(function Transition(props: TransitionProps & {
+  children: React.ReactElement<any, any>;
+},
+  ref: React.Ref<unknown>) {
   return <Grow ref={ref} {...props} timeout={{ enter: 0 }} />;
 });
 
-export default function ChooseEngagementDialog(props) {
+type ChooseEngagementDialogProps = {
+  isOpen: boolean,
+  closeDialog?: () => void,
+  engagements: Engagement[],
+  org: Org,
+  user: User,
+  engagement?: Engagement;
+};
+
+export default function ChooseEngagementDialog(props: ChooseEngagementDialogProps) {
   const {
     isOpen,
-    close,
+    closeDialog,
     engagements,
     org,
     user,
@@ -27,17 +46,20 @@ export default function ChooseEngagementDialog(props) {
   } = props;
 
   const [query, setQuery] = useState('');
-  const [engagementId, setEngagementId] = useState();
-  const [orgId, setOrgId] = useState();
+  const [engagementId, setEngagementId] = useState<number>();
+  const [orgId, setOrgId] = useState<number>();
   const [shouldAnimate, setShouldAnimate] = useState(true);
   const [isLoadingEngagement, setLoadingEngagement] = useState(false);
   const [isLoadingOrg, setLoadingOrg] = useState(false);
-  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState(null);
+  const [changeOrgMenuAnchor, setChangeOrgMenuAnchor] = useState<Element | null>(null);
 
   const changeOrgMenuOpen = Boolean(changeOrgMenuAnchor);
 
   const handleClose = () => {
-    close();
+    if (closeDialog) {
+      closeDialog();
+    }
+
     setTimeout(() => {
       setQuery('');
       setShouldAnimate(true);
@@ -53,33 +75,33 @@ export default function ChooseEngagementDialog(props) {
     }
   }, [isOpen]);
 
-  const handleQueryChange = e => {
+  const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && filteredEngagements.length === 1) {
       handleLoadEngagement(filteredEngagements[0].id);
     }
   };
 
-  const handleLoadEngagement = eId => {
+  const handleLoadEngagement = (eId: number) => {
     setLoadingEngagement(true);
     setEngagementId(eId);
   };
 
-  const handleLoadOrg = orgId => {
+  const handleLoadOrg = (orgId: number) => {
     setLoadingOrg(true);
     setOrgId(orgId);
   };
 
   useEffect(() => {
-    if (isLoadingEngagement) {
+    if (isLoadingEngagement && engagementId) {
       setTimeout(() => {
         setActiveEngagementId(engagementId);
         window.location.href = '/home/dashboard';
       }, 500);
-    } else if (isLoadingOrg) {
+    } else if (isLoadingOrg && orgId) {
       setTimeout(() => {
         setActiveOrgId(orgId);
         deleteActiveEngagementId();
@@ -109,7 +131,7 @@ export default function ChooseEngagementDialog(props) {
         className='choose-engagement-dialog'
         open={isOpen}
         onClose={handleClose}
-        TransitionComponent={close ? toggleableTransition : fixedTransition}
+        TransitionComponent={closeDialog ? toggleableTransition : fixedTransition}
         PaperProps={{
           style: {
             padding: '1rem',
@@ -126,7 +148,7 @@ export default function ChooseEngagementDialog(props) {
               alignItems="flex-start">
               <IconButton
                 className='close-btn'
-                hidden={!close}
+                hidden={!closeDialog}
                 size='large'
                 onClick={handleClose}>
                 <CloseIcon />
@@ -198,7 +220,7 @@ export default function ChooseEngagementDialog(props) {
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>
         {
-          user.memberOfOrgs.map(({ id, name }) => {
+          user.memberOfOrgs?.map(({ id, name }) => {
             return (
               <MenuItem
                 disabled={id === org.id}
