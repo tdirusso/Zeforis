@@ -37,7 +37,7 @@ export default function Collaborators() {
 
   const removeUserMenuOpen = Boolean(removeUserMenuAnchor);
 
-  const openRemoveEngagementUserConfirmatiom = (e: React.MouseEvent<HTMLButtonElement>, userObject: User) => {
+  const openRemoveEngagementUserConfirmatiom = (e: React.MouseEvent, userObject: User) => {
     setRemoveUserMenuAnchor(e.currentTarget);
     setUserToRemove(userObject);
   };

@@ -43,7 +43,7 @@ import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { statuses } from "../../../lib/constants";
 import { useEffect } from "react";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { createTag } from "../../../api/tags";
 import { TransitionGroup } from "react-transition-group";
 import StarOutlineOutlinedIcon from '@mui/icons-material/StarOutlineOutlined';
@@ -52,9 +52,22 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { batchUpdateTasks, createTask, updateTask } from "../../../api/tasks";
+import { AppContext } from "src/types/AppContext";
+import { Task } from "@shared/types/Task";
+import { Tag } from "@shared/types/Tag";
+import { User } from "@shared/types/User";
+import { Folder } from "@shared/types/Folder";
 
 const tasksPerPage = 25;
 const tasksParamsKey = 'params-tasks';
+
+type TempAssignee = {
+  firstName?: string | null,
+  lastName?: string | null,
+  id: number;
+  role?: string;
+  email?: string;
+};
 
 export default function TasksTable() {
   const {
@@ -73,7 +86,7 @@ export default function TasksTable() {
     tasks,
     orgUsersMap,
     openContextMenu
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const [searchParams, setSearchParams] = useSearchParams(localStorage.getItem(tasksParamsKey) || '');
 
@@ -93,31 +106,31 @@ export default function TasksTable() {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [selectedTasks, setSelectedTasks] = useState([]);
+  const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
   const [shouldAnimate, setShouldAnimate] = useState(true);
 
-  const [editingTask, setEditingTask] = useState(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isEditingName, setEditingName] = useState(false);
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
-  const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState(null);
-  const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState(null);
-  const [tagsMenuAnchor, setTagsMenuAnchor] = useState(null);
-  const [folderMenuAnchor, setFolderMenuAnchor] = useState(null);
-  const [tempAssignee, setTempAssignee] = useState(null);
-  const [tempSelectedTags, setTempSelectedTags] = useState([]);
-  const [tagIdToRemove, setTagIdToRemove] = useState(null);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<Element | null>(null);
+  const [assigneeMenuAnchor, setAssigneeMenuAnchor] = useState<Element | null>(null);
+  const [dateDueMenuAnchor, setDateDueMenuAnchor] = useState<Element | null>(null);
+  const [tagsMenuAnchor, setTagsMenuAnchor] = useState<Element | null>(null);
+  const [folderMenuAnchor, setFolderMenuAnchor] = useState<Element | null>(null);
+  const [tempAssignee, setTempAssignee] = useState<User | null>(null);
+  const [tempSelectedTags, setTempSelectedTags] = useState<Tag[]>([]);
+  const [tagIdToRemove, setTagIdToRemove] = useState<number | null>(null);
   const [doUpdate, setDoUpdate] = useState(false);
 
-  const [filterTags, setFilterTags] = useState([]);
+  const [filterTags, setFilterTags] = useState<Tag[]>([]);
   //const [filterFolder, setFilterFolder] = useState(null);
   const [sortBy, setSortBy] = useState('name');
 
   const [isBulkEditMode, setBulkEditMode] = useState(false);
-  const [bulkEditAction, setBulkEditAction] = useState(null);
-  const [bulkStatusValue, setBulkStatusValue] = useState(null);
-  const [bulkDueValue, setBulkDueValue] = useState(null);
-  const [bulkFolderValue, setBulkFolderValue] = useState(null);
-  const [bulkAssigneeValue, setBulkAssigneeValue] = useState(null);
+  const [bulkEditAction, setBulkEditAction] = useState('');
+  const [bulkStatusValue, setBulkStatusValue] = useState('');
+  const [bulkDueValue, setBulkDueValue] = useState<string | null>(null);
+  const [bulkFolderValue, setBulkFolderValue] = useState<number | null>(null);
+  const [bulkAssigneeValue, setBulkAssigneeValue] = useState<number | null>(null);
   const [bulkTagAction, setBulkTagAction] = useState('add');
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
@@ -129,8 +142,8 @@ export default function TasksTable() {
   const [addingTask, setAddingTask] = useState(false);
   const [addingTaskLoading, setAddingTaskLoading] = useState(false);
 
-  const nameRef = useRef(null);
-  const addingTaskNameRef = useRef(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const addingTaskNameRef = useRef<HTMLInputElement>(null);
 
   const now = moment();
   const tomorrow = moment().add(1, 'day');
@@ -149,7 +162,7 @@ export default function TasksTable() {
     const lcFilterName = filterName?.toLowerCase();
 
     theTasks = theTasks.filter(task => {
-      let tagIds;
+      let tagIds: string[];
 
       if (filterTags.length) {
         tagIds = task.tags?.split(',').filter(Boolean).map(id => String(id)) || [];
@@ -183,7 +196,7 @@ export default function TasksTable() {
         }).sort((a, b) => {
           // Now sort by the due date
           if (!a.date_due || !b.date_due) return 1;
-          return new Date(a.date_due) - new Date(b.date_due);
+          return new Date(a.date_due).getTime() - new Date(b.date_due).getTime();
         });
         break;
       case 'dateDueReverse':
@@ -195,7 +208,7 @@ export default function TasksTable() {
         }).sort((a, b) => {
           // Now sort by the due date
           if (!a.date_due || !b.date_due) return 1;
-          return new Date(a.date_due) - new Date(b.date_due);
+          return new Date(a.date_due).getTime() - new Date(b.date_due).getTime();
         }).reverse();
         break;
       case 'assignee':
@@ -229,13 +242,13 @@ export default function TasksTable() {
   const endIndex = startIndex + tasksPerPage;
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (nameRef.current && !nameRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (nameRef.current && !nameRef.current.contains(event.target as Node)) {
         setEditingName(false);
         setEditingTask(null);
       }
 
-      if (addingTaskNameRef.current && !addingTaskNameRef.current.contains(event.target)) {
+      if (addingTaskNameRef.current && !addingTaskNameRef.current.contains(event.target as Node)) {
         setAddingTask(false);
       }
     };
@@ -249,6 +262,10 @@ export default function TasksTable() {
 
   useEffect(() => {
     async function handleUpdateTask() {
+      if (!editingTask) {
+        return;
+      }
+
       try {
         const currentTags = editingTaskTagIds.map(tagId => ({
           id: Number(tagId),
@@ -291,7 +308,7 @@ export default function TasksTable() {
           }
 
           const updatedTaskObject = {
-            ...(delete editingTask.currentTags && editingTask),
+            ...editingTask,
             date_completed: dateCompletedToSet,
             date_last_updated: now,
             tags: allTags.length > 0 ? allTags.map(t => t.id).join(',') : null
@@ -315,18 +332,20 @@ export default function TasksTable() {
           setTagIdToRemove(null);
           openSnackBar(message, 'error');
         }
-      } catch (error) {
-        setEditingTask(null);
-        setDoUpdate(false);
-        setTempSelectedTags([]);
-        setTagIdToRemove(null);
-        openSnackBar(error.message, 'error');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setEditingTask(null);
+          setDoUpdate(false);
+          setTempSelectedTags([]);
+          setTagIdToRemove(null);
+          openSnackBar(error.message, 'error');
+        }
       }
     }
 
     async function handleBulkUpdateTasks() {
       try {
-        const { updatedTasks, message } = await batchUpdateTasks({
+        const { updatedTasks, message }: { updatedTasks: Task[], message: string; } = await batchUpdateTasks({
           engagementId,
           taskIds: selectedTasks,
           action: bulkEditAction,
@@ -347,7 +366,7 @@ export default function TasksTable() {
           setStatusMenuAnchor(null);
           setAssigneeMenuAnchor(null);
           setDateDueMenuAnchor(null);
-          setBulkEditAction(null);
+          setBulkEditAction('');
           setTempSelectedTags([]);
           setTagsMenuAnchor(null);
           setFolderMenuAnchor(null);
@@ -358,9 +377,11 @@ export default function TasksTable() {
           setDoUpdate(false);
           openSnackBar(message, 'error');
         }
-      } catch (error) {
-        setDoUpdate(false);
-        openSnackBar(error.message, 'error');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setDoUpdate(false);
+          openSnackBar(error.message, 'error');
+        }
       }
     }
 
@@ -373,12 +394,12 @@ export default function TasksTable() {
     }
   }, [doUpdate]);
 
-  const handlePageChange = (_, pageNum) => {
+  const handlePageChange = (_: React.MouseEvent | null, pageNum: number) => {
     setShouldAnimate(false);
 
     setTimeout(() => {
       setSearchParams(prev => {
-        prev.set('page', pageNum);
+        prev.set('page', String(pageNum));
         return prev;
       }, { replace: true });
       setTimeout(() => {
@@ -387,7 +408,7 @@ export default function TasksTable() {
     }, 0);
   };
 
-  const handleSelectAll = (_, isChecked) => {
+  const handleSelectAll = (_: React.ChangeEvent, isChecked: boolean) => {
     if (isChecked) {
       setSelectedTasks(filteredTasks.map(({ task_id }) => task_id));
     } else {
@@ -395,7 +416,7 @@ export default function TasksTable() {
     }
   };
 
-  const handleTaskSelection = taskId => {
+  const handleTaskSelection = (taskId: number) => {
     if (isBulkEditMode) {
       if (selectedTasks.includes(taskId)) {
         setSelectedTasks(selectedTasks.filter(id => id !== taskId));
@@ -405,29 +426,30 @@ export default function TasksTable() {
     }
   };
 
-  const handleEditNameClick = task => {
+  const handleEditNameClick = (task: Task) => {
     setEditingTask(task);
     setEditingName(true);
   };
 
-  const handleStatusClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleStatusClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
     }
 
     setStatusMenuAnchor(e.currentTarget);
   };
 
-  const handleAssigneeClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleAssigneeClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
 
       setTempAssignee(
         task.assigned_to_id ?
           {
             id: task.assigned_to_id,
-            firstName: task.assigned_first,
-            lastName: task.assigned_last
+            firstName: task.assigned_first || '',
+            lastName: task.assigned_last || '',
+            email: ''
           } :
           null
       );
@@ -437,7 +459,7 @@ export default function TasksTable() {
   };
 
   const handleAssignToMe = () => {
-    if (!isBulkEditMode) {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({
         ...editingTask,
         assigned_to_id: user.id,
@@ -452,9 +474,9 @@ export default function TasksTable() {
     setDoUpdate(true);
   };
 
-  const handleAssigneeChange = (_, newVal) => {
+  const handleAssigneeChange = (_: React.SyntheticEvent, newVal: User | null) => {
     if (newVal) {
-      if (!isBulkEditMode) {
+      if (!isBulkEditMode && editingTask) {
         setEditingTask({
           ...editingTask,
           assigned_to_id: newVal.id,
@@ -472,7 +494,7 @@ export default function TasksTable() {
   };
 
   const handleClearAssignee = () => {
-    if (!isBulkEditMode) {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({
         ...editingTask,
         assigned_to_id: null,
@@ -490,7 +512,7 @@ export default function TasksTable() {
   };
 
   const handleClearDateDue = () => {
-    if (!isBulkEditMode) {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({ ...editingTask, date_due: null });
       setDateDueMenuAnchor(null);
     } else {
@@ -501,34 +523,36 @@ export default function TasksTable() {
     setDoUpdate(true);
   };
 
-  const handleDateDueClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleDateDueClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
     }
 
     setDateDueMenuAnchor(e.currentTarget);
   };
 
-  const handleToggleKeyTask = (task) => {
+  const handleToggleKeyTask = (task: Task) => {
     setEditingTask({ ...task, is_key_task: !task.is_key_task });
     setDoUpdate(true);
   };
 
-  const handleNameSubmit = e => {
+  const handleNameSubmit = (e: React.KeyboardEvent) => {
     if (e && e.key === 'Enter') {
-      if (!nameRef.current.value) {
+      if (!nameRef.current?.value) {
         openSnackBar('Task name cannot be empty.');
         return;
       } else {
         e.preventDefault();
-        setEditingTask({ ...editingTask, task_name: nameRef.current.value });
-        setDoUpdate(true);
+        if (editingTask) {
+          setEditingTask({ ...editingTask, task_name: nameRef.current.value });
+          setDoUpdate(true);
+        }
       }
     }
   };
 
-  const handleStatusSubmit = (newStatus) => {
-    if (!isBulkEditMode) {
+  const handleStatusSubmit = (newStatus: string) => {
+    if (!isBulkEditMode && editingTask) {
       setEditingTask({ ...editingTask, status: newStatus });
       setStatusMenuAnchor(null);
     } else {
@@ -539,28 +563,28 @@ export default function TasksTable() {
     setDoUpdate(true);
   };
 
-  const handleDateDueSubmit = newDate => {
-    if (!isBulkEditMode) {
-      setEditingTask({ ...editingTask, date_due: newDate.toISOString() });
+  const handleDateDueSubmit = (newDate: Moment | null) => {
+    if (!isBulkEditMode && editingTask) {
+      setEditingTask({ ...editingTask, date_due: newDate?.toISOString() || null });
       setDateDueMenuAnchor(null);
     } else {
       setBulkEditAction('dateDue');
-      setBulkDueValue(newDate.toISOString());
+      setBulkDueValue(newDate?.toISOString() || null);
     }
 
     setDoUpdate(true);
   };
 
-  const handleAddTagClick = (e, task) => {
-    if (!isBulkEditMode) {
+  const handleAddTagClick = (e: React.MouseEvent, task?: Task) => {
+    if (!isBulkEditMode && task) {
       setEditingTask(task);
     }
 
     setTagsMenuAnchor(e.currentTarget);
   };
 
-  const handleCreateTag = async e => {
-    const newTagValue = e.target.value;
+  const handleCreateTag = async (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const newTagValue = (e.target as HTMLInputElement).value;
 
     if (newTagValue) {
       const result = await createTag({
@@ -591,13 +615,13 @@ export default function TasksTable() {
     }
   };
 
-  const handleRemoveTag = async (tagId, task) => {
+  const handleRemoveTag = async (tagId: string, task: Task) => {
     setTagIdToRemove(Number(tagId));
     setEditingTask(task);
     setDoUpdate(true);
   };
 
-  const handleFolderSubmit = (_, folderVal) => {
+  const handleFolderSubmit = (_: React.SyntheticEvent, folderVal: Folder | null) => {
     if (folderVal) {
       setBulkFolderValue(folderVal.id);
       setBulkEditAction('folder');
@@ -605,11 +629,11 @@ export default function TasksTable() {
     }
   };
 
-  const handleCreateTask = async e => {
+  const handleCreateTask = async (e: React.KeyboardEvent) => {
     if (e && e.key === 'Enter') {
       e.preventDefault();
 
-      const newTaskName = addingTaskNameRef.current.value;
+      const newTaskName = addingTaskNameRef.current?.value;
 
       if (!newTaskName) {
         openSnackBar('Task name cannot be empty.');
@@ -630,17 +654,17 @@ export default function TasksTable() {
 
             setAddingTaskLoading(false);
             setTasks(tasks => [...tasks, {
-              task_id: task.id,
+              task_id: task.id as number,
               task_name: newTaskName,
               description: '',
               date_created: now,
               created_by_id: user.id,
               status: 'New',
-              folder_id: null,
+              folder_id: task.folderId as number,
               link_url: '',
               assigned_to_id: null,
               date_completed: null,
-              is_key_task: 0,
+              is_key_task: false,
               date_due: null,
               date_last_updated: now,
               tags: null,
@@ -652,10 +676,9 @@ export default function TasksTable() {
               updated_by_last: user.lastName
             }]);
 
-
             addingTaskNameRef.current.value = '';
             setTimeout(() => {
-              addingTaskNameRef.current.focus();
+              addingTaskNameRef.current?.focus();
             }, 250);
           } else {
             if (uiProps && uiProps.alertType === 'upgrade') {
@@ -670,9 +693,10 @@ export default function TasksTable() {
             }
             setAddingTaskLoading(false);
           }
-        } catch (error) {
-          openSnackBar(error.message, 'error');
-          setAddingTaskLoading(false);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            setAddingTaskLoading(false);
+          }
         }
       }
     }
@@ -690,8 +714,8 @@ export default function TasksTable() {
 
   useEffect(() => {
     if (isEditingName) {
-      nameRef.current.focus();
-      nameRef.current.setSelectionRange(1000, 1000);
+      nameRef.current?.focus();
+      nameRef.current?.setSelectionRange(1000, 1000);
     }
   }, [isEditingName]);
 
@@ -702,7 +726,7 @@ export default function TasksTable() {
 
   const handleToggleFilters = () => {
     setSearchParams(prev => {
-      prev.set('showFilters', !showFilters);
+      prev.set('showFilters', String(!showFilters));
       return prev;
     }, { replace: true });
   };
@@ -734,7 +758,9 @@ export default function TasksTable() {
           <Box className="flex-ac folder-tasks-controls">
             <Box className="flex-ac" gap='8px'>
               <Tooltip title="Toggle bulk edit" placement="top">
-                <IconButton onClick={handleBulkEditChange} color={isBulkEditMode ? 'primary' : ''}>
+                <IconButton
+                  onClick={handleBulkEditChange}
+                  color={isBulkEditMode ? 'primary' : 'default'}>
                   <EditNoteRoundedIcon />
                 </IconButton>
               </Tooltip>
@@ -879,8 +905,8 @@ export default function TasksTable() {
                           size="small"
                           className={name}
                           label={name}
-                          style={{ cursor: 'pointer' }}>
-                        </Chip>
+                          style={{ cursor: 'pointer' }}
+                        />
 
                       </MenuItem>)
                   }
@@ -901,16 +927,16 @@ export default function TasksTable() {
                     if (option.firstName) {
                       return `${option.firstName} ${option.lastName}`;
                     }
-                    return orgUsersMap[option]?.firstName + ' ' + orgUsersMap[option]?.lastName;
+                    return orgUsersMap[option.id]?.firstName + ' ' + orgUsersMap[option.id]?.lastName;
                   }
                   }
-                  isOptionEqualToValue={(option, value) => option.id === value}
-                  groupBy={(option) => option.role}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  groupBy={(option) => option.role || ''}
                   onChange={(_, newVal) => setSearchParams(prev => {
-                    prev.set('filterAssignedTo', newVal?.id || '');
+                    prev.set('filterAssignedTo', String(newVal?.id || ''));
                     return prev;
                   }, { replace: true })}
-                  value={filterAssignedTo}
+                  value={filterAssignedTo ? membersAndAdmins.find(user => user.id === filterAssignedTo) : null}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -1150,7 +1176,7 @@ export default function TasksTable() {
                             }
                           </Box>
                           {
-                            isEditingName && editingTask.task_id === task.task_id ?
+                            isEditingName && editingTask?.task_id === task.task_id ?
                               <TextField
                                 multiline
                                 variant="standard"
@@ -1187,8 +1213,8 @@ export default function TasksTable() {
                           size="small"
                           label={task.status}
                           onClick={e => handleStatusClick(e, task)}
-                          className={task.status}>
-                        </Chip>
+                          className={task.status}
+                        />
                       </Box>
                       <Box className="task-assigned-cell">
                         {
@@ -1200,7 +1226,7 @@ export default function TasksTable() {
                                 className="assigned-btn">
                                 {
                                   <Avatar>
-                                    {task.assigned_first[0]}{task.assigned_last[0]}
+                                    {task.assigned_first?.[0]}{task.assigned_last?.[0]}
                                   </Avatar>
                                 }
                               </IconButton>
@@ -1244,7 +1270,7 @@ export default function TasksTable() {
                             onDelete={() => handleRemoveTag(tagId, task)}
                             className="chip"
                             key={tagId}
-                            label={tagsMap[tagId].name}
+                            label={tagsMap[Number(tagId)].name}
                             size="small"
                           />)}
                         <Chip
@@ -1415,7 +1441,7 @@ export default function TasksTable() {
               <StaticDatePicker
                 disabled={bulkEditAction === 'dateDue'}
                 value={editingTask?.date_due}
-                renderInput={() => { }}
+                renderInput={() => <></>}
                 onChange={handleDateDueSubmit}
                 displayStaticWrapperAs="desktop"
               />
@@ -1446,7 +1472,7 @@ export default function TasksTable() {
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.role}
+                groupBy={(option) => option.role || ''}
                 onChange={handleAssigneeChange}
                 value={tempAssignee}
                 renderInput={(params) => (

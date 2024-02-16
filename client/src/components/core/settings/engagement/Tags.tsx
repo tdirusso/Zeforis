@@ -51,7 +51,7 @@ export default function Tags() {
   const deleteTagMenuOpen = Boolean(deleteTagMenuAnchor);
   const newTagMenuOpen = Boolean(newTagMenuAnchor);
 
-  const handleEditTag = (e: React.MouseEvent<HTMLDivElement>, tag: Tag) => {
+  const handleEditTag = (e: React.MouseEvent, tag: Tag) => {
     setTagToEdit(tag);
     setEditingTagName(tag.name);
     setEditTagMenuAnchor(e.currentTarget);
@@ -171,7 +171,7 @@ export default function Tags() {
   };
 
 
-  const openDeleteTagConfirmation = (e: React.MouseEvent<HTMLButtonElement>, tag: Tag) => {
+  const openDeleteTagConfirmation = (e: React.MouseEvent, tag: Tag) => {
     setTagToDelete(tag);
     setDeleteTagMenuAnchor(e.currentTarget);
   };

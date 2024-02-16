@@ -1,8 +1,8 @@
 import { Box, Grid, Paper, Tooltip, TextField, InputAdornment, Collapse, IconButton, ButtonGroup, Button, CircularProgress, Menu, MenuItem, Typography } from "@mui/material";
 import './styles.scss';
-import { useOutlet, useOutletContext, useSearchParams } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import Divider from '@mui/material/Divider';
-import React, { MouseEventHandler, SyntheticEvent, useEffect, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
 import SearchIcon from '@mui/icons-material/Search';
 import ListSubheader from '@mui/material/ListSubheader';

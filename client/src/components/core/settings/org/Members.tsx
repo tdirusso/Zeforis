@@ -8,6 +8,8 @@ import { useOutletContext } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import React from "react";
+import { AppContext } from "src/types/AppContext";
+import { User } from "@shared/types/User";
 
 export default function Members() {
 
@@ -17,24 +19,24 @@ export default function Members() {
     isAdmin,
     org,
     openModal
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
   const isSmallScreen = useMediaQuery('(max-width: 525px)');
 
-  const adminOrgUsers = [];
-  const memberOrgUsers = [];
+  const adminOrgUsers: User[] = [];
+  const memberOrgUsers: User[] = [];
 
   orgUsers.forEach(orgUser => {
-    orgUser.adminOfEngagements.length > 0 ?
+    (orgUser.adminOfEngagements || []).length > 0 ?
       adminOrgUsers.push(orgUser) :
       memberOrgUsers.push(orgUser);
   });
 
-  const handleEditUser = (userObject) => {
+  const handleEditUser = (userObject: User) => {
     openModal('edit-permissions', { user: userObject });
   };
 
-  const handleRemoveUser = (userObject) => {
+  const handleRemoveUser = (userObject: User) => {
     openModal('remove-user', { userToRemove: userObject });
   };
 

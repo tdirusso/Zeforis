@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -11,7 +11,6 @@ import { Button, Divider, FormControlLabel, Typography, useMediaQuery } from "@m
 import './styles.scss';
 import { isMobile } from "../../lib/constants";
 import validator from 'email-validator';
-import { InputChangeEventHandler } from "src/types/EventHandler";
 
 type FormData = {
   firstName: string,
@@ -152,7 +151,7 @@ export default function RegisterPage() {
     }
   }, []);
 
-  const handleInputChange: InputChangeEventHandler = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setFormData({

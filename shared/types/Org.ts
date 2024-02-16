@@ -2,8 +2,8 @@ import { User } from "./User";
 
 export type Org = {
   readonly id: number,
-  name?: string,
-  brandColor: '#3365f6',
+  name: string,
+  brandColor: string,
   logo?: string,
   ownerId?: number;
 };

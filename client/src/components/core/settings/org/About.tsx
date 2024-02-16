@@ -4,7 +4,7 @@ import { LoadingButton } from "@mui/lab";
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { useOutletContext } from "react-router";
 import { deleteActiveOrgId, leaveOrg, updateOrg } from "../../../../api/orgs";
-import { TwitterPicker } from "react-color";
+import { ColorResult, TwitterPicker } from "react-color";
 import { hexToRgb, updateTheme } from "../../../../lib/utils";
 import themeConfig from "../../../../theme";
 import LinkIcon from '@mui/icons-material/Link';
@@ -13,6 +13,8 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { deleteActiveEngagementId } from "../../../../api/engagements";
+import { AppContext } from "src/types/AppContext";
+import { EnvVariable, getEnvVariable } from "src/types/EnvVariable";
 
 export default function About() {
   const {
@@ -25,25 +27,25 @@ export default function About() {
     isOrgOwner,
     isAdmin,
     engagement
-  } = useOutletContext();
+  } = useOutletContext<AppContext>();
 
-  const customLoginPageUrl = `${process.env.REACT_APP_APP_DOMAIN}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
+  const customLoginPageUrl = `${getEnvVariable(EnvVariable.REACT_APP_APP_DOMAIN)}/login?cp=${window.btoa(`orgId=${org.id}`)}`;
 
   const [orgName, setOrgName] = useState(org.name);
   const [isUpdatingBranding, setUpdatingBranding] = useState(false);
   const [isUpdatingName, setUpdatingName] = useState(false);
-  const [brandColor, setBrandColor] = useState(org.brandColor);
+  const [brandColor, setBrandColor] = useState<string>(org.brandColor);
   const [logoSrc, setLogoSrc] = useState(org.logo);
-  const [logoFile, setLogoFile] = useState(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isLogoChanged, setLogoChanged] = useState(false);
   const [isLogoLoading, setLogoLoading] = useState(org.logo !== '');
   const [copyButtonText, setCopyButtonText] = useState('Copy link');
-  const [confirmLeaveOrgMenu, setConfirmLeaveOrgMenu] = useState(null);
+  const [confirmLeaveOrgMenu, setConfirmLeaveOrgMenu] = useState<Element | null>(null);
   const [leaving, setLeaving] = useState(false);
 
   const confirmLeaveOrgMenuOpen = Boolean(confirmLeaveOrgMenu);
 
-  const fileInput = useRef();
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const handleUpdateOrgName = async () => {
     if (!orgName) {
@@ -72,9 +74,11 @@ export default function About() {
         openSnackBar(message, 'error');
         setUpdatingName(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setUpdatingName(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setUpdatingName(false);
+      }
     }
   };
 
@@ -83,11 +87,15 @@ export default function About() {
 
     try {
       const fd = new FormData();
-      fd.append('logoFile', logoFile);
+
+      if (logoFile) {
+        fd.append('logoFile', logoFile);
+      }
+
       fd.append('name', org.name);
       fd.append('brandColor', brandColor);
-      fd.append('isLogoChanged', isLogoChanged);
-      fd.append('orgId', org.id);
+      fd.append('isLogoChanged', String(isLogoChanged));
+      fd.append('orgId', String(org.id));
 
       const result = await updateOrg(fd);
       const { success, message } = result;
@@ -101,14 +109,16 @@ export default function About() {
         openSnackBar(message, 'error');
         setUpdatingBranding(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setUpdatingBranding(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setUpdatingBranding(false);
+      }
     }
   };
 
-  const handleLogoChange = e => {
-    const imageFile = e.target.files[0];
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const imageFile = e.target.files?.[0];
 
     if (!imageFile) {
       return;
@@ -123,15 +133,20 @@ export default function About() {
     setLogoSrc('');
     setLogoFile(null);
     setLogoChanged(true);
-    fileInput.current.value = null;
+    if (fileInput.current) {
+      fileInput.current.value = '';
+    }
   };
 
   const updateUI = () => {
     const brandRGB = hexToRgb(brandColor);
-    document.documentElement.style.setProperty('--colors-primary', brandColor);
-    document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
-    themeConfig.palette.primary.main = brandColor;
-    updateTheme(setTheme);
+
+    if (brandRGB) {
+      document.documentElement.style.setProperty('--colors-primary', brandColor);
+      document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB.r}, ${brandRGB.g}, ${brandRGB.b}`);
+      themeConfig.palette!.primary!.main = brandColor;
+      updateTheme(setTheme);
+    }
   };
 
   const handleCopyLoginLink = () => {
@@ -167,9 +182,11 @@ export default function About() {
         openSnackBar(message, 'error');
         setLeaving(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLeaving(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLeaving(false);
+      }
     }
   };
 
