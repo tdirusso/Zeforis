@@ -1,0 +1,19 @@
+.task-actions-menu {
+  .MuiList-root {
+    padding: 0;
+  }
+
+  .MuiMenuItem-root {
+    font-size: 13px;
+    min-height: 30px;
+
+    span {
+      font-size: 13px;
+    }
+
+    svg {
+      color: #a8a8a8;
+      margin-right: 15px;
+    }
+  }
+}
