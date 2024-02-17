@@ -12,8 +12,19 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import FolderIcon from '@mui/icons-material/Folder';
 import { isMobile } from '../../lib/constants';
 import SearchIcon from '@mui/icons-material/Search';
+import { Folder } from '@shared/types/Folder';
+import { Task } from '@shared/types/Task';
+import { AppContext } from 'src/types/AppContext';
 
-export default function SearchModal(props) {
+type SearchModalProps = {
+  folders: Folder[],
+  tasks: Task[],
+  isOpen: boolean,
+  closeModal: () => void,
+  openDrawer: AppContext['openDrawer'];
+};
+
+export default function SearchModal(props: SearchModalProps) {
   const navigate = useNavigate();
 
   const [query, setQuery] = useState('');
@@ -22,7 +33,7 @@ export default function SearchModal(props) {
     folders,
     tasks,
     isOpen,
-    close,
+    closeModal,
     openDrawer
   } = props;
 
@@ -42,24 +53,24 @@ export default function SearchModal(props) {
     return folder.name.toLowerCase().includes(query.toLowerCase());
   });
 
-  const handleTaskClick = (task) => {
+  const handleTaskClick = (task: Task) => {
     openDrawer('task', { taskProp: task });
-    close();
+    closeModal();
     setTimeout(() => {
       setQuery('');
     }, 500);
   };
 
-  const handleFolderClick = (folder) => {
+  const handleFolderClick = (folder: Folder) => {
     navigate(`/home/tasks?folderId=${folder.id}`);
-    close();
+    closeModal();
     setTimeout(() => {
       setQuery('');
     }, 500);
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
     setQuery('');
     setTimeout(() => {
       setQuery('');

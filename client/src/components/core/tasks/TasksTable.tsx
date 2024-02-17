@@ -843,7 +843,7 @@ export default function TasksTable() {
                   Move
                 </LoadingButton>
                 <Button
-                  onClick={() => openModal('delete-tasks', { taskIds: selectedTasks })}
+                  onClick={() => openModal('delete-tasks', { taskIds: selectedTasks, setSelectedTasks })}
                   disabled={selectedTasks.length === 0}
                   style={{ marginRight: '15px' }}
                   size="small"

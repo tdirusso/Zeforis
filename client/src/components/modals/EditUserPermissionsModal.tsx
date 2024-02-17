@@ -15,11 +15,29 @@ import HelpIcon from '@mui/icons-material/Help';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
+import { User } from '@shared/types/User';
+import { Engagement } from '@shared/types/Engagement';
+import { AppContext } from 'src/types/AppContext';
+import { Org } from '@shared/types/Org';
+import { Task } from '@shared/types/Task';
 
-export default function EditUserPermissionsModal(props) {
+type EditUserPermissionsModalProps = {
+  isOpen: boolean,
+  closeModal: () => void,
+  user: User,
+  engagements: Engagement[],
+  setOrgUsers: AppContext['setOrgUsers'],
+  orgUsersMap: AppContext['orgUsersMap'],
+  openSnackBar: AppContext['openSnackBar'],
+  org: Org,
+  tasks: Task[],
+  setTasks: AppContext['setTasks'];
+};
+
+export default function EditUserPermissionsModal(props: EditUserPermissionsModalProps) {
   const {
     isOpen,
-    close,
+    closeModal,
     user,
     engagements,
     setOrgUsers,
@@ -34,11 +52,11 @@ export default function EditUserPermissionsModal(props) {
 
   const isSmallScreen = useMediaQuery('(max-width: 800px)');
 
-  const memberOfEngagementIds = user?.memberOfEngagements.map(({ id }) => id) || [];
-  const adminOfEngagementIds = user?.adminOfEngagements.map(({ id }) => id) || [];
+  const memberOfEngagementIds = user?.memberOfEngagements?.map(({ id }) => id) || [];
+  const adminOfEngagementIds = user?.adminOfEngagements?.map(({ id }) => id) || [];
 
-  const [bulkAccessMenu, setBulkAccessMenu] = useState(false);
-  const [bulkAdminMenu, setBulkAdminMenu] = useState(false);
+  const [bulkAccessMenu, setBulkAccessMenu] = useState<Element | null>(null);
+  const [bulkAdminMenu, setBulkAdminMenu] = useState<Element | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [isEnablingAccess, setEnablingAccess] = useState(false);
   const [isDisablingAccess, setDisablingAccess] = useState(false);
@@ -51,7 +69,7 @@ export default function EditUserPermissionsModal(props) {
 
   const theUser = orgUsersMap[user?.id];
 
-  const handleUpdatePermissions = async (isAdmin, engagementObject) => {
+  const handleUpdatePermissions = async (isAdmin: boolean, engagementObject: Engagement) => {
     setLoading(true);
 
     const engagementId = engagementObject.id;
@@ -64,14 +82,14 @@ export default function EditUserPermissionsModal(props) {
 
       if (success) {
         if (isAdmin) {
-          theUser.memberOfEngagements = theUser.memberOfEngagements.filter(c => c.id !== engagementId);
-          theUser.adminOfEngagements.push({
+          theUser.memberOfEngagements = theUser.memberOfEngagements?.filter(c => c.id !== engagementId);
+          theUser.adminOfEngagements?.push({
             id: engagementId,
             name: engagementName
           });
         } else {
-          theUser.adminOfEngagements = theUser.adminOfEngagements.filter(c => c.id !== engagementId);
-          theUser.memberOfEngagements.push({
+          theUser.adminOfEngagements = theUser.adminOfEngagements?.filter(c => c.id !== engagementId);
+          theUser.memberOfEngagements?.push({
             id: engagementId,
             name: engagementName
           });
@@ -94,13 +112,15 @@ export default function EditUserPermissionsModal(props) {
         }
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
-  const handleUpdateAccess = async (hasAccess, engagementObject) => {
+  const handleUpdateAccess = async (hasAccess: boolean, engagementObject: Engagement) => {
     setLoading(true);
 
     const engagementId = engagementObject.id;
@@ -113,13 +133,13 @@ export default function EditUserPermissionsModal(props) {
 
       if (success) {
         if (hasAccess) {
-          theUser.memberOfEngagements.push({
+          theUser.memberOfEngagements?.push({
             id: engagementId,
             name: engagementName
           });
         } else {
-          theUser.adminOfEngagements = theUser.adminOfEngagements.filter(c => c.id !== engagementId);
-          theUser.memberOfEngagements = theUser.memberOfEngagements.filter(c => c.id !== engagementId);
+          theUser.adminOfEngagements = theUser.adminOfEngagements?.filter(c => c.id !== engagementId);
+          theUser.memberOfEngagements = theUser.memberOfEngagements?.filter(c => c.id !== engagementId);
         }
 
         setOrgUsers(Object.values(orgUsersMap));
@@ -129,23 +149,25 @@ export default function EditUserPermissionsModal(props) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    setBulkAccessMenu(false);
-    setBulkAdminMenu(false);
-    close();
+    setBulkAccessMenu(null);
+    setBulkAdminMenu(null);
+    closeModal();
 
     setTimeout(() => {
       setLoading(false);
     }, 500);
   };
 
-  const handleBulkUpdateAccess = async (hasAccess, isConfirmed) => {
+  const handleBulkUpdateAccess = async (hasAccess: boolean, isConfirmed: boolean = false) => {
     if (hasAccess) {
       setEnablingAccess(true);
     } else {
@@ -196,14 +218,16 @@ export default function EditUserPermissionsModal(props) {
         setEnablingAccess(false);
         setDisablingAccess(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setEnablingAccess(false);
-      setDisablingAccess(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setEnablingAccess(false);
+        setDisablingAccess(false);
+      }
     }
   };
 
-  const handleBulkUpdatePermission = async isAdmin => {
+  const handleBulkUpdatePermission = async (isAdmin: boolean) => {
     if (isAdmin) {
       setEnablingAdmin(true);
     } else {
@@ -219,10 +243,10 @@ export default function EditUserPermissionsModal(props) {
 
       if (success) {
         if (isAdmin) {
-          theUser.adminOfEngagements = [...theUser.adminOfEngagements, ...theUser.memberOfEngagements];
+          theUser.adminOfEngagements = [...(theUser.adminOfEngagements || []), ...(theUser.memberOfEngagements || [])];
           theUser.memberOfEngagements = [];
         } else {
-          theUser.memberOfEngagements = [...theUser.adminOfEngagements, ...theUser.memberOfEngagements];;
+          theUser.memberOfEngagements = [...(theUser.adminOfEngagements || []), ...(theUser.memberOfEngagements || [])];
           theUser.adminOfEngagements = [];
         }
 
@@ -246,10 +270,12 @@ export default function EditUserPermissionsModal(props) {
         setEnablingAdmin(false);
         setDisablingAdmin(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setEnablingAdmin(false);
-      setDisablingAdmin(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setEnablingAdmin(false);
+        setDisablingAdmin(false);
+      }
     }
   };
 

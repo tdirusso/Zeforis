@@ -7,6 +7,10 @@ import { Task, TasksMap } from "@shared/types/Task";
 import { User } from "@shared/types/User";
 import { Widget } from "@shared/types/Widget";
 
+type CustomObjectParams = {
+  [key: string | number]: any;
+};
+
 export type AppContext = {
   engagement: Engagement,
   engagements: Engagement[],
@@ -36,8 +40,8 @@ export type AppContext = {
   setWidgets: React.Dispatch<React.SetStateAction<Widget[]>>,
   setUser: React.Dispatch<React.SetStateAction<User | null>>,
   openSnackBar: (message?: string, type?: AlertColor, options?: {}) => void,
-  openModal: (modalType: string, props?: any) => void,
-  openDrawer: (drawerType: string, props?: any) => void,
-  openDialog: (dialogType: string, props?: any) => void,
-  openContextMenu: (event: React.MouseEvent<Element, MouseEvent>, contextMenuType: string, props: any) => void;
+  openModal: (modalType: string, props?: CustomObjectParams) => void,
+  openDrawer: (drawerType: string, props?: CustomObjectParams) => void,
+  openDialog: (dialogType: string, props?: CustomObjectParams) => void,
+  openContextMenu: (event: React.MouseEvent<Element, MouseEvent>, contextMenuType: string, props?: CustomObjectParams) => void;
 };

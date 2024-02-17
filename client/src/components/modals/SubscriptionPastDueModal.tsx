@@ -6,11 +6,11 @@ import { DialogTitle, Typography } from '@mui/material';
 import { stripeCustomerPortalUrl } from '../../lib/constants';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
-export default function SubscriptionPastDueModal(props) {
+export default function SubscriptionPastDueModal(props: { isOpen: boolean, closeModal: () => void; }) {
 
   const {
     isOpen,
-    close
+    closeModal
   } = props;
 
   const setSupressPastDue = () => {
@@ -19,11 +19,11 @@ export default function SubscriptionPastDueModal(props) {
 
   const handleDismiss = () => {
     setSupressPastDue();
-    close();
+    closeModal();
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
   };
 
   return (

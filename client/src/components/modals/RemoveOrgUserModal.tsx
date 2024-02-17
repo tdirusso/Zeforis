@@ -6,23 +6,38 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { removeOrgUser } from '../../api/orgs';
 import { DialogTitle, Typography } from '@mui/material';
+import { AppContext } from 'src/types/AppContext';
+import { User } from '@shared/types/User';
+import { Org } from '@shared/types/Org';
+import { Task } from '@shared/types/Task';
 
-export default function RemoveOrgUserModal(props) {
+type RemoveOrgUserModalProps = {
+  isOpen: boolean,
+  closeModal: () => void,
+  org: Org,
+  setOrgUsers: AppContext['setOrgUsers'],
+  openSnackBar: AppContext['openSnackBar'],
+  user: User,
+  tasks: Task[],
+  setTasks: AppContext['setTasks'];
+};
+
+export default function RemoveOrgUserModal(props: RemoveOrgUserModalProps) {
   const {
     isOpen,
-    close,
+    closeModal,
     org,
     setOrgUsers,
     openSnackBar,
-    userToRemove,
+    user,
     tasks,
     setTasks
   } = props;
 
   const orgId = org.id;
   const orgName = org.name;
-  const userId = userToRemove?.id;
-  const name = userToRemove?.firstName + ' ' + userToRemove?.lastName;
+  const userId = user?.id;
+  const name = user?.firstName + ' ' + user?.lastName;
 
   const [isLoading, setLoading] = useState(false);
 
@@ -36,11 +51,11 @@ export default function RemoveOrgUserModal(props) {
       const resultMessage = result.message;
 
       if (success) {
-        setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== userToRemove.id));
+        setOrgUsers(orgUsers => orgUsers.filter(u => u.id !== user.id));
 
         const tasksClone = [...tasks];
         tasksClone.forEach(task => {
-          if (task.assigned_to_id && task.assigned_to_id === userToRemove.id) {
+          if (task.assigned_to_id && task.assigned_to_id === user.id) {
             task.assigned_to_id = null;
           }
         });
@@ -52,20 +67,22 @@ export default function RemoveOrgUserModal(props) {
         openSnackBar(resultMessage, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
     setLoading(false);
   };
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={close} className='modal'>
+      <Dialog open={isOpen} onClose={closeModal} className='modal'>
         <DialogTitle>
           Remove User
         </DialogTitle>
@@ -85,7 +102,6 @@ export default function RemoveOrgUserModal(props) {
             <LoadingButton
               variant='contained'
               onClick={handleRemoveOrgUser}
-              required
               loading={isLoading}
               color="error">
               Yes, remove {name}

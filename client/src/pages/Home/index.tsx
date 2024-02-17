@@ -389,10 +389,27 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
             />
 
             <Modals
-              {...context}
-              {...modalProps}
+              setTasks={setTasks}
+              modalProps={modalProps}
               modalToOpen={modalToOpen}
               closeModal={closeModal}
+              user={user!}
+              engagements={engagements}
+              org={org!}
+              openSnackBar={openSnackBar}
+              foldersMap={foldersMap}
+              setFolders={setFolders}
+              engagement={engagement}
+              folders={folders}
+              tasksMap={tasksMap}
+              engagementAdmins={engagementAdmins}
+              engagementMembers={engagementMembers}
+              tags={tags}
+              tasks={tasks}
+              setOrgUsers={setOrgUsers}
+              orgUsersMap={orgUsersMap}
+              orgUsers={orgUsers}
+              openDrawer={openDrawer}
             />
 
             <Drawers

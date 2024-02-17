@@ -2,16 +2,13 @@ import { useState } from 'react';
 
 export default function useContextMenu() {
   const [contextMenuToOpen, setContextMenuToOpen] = useState('');
-  const [contextMenuProps, setContextMenuProps] = useState({});
+  const [contextMenuProps, setContextMenuProps] = useState<{ [key: string | number]: any; }>({});
   const [mouseCoords, setMouseCoords] = useState({ x: 0, y: 0 });
 
-  const openContextMenu = (event: React.MouseEvent, contextMenuType: string, props: any) => {
+  const openContextMenu = (event: React.MouseEvent, contextMenuType: string, props: { [key: string | number]: any; } = {}) => {
     event.preventDefault();
 
-    if (props) {
-      setContextMenuProps(props);
-    }
-
+    setContextMenuProps(props);
     setContextMenuToOpen(contextMenuType);
     setMouseCoords({
       x: event.clientX,

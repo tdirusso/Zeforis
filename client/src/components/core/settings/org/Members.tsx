@@ -37,7 +37,7 @@ export default function Members() {
   };
 
   const handleRemoveUser = (userObject: User) => {
-    openModal('remove-user', { userToRemove: userObject });
+    openModal('remove-user', { user: userObject });
   };
 
   return (

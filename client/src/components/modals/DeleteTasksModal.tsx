@@ -6,12 +6,26 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteTasks } from '../../api/tasks';
 import { DialogTitle, Typography } from '@mui/material';
+import { Task } from '@shared/types/Task';
+import { AppContext } from 'src/types/AppContext';
+import { Engagement } from '@shared/types/Engagement';
 
-export default function DeleteTasksModal(props) {
+type DeleteTasksModalProps = {
+  isOpen: boolean,
+  closeModal: () => void,
+  taskIds: number[],
+  setSelectedTasks: React.Dispatch<React.SetStateAction<number[]>>,
+  setTasks: AppContext['setTasks'],
+  engagement: Engagement,
+  tasksMap: AppContext['tasksMap'],
+  openSnackBar: AppContext['openSnackBar'];
+};
+
+export default function DeleteTasksModal(props: DeleteTasksModalProps) {
 
   const {
     isOpen,
-    close,
+    closeModal,
     taskIds = [],
     setSelectedTasks,
     setTasks,
@@ -55,14 +69,16 @@ export default function DeleteTasksModal(props) {
         openSnackBar(resultMessage, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -95,7 +111,6 @@ export default function DeleteTasksModal(props) {
             <LoadingButton
               variant='contained'
               onClick={handleDeleteTasks}
-              required
               loading={isLoading}
               color="error">
               Yes, Delete

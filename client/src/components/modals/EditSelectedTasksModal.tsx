@@ -5,23 +5,45 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { batchUpdateTasks } from '../../api/tasks';
-import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip, ListItemIcon, ListItemText, Box, RadioGroup, FormControlLabel, Radio, DialogTitle, Typography } from '@mui/material';
+import { Grid, FormControl, Select, InputLabel, MenuItem, Autocomplete, TextField, Chip, ListItemIcon, ListItemText, Box, RadioGroup, FormControlLabel, Radio, DialogTitle, Typography, SelectChangeEvent } from '@mui/material';
 import { statuses } from '../../lib/constants';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
-import { Folder, Person } from '@mui/icons-material';
+import { Folder as FolderIcon, Person } from '@mui/icons-material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import { User } from '@shared/types/User';
+import { Folder } from '@shared/types/Folder';
+import { AppContext } from 'src/types/AppContext';
+import { Engagement } from '@shared/types/Engagement';
+import { Tag } from '@shared/types/Tag';
+import { Moment } from 'moment';
+import { Task } from '@shared/types/Task';
 
-export default function EditSelectedTasksModal(props) {
+type EditSelectedTasksModalProps = {
+  taskIds: number[],
+  isOpen: boolean,
+  closeModal: () => void,
+  setSelectedTasks: React.Dispatch<React.SetStateAction<number[]>>,
+  engagementAdmins: User[],
+  engagementMembers: User[],
+  folders: Folder[],
+  setTasks: AppContext['setTasks'],
+  engagement: Engagement,
+  tasksMap: AppContext['tasksMap'],
+  openSnackBar: AppContext['openSnackBar'],
+  tags: Tag[];
+};
+
+export default function EditSelectedTasksModal(props: EditSelectedTasksModalProps) {
   const {
     taskIds = [],
     isOpen,
-    close,
+    closeModal,
     setSelectedTasks,
     engagementAdmins,
     engagementMembers,
@@ -38,11 +60,11 @@ export default function EditSelectedTasksModal(props) {
   const [isLoading, setLoading] = useState(false);
   const [action, setAction] = useState('');
   const [status, setStatus] = useState('');
-  const [assignee, setAssignee] = useState(null);
-  const [folder, setFolder] = useState(null);
-  const [dateDue, setDateDue] = useState(null);
+  const [assignee, setAssignee] = useState<User | null>(null);
+  const [folder, setFolder] = useState<Folder | null>(null);
+  const [dateDue, setDateDue] = useState<Moment | null>(null);
   const [isKey, setIsKey] = useState('');
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [tagAction, setTagAction] = useState('add');
 
   const handleBatchUpdate = async () => {
@@ -69,7 +91,7 @@ export default function EditSelectedTasksModal(props) {
     setLoading(true);
 
     try {
-      const { updatedTasks, message } = await batchUpdateTasks({
+      const { updatedTasks, message }: { updatedTasks: Task[], message: string; } = await batchUpdateTasks({
         engagementId,
         taskIds,
         action,
@@ -92,14 +114,16 @@ export default function EditSelectedTasksModal(props) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
     setTimeout(() => {
       setLoading(false);
       setAction('');
@@ -148,7 +172,7 @@ export default function EditSelectedTasksModal(props) {
             options={[...engagementAdmins, ...engagementMembers]}
             getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            groupBy={(option) => option.role}
+            groupBy={(option) => option.role || ''}
             onChange={(_, newVal) => setAssignee(newVal)}
             disabled={isLoading}
             renderInput={(params) => (
@@ -182,7 +206,7 @@ export default function EditSelectedTasksModal(props) {
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <DatePicker
               disabled={isLoading}
-              format="MM/DD/YYYY"
+              inputFormat="MM/DD/YYYY"
               value={dateDue}
               onChange={value => setDateDue(value)}
               renderInput={(params) => <TextField
@@ -272,7 +296,7 @@ export default function EditSelectedTasksModal(props) {
     }
   };
 
-  const handleChangeAction = e => {
+  const handleChangeAction = (e: SelectChangeEvent) => {
     setAssignee(null);
     setFolder(null);
     setStatus('');
@@ -326,7 +350,7 @@ export default function EditSelectedTasksModal(props) {
                 </MenuItem>
                 <MenuItem value="folder">
                   <ListItemIcon>
-                    <Folder fontSize='small' />
+                    <FolderIcon fontSize='small' />
                   </ListItemIcon>
                   Folder
                 </MenuItem>
@@ -368,7 +392,6 @@ export default function EditSelectedTasksModal(props) {
           <LoadingButton
             variant='contained'
             onClick={handleBatchUpdate}
-            required
             loading={isLoading}>
             Apply Changes
           </LoadingButton>

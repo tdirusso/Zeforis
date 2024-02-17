@@ -4,16 +4,16 @@ import Button from '@mui/material/Button';
 import { Box, DialogTitle, Divider, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-export default function UpgradeModal(props) {
+export default function UpgradeModal(props: { isOpen: boolean, closeModal: () => void; }) {
 
   const {
-    close,
+    closeModal,
     isOpen
   } = props;
 
   return (
     <div>
-      <Dialog open={isOpen} onClose={close} className='modal' PaperProps={{ style: { minWidth: 425 } }}>
+      <Dialog open={isOpen} onClose={closeModal} className='modal' PaperProps={{ style: { minWidth: 425 } }}>
         <DialogTitle>
           Upgrade to Pro &nbsp;🚀
         </DialogTitle>
@@ -29,7 +29,7 @@ export default function UpgradeModal(props) {
             <Typography component='span' color='primary' fontWeight='bold'>Additional</Typography> administrators.
           </Typography>
           <Box mt={4}>
-            <Link to='settings/account/billing' onClick={close}>
+            <Link to='settings/account/billing' onClick={closeModal}>
               <Button size='large' variant='contained' fullWidth>
                 Upgrade now
               </Button>

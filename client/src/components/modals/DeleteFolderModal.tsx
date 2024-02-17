@@ -6,12 +6,25 @@ import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
 import { deleteFolder } from '../../api/folders';
 import { DialogTitle, Typography } from '@mui/material';
+import { Engagement } from '@shared/types/Engagement';
+import { AppContext } from 'src/types/AppContext';
 
-export default function DeleteFolderModal(props) {
+type DeleteFolderModalProps = {
+  isOpen: boolean,
+  closeModal: () => void,
+  folderId: number,
+  engagement: Engagement,
+  foldersMap: AppContext['foldersMap'],
+  setFolders: AppContext['setFolders'],
+  setTasks: AppContext['setTasks'],
+  openSnackBar: AppContext['openSnackBar'];
+};
+
+export default function DeleteFolderModal(props: DeleteFolderModalProps) {
 
   const {
     isOpen,
-    close,
+    closeModal,
     folderId,
     engagement,
     foldersMap,
@@ -47,14 +60,16 @@ export default function DeleteFolderModal(props) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -82,7 +97,6 @@ export default function DeleteFolderModal(props) {
             <LoadingButton
               variant='contained'
               onClick={handleDeleteFolder}
-              required
               loading={isLoading}
               color="error">
               Yes, Delete

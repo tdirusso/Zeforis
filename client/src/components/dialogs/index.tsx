@@ -5,11 +5,11 @@ import { Engagement } from "@shared/types/Engagement";
 import { Org } from "@shared/types/Org";
 import { User } from "@shared/types/User";
 
-export type DialogProps = {
+export type DialogsProps = {
   dialogToOpen?: string,
   dialogProps?: any,
   closeDialog: () => void,
-  isOpen?: boolean;
+  //isOpen?: boolean;
   openDialog?: AppContext['openDialog'],
   openModal?: AppContext['openModal'],
   openSnackBar: AppContext['openSnackBar'],
@@ -20,24 +20,34 @@ export type DialogProps = {
 };
 
 
-export default function Dialogs(props: DialogProps) {
+export default function Dialogs(props: DialogsProps) {
   const {
     dialogToOpen,
-    closeDialog
+    closeDialog,
+    openSnackBar,
+    org,
+    user,
+    engagements,
+    engagement
   } = props;
 
   return (
     <>
       <ChooseEngagementDialog
-        {...props}
         isOpen={dialogToOpen === 'choose-engagement'}
         closeDialog={closeDialog}
+        engagements={engagements}
+        org={org}
+        user={user}
+        engagement={engagement}
       />
 
       <CreateEngagementDialog
-        {...props}
         isOpen={dialogToOpen === 'create-engagement'}
         closeDialog={closeDialog}
+        org={org}
+        openSnackBar={openSnackBar}
+        user={user}
       />
     </>
   );

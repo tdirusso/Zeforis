@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
 import { Box, Checkbox, DialogActions, DialogTitle, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Collapse } from "@mui/material";
 import './styles.scss';
 import StarIcon from '@mui/icons-material/Star';
@@ -15,10 +15,23 @@ import ListItemText from '@mui/material/ListItemText';
 import FolderIcon from '@mui/icons-material/Folder';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import { updateFolder } from '../../api/folders';
+import { AppContext } from 'src/types/AppContext';
+import { Folder } from '@shared/types/Folder';
 
-export default function MoveFolderModal(props) {
+type MoveFolderModalProps = {
+  closeModal: () => void,
+  isOpen: boolean,
+  foldersMap: AppContext['foldersMap'],
+  moveFolderId: number,
+  folders: AppContext['folders'],
+  openSnackBar: AppContext['openSnackBar'],
+  engagementId: number,
+  setFolders: AppContext['setFolders'];
+};
+
+export default function MoveFolderModal(props: MoveFolderModalProps) {
   const {
-    close,
+    closeModal,
     isOpen,
     foldersMap,
     moveFolderId,
@@ -29,8 +42,8 @@ export default function MoveFolderModal(props) {
   } = props;
 
   const [isLoading, setLoading] = useState(false);
-  const [openStates, setOpenStates] = useState({});
-  const [selectedFolderId, setSelectedFolderId] = useState(null);
+  const [openStates, setOpenStates] = useState<FolderStates>({});
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
   const [moveToTop, setMoveToTop] = useState(false);
 
   const theFolder = foldersMap[moveFolderId];
@@ -60,14 +73,16 @@ export default function MoveFolderModal(props) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
 
   };
 
-  const handleMoveToTopClick = (_, newVal) => {
+  const handleMoveToTopClick = (_: ChangeEvent, newVal: boolean) => {
     if (newVal === true) {
       setSelectedFolderId(null);
     }
@@ -76,7 +91,7 @@ export default function MoveFolderModal(props) {
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
 
     setTimeout(() => {
       setMoveToTop(false);
@@ -85,8 +100,8 @@ export default function MoveFolderModal(props) {
     }, 500);
   };
 
-  const keyFolders = [];
-  const otherFolders = [];
+  const keyFolders: Folder[] = [];
+  const otherFolders: Folder[] = [];
 
   folders.forEach(folder => {
     if (!folder.parent_id) {
@@ -153,7 +168,6 @@ export default function MoveFolderModal(props) {
             disabled={(!selectedFolderId && !moveToTop) || isLoading}
             variant='contained'
             onClick={handleMoveFolder}
-            required
             loading={isLoading}>
             Move
           </LoadingButton>
@@ -163,7 +177,25 @@ export default function MoveFolderModal(props) {
   );
 };
 
-function FolderList(props) {
+type FolderStates = {
+  [key: number]: boolean;
+};
+
+type FolderListProps = {
+  keyFolders: Folder[],
+  otherFolders: Folder[];
+  allFolders: Folder[];
+  openStates: FolderStates,
+  setOpenStates: React.Dispatch<React.SetStateAction<{
+    [key: number]: boolean;
+  }>>,
+  setSelectedFolderId: React.Dispatch<React.SetStateAction<number | null>>;
+  selectedFolderId: number | null;
+  moveToTop: boolean,
+  moveFolderId: number;
+};
+
+function FolderList(props: FolderListProps) {
   const {
     keyFolders,
     otherFolders,
@@ -176,7 +208,7 @@ function FolderList(props) {
     moveFolderId
   } = props;
 
-  const handleFolderClick = (folderId, hasNestedFolders) => {
+  const handleFolderClick = (folderId: number) => {
     setSelectedFolderId(folderId);
     setOpenStates(prevOpenStates => ({
       ...prevOpenStates,
@@ -242,7 +274,21 @@ function FolderList(props) {
   );
 }
 
-function FolderListItem(props) {
+type FolderListItemProps = {
+  name: string,
+  id: number,
+  selectedFolderId: number | null,
+  handleFolderClick: (folderId: number, hasNestedFolders: boolean) => void,
+  allFolders: Folder[],
+  openStates: FolderStates,
+  moveToTop: boolean,
+  moveFolderId: number,
+  setOpenStates: React.Dispatch<React.SetStateAction<{
+    [key: number]: boolean;
+  }>>;
+};
+
+function FolderListItem(props: FolderListItemProps) {
   const {
     name,
     id,
@@ -291,7 +337,7 @@ function FolderListItem(props) {
   );
 }
 
-function renderNestedFolders(folders, parentFolderId, handleFolderClick, openStates, setOpenStates, selectedFolderId, moveToTop, moveFolderId, depth = 1) {
+function renderNestedFolders(folders: Folder[], parentFolderId: number, handleFolderClick: (folderId: number, hasNestedFolders: boolean) => void, openStates: FolderStates, setOpenStates: FolderListProps['setOpenStates'], selectedFolderId: number | null, moveToTop: boolean, moveFolderId: number, depth = 1) {
   depth++;
   const nestedFolders = folders.filter(folder => folder.parent_id === parentFolderId);
 

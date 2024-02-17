@@ -9,13 +9,29 @@ import validator from 'email-validator';
 import { inviteOrgUsers } from '../../api/orgs';
 import { appLimits } from '../../lib/constants';
 import { Link } from 'react-router-dom';
+import { AppContext } from 'src/types/AppContext';
+import { Org } from '@shared/types/Org';
+import { Engagement } from '@shared/types/Engagement';
+import { User } from '@shared/types/User';
 
 const inviteLimit = appLimits.simultaneousEmailInvites;
 
-export default function InviteOrgUsers(props) {
+type InviteOrgUsersProps = {
+  closeModal: () => void,
+  isOpen: boolean,
+  openSnackBar: AppContext['openSnackBar'],
+  org: Org,
+  orgUsers: AppContext['orgUsers'],
+  engagement: Engagement,
+  user: User,
+  orgUsersMap: AppContext['orgUsersMap'],
+  setOrgUsers: AppContext['setOrgUsers'];
+};
+
+export default function InviteOrgUsers(props: InviteOrgUsersProps) {
 
   const {
-    close,
+    closeModal,
     isOpen,
     openSnackBar,
     org,
@@ -34,22 +50,22 @@ export default function InviteOrgUsers(props) {
   const orgLogo = org.logo;
   const orgColor = org.brandColor;
 
-  const [inviteType, setInviteType] = useState(null);
-  const [inviteeUsers, setInviteeUsers] = useState([]);
+  const [inviteType, setInviteType] = useState('');
+  const [inviteeUsers, setInviteeUsers] = useState<(User)[]>([]);
   const [animateOptions, setAnimateOptions] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
-  const emailRef = useRef();
+  const emailRef = useRef<HTMLInputElement>(null);
 
   const allowedToInvite = orgUsers.filter(orgUser => {
     return (
       orgUser.id !== userId
       &&
-      ![...orgUser.memberOfEngagements, ...orgUser.adminOfEngagements].some(eng => eng.id === engagementId)
+      ![...(orgUser.memberOfEngagements || []), ...(orgUser.adminOfEngagements || [])].some(eng => eng.id === engagementId)
     );
   });
 
-  const handleInviteTypeChange = type => {
+  const handleInviteTypeChange = (type: string) => {
     if (!inviteType) {
       setInviteType(type);
       setAnimateOptions(true);
@@ -69,24 +85,26 @@ export default function InviteOrgUsers(props) {
   };
 
   const handleClose = () => {
-    close();
+    closeModal();
     setTimeout(() => {
       setInviteeUsers([]);
-      setInviteType(null);
+      setInviteType('');
       setLoading(false);
       setAnimateOptions(false);
     }, 500);
   };
 
-  const handleEmailChange = (e, newVal) => {
-    const isNewOrgUser =
-      typeof newVal[newVal.length - 1] !== 'object'
-      && typeof newVal[newVal.length - 1] !== 'undefined';
+  // const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>, newVal: (string | User)[]) => {
+  //   const isNewOrgUser =
+  //     typeof newVal[newVal.length - 1] === 'string'
+  //     && typeof newVal[newVal.length - 1] !== 'undefined';
 
-    setInviteeUsers(isNewOrgUser ? [...inviteeUsers, { email: e.target.value.toLowerCase() }] : newVal);
-  };
+  //     const 
 
-  let invalidEmails = [];
+  //   setInviteeUsers(isNewOrgUser ? [...inviteeUsers, { email: e.target.value.toLowerCase(), id: -1 }] : newVal);
+  // };
+
+  let invalidEmails: string[] = [];
   let newEmailCount = 0;
 
   inviteeUsers.forEach(userObject => {
@@ -94,93 +112,93 @@ export default function InviteOrgUsers(props) {
       invalidEmails.push(userObject.email);
     }
 
-    if (!userObject.id) {
+    if (userObject.id === -1) {
       newEmailCount++;
     }
   });
 
-  const handleInviteUsers = async () => {
-    if (!inviteeUsers.length) {
-      openSnackBar("Please enter at least 1 user to add.");
-      return;
-    }
+  // const handleInviteUsers = async () => {
+  //   if (!inviteeUsers.length) {
+  //     openSnackBar("Please enter at least 1 user to add.");
+  //     return;
+  //   }
 
-    if (inviteeUsers.some(({ email }) => email === user.email)) {
-      openSnackBar(`You cannot invite yourself (${user.email}) to an engagement.`);
-      return;
-    }
+  //   if (inviteeUsers.some(({ email }) => email === user.email)) {
+  //     openSnackBar(`You cannot invite yourself (${user.email}) to an engagement.`);
+  //     return;
+  //   }
 
-    setLoading(true);
+  //   setLoading(true);
 
-    try {
-      const {
-        success,
-        message,
-        invitedUsers
-      } = await inviteOrgUsers(orgId, {
-        usersToInvite: inviteeUsers,
-        engagementId,
-        engagementName,
-        orgName,
-        inviteType,
-        orgColor,
-        orgLogo
-      });
+  //   try {
+  //     const {
+  //       success,
+  //       message,
+  //       invitedUsers
+  //     } = await inviteOrgUsers(orgId, {
+  //       usersToInvite: inviteeUsers,
+  //       engagementId,
+  //       engagementName,
+  //       orgName,
+  //       inviteType,
+  //       orgColor,
+  //       orgLogo
+  //     });
 
-      if (success) {
-        const engagementData = { id: engagementId, name: engagementName };
-        invitedUsers.forEach(invitedUser => {
+  //     if (success) {
+  //       const engagementData = { id: engagementId, name: engagementName };
+  //       invitedUsers.forEach(invitedUser => {
 
-          if (invitedUser.isNew || !orgUsersMap[invitedUser.id]) {
-            //a completely new user was created for this email, and thus, is new to the org, or was not part of the org
-            orgUsersMap[invitedUser.id] = {
-              id: invitedUser.id,
-              email: invitedUser.email,
-              firstName: invitedUser.firstName || '',
-              lastName: invitedUser.lastName || '',
-              memberOfEngagements: inviteType === 'member' ? [engagementData] : [],
-              adminOfEngagements: inviteType === 'admin' ? [engagementData] : []
-            };
-          } else {
-            //user is already a part of this org
-            const existingUser = orgUsersMap[invitedUser.id];
-            const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
-            const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
+  //         if (invitedUser.isNew || !orgUsersMap[invitedUser.id]) {
+  //           //a completely new user was created for this email, and thus, is new to the org, or was not part of the org
+  //           orgUsersMap[invitedUser.id] = {
+  //             id: invitedUser.id,
+  //             email: invitedUser.email,
+  //             firstName: invitedUser.firstName || '',
+  //             lastName: invitedUser.lastName || '',
+  //             memberOfEngagements: inviteType === 'member' ? [engagementData] : [],
+  //             adminOfEngagements: inviteType === 'admin' ? [engagementData] : []
+  //           };
+  //         } else {
+  //           //user is already a part of this org
+  //           const existingUser = orgUsersMap[invitedUser.id];
+  //           const userIsMember = existingUser.memberOfEngagements.find(({ id }) => id === engagementId);
+  //           const userIsAdmin = existingUser.adminOfEngagements.find(({ id }) => id === engagementId);
 
 
-            if (inviteType === 'admin') {
-              if (userIsMember) {
-                existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
-              }
+  //           if (inviteType === 'admin') {
+  //             if (userIsMember) {
+  //               existingUser.memberOfEngagements.filter(({ id }) => id !== engagementId);
+  //             }
 
-              if (!userIsAdmin) {
-                existingUser.adminOfEngagements.push({ id: engagementId, name: engagementName });
-              }
-            } else {
-              if (userIsAdmin) {
-                existingUser.adminOfEngagements.filter(({ id }) => id !== engagementId);
-              }
+  //             if (!userIsAdmin) {
+  //               existingUser.adminOfEngagements.push({ id: engagementId, name: engagementName });
+  //             }
+  //           } else {
+  //             if (userIsAdmin) {
+  //               existingUser.adminOfEngagements.filter(({ id }) => id !== engagementId);
+  //             }
 
-              if (!userIsMember) {
-                existingUser.memberOfEngagements.push({ id: engagementId, name: engagementName });
-              }
-            }
-          }
-        });
+  //             if (!userIsMember) {
+  //               existingUser.memberOfEngagements.push({ id: engagementId, name: engagementName });
+  //             }
+  //           }
+  //         }
+  //       });
 
-        setOrgUsers(Object.values(orgUsersMap));
-        setLoading(false);
-        openSnackBar('Invitation successfully sent.', 'success');
-        handleClose();
-      } else {
-        openSnackBar(message, 'error');
-        setLoading(false);
-      }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
-    }
-  };
+  //       setOrgUsers(Object.values(orgUsersMap));
+  //       setLoading(false);
+  //       openSnackBar('Invitation successfully sent.', 'success');
+  //       handleClose();
+  //     } else {
+  //       openSnackBar(message, 'error');
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     openSnackBar(error.message, 'error');
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <Dialog
@@ -192,7 +210,7 @@ export default function InviteOrgUsers(props) {
       <Box className='invite-types' mb='3rem'>
         <Paper className={`invite-type ${inviteType === 'member' ? 'selected' : ''}`}>
           <Box fontSize='3rem'>
-            <AccountCircleIcon fontSize='3rem' htmlColor='#b9b9b9' />
+            <AccountCircleIcon htmlColor='#b9b9b9' style={{ fontSize: '3rem' }} />
           </Box>
           <Box component='h3' mb='2rem'>Clients</Box>
           <Button
@@ -205,7 +223,7 @@ export default function InviteOrgUsers(props) {
         </Paper>
         <Paper className={`invite-type ${inviteType === 'admin' ? 'selected' : ''}`}>
           <Box fontSize='3rem'>
-            <BuildIcon fontSize='3rem' htmlColor='#b9b9b9' />
+            <BuildIcon style={{ fontSize: '3rem' }} htmlColor='#b9b9b9' />
           </Box>
           <Box component='h3' mb='2rem'>Administrators</Box>
           <Button
@@ -260,9 +278,9 @@ export default function InviteOrgUsers(props) {
                     </li>
                   }
                   options={allowedToInvite}
-                  getOptionLabel={(option) => option.id ? `${option.firstName} ${option.lastName} ${option.email}` : option.email}
+                  // getOptionLabel={(option) => option.id ? `${option.firstName} ${option.lastName} ${option.email}` : option.email}
                   isOptionEqualToValue={(option, value) => option.email === value.email}
-                  onChange={handleEmailChange}
+                  //  onChange={handleEmailChange}
                   value={inviteeUsers}
                   renderInput={(params) => (
                     <TextField
@@ -292,7 +310,7 @@ export default function InviteOrgUsers(props) {
               </Box>
               <Box mt='3rem'>
                 <LoadingButton
-                  onClick={handleInviteUsers}
+                  // onClick={handleInviteUsers}
                   loading={isLoading}
                   variant='contained'
                   fullWidth
