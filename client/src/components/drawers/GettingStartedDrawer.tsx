@@ -26,11 +26,21 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import { Org } from '@shared/types/Org';
+import { Engagement } from '@shared/types/Engagement';
 
-export default function GettingStartedDrawer(props) {
+type GettingStartedDrawerProps = {
+  isOpen: boolean,
+  closeDrawer: () => void,
+  org: Org,
+  engagement: Engagement,
+  isAdmin: boolean;
+};
+
+export default function GettingStartedDrawer(props: GettingStartedDrawerProps) {
   const {
     isOpen,
-    close,
+    closeDrawer,
     org,
     engagement,
     isAdmin
@@ -40,7 +50,7 @@ export default function GettingStartedDrawer(props) {
     <Drawer
       anchor="right"
       open={isOpen}
-      onClose={close}
+      onClose={closeDrawer}
       hideBackdrop
       className='getting-started-drawer'
       variant='persistent'
@@ -51,7 +61,7 @@ export default function GettingStartedDrawer(props) {
         className='p0 br50'
         style={{ position: 'absolute', top: '50vh', left: '-20px' }}>
         <Tooltip title="Close">
-          <IconButton onClick={close}>
+          <IconButton onClick={closeDrawer}>
             <KeyboardDoubleArrowRightIcon />
           </IconButton>
         </Tooltip>
@@ -65,7 +75,7 @@ export default function GettingStartedDrawer(props) {
           justifyContent="center">
           <IconButton
             size='large'
-            onClick={close}
+            onClick={closeDrawer}
             style={{
               position: 'absolute',
               left: '-8px',
@@ -82,19 +92,22 @@ export default function GettingStartedDrawer(props) {
         <Divider style={{ marginBottom: '2rem' }} />
         {
           isAdmin ?
-            <AdminGettingStartedDrawer close={close} org={org} engagement={engagement} /> :
-            <MemberGettingStartedDrawer close={close} org={org} />
+            <AdminGettingStartedDrawer closeDrawer={closeDrawer} org={org} engagement={engagement} /> :
+            <MemberGettingStartedDrawer closeDrawer={closeDrawer} org={org} />
         }
       </DialogContent>
     </Drawer>
   );
 }
 
+type MemberGettingStartedDrawerProps = {
+  closeDrawer: GettingStartedDrawerProps['closeDrawer'],
+  org: Org;
+};
 
-
-function MemberGettingStartedDrawer(props) {
+function MemberGettingStartedDrawer(props: MemberGettingStartedDrawerProps) {
   const {
-    close,
+    closeDrawer,
     org
   } = props;
 
@@ -135,7 +148,7 @@ function MemberGettingStartedDrawer(props) {
         Folders are used to organize tasks efficiently. Every task belongs to a specific folder.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/folders" component="a">Go to folders &rarr;</Link>
+        <Link to="/home/folders">Go to folders &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From this page, you can explore existing folders and view tasks within each folder.
@@ -156,7 +169,7 @@ function MemberGettingStartedDrawer(props) {
         Tasks
       </Box>
       <Typography mt={2}>
-        <Link to="/home/tasks" component="a">Go to tasks &rarr;</Link>
+        <Link to="/home/tasks">Go to tasks &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From the tasks page, you can view all of the current tasks for your engagement with {org.name}.
@@ -216,7 +229,7 @@ function MemberGettingStartedDrawer(props) {
         Now that you're familiar with folders and tasks, let's head back to the dashboard.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/dashboard" component="a">Go to dashboard &rarr;</Link>
+        <Link to="/home/dashboard">Go to dashboard &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         The dashboard gives you a general overview of the engagement, including key tasks, key folders,
@@ -235,7 +248,7 @@ function MemberGettingStartedDrawer(props) {
       <Box mt={3}>
         <Button
           startIcon={<RocketLaunchIcon />}
-          onClick={close}
+          onClick={closeDrawer}
           variant='contained'>
           Let's go!
         </Button>
@@ -245,12 +258,15 @@ function MemberGettingStartedDrawer(props) {
 }
 
 
+type AdminGettingStartedDrawerProps = {
+  closeDrawer: GettingStartedDrawerProps['closeDrawer'],
+  org: Org,
+  engagement: Engagement;
+};
 
-
-
-function AdminGettingStartedDrawer(props) {
+function AdminGettingStartedDrawer(props: AdminGettingStartedDrawerProps) {
   const {
-    close,
+    closeDrawer,
     org,
     engagement
   } = props;
@@ -297,7 +313,7 @@ function AdminGettingStartedDrawer(props) {
         Folders are your way of organizing and dividing tasks.  Each and every task must reside in a folder.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/folders" component="a">Go to folders &rarr;</Link>
+        <Link to="/home/folders">Go to folders &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From this page, you can create new folders, edit or delete existing folders,
@@ -325,7 +341,7 @@ function AdminGettingStartedDrawer(props) {
         Once you have created your folders, you can start creating tasks to reside in those folders.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/tasks" component="a">Go to tasks &rarr;</Link>
+        <Link to="/home/tasks">Go to tasks &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From this page, you can create new tasks and view/edit all tasks for the current engagement,
@@ -378,7 +394,7 @@ function AdminGettingStartedDrawer(props) {
       <Box mt={2} mb={4}>
         <Alert severity="info">
           <strong>Note: &nbsp;</strong>Before you start manually creating tasks,
-          there is a tool to bulk import tasks on the <Link to="/home/tools" component="a">Tools page.</Link>
+          there is a tool to bulk import tasks on the <Link to="/home/tools">Tools page.</Link>
         </Alert>
       </Box>
 
@@ -393,7 +409,7 @@ function AdminGettingStartedDrawer(props) {
         (Settings &rarr; Engagement &rarr; Members).
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/settings/engagement/collaborators" component="a">Go to engagement settings &rarr;</Link>
+        <Link to="/home/settings/engagement/collaborators">Go to engagement settings &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         From this page, click the
@@ -433,7 +449,7 @@ function AdminGettingStartedDrawer(props) {
         These customizations can be done from Settings &rarr; Organization &rarr; Branding.
       </Typography>
       <Typography mt={2}>
-        <Link to="/home/settings/organization/about" component="a">Go to branding settings &rarr;</Link>
+        <Link to="/home/settings/organization/about">Go to branding settings &rarr;</Link>
       </Typography>
       <Typography mt={2}>
         The "Custom Login Page" feature provides your customers with a custom login experience by incorporating your branding into the login page, delivering a professional touch while
@@ -454,7 +470,7 @@ function AdminGettingStartedDrawer(props) {
         Widgets
       </Box>
       <Typography mt={1}>
-        You can create custom widgets that will display on the dashboard from the <Link to="/home/tools" component="a">Tools page</Link> (Tools &rarr; Widgets).
+        You can create custom widgets that will display on the dashboard from the <Link to="/home/tools">Tools page</Link> (Tools &rarr; Widgets).
       </Typography>
       <Typography mt={2}>
         These widgets are great for things like announcements, general messages, etc.  You can
@@ -507,7 +523,7 @@ Announcements
       <Box mt={3}>
         <Button
           startIcon={<RocketLaunchIcon />}
-          onClick={close}
+          onClick={closeDrawer}
           variant='contained'>
           Let's go!
         </Button>

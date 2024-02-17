@@ -21,16 +21,14 @@ import { Tag } from "@shared/types/Tag";
 import { Task } from "@shared/types/Task";
 
 type ModalsProps = {
-  modalToOpen?: string,
+  modalToOpen: string,
   closeModal: () => void,
   openSnackBar: AppContext['openSnackBar'],
-  openDialog?: AppContext['openDialog'],
-  openModal?: AppContext['openModal'],
   engagements: Engagement[],
   org: Org,
   user: User,
   engagement: Engagement,
-  modalProps?: {
+  modalProps: {
     [key: string | number]: any;
   };
   folders: Folder[];

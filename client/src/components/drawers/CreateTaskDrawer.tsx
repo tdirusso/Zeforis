@@ -1,5 +1,5 @@
 import DialogContent from '@mui/material/DialogContent';
-import { useEffect, useRef, useState } from 'react';
+import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Autocomplete, Box, Checkbox, Chip, CircularProgress, Divider, Drawer, FormControlLabel, IconButton, Menu, MenuItem, Paper, TextField, Tooltip } from '@mui/material';
 import { FormControl } from "@mui/material";
 import { createTask } from '../../api/tasks';
@@ -22,12 +22,35 @@ import { useNavigate } from 'react-router-dom';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { createFolder } from '../../api/folders';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import { Folder } from '@shared/types/Folder';
+import { User } from '@shared/types/User';
+import { Engagement } from '@shared/types/Engagement';
+import { Tag } from '@shared/types/Tag';
+import { AppContext } from 'src/types/AppContext';
+import { Moment } from 'moment';
+import { Task } from '@shared/types/Task';
 
-export default function CreateTaskDrawer(props) {
+type CreateTaskDrawerProps = {
+  isOpen: boolean,
+  closeDrawer: () => void,
+  folders: Folder[],
+  engagementMembers: User[],
+  engagementAdmins: User[],
+  engagement: Engagement,
+  tags: Tag[],
+  setTags: AppContext['setTags'],
+  setTasks: AppContext['setTasks'],
+  user: User,
+  openSnackBar: AppContext['openSnackBar'],
+  setFolders: AppContext['setFolders'],
+  defaultFolder: Folder | null;
+};
+
+export default function CreateTaskDrawer(props: CreateTaskDrawerProps) {
 
   const {
     isOpen,
-    close,
+    closeDrawer,
     folders,
     engagementMembers,
     engagementAdmins,
@@ -38,45 +61,45 @@ export default function CreateTaskDrawer(props) {
     user,
     openSnackBar,
     setFolders,
-    drawerProps: { defaultFolder }
+    defaultFolder
   } = props;
 
   const engagementId = engagement.id;
 
-  const name = useRef();
-  const description = useRef();
-  const linkUrl = useRef();
+  const name = useRef<HTMLInputElement>(null);
+  const description = useRef<HTMLInputElement>(null);
+  const linkUrl = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [assignedTo, setAssignedTo] = useState(null);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [assignedTo, setAssignedTo] = useState<User | null>(null);
   const [folder, setFolder] = useState(defaultFolder || null);
-  const [dateDue, setDateDue] = useState(null);
+  const [dateDue, setDateDue] = useState<Moment | null>(null);
   const [isKeyTask, setIsKeyTask] = useState(false);
   const [status, setStatus] = useState('New');
   const [membersAndAdmins] = useState([...engagementAdmins, ...engagementMembers]);
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState(null);
-  const [formErrors, setFormErrors] = useState([]);
-  const [addFolderPopup, setAddFolderPopup] = useState(null);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<Element | null>(null);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [addFolderPopup, setAddFolderPopup] = useState<Element | null>(null);
   const [addingFolder, setAddingFolder] = useState(false);
 
   const statusMenuOpen = Boolean(statusMenuAnchor);
   const addFolderPopupOpen = Boolean(addFolderPopup);
 
-  const newFolderName = useRef();
+  const newFolderName = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setFolder(defaultFolder || null);
 
     if (isOpen && !isMobile) {
-      name.current.focus();
+      name.current?.focus();
     }
   }, [defaultFolder, isOpen]);
 
   const handleCreateFolder = async () => {
-    const folderName = newFolderName.current.value;
+    const folderName = newFolderName.current?.value;
 
     if (!folderName) {
       openSnackBar("Folder name can't be blank.");
@@ -104,9 +127,11 @@ export default function CreateTaskDrawer(props) {
         openSnackBar(message, 'error');
         setAddingFolder(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setAddingFolder(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setAddingFolder(false);
+      }
     }
   };
 
@@ -116,13 +141,13 @@ export default function CreateTaskDrawer(props) {
       return;
     }
 
-    const nameVal = name.current.value;
-    const descriptionVal = description.current.value;
-    const linkVal = linkUrl.current.value;
+    const nameVal = name.current?.value;
+    const descriptionVal = description.current?.value;
+    const linkVal = linkUrl.current?.value;
     const folderId = folder?.id;
     const assignedToId = assignedTo?.id;
 
-    const errors = [];
+    const errors: string[] = [];
 
     if (!nameVal) {
       errors.push('name');
@@ -160,16 +185,16 @@ export default function CreateTaskDrawer(props) {
 
         setTasks(tasks => [...tasks, {
           task_id: task.id,
-          task_name: nameVal,
+          task_name: nameVal!,
           description: descriptionVal,
           date_created: now,
           created_by_id: user.id,
           status: status,
-          folder_id: folderId,
+          folder_id: task.folderId,
           link_url: linkVal,
           assigned_to_id: assignedToId,
           date_completed: status === 'Complete' ? now : null,
-          is_key_task: Number(isKeyTask),
+          is_key_task: Boolean(isKeyTask),
           date_due: dateDue ? dateDue.toISOString() : null,
           date_last_updated: now,
           tags: selectedTags.length > 0 ? selectedTags.map(t => t.id).join(',') : null,
@@ -197,19 +222,23 @@ export default function CreateTaskDrawer(props) {
         }
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    close();
+    closeDrawer();
     setTimeout(() => {
-      name.current.value = '';
-      linkUrl.current.value = '';
-      description.current.value = '';
-      description.current.style.height = 'auto';
+      if (name.current) name.current.value = '';
+      if (linkUrl.current) linkUrl.current.value = '';
+      if (description.current) {
+        description.current.value = '';
+        description.current.style.height = 'auto';
+      }
       setFolder(null);
       setAssignedTo(null);
       setSelectedTags([]);
@@ -220,9 +249,9 @@ export default function CreateTaskDrawer(props) {
     }, 500);
   };
 
-  const handleCreateTag = async e => {
+  const handleCreateTag = async (e: KeyboardEvent<HTMLDivElement>) => {
     const key = e.key;
-    const newTagValue = e.target.value;
+    const newTagValue = (e.target as HTMLInputElement).value;
 
     if (key === 'Enter' && newTagValue) {
       const result = await createTag({
@@ -240,18 +269,18 @@ export default function CreateTaskDrawer(props) {
     }
   };
 
-  const handleStatusChange = status => {
+  const handleStatusChange = (status: string) => {
     setStatus(status);
     setStatusMenuAnchor(null);
   };
 
-  const handleNameChange = e => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value && formErrors.includes('name')) {
       setFormErrors(prev => prev.filter(er => er !== 'name'));
     }
   };
 
-  const handleFolderChange = (_, newVal) => {
+  const handleFolderChange = (_: React.SyntheticEvent, newVal: Folder | null) => {
     setFolder(newVal);
   };
 
@@ -269,7 +298,7 @@ export default function CreateTaskDrawer(props) {
       <Paper className='p0 close-btn br50'>
         <Tooltip title="Cancel" placement='top'>
           <IconButton onClick={handleClose} disabled={isLoading}>
-            <CloseIcon color={isLoading ? '' : 'error'} />
+            <CloseIcon color={isLoading ? 'disabled' : 'error'} />
           </IconButton>
         </Tooltip>
       </Paper>
@@ -328,8 +357,8 @@ export default function CreateTaskDrawer(props) {
               cursor: 'pointer'
             }}
             onDelete={e => setStatusMenuAnchor(e.currentTarget)}
-            className={status}>
-          </Chip>
+            className={status}
+          />
           <Menu
             anchorEl={statusMenuAnchor}
             open={statusMenuOpen}
@@ -444,7 +473,7 @@ export default function CreateTaskDrawer(props) {
                 renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
-                groupBy={(option) => option.role}
+                groupBy={(option) => option.role || ''}
                 onChange={(_, val) => setAssignedTo(val)}
                 value={assignedTo}
                 renderInput={(params) => (
@@ -469,7 +498,7 @@ export default function CreateTaskDrawer(props) {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DatePicker
                 disabled={isLoading}
-                format="MM/DD/YYYY"
+                inputFormat="MM/DD/YYYY"
                 value={dateDue}
                 InputProps={{
                   style: {

@@ -1,6 +1,6 @@
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Box, Button, Checkbox, Drawer, FormControlLabel, FormHelperText, Grid, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createFolder, updateFolder } from '../../api/folders';
@@ -11,17 +11,33 @@ import FolderIcon from '@mui/icons-material/Folder';
 import HelpIcon from '@mui/icons-material/Help';
 import { isMobile } from '../../lib/constants';
 import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
+import { Engagement } from '@shared/types/Engagement';
+import { AppContext } from 'src/types/AppContext';
 
-export default function FolderDrawer(props) {
+type FolderDrawerProps = {
+  isOpen: boolean,
+  closeDrawer: () => void,
+  engagement: Engagement,
+  openSnackBar: AppContext['openSnackBar'],
+  setFolders: AppContext['setFolders'],
+  foldersMap: AppContext['foldersMap'],
+  openModal: AppContext['openModal'],
+  folderProps: {
+    id?: number;
+    is_key_folder?: boolean;
+  };
+};
+
+export default function FolderDrawer(props: FolderDrawerProps) {
   const {
     isOpen,
-    close,
+    closeDrawer,
     engagement,
     openSnackBar,
     setFolders,
     foldersMap,
     openModal,
-    drawerProps: { folderProps }
+    folderProps
   } = props;
 
   const [isLoading, setLoading] = useState(false);
@@ -29,14 +45,14 @@ export default function FolderDrawer(props) {
   const [name, setName] = useState('');
   const [path, setPath] = useState('');
 
-  const nameRef = useRef();
+  const nameRef = useRef<HTMLInputElement>(null);
 
-  const getPath = (folderId) => {
-    const pathArray = [];
+  const getPath = (folderId: number) => {
+    const pathArray: string[] = [];
 
-    const findParentFolder = (folderId) => {
+    const findParentFolder = (folderId: number) => {
       const parentFolder = foldersMap[folderId];
-      if (parentFolder) {
+      if (parentFolder && parentFolder.parent_id) {
         pathArray.unshift(parentFolder.name);
         findParentFolder(parentFolder.parent_id);
       }
@@ -49,7 +65,7 @@ export default function FolderDrawer(props) {
   useEffect(() => {
     if (isOpen) {
       if (!isMobile) {
-        nameRef.current.focus();
+        nameRef.current?.focus();
       }
 
       if (folderProps) {
@@ -73,7 +89,7 @@ export default function FolderDrawer(props) {
     handleClose();
   };
 
-  const handleCreateFolder = async e => {
+  const handleCreateFolder = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!name) {
@@ -98,17 +114,23 @@ export default function FolderDrawer(props) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
-  const handleUpdateFolder = async e => {
+  const handleUpdateFolder = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!name) {
       openSnackBar('Enter a name for the folder.');
+      return;
+    }
+
+    if (!folderProps.id) {
       return;
     }
 
@@ -135,14 +157,16 @@ export default function FolderDrawer(props) {
         openSnackBar(message, 'error');
         setLoading(false);
       }
-    } catch (error) {
-      openSnackBar(error.message, 'error');
-      setLoading(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        openSnackBar(error.message, 'error');
+        setLoading(false);
+      }
     }
   };
 
   const handleClose = () => {
-    close();
+    closeDrawer();
 
     setTimeout(() => {
       setName('');

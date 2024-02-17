@@ -6,17 +6,13 @@ import { Org } from "@shared/types/Org";
 import { User } from "@shared/types/User";
 
 export type DialogsProps = {
-  dialogToOpen?: string,
-  dialogProps?: any,
+  dialogToOpen: string,
   closeDialog: () => void,
-  //isOpen?: boolean;
-  openDialog?: AppContext['openDialog'],
-  openModal?: AppContext['openModal'],
   openSnackBar: AppContext['openSnackBar'],
   engagements: Engagement[],
   org: Org,
   user: User,
-  engagement?: Engagement;
+  engagement: Engagement;
 };
 
 

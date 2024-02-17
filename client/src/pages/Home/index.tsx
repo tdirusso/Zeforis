@@ -413,17 +413,31 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
             />
 
             <Drawers
-              {...context}
               drawerProps={drawerProps}
               drawerToOpen={drawerToOpen}
               closeDrawer={closeDrawer}
+              setTasks={setTasks}
+              user={user!}
+              org={org!}
+              openSnackBar={openSnackBar}
+              foldersMap={foldersMap}
+              setFolders={setFolders}
+              engagement={engagement}
+              folders={folders}
+              tasksMap={tasksMap}
+              engagementAdmins={engagementAdmins}
+              engagementMembers={engagementMembers}
+              tags={tags}
+              tasks={tasks}
+              setTags={setTags}
+              openModal={openModal}
+              isAdmin={isAdmin}
+              tagsMap={tagsMap}
             />
 
             <Dialogs
               dialogToOpen={dialogToOpen}
               closeDialog={closeDialog}
-              openDialog={openDialog}
-              openModal={openModal}
               openSnackBar={openSnackBar}
               engagement={engagement}
               engagements={engagements}

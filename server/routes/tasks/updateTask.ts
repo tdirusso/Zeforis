@@ -96,7 +96,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       }
 
       connection.release();
-      return res.json({ success: true });
+      return res.json({ success: true, placedFolderId: folderId });
     }
 
     return res.json({ message: 'Task not found.' });
