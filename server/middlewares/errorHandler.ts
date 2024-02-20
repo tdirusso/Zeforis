@@ -3,18 +3,23 @@ import { pool } from '../database';
 import slackbot from '../slackbot';
 import { isDev } from '../config';
 import { NextFunction, Request, Response } from 'express';
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../types/Errors";
 
 export default async function errorHandler(error: unknown, _: Request, res: Response, __: NextFunction) {
   if (error instanceof Error) {
-    if (error instanceof TokenExpiredError) {
-      return res.status(401).json({
-        message: 'Session expired.'
-      });
-    }
-
-    if (!error.message?.includes('Range Not Satisfiable')) {
-      console.error('Application error:', error);
-      await handleServerError(error);
+    switch (true) {
+      case error instanceof BadRequestError:
+        return res.status(400).json({ message: error.message });
+      case error instanceof TokenExpiredError:
+        return res.status(401).json({ message: 'Session expired.' });
+      case error instanceof UnauthorizedError:
+        return res.status(401).json({ message: error.message });
+      case error instanceof NotFoundError:
+        return res.status(404).json({ message: error.message });
+      default:
+        console.error('Application error:', error);
+        await handleServerError(error);
+        break;
     }
   } else {
     console.error('Non-Error object received:', error);
@@ -24,7 +29,7 @@ export default async function errorHandler(error: unknown, _: Request, res: Resp
   return res.status(500).json({
     error: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : null,
-    message: 'Internal server error',
+    message: 'Something went wrong...',
   });
 }
 

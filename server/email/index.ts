@@ -19,7 +19,7 @@ type EmailFromTemplateParameters = {
   templateData: {};
 };
 
-class EmailService {
+class Emailer {
   instance = this;
 
   senders = {
@@ -29,7 +29,8 @@ class EmailService {
   };
 
   templates = {
-    engagementInvitation: 'd-3070cc2e1f93499692376b90b4bbef04'
+    engagementInvitation: 'd-3070cc2e1f93499692376b90b4bbef04',
+    loginLink: 'd-700a472b0af44176b3f18068e70363c0'
   };
 
   constructor() {
@@ -46,9 +47,23 @@ class EmailService {
 
   async sendMultipleEmailsFromTemplate(emailsArray: sgMail.MailDataRequired | sgMail.MailDataRequired[]) {
     await sgMail.send(emailsArray);
+  }
 
+  async sendLoginLinkEmail(email: string, loginCode: string) {
+    await sgMail.send({
+      to: email,
+      from: {
+        email: this.senders.info,
+        name: 'Zeforis'
+      },
+      templateId: this.templates.loginLink,
+      dynamicTemplateData: {
+        loginLinkUrl: `${getEnvVariable(EnvVariable.APP_DOMAIN)}/verify-login?loginCode=${loginCode}&email=${email}`
+      },
+      hideWarnings: true
+    });
   }
 }
 
-export default new EmailService();
+export default new Emailer();
 

@@ -53,12 +53,12 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   const customPageParam = searchParams.get('cp');
   const engagementIdParam = searchParams.get('engagementId');
   let needsCustomPage = false;
-  let orgId: string | null;
+  let orgId: number;
 
   if (customPageParam) {
     try {
       const cpParamVal = window.atob(customPageParam);
-      orgId = new URLSearchParams(cpParamVal).get('orgId');
+      orgId = Number(new URLSearchParams(cpParamVal).get('orgId'));
 
       if (orgId) {
         needsCustomPage = true;
@@ -83,7 +83,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
             if (engagementIdParam) {
               setActiveEngagementId(Number(engagementIdParam));
             }
-            setActiveOrgId(Number(orgId));
+            setActiveOrgId(orgId);
           }
           window.location.href = '/home/dashboard';
         } else {
@@ -153,7 +153,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
 
     async function fetchCustomPageData() {
       try {
-        const { org } = await getOrg(Number(orgId));
+        const { org } = await getOrg(orgId);
 
         if (org) {
           document.title = `${org.name} Portal - Login`;
@@ -221,7 +221,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
 
       if (result.token) {
         if (needsCustomPage && org) {
-          setActiveOrgId(Number(orgId));
+          setActiveOrgId(orgId);
         }
         window.location.href = '/home/dashboard';
       } else {

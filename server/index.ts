@@ -55,8 +55,10 @@ import checkOrgOwnerMW from './middlewares/checkOrgOwner';
 import checkAuthMW from './middlewares/checkAuth';
 import errorHandlerMW from './middlewares/errorHandler';
 import checkSlackSignature from './middlewares/checkSlackSignature';
-
+import verifyLogin from './routes/auth/verifyLogin';
 import stripeWebhook from './webhooks/stripe';
+
+import 'express-async-errors';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -126,6 +128,7 @@ const boot = async () => {
   app.use(express.json());
 
   app.post('/api/login', unAuthenicatedUserRateLimit, login);
+  app.post('/api/verify-login', unAuthenicatedUserRateLimit, verifyLogin);
   app.post('/api/authenticate', authenicatedUserRateLimit, authenticate);
   app.post('/api/register', unAuthenicatedUserRateLimit, register);
 
@@ -183,7 +186,7 @@ const boot = async () => {
   app.use(errorHandlerMW);
 
   app.get('*', forceSSL, (_, res) => {
-    return res.sendFile(path.join(__dirname + '/../', 'build-client', 'index.html'));
+    return res.sendFile(path.join(__dirname + '/../', 'build-client', 'index.html'), { acceptRanges: false });
   });
 
   app.listen(port, () => console.log('App is running'));

@@ -1,7 +1,8 @@
-main {
+.Home main {
   background-color: #f3f4f9;
   transition: margin 200ms, background-color 250ms, color 250ms;
   padding: 0 2.5rem;
+  min-height: 100vh;
 
   .content {
     margin: auto;
@@ -10,7 +11,7 @@ main {
   }
 }
 
-body.dark main {
+body.dark .Home main {
   color: white;
   background-color: var(--colors-body-background-dark);
 }

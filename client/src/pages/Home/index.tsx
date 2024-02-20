@@ -358,7 +358,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   };
 
   return (
-    <Box>
+    <Box className='Home'>
       <SideNav
         org={org!}
         engagement={engagement}

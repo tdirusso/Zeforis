@@ -1,9 +1,12 @@
 import request from '../lib/request';
+import type { LoginRequest, LoginResponse, VerifyLoginRequest, VerifyLoginResponse } from '@shared/types/api/Auth';
 
-const login = async (payload: unknown) => {
-  const { data } = await request.post(`login`, payload);
+const login = async (payload: LoginRequest) => {
+  return (await request.post<LoginResponse>('login', payload)).data;
+};
 
-  return data;
+const verifyLogin = async (payload: VerifyLoginRequest) => {
+  return (await request.post<VerifyLoginResponse>('verify-login', payload)).data;
 };
 
 const logout = (logoutPageUrl: string) => {
@@ -39,5 +42,6 @@ export {
   authenticate,
   getToken,
   setToken,
-  deleteToken
+  deleteToken,
+  verifyLogin
 };

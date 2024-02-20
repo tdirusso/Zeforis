@@ -1,7 +1,7 @@
 import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import cache from '../cache';
-import { CachedOrg } from '../types/Cache';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
+import { CachedOrg } from '../types/Cache';
 
 interface TaskCountRow extends RowDataPacket {
   taskCount: number;

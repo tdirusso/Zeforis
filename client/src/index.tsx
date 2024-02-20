@@ -31,6 +31,7 @@ import Profile from './components/core/settings/account/Profile';
 import Billing from './components/core/settings/account/Billing';
 import TaskPage from './pages/Home/Tasks/Task';
 import Loader from './components/core/Loader';
+import VerifyLoginPage from './pages/Login/VerifyLogin';
 
 const LoginPage = lazy(() => import('./pages/Login'));
 const RegisterPage = lazy(() => import('./pages/Register'));
@@ -47,6 +48,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="login" element={<Suspense fallback={<Loader />}> <LoginPage setTheme={setTheme} /></Suspense>} />
+            <Route path="verify-login" element={<VerifyLoginPage />} />
             <Route path="register" element={<Suspense fallback={<Loader />}> <RegisterPage /></Suspense>} />
             <Route path="register-success" element={<RegisterSuccessPage />} />
             <Route path="accept-invitation" element={<AcceptInvitationPage />} />

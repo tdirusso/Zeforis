@@ -25,7 +25,10 @@ axiosClient.interceptors.response.use(response => {
   if (error.response.status === 401) {
     alert('Session expired');
     window.location.replace('/login');
+    return null;
   }
+
+  return Promise.reject(error);
 });
 
 export default axiosClient;
