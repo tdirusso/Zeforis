@@ -19,6 +19,36 @@ const theme: ThemeOptions = {
   typography: {
     fontSize: 14,
     fontFamily: 'Inter',
+    h1: {
+      fontWeight: 500,
+      fontSize: '2rem',
+      color: 'var(--colors-gray-1000)'
+    },
+    h2: {
+      fontWeight: 600,
+      fontSize: '1.25rem',
+      color: 'var(--colors-gray-1000)'
+    },
+    h3: {
+      fontWeight: 600,
+      fontSize: '1.17rem',
+      color: 'var(--colors-gray-1000)'
+    },
+    subtitle1: {
+      fontWeight: 400,
+      fontSize: '14px',
+      color: 'var(--colors-gray-1000)'
+    },
+    body1: {
+      fontWeight: 400,
+      fontSize: '14px',
+      color: 'var(--colors-gray-1000)'
+    },
+    body2: {
+      fontWeight: 400,
+      fontSize: '14px',
+      color: 'var(--colors-gray-900)'
+    }
   },
   components: {
     MuiTouchRipple: {

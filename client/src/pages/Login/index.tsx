@@ -18,12 +18,9 @@ import Watermark from "../../components/core/Watermark";
 import { isMobile } from "../../lib/constants";
 import { setActiveEngagementId } from "../../api/engagements";
 import validator from 'email-validator';
-
-type OrgType = {
-  name: string,
-  logo_url: string | null,
-  brand_color: string;
-};
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { Org } from "@shared/types/Org";
+import { AxiosError } from "axios";
 
 type FormErrorsType = {
   email?: string;
@@ -40,8 +37,9 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   const [email, setEmail] = useState('');
   const [formErrors, setFormErrors] = useState<FormErrorsType>({});
   const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
-  const [org, setOrg] = useState<OrgType | null>(null);
+  const [org, setOrg] = useState<Org | null>(null);
   const [isLoading, setLoading] = useState(false);
+  const [loginLinkSent, setLoginLinkSet] = useState(false);
 
   const {
     isOpen,
@@ -127,28 +125,30 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   };
 
   useEffect(() => {
-    if (!needsCustomPage) {
-      const ableToLoadButton = tryLoadGoogleButton();
-      if (!ableToLoadButton) {
-        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+    if (!loginLinkSent) {
+      if (!needsCustomPage) {
+        const ableToLoadButton = tryLoadGoogleButton();
+        if (!ableToLoadButton) {
+          window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+        }
+
+        window.VANTA?.TOPOLOGY({
+          el: ".form-wrapper",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          backgroundColor: '#ffffff',
+          color: window.getComputedStyle(document.body).getPropertyValue('--colors-primary')
+
+        });
+
+      } else {
+        fetchCustomPageData();
       }
-
-      window.VANTA?.TOPOLOGY({
-        el: ".form-wrapper",
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        backgroundColor: '#ffffff',
-        color: window.getComputedStyle(document.body).getPropertyValue('--colors-primary')
-
-      });
-
-    } else {
-      fetchCustomPageData();
     }
 
     async function fetchCustomPageData() {
@@ -158,11 +158,11 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         if (org) {
           document.title = `${org.name} Portal - Login`;
 
-          const brandRGB = hexToRgb(org.brand_color);
+          const brandRGB = hexToRgb(org.brandColor);
           if (brandRGB) {
-            document.documentElement.style.setProperty('--colors-primary', org.brand_color);
+            document.documentElement.style.setProperty('--colors-primary', org.brandColor);
             document.documentElement.style.setProperty('--colors-primary-rgb', `${brandRGB?.r}, ${brandRGB?.g}, ${brandRGB?.b}`);
-            themeConfig.palette!.primary!.main = org.brand_color;
+            themeConfig.palette!.primary!.main = org.brandColor;
           }
 
           setTheme(createTheme(themeConfig));
@@ -177,7 +177,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         }
       }
     }
-  }, []);
+  }, [loginLinkSent]);
 
   useEffect(() => {
     if (doneFetchingCustomPage) {
@@ -196,7 +196,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
         scale: 1.00,
         scaleMobile: 1.00,
         backgroundColor: '#ffffff',
-        color: org?.brand_color
+        color: org?.brandColor
       });
     }
   }, [doneFetchingCustomPage]);
@@ -213,25 +213,21 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
     setLoading(true);
 
     try {
-      const result = await login({
+      await login({
         email,
         isFromCustomLoginPage: needsCustomPage,
         orgId
       });
 
-      if (result.token) {
-        if (needsCustomPage && org) {
-          setActiveOrgId(orgId);
-        }
-        window.location.href = '/home/dashboard';
-      } else {
-        setLoading(false);
-        openSnackBar(result.message, 'error');
-      }
+      setLoginLinkSet(true);
+      setLoading(false);
+
     } catch (error: unknown) {
-      if (error instanceof Error) {
+      setLoading(false);
+      if (error instanceof AxiosError) {
+        setFormErrors({ email: error.response?.data?.message || error.message });
+      } else if (error instanceof Error) {
         openSnackBar(error.message, 'error');
-        setLoading(false);
       }
     }
   };
@@ -251,12 +247,12 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
 
   if (needsCustomPage && org) {
     orgName = org.name;
-    if (org.logo_url) {
+    if (org.logo) {
       pageIcon = <Box>
-        <img src={org.logo_url} alt={org.name} className="logo" />
+        <img src={org.logo} alt={org.name} className="logo" />
       </Box>;
     } else {
-      pageIcon = <Box component="h1" style={{ color: org.brand_color }}>{org.name}</Box>;
+      pageIcon = <Box component="h1" style={{ color: org.brandColor }}>{org.name}</Box>;
     }
   }
 
@@ -278,51 +274,80 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
       </Box>
       <Box className="form-wrapper">
         <Box display="flex" alignItems="center" justifyContent="center" mb='4rem'>
-          <Paper className="inner">
-            <h1>
-              Log in to <span style={{ color: org ? org.brand_color : 'inherit' }}>{orgName}</span>
-            </h1>
-            <Box id="google-signin"></Box>
-            <Box width={formWidth} my='22px'>
-              <Divider />
-            </Box>
+          <Paper className="form-content">
+            <Typography variant="h1">
+              Log in to <span style={{
+                color: org ? org.brandColor : 'inherit',
+                fontWeight: 600
+              }}>
+                {orgName}
+              </span>
+            </Typography>
+            {
+              loginLinkSent ?
+                <Box p='0px 35px 15px 35px'>
+                  <Divider className="my2" />
+                  <Typography variant="h3" mb={2} mt={4}>
+                    Email Verification
+                  </Typography>
+                  <Typography variant="body2">
+                    We've sent a <b>secret login link</b> to your email address.
+                  </Typography>
+                  <Typography variant="body2">
+                    Click the link in the email to log in.
+                  </Typography>
+                  <Button
+                    style={{ marginTop: '2rem' }}
+                    startIcon={<KeyboardBackspaceIcon />}
+                    onClick={() => setLoginLinkSet(false)}>
+                    Back to login
+                  </Button>
+                </Box>
+                :
+                <Box className="inner">
+                  <Box id="google-signin" height={45}></Box>
+                  <Box width={formWidth} my='22px'>
+                    <Divider />
+                  </Box>
 
-            <form onSubmit={handleLogin} style={{ width: formWidth }}>
-              <TextField
-                placeholder="Email"
-                variant="outlined"
-                type="email"
-                name="email"
-                disabled={isLoading}
-                fullWidth
-                autoComplete="email"
-                autoFocus={!isMobile}
-                onChange={e => {
-                  setFormErrors({});
-                  setEmail(e.target.value);
-                }}
-                error={Boolean(formErrors.email)}
-                helperText={formErrors.email}
-              />
-              <LoadingButton
-                loading={isLoading}
-                disabled={!validator.validate(email) || isLoading}
-                fullWidth
-                size="large"
-                style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
-                variant="contained"
-                type="submit">
-                Sign in
-              </LoadingButton>
-              <Box
-                hidden={!needsCustomPage}
-                component="a"
-                href="/login"
-                style={{ fontSize: '14px' }}
-                mt={4}>
-                &larr; Go to universal login
-              </Box>
-            </form>
+                  <form onSubmit={handleLogin} style={{ width: formWidth }}>
+                    <TextField
+                      placeholder="Email"
+                      variant="outlined"
+                      type="email"
+                      name="email"
+                      disabled={isLoading}
+                      fullWidth
+                      autoComplete="email"
+                      autoFocus={!isMobile}
+                      onChange={e => {
+                        setFormErrors({});
+                        setEmail(e.target.value);
+                      }}
+                      error={Boolean(formErrors.email)}
+                      helperText={formErrors.email}
+                    />
+                    <LoadingButton
+                      loading={isLoading}
+                      disabled={!validator.validate(email) || isLoading}
+                      fullWidth
+                      size="large"
+                      style={{ padding: '0.75rem 0.5rem', marginTop: '0.5rem' }}
+                      variant="contained"
+                      type="submit">
+                      Sign in
+                    </LoadingButton>
+                    <Box
+                      hidden={!needsCustomPage}
+                      component="a"
+                      href="/login"
+                      style={{ fontSize: '14px' }}
+                      mt={4}>
+                      &larr; Go to universal login
+                    </Box>
+                  </form>
+                </Box>
+            }
           </Paper>
         </Box>
       </Box>

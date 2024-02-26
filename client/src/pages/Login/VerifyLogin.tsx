@@ -1,39 +1,19 @@
-import { SyntheticEvent, useEffect, useState } from "react";
-import { login, verifyLogin } from "../../api/auth";
+import { useEffect, useState } from "react";
+import { setToken, verifyLogin } from "../../api/auth";
 import { Link, useLocation } from "react-router-dom";
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import Snackbar from "../../components/core/Snackbar";
-import useSnackbar from "../../hooks/useSnackbar";
 import zeforisLogo from '../../assets/zeforis-logo.png';
 import './styles.scss';
-import { Button, Divider, Paper, Theme, createTheme, useMediaQuery } from "@mui/material";
+import { Button, Paper, Typography } from "@mui/material";
 import Loader from "../../components/core/Loader";
-import { getOrg, setActiveOrgId } from "../../api/orgs";
-import { hexToRgb } from "../../lib/utils";
-import themeConfig from "../../theme";
-import Watermark from "../../components/core/Watermark";
-import { isMobile } from "../../lib/constants";
-import { setActiveEngagementId } from "../../api/engagements";
-import validator from 'email-validator';
-
-type OrgType = {
-  name: string,
-  logo_url: string | null,
-  brand_color: string;
-};
-
-type FormErrorsType = {
-  email?: string;
-};
+import { AxiosError } from "axios";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 export default function VerifyLoginPage() {
   const { search } = useLocation();
 
   const searchParams = new URLSearchParams(search);
-  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const email = searchParams.get('email');
   const loginCode = searchParams.get('loginCode');
@@ -42,7 +22,6 @@ export default function VerifyLoginPage() {
     window.location.replace('/login');
     return null;
   }
-
 
   useEffect(() => {
     doVerifyLogin();
@@ -55,11 +34,14 @@ export default function VerifyLoginPage() {
             loginCode
           });
 
-          //  console.log(token);
-
+          setToken(token);
+          window.location.replace('/home/dashboard');
         } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.log("ERROR", error);
+          console.log(error);
+          if (error instanceof AxiosError) {
+            setError(error.response?.data?.message || error.message);
+          } else if (error instanceof Error) {
+            setError(error.message);
           }
         }
       }
@@ -68,7 +50,47 @@ export default function VerifyLoginPage() {
 
   return (
     <Box className="VerifyLogin">
-      <Loader />
+      {
+        error ? <CantVerifyMessage /> : <Loader />
+      }
     </Box>
   );
 };
+
+function CantVerifyMessage() {
+  return (
+    <Box>
+      <Box component="header">
+        <Box className="inner">
+          <Box component="a" href="https://www.zeforis.com" target="_blank">
+            <img src={zeforisLogo} alt="Zeforis" className="logo" />
+          </Box>
+        </Box>
+      </Box>
+      <Box className="form-wrapper">
+        <Box display="flex" alignItems="center" justifyContent="center" mb='4rem'>
+          <Paper className="form-content">
+            <Box>
+              <Typography variant="h1" gutterBottom>
+                Verification Error
+              </Typography>
+              <Typography variant="body2" fontSize='1rem'>
+                We could not verify your login attempt.  The link may be expired or invalid.
+              </Typography>
+              <Typography variant="body2" fontSize='1rem' mb={4}>
+                Please return to the login page and try again.
+              </Typography>
+              <Button
+                to="/login"
+                component={Link}
+                variant="outlined"
+                startIcon={<KeyboardBackspaceIcon />}>
+                Back to Login
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+      </Box>
+    </Box>
+  );
+}

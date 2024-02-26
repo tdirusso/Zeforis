@@ -4,12 +4,13 @@ import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
+import { UnauthorizedError } from '../types/Errors';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
-    return res.json({ message: 'Missing authentication token.' });
+    throw new UnauthorizedError('No JWT token provided.');
   }
 
   if (typeof token !== 'string') {

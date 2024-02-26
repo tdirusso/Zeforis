@@ -1,7 +1,7 @@
 import { pool } from '../../database';
 import { OAuth2Client } from 'google-auth-library';
 import slackbot from '../../slackbot';
-import { createJWT } from '../../lib/utils';
+import { createJWT, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 import { User } from '../../../shared/types/User';
@@ -21,6 +21,8 @@ export default async (req: APILoginRequest, res: APILoginResponse) => {
   const {
     isFromCustomLoginPage
   } = req.body;
+
+  await wait(1500);
 
   if (isFromCustomLoginPage) {
     await handleCustomPageLogin(req, res);
@@ -134,7 +136,7 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
   } = req.body;
 
   if ((!email) && !googleCredential) {
-    throw new BadRequestError('Missing email or Google Credential.');
+    throw new BadRequestError('No email or Google Credential was provided.');
   }
 
   if (googleCredential) {
@@ -156,9 +158,7 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
       [googleEmail]
     );
 
-    console.log(userResult.length);
-
-    if (userResult[0]) {
+    if (userResult.length) {
       const user: User = {
         id: userResult[0].id,
         firstName: userResult[0].firstName,
@@ -188,18 +188,10 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
         plan: 'free'
       };
 
-      const token = getJWT(newUser);
-
-      return res.json({ token });
+      return res.json({ token: createJWT(newUser) });
     }
   } else {
     const lcEmail = email!.toLowerCase();
-
-    // const [userResult] = await pool.query<RowDataPacket[]>(
-    //   'SELECT id, first_name as firstName, last_name as lastName, email, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
-    //   [lcEmail]
-    // );
-
 
     const [userResult] = await pool.query<RowDataPacket[]>(
       'SELECT id, email FROM users WHERE email = ?',

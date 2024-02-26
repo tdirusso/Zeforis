@@ -11,9 +11,9 @@ export default async function errorHandler(error: unknown, _: Request, res: Resp
       case error instanceof BadRequestError:
         return res.status(400).json({ message: error.message });
       case error instanceof TokenExpiredError:
-        return res.status(401).json({ message: 'Session expired.' });
+        return res.status(401).json({ message: 'Session expired (token expired).' });
       case error instanceof UnauthorizedError:
-        return res.status(401).json({ message: error.message });
+        return res.status(401).json({ message: `Unauthorized error:  ${error.message}` });
       case error instanceof NotFoundError:
         return res.status(404).json({ message: error.message });
       default:

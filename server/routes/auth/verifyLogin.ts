@@ -1,21 +1,20 @@
-import jwt from 'jsonwebtoken';
 import { pool } from '../../database';
-import { createJWT } from '../../lib/utils';
+import { createJWT, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
-import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
-import { JWTToken } from '../../types/Token';
 import { RowDataPacket } from 'mysql2';
-import { Engagement } from '../../../shared/types/Engagement';
-import { LoginRequest, VerifyLoginRequest, VerifyLoginResponse } from '../../../shared/types/api/Auth';
+import { VerifyLoginRequest, VerifyLoginResponse } from '../../../shared/types/api/Auth';
 import moment from 'moment';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../../types/Errors';
 import validator from 'email-validator';
+import { User } from '../../../shared/types/User';
 
 export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response<VerifyLoginResponse>) => {
   const {
     email,
     loginCode
   } = req.body;
+
+  await wait(1500);
 
   if (!email || !loginCode) {
     throw new BadRequestError('Missing email address or login code.');
@@ -61,11 +60,19 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response<Ve
 
   if (loginCodeExpiration.isBefore(now)) {
     connection.release();
-    throw new UnauthorizedError('Invalid login code.');
+    throw new UnauthorizedError('Login code expired.');
   }
 
+  await connection.query('UPDATE users SET login_code = NULL, login_code_expiration = NULL WHERE id = ?', [user.id]);
 
+  const jwtUser: User = {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    plan: user.plan,
+    subscriptionStatus: user.subscriptionStatus
+  };
 
-  return res.json({ token: 'yessir@' });
-
+  return res.json({ token: createJWT(jwtUser) });
 };

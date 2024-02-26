@@ -195,7 +195,7 @@ export default function RegisterPage() {
       <Box className="form-wrapper">
         <Box className="inner">
           <h1 style={{ marginBottom: '1.75rem' }}>Create Your <span>Zeforis</span> Account</h1>
-          <Box id="google-signin"></Box>
+          <Box id="google-signin" height={45}></Box>
           <Box width={formWidth} my='22px'>
             <Divider />
           </Box>

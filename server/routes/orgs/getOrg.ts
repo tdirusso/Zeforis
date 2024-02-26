@@ -15,7 +15,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const [orgResult] = await pool.query<RowDataPacket[]>(
-      'SELECT name, brand_color, logo_url FROM orgs WHERE id = ?',
+      'SELECT name, brand_color as brandColor, logo_url as logoUrl FROM orgs WHERE id = ?',
       [orgId]
     );
 

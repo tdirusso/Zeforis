@@ -78,9 +78,8 @@ function App() {
                 </Route>
                 <Route path="*" element={<Navigate to="engagement/collaborators" />} />
               </Route>
-
+              <Route path="*" element={<Navigate to="../dashboard" />} />
             </Route>
-
             <Route path="*" element={<Navigate to="login" />} />
           </Routes>
         </Router>

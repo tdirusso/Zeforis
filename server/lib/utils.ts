@@ -24,6 +24,10 @@ function createJWT(user: User) {
   );
 }
 
+async function wait(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function updateStripeSubscription(con: PoolConnection, userId: number, orgId: number) {
   const [customerIdResult] = await con.query<RowDataPacket[]>('SELECT stripe_customerId FROM users WHERE id = ?', [userId]);
   const customerId = customerIdResult[0].stripe_customerId;
@@ -86,5 +90,6 @@ const getMissingFields = (requiredFields: (keyof FrontendFieldMappings)[], reque
 export {
   createJWT,
   updateStripeSubscription,
-  getMissingFields
+  getMissingFields,
+  wait
 };

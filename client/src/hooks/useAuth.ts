@@ -10,7 +10,8 @@ export default function useAuth() {
     const token = getToken();
 
     if (!token) {
-      window.location.href = ('/login');
+      //window.location.href = ('/login');
+      authenticateUser();
     } else {
       authenticateUser();
     }
