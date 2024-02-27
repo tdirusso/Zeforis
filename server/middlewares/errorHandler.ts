@@ -3,7 +3,7 @@ import { pool } from '../database';
 import slackbot from '../slackbot';
 import { isDev } from '../config';
 import { NextFunction, Request, Response } from 'express';
-import { BadRequestError, NotFoundError, UnauthorizedError } from "../types/Errors";
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "../types/Errors";
 
 export default async function errorHandler(error: unknown, _: Request, res: Response, __: NextFunction) {
   if (error instanceof Error) {
@@ -13,7 +13,9 @@ export default async function errorHandler(error: unknown, _: Request, res: Resp
       case error instanceof TokenExpiredError:
         return res.status(401).json({ message: 'Session expired (token expired).' });
       case error instanceof UnauthorizedError:
-        return res.status(401).json({ message: `Unauthorized error:  ${error.message}` });
+        return res.status(401).json({ message: `${error.message}` });
+      case error instanceof ForbiddenError:
+        return res.status(403).json({ message: `${error.message}` });
       case error instanceof NotFoundError:
         return res.status(404).json({ message: error.message });
       default:

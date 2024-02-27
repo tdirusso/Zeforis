@@ -18,7 +18,6 @@ import Watermark from "../../components/core/Watermark";
 import { isMobile } from "../../lib/constants";
 import { setActiveEngagementId } from "../../api/engagements";
 import validator from 'email-validator';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { Org } from "@shared/types/Org";
 import { AxiosError } from "axios";
 
@@ -70,28 +69,27 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
       setLoading(true);
 
       try {
-        const result = await login({
+        await login({
           googleCredential: authResponse.credential,
           isFromCustomLoginPage: needsCustomPage,
           orgId
         });
 
-        if (result.token) {
-          if (needsCustomPage && org) {
-            if (engagementIdParam) {
-              setActiveEngagementId(Number(engagementIdParam));
-            }
-            setActiveOrgId(orgId);
+        if (needsCustomPage && org) {
+          if (engagementIdParam) {
+            setActiveEngagementId(Number(engagementIdParam));
           }
-          window.location.href = '/home/dashboard';
-        } else {
-          setLoading(false);
-          openSnackBar(result.message, 'error');
+          setActiveOrgId(orgId);
         }
+
+        setLoginLinkSet(true);
+        setLoading(false);
       } catch (error: unknown) {
-        if (error instanceof Error) {
+        setLoading(false);
+        if (error instanceof AxiosError) {
+          setFormErrors({ email: error.response?.data?.message || error.message });
+        } else if (error instanceof Error) {
           openSnackBar(error.message, 'error');
-          setLoading(false);
         }
       }
     } else {
@@ -127,27 +125,14 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   useEffect(() => {
     if (!loginLinkSent) {
       if (!needsCustomPage) {
-        const ableToLoadButton = tryLoadGoogleButton();
-        if (!ableToLoadButton) {
-          window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
-        }
-
-        window.VANTA?.TOPOLOGY({
-          el: ".form-wrapper",
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          backgroundColor: '#ffffff',
-          color: window.getComputedStyle(document.body).getPropertyValue('--colors-primary')
-
-        });
-
+        renderGoogleButton();
+        renderVantaBackground(window.getComputedStyle(document.body).getPropertyValue('--colors-primary'));
       } else {
-        fetchCustomPageData();
+        if (!doneFetchingCustomPage) {
+          fetchCustomPageData();
+        } else {
+          renderGoogleButton();
+        }
       }
     }
 
@@ -180,26 +165,34 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   }, [loginLinkSent]);
 
   useEffect(() => {
-    if (doneFetchingCustomPage) {
-      const ableToLoadButton = tryLoadGoogleButton();
-      if (!ableToLoadButton) {
-        window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
-      }
-
-      window.VANTA?.TOPOLOGY({
-        el: ".form-wrapper",
-        mouseControls: false,
-        touchControls: false,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        backgroundColor: '#ffffff',
-        color: org?.brandColor
-      });
+    if (doneFetchingCustomPage && org) {
+      renderGoogleButton();
+      renderVantaBackground(org.brandColor);
     }
   }, [doneFetchingCustomPage]);
+
+  function renderGoogleButton() {
+    const ableToLoadButton = tryLoadGoogleButton();
+
+    if (!ableToLoadButton) {
+      window.googleButtonInterval = setInterval(tryLoadGoogleButton, 1000);
+    }
+  }
+
+  function renderVantaBackground(color: string) {
+    window.VANTA?.TOPOLOGY({
+      el: ".form-wrapper",
+      mouseControls: false,
+      touchControls: false,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      backgroundColor: '#ffffff',
+      color: color
+    });
+  }
 
   const handleLogin = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -298,9 +291,8 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
                   </Typography>
                   <Button
                     style={{ marginTop: '2rem' }}
-                    startIcon={<KeyboardBackspaceIcon />}
                     onClick={() => setLoginLinkSet(false)}>
-                    Back to login
+                    &larr; Back to login
                   </Button>
                 </Box>
                 :
@@ -320,6 +312,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
                       fullWidth
                       autoComplete="email"
                       autoFocus={!isMobile}
+                      value={email}
                       onChange={e => {
                         setFormErrors({});
                         setEmail(e.target.value);
@@ -337,15 +330,19 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
                       type="submit">
                       Sign in
                     </LoadingButton>
-                    <Box
-                      hidden={!needsCustomPage}
-                      component="a"
-                      href="/login"
-                      style={{ fontSize: '14px' }}
-                      mt={4}>
-                      &larr; Go to universal login
-                    </Box>
                   </form>
+                  <Button
+                    onClick={e => {
+                      e.preventDefault();
+                      window.location.href = '/login';
+                    }}
+                    size="small"
+                    style={{ marginTop: '3.5rem' }}
+                    hidden={!needsCustomPage}
+                    component={Link}
+                    to="/login">
+                    &larr; Go to Universal Login
+                  </Button>
                 </Box>
             }
           </Paper>

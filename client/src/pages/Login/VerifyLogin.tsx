@@ -7,7 +7,6 @@ import './styles.scss';
 import { Button, Paper, Typography } from "@mui/material";
 import Loader from "../../components/core/Loader";
 import { AxiosError } from "axios";
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 export default function VerifyLoginPage() {
   const { search } = useLocation();
@@ -83,9 +82,8 @@ function CantVerifyMessage() {
               <Button
                 to="/login"
                 component={Link}
-                variant="outlined"
-                startIcon={<KeyboardBackspaceIcon />}>
-                Back to Login
+                variant="outlined">
+                &larr; Back to Login
               </Button>
             </Box>
           </Paper>

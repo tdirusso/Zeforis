@@ -7,7 +7,7 @@ import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 import { User } from '../../../shared/types/User';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import type { LoginResponse, LoginRequest } from '../../../shared/types/api/Auth';
-import { BadRequestError, NotFoundError } from '../../types/Errors';
+import { BadRequestError, ForbiddenError, NotFoundError } from '../../types/Errors';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import emailer from '../../email';
@@ -55,7 +55,7 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
     const payload = ticket.getPayload();
 
     if (!payload?.email) {
-      return res.status(400).json({ message: 'Missing email from Google credential.' });
+      throw new BadRequestError('Email is missing from Google Credential.');
     }
 
     const googleEmail = payload.email.toLowerCase();
@@ -81,7 +81,7 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
     );
 
     if (!userResult[0]) {
-      return res.status(403).json({ message: 'You are not a member of this organization.' });
+      throw new ForbiddenError('You are not a member of this organization.');
     }
 
     const user: User = {
@@ -93,8 +93,7 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
       subscriptionStatus: userResult[0].subscriptionStatus,
     };
 
-    const token = getJWT(user);
-    return res.json({ token });
+    return res.json({ token: createJWT(user) });
 
   } else {
     const lcEmail = email!.toLowerCase();
@@ -122,9 +121,10 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
     const user = userResult[0];
 
     if (user) {
-      //TODO login logic
+      await sendLoginLink(user.id, user.email);
+      return res.sendStatus(200);
     } else {
-      return res.json({ message: 'You are not a member of this organization.' });
+      throw new ForbiddenError('You are not a member of this organization.');
     }
   }
 }
@@ -201,17 +201,21 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
     const user = userResult[0];
 
     if (user) {
-      const loginCode = uuidv4().substring(0, 24);
-      const _15minutesFromNow = moment().add('15', 'minutes');
-
-      await pool.query('UPDATE users SET login_code = ?, login_code_expiration = ? WHERE id = ?',
-        [loginCode, _15minutesFromNow.toDate(), user.id]
-      );
-
-      await emailer.sendLoginLinkEmail(user.email, loginCode);
+      await sendLoginLink(user.id, user.email);
       return res.sendStatus(200);
     } else {
       throw new NotFoundError(`No account was found with email ${lcEmail}.`);
     }
   }
+}
+
+async function sendLoginLink(userId: number, email: string) {
+  const loginCode = uuidv4().substring(0, 24);
+  const _15minutesFromNow = moment().add('15', 'minutes');
+
+  await pool.query('UPDATE users SET login_code = ?, login_code_expiration = ? WHERE id = ?',
+    [loginCode, _15minutesFromNow.toDate(), userId]
+  );
+
+  await emailer.sendLoginLinkEmail(email, loginCode);
 }

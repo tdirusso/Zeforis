@@ -22,7 +22,7 @@ axiosClient.interceptors.response.use(response => {
 
   return response;
 }, error => {
-  if (error.response.status === 401 && error.response.data?.message?.includes('token')) {
+  if (error.response?.status === 401 && error.response?.data?.message?.includes('token')) {
     alert('Session expired');
     window.location.replace('/login');
     return null;

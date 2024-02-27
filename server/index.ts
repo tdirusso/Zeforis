@@ -7,6 +7,7 @@ import fileUpload from 'express-fileupload';
 import { initializeDatabase, pool } from './database';
 import emailService from './email';
 import slackbot from './slackbot';
+
 import login from './routes/auth/login';
 import authenticate from './routes/auth/authenticate';
 import createEngagement from './routes/engagements/createEngagement';
@@ -132,7 +133,6 @@ const boot = async () => {
   app.post('/api/authenticate', authenicatedUserRateLimit, authenticate);
   app.post('/api/register', unAuthenicatedUserRateLimit, register);
 
-  //app.get('/api/users/:userId/verify', unAuthenicatedUserRateLimit, verify);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
 
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
