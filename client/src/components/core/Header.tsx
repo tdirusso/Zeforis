@@ -87,6 +87,11 @@ export default function Header(props: HeaderProps) {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = customLoginPageUrl;
+  };
+
   return (
     <Grid
       style={{ paddingTop: '15px' }}
@@ -254,7 +259,7 @@ export default function Header(props: HeaderProps) {
 
               <Divider style={{ margin: '8px 0' }} />
 
-              <MenuItem onClick={() => logout(customLoginPageUrl)} dense>
+              <MenuItem onClick={handleLogout} dense>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>

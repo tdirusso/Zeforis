@@ -1,5 +1,10 @@
 import request from '../lib/request';
 
+const getMe = async () => {
+  const { data } = await request.get('users/me');
+  return data;
+};
+
 const register = async (payload: unknown) => {
   const { data } = await request.post(`register`, payload);
 
@@ -32,5 +37,6 @@ export {
   register,
   getInvitationData,
   batchUpdatePermission,
-  closeAccount
+  closeAccount,
+  getMe
 };

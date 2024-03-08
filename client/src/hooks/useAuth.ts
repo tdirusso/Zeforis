@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { authenticate, getToken } from "../api/auth";
+import { authenticate } from "../api/auth";
 import { User } from "@shared/types/User";
 
 export default function useAuth() {
@@ -7,14 +7,7 @@ export default function useAuth() {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken();
-
-    if (!token) {
-      //window.location.href = ('/login');
-      authenticateUser();
-    } else {
-      authenticateUser();
-    }
+    authenticateUser();
 
     async function authenticateUser() {
       try {

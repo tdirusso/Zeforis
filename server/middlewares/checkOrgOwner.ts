@@ -6,14 +6,10 @@ import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['x-access-token'];
+  const token = req.cookies.token;
 
   if (!token) {
     return res.json({ message: 'No authentication token provided.' });
-  }
-
-  if (typeof token !== 'string') {
-    return res.status(400).json({ message: 'Incorrect type for header "x-access-token supplied, string required."' });
   }
 
   let orgId = req.params.orgId || req.body.orgId || req.query.orgId;

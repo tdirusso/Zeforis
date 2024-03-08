@@ -11,6 +11,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '../../types/Erro
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import emailer from '../../email';
+import { isDev } from '../../config';
 
 const authClient = new OAuth2Client(getEnvVariable(EnvVariable.GOOGLE_OAUTH_CLIENT_ID));
 
@@ -29,10 +30,6 @@ export default async (req: APILoginRequest, res: APILoginResponse) => {
   } else {
     await handleUniversalLogin(req, res);
   }
-};
-
-const getJWT = (user: User) => {
-  return createJWT(user);
 };
 
 async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse) {
@@ -122,7 +119,7 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
 
     if (user) {
       await sendLoginLink(user.id, user.email);
-      return res.sendStatus(200);
+      return res.sendStatus(202);
     } else {
       throw new ForbiddenError('You are not a member of this organization.');
     }
@@ -168,7 +165,15 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
         subscriptionStatus: userResult[0].subscriptionStatus,
       };
 
-      const token = getJWT(user);
+      const token = createJWT(user);
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: !isDev,
+        sameSite: 'lax',
+        maxAge: 3600000 // 10 hours
+      });
+
       return res.json({ token });
     } else {
       const createUserResult = await pool.query<ResultSetHeader>(
@@ -202,7 +207,7 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
 
     if (user) {
       await sendLoginLink(user.id, user.email);
-      return res.sendStatus(200);
+      return res.sendStatus(202);
     } else {
       throw new NotFoundError(`No account was found with email ${lcEmail}.`);
     }

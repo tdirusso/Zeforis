@@ -2,13 +2,14 @@ import { pool } from '../../database';
 import { createJWT, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { VerifyLoginRequest, VerifyLoginResponse } from '../../../shared/types/api/Auth';
+import { VerifyLoginRequest } from '../../../shared/types/api/Auth';
 import moment from 'moment';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../../types/Errors';
 import validator from 'email-validator';
 import { User } from '../../../shared/types/User';
+import { isDev } from '../../config';
 
-export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response<VerifyLoginResponse>) => {
+export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) => {
   const {
     email,
     loginCode
@@ -74,5 +75,21 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response<Ve
     subscriptionStatus: user.subscriptionStatus
   };
 
-  return res.json({ token: createJWT(jwtUser) });
+  const token = createJWT({
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    plan: user.plan,
+    subscriptionStatus: user.subscriptionStatus
+  });
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: !isDev,
+    sameSite: 'lax',
+    maxAge: 3600000 // 10 hours
+  });
+
+  return res.sendStatus(200);
 };

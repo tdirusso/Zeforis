@@ -1,6 +1,6 @@
 import { SyntheticEvent, useEffect, useState } from "react";
 import { login } from "../../api/auth";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -39,6 +39,8 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   const [org, setOrg] = useState<Org | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [loginLinkSent, setLoginLinkSet] = useState(false);
+
+  const navigate = useNavigate();
 
   const {
     isOpen,
@@ -82,8 +84,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
           setActiveOrgId(orgId);
         }
 
-        setLoginLinkSet(true);
-        setLoading(false);
+        navigate('/home/dashboard');
       } catch (error: unknown) {
         setLoading(false);
         if (error instanceof AxiosError) {
@@ -290,7 +291,8 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
                     Click the link in the email to log in.
                   </Typography>
                   <Button
-                    style={{ marginTop: '2rem' }}
+                    size="small"
+                    style={{ marginTop: '3rem' }}
                     onClick={() => setLoginLinkSet(false)}>
                     &larr; Back to login
                   </Button>

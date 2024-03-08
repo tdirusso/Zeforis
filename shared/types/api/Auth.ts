@@ -14,7 +14,3 @@ export interface VerifyLoginRequest {
   email: string,
   loginCode: string;
 }
-
-export interface VerifyLoginResponse {
-  token: string;
-}

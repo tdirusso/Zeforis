@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { setToken, verifyLogin } from "../../api/auth";
+import { verifyLogin } from "../../api/auth";
 import { Link, useLocation } from "react-router-dom";
 import Box from '@mui/material/Box';
 import zeforisLogo from '../../assets/zeforis-logo.png';
@@ -28,12 +28,11 @@ export default function VerifyLoginPage() {
     async function doVerifyLogin() {
       if (email && loginCode) {
         try {
-          const { token } = await verifyLogin({
+          await verifyLogin({
             email,
             loginCode
           });
 
-          setToken(token);
           window.location.replace('/home/dashboard');
         } catch (error: unknown) {
           console.log(error);

@@ -45,7 +45,7 @@ const theme: ThemeOptions = {
       color: 'var(--colors-gray-1000)'
     },
     body2: {
-      fontWeight: 400,
+      fontWeight: 300,
       fontSize: '14px',
       color: 'var(--colors-gray-900)'
     }

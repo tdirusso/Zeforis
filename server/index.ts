@@ -49,17 +49,19 @@ import stripe_createSubscription from './routes/stripe/createSubscription';
 import dumpCache from './routes/cache/dumpCache';
 import clearCache from './routes/cache/clearCache';
 import closeAccount from './routes/users/closeAccount';
+import logout from './routes/auth/logout';
 
 import checkEngagementAdminMW from './middlewares/checkEngagementAdmin';
 import checkEngagementMemberMW from './middlewares/checkEngagementMember';
 import checkOrgOwnerMW from './middlewares/checkOrgOwner';
-import checkAuthMW from './middlewares/checkAuth';
+import checkAuth from './middlewares/checkAuth';
 import errorHandlerMW from './middlewares/errorHandler';
 import checkSlackSignature from './middlewares/checkSlackSignature';
 import verifyLogin from './routes/auth/verifyLogin';
 import stripeWebhook from './webhooks/stripe';
 
 import 'express-async-errors';
+import getMe from './routes/users/getMe';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -129,15 +131,17 @@ const boot = async () => {
   app.use(express.json());
 
   app.post('/api/login', unAuthenicatedUserRateLimit, login);
+  app.delete('/api/logout', unAuthenicatedUserRateLimit, logout);
   app.post('/api/verify-login', unAuthenicatedUserRateLimit, verifyLogin);
-  app.post('/api/authenticate', authenicatedUserRateLimit, authenticate);
+  app.post('/api/authenticate', authenicatedUserRateLimit, checkAuth, authenticate);
   app.post('/api/register', unAuthenicatedUserRateLimit, register);
 
-  app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuthMW, updateUser);
+  app.get('/api/users/me', checkAuth, getMe);
+  app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuth, updateUser);
 
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);
-  app.delete('/api/users', authenicatedUserRateLimit, checkAuthMW, closeAccount);
+  app.delete('/api/users', authenicatedUserRateLimit, checkAuth, closeAccount);
 
   app.post('/api/stripe/subscriptions', authenicatedUserRateLimit, checkOrgOwnerMW, stripe_createSubscription);
 
@@ -166,7 +170,7 @@ const boot = async () => {
   app.delete('/api/orgs/:orgId/users/:userId', authenicatedUserRateLimit, checkOrgOwnerMW, removeOrgUser);
   app.patch('/api/orgs/:orgId/users/:userId/access', authenicatedUserRateLimit, checkOrgOwnerMW, updateAccess);
   app.post('/api/orgs/:orgId/invite', authenicatedUserRateLimit, checkOrgOwnerMW, inviteOrgUsers);
-  app.post('/api/orgs', authenicatedUserRateLimit, checkAuthMW, createOrg);
+  app.post('/api/orgs', authenicatedUserRateLimit, checkAuth, createOrg);
   app.patch('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, updateOrg);
   app.get('/api/orgs', unAuthenicatedUserRateLimit, getOrg);
   app.delete('/api/orgs', authenicatedUserRateLimit, checkOrgOwnerMW, deleteOrg);
