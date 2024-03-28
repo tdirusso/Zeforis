@@ -27,6 +27,6 @@ export class ForbiddenError extends Error {
 }
 
 export enum ErrorMessages {
-  NoTokenProvided = 'Missing authentication token cookie.',
+  NoTokenProvided = 'Missing authentication cookie.',
   InvalidTokenBody = 'Missing required fields in x-access-token body.'
 }

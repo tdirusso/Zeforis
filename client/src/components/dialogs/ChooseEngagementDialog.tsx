@@ -11,6 +11,7 @@ import { Engagement } from '@shared/types/Engagement';
 import { Org } from '@shared/types/Org';
 import { User } from '@shared/types/User';
 import { TransitionProps } from '@mui/material/transitions';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const toggleableTransition = forwardRef(function Transition(props: TransitionProps & {
   children: React.ReactElement<any, any>;
@@ -161,7 +162,7 @@ export default function ChooseEngagementDialog(props: ChooseEngagementDialogProp
               </Box>
               <Button
                 className='change-org-btn'
-                startIcon={<SwapHorizOutlined />}
+                endIcon={<ExpandMoreIcon />}
                 onClick={e => setChangeOrgMenuAnchor(e.currentTarget)}
                 variant='contained'>
                 Change org
@@ -220,7 +221,7 @@ export default function ChooseEngagementDialog(props: ChooseEngagementDialogProp
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>
         {
-          user.memberOfOrgs?.map(({ id, name }) => {
+          user.orgs?.map(({ id, name }) => {
             return (
               <MenuItem
                 disabled={id === org.id}

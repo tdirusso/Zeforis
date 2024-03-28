@@ -4,4 +4,5 @@ export interface Engagement {
   orgId?: number,
   dateCreated?: Date;
   access?: string;
+  role?: string;
 };

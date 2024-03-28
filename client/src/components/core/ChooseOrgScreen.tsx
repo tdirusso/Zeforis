@@ -49,7 +49,7 @@ export default function ChooseOrgScreen(props: { user: User; }) {
             mt={3}
             maxWidth={1200}>
             {
-              user.memberOfOrgs?.map((org, index) => {
+              user.orgs?.map((org, index) => {
                 return (
                   <Zoom key={org.id} appear in style={{ transitionDelay: `${index * 50}ms` }}>
                     <Paper

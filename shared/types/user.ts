@@ -11,7 +11,7 @@ export interface User {
   subscriptionStatus?: string | null,
   adminOfEngagements?: Engagement[];
   memberOfEngagements?: Engagement[];
-  memberOfOrgs?: Org[];
   access?: string;
   role?: string;
+  orgs?: Org[];
 };

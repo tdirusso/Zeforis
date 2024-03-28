@@ -134,7 +134,7 @@ export default function NoEngagementsDialog(props: NoEngagementsDialogProps) {
         open={changeOrgMenuOpen}
         onClose={() => setChangeOrgMenuAnchor(null)}>
         {
-          user.memberOfOrgs?.map(({ id, name }) => {
+          user.orgs?.map(({ id, name }) => {
             return (
               <MenuItem
                 disabled={id === org.id}

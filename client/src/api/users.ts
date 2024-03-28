@@ -1,7 +1,8 @@
 import request from '../lib/request';
+import type { User } from '@shared/types/User';
 
 const getMe = async () => {
-  const { data } = await request.get('users/me');
+  const { data } = await request.get<User>('users/me');
   return data;
 };
 

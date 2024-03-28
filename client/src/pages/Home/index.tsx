@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import useAuth from "../../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 import SideNav from "../../components/core/SideNav";
 import { Box, Grid, Theme } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { deleteActiveEngagementId, getActiveEngagementId, getEngagementData, getUserEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
+import { deleteActiveEngagementId, getActiveEngagementId, getEngagementData, getEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
 import CreateEngagementDialog from "../../components/dialogs/CreateEngagementDialog";
 import { deleteActiveOrgId, getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
@@ -34,12 +33,14 @@ import { Folder, FoldersMap } from "@shared/types/Folder";
 import { Tag, TagsMap } from "@shared/types/Tag";
 import { User } from "@shared/types/User";
 import { Widget } from "@shared/types/Widget";
+import useUser from "src/hooks/useUser";
 
 export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }) {
   let activeOrgId = getActiveOrgId();
   let activeEngagementId = getActiveEngagementId();
 
-  const { user, setUser } = useAuth();
+  const { user, setUser } = useUser();
+
   const [isDataFetched, setDataFetched] = useState(false);
   const [isReadyToRender, setReadyToRender] = useState(false);
   const [engagement, setEngagement] = useState<Engagement | null>(null);
@@ -106,12 +107,16 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
 
   useEffect(() => {
     if (user) {
+      getActiveOrgAndEngagement(user);
+    }
+
+    async function getActiveOrgAndEngagement(user: User) {
       let activeOrg: Org | null = null;
 
-      if (user.memberOfOrgs?.length === 1) {
-        activeOrg = user.memberOfOrgs[0];
+      if (user.orgs?.length === 1) {
+        activeOrg = user.orgs[0];
       } else if (activeOrgId) {
-        activeOrg = user.memberOfOrgs?.find(org => org.id === activeOrgId) || null;
+        activeOrg = user.orgs?.find(org => org.id === activeOrgId) || null;
       }
 
       if (activeOrg) {
@@ -126,19 +131,20 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
           themeConfig.palette!.primary!.main = activeOrg.brandColor;
         }
 
-        const userEngagementsForOrg = getUserEngagementsForOrg(user, activeOrg.id);
-
         updateTheme(setTheme);
         setOrg(activeOrg);
         setIsOrgOwner(isOwnerOfActiveOrg);
-        setEngagements(userEngagementsForOrg);
+
+        const orgEngagements = await getEngagementsForOrg(activeOrg.id);
+
+        setEngagements(orgEngagements);
 
         let activeEngagement = null;
 
-        if (userEngagementsForOrg.length === 1) {
-          activeEngagement = userEngagementsForOrg[0];
+        if (orgEngagements.length === 1) {
+          activeEngagement = orgEngagements[0];
         } else if (activeEngagementId) {
-          activeEngagement = userEngagementsForOrg.find(engagement => engagement.id === activeEngagementId);
+          activeEngagement = orgEngagements.find(engagement => engagement.id === activeEngagementId);
         }
 
         if (activeEngagement) {
@@ -268,10 +274,10 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   }
 
   if (!org && user) {
-    if (user.memberOfOrgs?.length === 1) {
-      setActiveOrgId(user.memberOfOrgs[0].id);
-      setOrg(user.memberOfOrgs[0]);
-    } else if (user.memberOfOrgs?.length === 0) {
+    if (user.orgs?.length === 1) {
+      setActiveOrgId(user.orgs[0].id);
+      setOrg(user.orgs[0]);
+    } else if (user.orgs?.length === 0) {
       window.location.href = '/create-org';
       return null;
     } else {

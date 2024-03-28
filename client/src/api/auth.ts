@@ -11,22 +11,10 @@ const verifyLogin = async (payload: VerifyLoginRequest) => {
 
 const logout = async () => {
   await request.post<void>('logout');
-  //window.location.href = logoutPageUrl;
-};
-
-const authenticate = async () => {
-  const { data } = await request.post(`authenticate`);
-
-  if (!data.user) {
-    // deleteToken();
-  }
-
-  return data;
 };
 
 export {
   login,
   logout,
-  authenticate,
   verifyLogin
 };

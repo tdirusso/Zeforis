@@ -1,6 +1,9 @@
 import { Engagement } from '@shared/types/Engagement';
 import request from '../lib/request';
-import { User } from '@shared/types/User';
+
+const getEngagementsForOrg = async (orgId: number) => {
+  return (await request.get<Engagement[]>(`orgs/${orgId}/engagements`)).data;
+};
 
 const createEngagement = async (payload: unknown) => {
   const { data } = await request.post(`engagements`, payload);
@@ -20,28 +23,6 @@ const setActiveEngagementId = (engagementId: number) => {
 
 const getActiveEngagementId = () => {
   return Number(localStorage.getItem('activeEngagementId'));
-};
-
-const getUserEngagementsForOrg = (user: User, activeOrgId: number) => {
-  const result: Engagement[] = [];
-
-  if (user.adminOfEngagements?.length) {
-    user.adminOfEngagements.forEach(engagement => {
-      if (engagement.orgId === activeOrgId) {
-        result.push({ ...engagement, access: 'admin' });
-      }
-    });
-  }
-
-  if (user.memberOfEngagements?.length) {
-    user.memberOfEngagements.forEach(engagement => {
-      if (engagement.orgId === activeOrgId) {
-        result.push({ ...engagement, access: 'member' });
-      }
-    });
-  }
-
-  return result;
 };
 
 const deleteActiveEngagementId = () => {
@@ -82,11 +63,11 @@ export {
   updateEngagement,
   setActiveEngagementId,
   getActiveEngagementId,
-  getUserEngagementsForOrg,
   deleteActiveEngagementId,
   getEngagementData,
   deleteEngagement,
   leaveEngagement,
   removeEngagementUser,
-  updateUserPermissions
+  updateUserPermissions,
+  getEngagementsForOrg
 };

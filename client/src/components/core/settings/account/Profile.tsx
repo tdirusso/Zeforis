@@ -21,7 +21,7 @@ export default function Profile() {
   const firstName = useRef<HTMLInputElement>(null);
   const lastName = useRef<HTMLInputElement>(null);
 
-  const hasOrg = Boolean(user.memberOfOrgs?.some(org => org.ownerId === user.id));
+  const hasOrg = Boolean(user.orgs?.some(org => org.ownerId === user.id));
 
   const handleProfileUpdate = async () => {
     const firstNameVal = firstName.current?.value;
