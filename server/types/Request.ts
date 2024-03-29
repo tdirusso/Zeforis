@@ -10,6 +10,7 @@ declare global {
         id: number;
       };
       engagementId: number;
+      engagementName: string;
       orgId: number;
     }
   }

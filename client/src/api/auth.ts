@@ -1,8 +1,8 @@
 import request from '../lib/request';
-import type { LoginRequest, LoginResponse, VerifyLoginRequest } from '@shared/types/api/Auth';
+import type { LoginRequest, VerifyLoginRequest } from '@shared/types/api/Auth';
 
 const login = async (payload: LoginRequest) => {
-  return (await request.post<LoginResponse>('login', payload)).data;
+  return (await request.post<void>('login', payload)).data;
 };
 
 const verifyLogin = async (payload: VerifyLoginRequest) => {

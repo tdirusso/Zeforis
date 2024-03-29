@@ -4,70 +4,64 @@ import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
-import { ErrorMessages, UnauthorizedError } from '../types/Errors';
+import { BadRequestError, ErrorMessages, ForbiddenError, NotFoundError, UnauthorizedError } from '../types/Errors';
+import { getAuthToken, getRequestParameter } from '../lib/utils';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
+  const token = getAuthToken(req);
 
   if (!token) {
     throw new UnauthorizedError(ErrorMessages.NoTokenProvided);
   }
 
-  let { engagementId } = req.body;
+  const engagementId = getRequestParameter('engagementId', req);
 
   if (!engagementId) {
-    engagementId = req.query.engagementId;
+    throw new BadRequestError('Missing required parameter "/:engagementId".');
   }
 
-  if (!engagementId) {
-    engagementId = req.params.engagementId;
+  const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
+
+  const userId = decoded.user?.id;
+
+  const [checkResult] = await pool.query<RowDataPacket[]>(
+    `
+    SELECT 
+      engagements.org_id AS orgId,
+      engagements.name AS engagementName,
+      orgs.owner_id AS orgOwnerId,
+    CASE 
+        WHEN EXISTS (
+            SELECT 1 
+            FROM engagement_users 
+            WHERE engagement_id = 49 AND user_id = ?
+        ) THEN 1 
+        ELSE 0 
+    END AS engagementUserExists
+    FROM engagements
+    LEFT JOIN orgs ON orgs.id = engagements.org_id
+    WHERE engagements.id = ?
+    `, [userId, engagementId]);
+
+  if (!checkResult.length) {
+    throw new NotFoundError(`Engagement with id ${engagementId} does not exist.`);
   }
 
-  if (!engagementId) {
-    return res.json({ message: 'No engagementId provided.' });
+  const {
+    orgId,
+    orgOwnerId,
+    engagementUserExists,
+    engagementName
+  } = checkResult[0];
+
+  if (orgOwnerId === userId || engagementUserExists) {
+    req.userId = userId;
+    req.user = decoded.user;
+    req.engagementId = Number(engagementId);
+    req.engagementName = engagementName;
+    req.orgId = orgId;
+    return next();
   }
 
-  let { orgId } = req.body;
-
-  if (!orgId) {
-    orgId = req.query.orgId;
-  }
-
-  try {
-    const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
-
-    const userId = decoded.user?.id;
-
-    if (engagementId) {
-      const [doesEngagementUserExistResult] = await pool.query<RowDataPacket[]>(
-        'SELECT 1 FROM engagement_users WHERE user_id = ? AND engagement_id = ?',
-        [userId, engagementId]
-      );
-
-      if (doesEngagementUserExistResult.length) {
-        if (orgId) {
-          const [orgIdForEngagementResult] = await pool.query<RowDataPacket[]>(
-            'SELECT org_id FROM engagements WHERE id = ?',
-            [engagementId]
-          );
-
-          const orgIdForEngagement = orgIdForEngagementResult[0].org_id;
-
-          if (orgIdForEngagement !== Number(orgId)) {
-            return res.json({ message: 'Engagement and org mismatch.' });
-          }
-        }
-
-        req.userId = userId;
-        req.user = decoded.user;
-        req.engagementId = engagementId;
-        req.orgId = orgId;
-        return next();
-      } else {
-        return res.json({ message: 'You are not a member of this engagement.' });
-      }
-    }
-  } catch (error) {
-    next(error);
-  }
+  throw new ForbiddenError(`You are not authorized to access engagement with id ${engagementId}.`);
 };

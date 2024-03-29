@@ -5,11 +5,6 @@ export interface LoginRequest {
   orgId?: number;
 };
 
-export interface LoginResponse {
-  token?: string;
-  message?: string;
-};
-
 export interface VerifyLoginRequest {
   email: string,
   loginCode: string;

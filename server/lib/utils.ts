@@ -5,6 +5,8 @@ import type { User } from '../../shared/types/User';
 import type { RowDataPacket } from 'mysql2';
 import type { PoolConnection } from 'mysql2/promise';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
+import { Request, Response } from 'express';
+import { isDev } from '../config';
 
 type RequestBody = {
   [key: string]: any;
@@ -22,6 +24,35 @@ function createJWT(user: User) {
     getEnvVariable(EnvVariable.SECRET_KEY),
     { expiresIn: 36000 }
   );
+}
+
+function setAuthTokenCookie(token: string, res: Response) {
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: !isDev,
+    sameSite: 'lax',
+    maxAge: 36000000 // 10 hours
+  });
+}
+
+function getAuthToken(req: Request) {
+  return req.cookies.token;
+}
+
+function getRequestParameter(parameterName: string, req: Request) {
+  let value;
+
+  value = req.body[parameterName];
+
+  if (!value) {
+    value = req.query[parameterName];
+  }
+
+  if (!value) {
+    value = req.params[parameterName];
+  }
+
+  return value;
 }
 
 async function wait(ms: number) {
@@ -91,5 +122,8 @@ export {
   createJWT,
   updateStripeSubscription,
   getMissingFields,
-  wait
+  wait,
+  getAuthToken,
+  getRequestParameter,
+  setAuthTokenCookie
 };

@@ -2,7 +2,6 @@ import { pool, commonQueries } from '../../database';
 import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2';
 import { Engagement } from '../../../shared/types/Engagement';
-import { BadRequestError } from '../../types/Errors';
 import { Folder } from '../../../shared/types/Folder';
 import { Tag } from '../../../shared/types/Tag';
 import { User } from '../../../shared/types/User';
@@ -18,17 +17,11 @@ type EngagementQueryResultType = [
 
 export default async (req: Request, res: Response<Engagement>) => {
 
-  const { engagementId } = req.params;
-
-  const { orgId } = req;
-
-  if (!orgId) {
-    throw new BadRequestError('no org id');
-  }
-
-  if (!engagementId) {
-    throw new BadRequestError('Missing required path parameter "/:engagementId".');
-  }
+  const {
+    engagementId,
+    engagementName,
+    orgId
+  } = req;
 
   const connection = await pool.getConnection();
 
@@ -117,8 +110,8 @@ export default async (req: Request, res: Response<Engagement>) => {
   connection.release();
 
   const engagementData: Engagement = {
-    id: Number(engagementId),
-    name: 'fill this in',
+    id: engagementId,
+    name: engagementName,
     folders,
     tasks,
     tags,

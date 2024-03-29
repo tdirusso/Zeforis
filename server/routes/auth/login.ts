@@ -1,22 +1,21 @@
 import { pool } from '../../database';
 import { OAuth2Client } from 'google-auth-library';
 import slackbot from '../../slackbot';
-import { createJWT, wait } from '../../lib/utils';
+import { createJWT, setAuthTokenCookie, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 import { User } from '../../../shared/types/User';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
-import type { LoginResponse, LoginRequest } from '../../../shared/types/api/Auth';
+import type { LoginRequest } from '../../../shared/types/api/Auth';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../types/Errors';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import emailer from '../../email';
-import { isDev } from '../../config';
 
 const authClient = new OAuth2Client(getEnvVariable(EnvVariable.GOOGLE_OAUTH_CLIENT_ID));
 
 type APILoginRequest = Request<{}, {}, LoginRequest>;
-type APILoginResponse = Response<LoginResponse>;
+type APILoginResponse = Response<void>;
 
 export default async (req: APILoginRequest, res: APILoginResponse) => {
   const {
@@ -90,8 +89,10 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
       subscriptionStatus: userResult[0].subscriptionStatus,
     };
 
-    return res.json({ token: createJWT(user) });
+    const token = createJWT(user);
+    setAuthTokenCookie(token, res);
 
+    return res.sendStatus(202);
   } else {
     const lcEmail = email!.toLowerCase();
 
@@ -166,15 +167,9 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
       };
 
       const token = createJWT(user);
+      setAuthTokenCookie(token, res);
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: !isDev,
-        sameSite: 'lax',
-        maxAge: 36000000 // 10 hours
-      });
-
-      return res.json({ token });
+      return res.sendStatus(202);
     } else {
       const createUserResult = await pool.query<ResultSetHeader>(
         'INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)',
@@ -185,7 +180,7 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
         message: `*New User*\n${googleEmail}`
       });
 
-      const newUser: User = {
+      const user: User = {
         id: createUserResult[0].insertId,
         email: googleEmail,
         firstName: payload.given_name,
@@ -193,7 +188,10 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
         plan: 'free'
       };
 
-      return res.json({ token: createJWT(newUser) });
+      const token = createJWT(user);
+      setAuthTokenCookie(token, res);
+
+      return res.sendStatus(202);
     }
   } else {
     const lcEmail = email!.toLowerCase();
