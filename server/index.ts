@@ -10,7 +10,6 @@ import slackbot from './slackbot';
 
 import login from './routes/auth/login';
 import createEngagement from './routes/engagements/createEngagement';
-import getEngagement from './routes/engagements/getEngagementData';
 import createFolder from './routes/folders/createFolder';
 import updateEngagement from './routes/engagements/updateEngagement';
 import register from './routes/users/register';
@@ -50,6 +49,7 @@ import clearCache from './routes/cache/clearCache';
 import closeAccount from './routes/users/closeAccount';
 import logout from './routes/auth/logout';
 import getEngagementsForOrg from './routes/engagements/getEngagementsForOrg';
+import getEngagement from './routes/engagements/getEngagement';
 
 import checkEngagementAdminMW from './middlewares/checkEngagementAdmin';
 import checkEngagementMemberMW from './middlewares/checkEngagementMember';
@@ -147,7 +147,7 @@ const boot = async () => {
   app.delete('/api/engagements/:engagementId/users/:userId', authenicatedUserRateLimit, checkOrgOwnerMW, removeEngagementUser);
   app.patch('/api/engagements/:engagementId/users/:userId/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updateUserPermissions);
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
-  app.get('/api/engagements', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
+  app.get('/api/engagements/:engagementId', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
   app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
   app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
   app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);

@@ -171,7 +171,7 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
         httpOnly: true,
         secure: !isDev,
         sameSite: 'lax',
-        maxAge: 3600000 // 10 hours
+        maxAge: 36000000 // 10 hours
       });
 
       return res.json({ token });

@@ -1,69 +1,42 @@
 import { pool } from '../../database';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { Engagement } from '../../../shared/types/Engagement';
-import { BadRequestError } from '../../types/Errors';
+import { User } from '../../../shared/types/User';
+import { Org } from '../../../shared/types/Org';
 
-export default async (req: Request, res: Response) => {
+export default async (req: Request, res: Response<User>) => {
   const requestingUser = req.user;
 
   const userId = requestingUser.id;
 
-  const [userDataResult] = await pool.query<RowDataPacket[]>('CALL getUserData(?)', [userId]);
+  const [userDataResult] = await pool.query<[RowDataPacket[], Org[] & RowDataPacket[]]>('CALL getUserData(?)', [userId]);
 
-  const [userPlanData, engagementMemberData, ownedOrgsData] = userDataResult;
+  const [planData, orgData] = userDataResult;
 
-  const userObect = { ...requestingUser, ...userPlanData[0] };
-
-  const memberOfOrgs = new Map();
-  const memberOfEngagements: Engagement[] = [];
-  const adminOfEngagements: Engagement[] = [];
-
-  ownedOrgsData.forEach((row: RowDataPacket) => {
-    memberOfOrgs.set(row.id, {
-      id: row.id,
-      name: row.name,
-      brandColor: row.brand_color,
-      logo: row.logo_url,
-      ownerId: row.owner_id
-    });
-  });
-
-  engagementMemberData.forEach((row: RowDataPacket) => {
-    const {
-      org_id,
-      org_name,
-      org_brand,
-      org_logo,
-      org_owner,
-      engagement_id,
-      engagement_name,
-      role
-    } = row;
-
-    memberOfOrgs.set(org_id, {
-      id: org_id,
-      name: org_name,
-      brandColor: org_brand,
-      logo: org_logo,
-      ownerId: org_owner
-    });
-
-    const engagementObject = {
-      id: engagement_id,
-      name: engagement_name,
-      orgId: org_id
-    };
-
-    if (role === 'admin') {
-      adminOfEngagements.push(engagementObject);
-    } else {
-      memberOfEngagements.push(engagementObject);
-    }
-  });
+  const userObect: User = { ...requestingUser, ...planData };
 
   return res.json({
     ...userObect,
-    orgs: [...memberOfOrgs.values()],
+    orgs: orgData,
   });
 };
+
+
+
+/*
+  SELECT 
+  engagement_users.engagement_id, 
+  engagement_users.user_id,
+  engagement_users.role,
+  orgs.name AS org_name,
+  orgs.brand_color AS org_brand,
+  orgs.logo_url AS org_logo,
+  orgs.id AS org_id,
+  orgs.owner_id AS org_owner,
+  engagements.name AS engagement_name
+  FROM engagement_users
+  LEFT JOIN engagements ON engagements.id = engagement_users.engagement_id
+  LEFT JOIN orgs ON orgs.id = engagements.org_id
+  WHERE user_id = userIdParam
+  ORDER BY engagement_name;
+*/

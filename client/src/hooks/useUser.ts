@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { User } from "@shared/types/User";
 import { getMe } from "src/api/users";
 import { AxiosError } from "axios";
+import { AppContext } from "src/types/AppContext";
 
-export default function useUser() {
+export default function useUser(openSnackBar: AppContext['openSnackBar']) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setLoading] = useState(true);
 
@@ -20,14 +21,15 @@ export default function useUser() {
         }
       } catch (error: unknown) {
         console.log(error);
+
         if (error instanceof AxiosError) {
           if (error.response?.status === 401) {
-            alert('Session expired.');
+            openSnackBar('Session expired.');
           } else {
-            alert(`${error.response?.data.message}`);
+            openSnackBar(`${error.response?.data.message}`);
           }
         } else if (error instanceof Error) {
-          alert(`${error.message}`);
+          openSnackBar(`${error.message}`);
         }
 
         window.location.replace('/login');

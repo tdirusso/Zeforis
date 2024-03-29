@@ -20,6 +20,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (!engagementId) {
+    engagementId = req.params.engagementId;
+  }
+
+  if (!engagementId) {
     return res.json({ message: 'No engagementId provided.' });
   }
 

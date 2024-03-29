@@ -88,7 +88,7 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
     httpOnly: true,
     secure: !isDev,
     sameSite: 'lax',
-    maxAge: 3600000 // 10 hours
+    maxAge: 36000000 // 10 hours
   });
 
   return res.sendStatus(200);

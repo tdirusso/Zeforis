@@ -2,8 +2,7 @@ import request from '../lib/request';
 import type { User } from '@shared/types/User';
 
 const getMe = async () => {
-  const { data } = await request.get<User>('users/me');
-  return data;
+  return (await request.get<User>('users/me')).data;
 };
 
 const register = async (payload: unknown) => {

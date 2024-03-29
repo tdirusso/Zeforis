@@ -5,7 +5,7 @@ import { Box, Grid, Theme } from "@mui/material";
 import ChooseEngagementDialog from "../../components/dialogs/ChooseEngagementDialog";
 import useSnackbar from "../../hooks/useSnackbar";
 import Snackbar from "../../components/core/Snackbar";
-import { deleteActiveEngagementId, getActiveEngagementId, getEngagementData, getEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
+import { deleteActiveEngagementId, getActiveEngagementId, getEngagement, getEngagementsForOrg, setActiveEngagementId } from "../../api/engagements";
 import CreateEngagementDialog from "../../components/dialogs/CreateEngagementDialog";
 import { deleteActiveOrgId, getActiveOrgId, setActiveOrgId } from "../../api/orgs";
 import Loader from "../../components/core/Loader";
@@ -39,8 +39,6 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   let activeOrgId = getActiveOrgId();
   let activeEngagementId = getActiveEngagementId();
 
-  const { user, setUser } = useUser();
-
   const [isDataFetched, setDataFetched] = useState(false);
   const [isReadyToRender, setReadyToRender] = useState(false);
   const [engagement, setEngagement] = useState<Engagement | null>(null);
@@ -59,7 +57,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   const [isOrgOwner, setIsOrgOwner] = useState(false);
   const [engagementMembers, setEngagementMembers] = useState<User[]>([]);
   const [engagementAdmins, setEngagementAdmins] = useState<User[]>([]);
-  const [orgOwnerPlan, setOrgOwnerPlan] = useState(null);
+  const [orgOwnerPlan, setOrgOwnerPlan] = useState('');
   const [triedOrgAndEngagement, setTriedOrgAndEngagement] = useState(false);
 
   const {
@@ -69,6 +67,8 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
     message,
     snackbarProps
   } = useSnackbar();
+
+  const { user, setUser } = useUser(openSnackBar);
 
   const {
     modalToOpen,
@@ -165,12 +165,12 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
           }
         });
 
-        fetchEngagementData(engagement.id, org.id);
+        getEngagementData(engagement.id);
       } else if (!engagement && org) {
         if (engagements.length === 1) {
           setActiveEngagementId(engagements[0].id);
           setEngagement(engagements[0]);
-          fetchEngagementData(engagements[0].id, org.id);
+          getEngagementData(engagements[0].id);
         } else {
           setReadyToRender(true);
         }
@@ -179,25 +179,27 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
       }
     }
 
-    async function fetchEngagementData(engagementId: number, orgId: number) {
-      const result = await getEngagementData(engagementId, orgId);
+    async function getEngagementData(engagementId: number) {
+      try {
+        const engagementData = await getEngagement(engagementId);
 
-      if (!result.engagement) {
-        deleteActiveEngagementId();
-        deleteActiveOrgId();
-        openSnackBar(result.message);
-        setTimeout(() => {
-          return window.location.reload();
-        }, 1000);
+        setTasks(engagementData.tasks || []);
+        setFolders(engagementData.folders || []);
+        setTags(engagementData.tags || []);
+        setOrgUsers(engagementData.metadata?.orgUsers || []);
+        setOrgOwnerPlan(engagementData.metadata?.orgOwnerPlan || '');
+        setWidgets(engagementData.widgets || []);
+        setDataFetched(true);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          deleteActiveEngagementId();
+          deleteActiveOrgId();
+          openSnackBar(error.message);
+          setTimeout(() => {
+            return window.location.reload();
+          }, 1000);
+        }
       }
-
-      setTasks(result.engagement.tasks);
-      setFolders(result.engagement.folders);
-      setTags(result.engagement.tags);
-      setOrgUsers(result.engagement.metadata.orgUsers);
-      setOrgOwnerPlan(result.engagement.metadata.orgOwnerPlan);
-      setWidgets(result.engagement.widgets);
-      setDataFetched(true);
     }
   }, [triedOrgAndEngagement]);
 

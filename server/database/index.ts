@@ -2,6 +2,7 @@ import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import cache from '../cache';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 import { CachedOrg } from '../types/Cache';
+import { BadRequestError } from '../types/Errors';
 
 interface TaskCountRow extends RowDataPacket {
   taskCount: number;
@@ -62,6 +63,10 @@ const commonQueries = {
       orgOwnerPlan = planResult[0].plan;
 
       cache.set(`org-${orgId}`, { ...cachedOrgData, ownerPlan: orgOwnerPlan });
+    }
+
+    if (!orgOwnerPlan) {
+      throw new BadRequestError('');
     }
 
     return orgOwnerPlan;

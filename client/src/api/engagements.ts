@@ -29,10 +29,8 @@ const deleteActiveEngagementId = () => {
   localStorage.removeItem('activeEngagementId');
 };
 
-const getEngagementData = async (engagementId: number, orgId: number) => {
-  const { data } = await request.get(`engagements?engagementId=${engagementId}&orgId=${orgId}`);
-
-  return data;
+const getEngagement = async (engagementId: number) => {
+  return (await request.get<Engagement>(`engagements/${engagementId}`)).data;
 };
 
 const deleteEngagement = async (payload: unknown) => {
@@ -64,7 +62,7 @@ export {
   setActiveEngagementId,
   getActiveEngagementId,
   deleteActiveEngagementId,
-  getEngagementData,
+  getEngagement,
   deleteEngagement,
   leaveEngagement,
   removeEngagementUser,
