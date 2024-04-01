@@ -3,7 +3,7 @@ import { pool } from '../database';
 import slackbot from '../slackbot';
 import { isDev } from '../config';
 import { NextFunction, Request, Response } from 'express';
-import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "../types/Errors";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, UnauthorizedError, UnprocessableError } from "../types/Errors";
 
 export default async function errorHandler(error: unknown, _: Request, res: Response, __: NextFunction) {
   if (error instanceof Error) {
@@ -18,6 +18,10 @@ export default async function errorHandler(error: unknown, _: Request, res: Resp
         return res.status(403).json({ message: `${error.message}` });
       case error instanceof NotFoundError:
         return res.status(404).json({ message: error.message });
+      case error instanceof ConflictError:
+        return res.status(409).json({ message: error.message });
+      case error instanceof UnprocessableError:
+        return res.status(422).json({ message: error.message });
       default:
         console.error('Application error:', error);
         await handleServerError(error);

@@ -10,7 +10,6 @@ import './index.scss';
 import HomePage from './pages/Home';
 // import LoginPage from './pages/Login';
 // import RegisterPage from './pages/Register';
-import RegisterSuccessPage from './pages/Register/RegisterSuccess';
 import AcceptInvitationPage from './pages/AcceptInvitation';
 import DashboardPage from './pages/Home/Dashboard';
 import SettingsPage, { SettingsSection } from './pages/Home/Settings';
@@ -50,7 +49,6 @@ function App() {
             <Route path="login" element={<Suspense fallback={<Loader />}> <LoginPage setTheme={setTheme} /></Suspense>} />
             <Route path="verify-login" element={<VerifyLoginPage />} />
             <Route path="register" element={<Suspense fallback={<Loader />}> <RegisterPage /></Suspense>} />
-            <Route path="register-success" element={<RegisterSuccessPage />} />
             <Route path="accept-invitation" element={<AcceptInvitationPage />} />
             <Route path="create-org" element={<CreateOrgPage setTheme={setTheme} />} />
 

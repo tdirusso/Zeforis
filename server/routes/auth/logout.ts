@@ -1,8 +1,6 @@
-import { pool } from '../../database';
-import { createJWT, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 
-export default async (_: Request, res: Response) => {
+export default async (_: Request, res: Response<void>) => {
   res.clearCookie('token');
   return res.sendStatus(204);
 };

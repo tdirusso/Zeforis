@@ -1,6 +1,9 @@
 import sgMail from '@sendgrid/mail';
 import { isDev } from '../config';
-import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
+import { pool } from '../database';
+import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 
 const defaultEmailSender = getEnvVariable(EnvVariable.EMAIL_SENDER_INFO) || 'info@zeforis.com';
 
@@ -49,7 +52,14 @@ class Emailer {
     await sgMail.send(emailsArray);
   }
 
-  async sendLoginLinkEmail(email: string, loginCode: string) {
+  async sendLoginLinkEmail(email: string) {
+    const loginCode = uuidv4().substring(0, 24);
+    const _15minutesFromNow = moment().add('15', 'minutes');
+
+    await pool.query('UPDATE users SET login_code = ?, login_code_expiration = ? WHERE email = ?',
+      [loginCode, _15minutesFromNow.toDate(), email]
+    );
+
     await sgMail.send({
       to: email,
       from: {

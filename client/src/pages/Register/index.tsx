@@ -11,11 +11,16 @@ import { Button, Divider, FormControlLabel, Typography, useMediaQuery } from "@m
 import './styles.scss';
 import { isMobile } from "../../lib/constants";
 import validator from 'email-validator';
+import { getErrorMessage } from "src/lib/utils";
 
-type FormData = {
+type RegisterFormData = {
   firstName: string,
   lastName: string,
   email: string;
+};
+
+type RegisterFormErrors = {
+  [T in keyof RegisterFormData]?: string
 };
 
 const emptyFormData = {
@@ -28,8 +33,8 @@ export default function RegisterPage() {
   const isSmallScreen = useMediaQuery('(max-width: 500px)');
   const formWidth = isSmallScreen ? 300 : 425;
 
-  const [formData, setFormData] = useState<FormData>(emptyFormData);
-  const [formErrors, setFormErrors] = useState<FormData>(emptyFormData);
+  const [formData, setFormData] = useState<RegisterFormData>({ ...emptyFormData });
+  const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
   const [registerError, setRegisterError] = useState('');
   const [isLoading, setLoading] = useState(false);
 
@@ -42,24 +47,28 @@ export default function RegisterPage() {
 
   const navigate = useNavigate();
 
+  const handleRegisterSuccess = () => {
+    openSnackBar('Registration successful.', 'success');
+    setTimeout(() => {
+      navigate('/login?emailSent=true');
+    }, 1000);
+  };
+
   const handleGoogleRegistration = (authResponse: { credential?: string; }) => {
     if (authResponse.credential) {
       setFormErrors(emptyFormData);
       setLoading(true);
 
       setTimeout(async () => {
-        const { success, message } = await register({
-          googleCredential: authResponse.credential
-        });
+        try {
+          await register({
+            googleCredential: authResponse.credential
+          });
 
-        if (success) {
-          openSnackBar('Registration successful.', 'success');
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 2000);
-        } else {
+          handleRegisterSuccess();
+        } catch (error) {
+          setRegisterError(getErrorMessage(error));
           setLoading(false);
-          openSnackBar(message, 'error');
         }
       }, 1000);
     } else {
@@ -103,7 +112,8 @@ export default function RegisterPage() {
       return;
     }
 
-    setFormErrors(emptyFormData);
+    setFormErrors({});
+    setRegisterError('');
     setLoading(true);
 
     setTimeout(async () => {
@@ -114,12 +124,10 @@ export default function RegisterPage() {
           lastName
         });
 
-        navigate('/register-success');
+        handleRegisterSuccess();
       } catch (error: unknown) {
-        if (error instanceof Error) {
-          setRegisterError(error.message || 'Something went wrong, please try again.');
-          setLoading(false);
-        }
+        setRegisterError(getErrorMessage(error));
+        setLoading(false);
       }
     }, 1000);
   };
@@ -127,7 +135,7 @@ export default function RegisterPage() {
   const getFormErrors = () => {
     const { email, firstName, lastName } = formData;
 
-    const newFormErrors: FormData = emptyFormData;
+    const newFormErrors: RegisterFormErrors = {};
 
     if (!firstName) {
       newFormErrors.firstName = 'First name is required.';
@@ -161,7 +169,7 @@ export default function RegisterPage() {
 
     setFormErrors((prevState) => {
       const copy = { ...prevState };
-      copy[name as keyof FormData] = '';
+      copy[name as keyof RegisterFormData] = '';
       return copy;
     });
 

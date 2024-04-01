@@ -3,9 +3,10 @@ import { Request, Response, NextFunction } from 'express';
 import type { JWTToken } from '../types/Token';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 import { BadRequestError, ErrorMessages, UnauthorizedError } from '../types/Errors';
+import { getAuthToken } from '../lib/utils';
 
 export default async (req: Request, _: Response, next: NextFunction) => {
-  const token = req.cookies.token;
+  const token = getAuthToken(req);
 
   if (!token) {
     throw new UnauthorizedError(ErrorMessages.NoTokenProvided);

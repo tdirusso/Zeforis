@@ -8,8 +8,6 @@ import { User } from '../../../shared/types/User';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import type { LoginRequest } from '../../../shared/types/api/Auth';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../types/Errors';
-import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
 import emailer from '../../email';
 
 const authClient = new OAuth2Client(getEnvVariable(EnvVariable.GOOGLE_OAUTH_CLIENT_ID));
@@ -119,7 +117,7 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
     const user = userResult[0];
 
     if (user) {
-      await sendLoginLink(user.id, user.email);
+      await emailer.sendLoginLinkEmail(user.email);
       return res.sendStatus(202);
     } else {
       throw new ForbiddenError('You are not a member of this organization.');
@@ -204,21 +202,10 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
     const user = userResult[0];
 
     if (user) {
-      await sendLoginLink(user.id, user.email);
+      await emailer.sendLoginLinkEmail(user.email);
       return res.sendStatus(202);
     } else {
       throw new NotFoundError(`No account was found with email ${lcEmail}.`);
     }
   }
-}
-
-async function sendLoginLink(userId: number, email: string) {
-  const loginCode = uuidv4().substring(0, 24);
-  const _15minutesFromNow = moment().add('15', 'minutes');
-
-  await pool.query('UPDATE users SET login_code = ?, login_code_expiration = ? WHERE id = ?',
-    [loginCode, _15minutesFromNow.toDate(), userId]
-  );
-
-  await emailer.sendLoginLinkEmail(email, loginCode);
 }

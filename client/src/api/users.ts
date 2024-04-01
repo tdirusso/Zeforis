@@ -1,14 +1,13 @@
 import request from '../lib/request';
 import type { User } from '@shared/types/User';
+import type { RegisterRequest } from '@shared/types/api/User';
 
 const getMe = async () => {
   return (await request.get<User>('users/me')).data;
 };
 
-const register = async (payload: unknown) => {
-  const { data } = await request.post(`register`, payload);
-
-  return data;
+const register = async (payload: RegisterRequest) => {
+  return (await request.post<void>('/users/register', payload)).data;
 };
 
 const updateUser = async (userId: number, payload: unknown) => {

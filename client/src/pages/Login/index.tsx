@@ -38,7 +38,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
   const [doneFetchingCustomPage, setDoneFetchingCustomPage] = useState(false);
   const [org, setOrg] = useState<Org | null>(null);
   const [isLoading, setLoading] = useState(false);
-  const [loginLinkSent, setLoginLinkSet] = useState(false);
+  const [loginLinkSent, setLoginLinkSet] = useState(Boolean(searchParams.get('emailSent') === 'true'));
 
   const navigate = useNavigate();
 
@@ -288,7 +288,7 @@ export default function LoginPage({ setTheme }: { setTheme: (theme: Theme) => vo
                     We've sent a <b>secret login link</b> to your email address.
                   </Typography>
                   <Typography variant="body2">
-                    Click the link in the email to log in.
+                    Click the link in the email to confirm your email address and log in.
                   </Typography>
                   <Button
                     size="small"

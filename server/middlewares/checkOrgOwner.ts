@@ -4,9 +4,10 @@ import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
+import { getAuthToken } from '../lib/utils';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
+  const token = getAuthToken(req);
 
   if (!token) {
     return res.json({ message: 'No authentication token provided.' });

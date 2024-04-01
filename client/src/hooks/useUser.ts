@@ -32,7 +32,9 @@ export default function useUser(openSnackBar: AppContext['openSnackBar']) {
           openSnackBar(`${error.message}`);
         }
 
-        window.location.replace('/login');
+        setTimeout(() => {
+          window.location.replace('/login');
+        }, 2000);
       }
     }
   }, []);

@@ -2,6 +2,7 @@ import { ThemeOptions, createTheme } from "@mui/material";
 import themeConfig, { darkThemeOverrides } from "../theme";
 import { Theme } from "@mui/material";
 import { AppTheme } from "./constants";
+import { AxiosError } from "axios";
 
 function hexToRgb(hex = AppTheme.Colors.primary) {
   var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -40,7 +41,18 @@ function updateTheme(setTheme: (theme: Theme) => void, mode?: string) {
   setTheme(createTheme(newThemeObject as ThemeOptions));
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof AxiosError) {
+    return error.response?.data.message || 'Something went wrong, please try again.';
+  } else if (error instanceof Error) {
+    return error.message || 'Something went wrong, please try again.';
+  }
+
+  return 'Something went wrong...';
+}
+
 export {
   hexToRgb,
-  updateTheme
+  updateTheme,
+  getErrorMessage
 };

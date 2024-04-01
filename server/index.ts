@@ -133,8 +133,8 @@ const boot = async () => {
   app.post('/api/login', unAuthenicatedUserRateLimit, login);
   app.delete('/api/logout', unAuthenicatedUserRateLimit, logout);
   app.post('/api/verify-login', unAuthenicatedUserRateLimit, verifyLogin);
-  app.post('/api/register', unAuthenicatedUserRateLimit, register);
 
+  app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
   app.get('/api/users/me', checkAuth, getMe);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuth, updateUser);
 

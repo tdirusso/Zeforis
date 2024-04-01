@@ -1,13 +1,11 @@
 import { pool } from '../../database';
-import { createJWT, wait } from '../../lib/utils';
+import { createJWT, setAuthTokenCookie, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
 import { VerifyLoginRequest } from '../../../shared/types/api/Auth';
 import moment from 'moment';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../../types/Errors';
 import validator from 'email-validator';
-import { User } from '../../../shared/types/User';
-import { isDev } from '../../config';
 
 export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) => {
   const {
@@ -66,15 +64,6 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
 
   await connection.query('UPDATE users SET login_code = NULL, login_code_expiration = NULL WHERE id = ?', [user.id]);
 
-  const jwtUser: User = {
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    plan: user.plan,
-    subscriptionStatus: user.subscriptionStatus
-  };
-
   const token = createJWT({
     id: user.id,
     email: user.email,
@@ -84,12 +73,7 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
     subscriptionStatus: user.subscriptionStatus
   });
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: !isDev,
-    sameSite: 'lax',
-    maxAge: 36000000 // 10 hours
-  });
+  setAuthTokenCookie(token, res);
 
   return res.sendStatus(200);
 };
