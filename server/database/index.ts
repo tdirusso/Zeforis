@@ -112,16 +112,8 @@ const commonQueries = {
   }
 };
 
-const apiFieldMappings = {
-  users: {
-    'firstName': 'first_name',
-    'lastName': 'last_name'
-  }
-};
-
 export {
   pool,
   initializeDatabase,
-  commonQueries,
-  apiFieldMappings
+  commonQueries
 };

@@ -1,55 +1,83 @@
-import { ResultSetHeader } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { pool } from '../../database';
-import { createJWT } from '../../lib/utils';
-const validFieldMappings = require('../../database').apiFieldMappings.users;
-import { Request, Response, NextFunction } from 'express';
+import { createJWT, setAuthTokenCookie } from '../../lib/utils';
+import { Request, Response } from 'express';
+import { UpdateUserRequest } from '../../../shared/types/api/User';
+import { BadRequestError, NotFoundError } from '../../types/Errors';
+import { Org } from '../../../shared/types/Org';
+import { User } from '../../../shared/types/User';
 
-export default async (req: Request, res: Response, next: NextFunction) => {
+const dbFieldsMapping = {
+  'firstName': {
+    databaseFieldName: 'first_name',
+    databaseFieldType: 'string'
+  },
+  'lastName': {
+    databaseFieldName: 'last_name',
+    databaseFieldType: 'string'
+  }
+};
+
+type FieldKey = keyof typeof dbFieldsMapping;
+type UserIdRequestParam = { userId?: { userId: string; }; };
+
+export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, res: Response<User>) => {
   const { user } = req;
   const { userId } = req.params;
-  const updateFields = req.body;
+  const updateRequestBody = req.body;
 
-  const userIdParam = Number(userId);
-
-  if (isNaN(userIdParam)) {
-    return res.json({ message: `Invalid userId provided: ${userId} - must be a number.` });
+  if (Object.keys(updateRequestBody).length === 0) {
+    throw new BadRequestError(`0 update fields provided - available fields: ${Object.keys(dbFieldsMapping).join(', ')}`);
   }
 
-  if (Object.keys(updateFields).length === 0) {
-    return res.json({ message: `No fields were provided.  Available fields: ${Object.keys(validFieldMappings).join(', ')}` });
-  }
+  const fieldsToUpdate: string[] = [];
+  const valuesToUpdate: any[] = [];
+  const validationErrors: string[] = [];
 
-  try {
-    const fieldUpdates = [];
-    const updateValues = [];
+  for (const field in dbFieldsMapping) {
+    if (updateRequestBody[field as FieldKey]) {
+      const fieldMapping = dbFieldsMapping[field as FieldKey];
+      const fieldValue = updateRequestBody[field as keyof UpdateUserRequest];
 
-    for (const field in updateFields) {
-      if (validFieldMappings[field]) {
-        fieldUpdates.push(`${validFieldMappings[field]} = ?`);
-        updateValues.push(updateFields[field]);
+      if (typeof fieldValue === fieldMapping.databaseFieldType) {
+        fieldsToUpdate.push(`${fieldMapping.databaseFieldName} = ?`);
+        valuesToUpdate.push(fieldValue);
+      } else {
+        validationErrors.push(`Invalid type "${typeof fieldValue}" received for field "${field}".`);
       }
     }
-
-    if (fieldUpdates.length === 0) {
-      return res.json({ message: `No valid fields were provided.  Available fields: ${Object.keys(validFieldMappings).join(', ')}` });
-    }
-
-    const updateClause = fieldUpdates.join(', ');
-
-    const query = `UPDATE users SET ${updateClause} WHERE id = ?`;
-    const params = [...updateValues, userId];
-
-    const [updateResult] = await pool.query<ResultSetHeader>(query, params);
-
-    if (updateResult.affectedRows) {
-      return res.json({
-        success: true,
-        token: createJWT({ ...user })
-      });
-    }
-
-    return res.json({ message: 'User not found.' });
-  } catch (error) {
-    next(error);
   }
+
+  if (fieldsToUpdate.length === 0) {
+    throw new BadRequestError(`No valid fields were provided - available fields: ${Object.keys(dbFieldsMapping).join(', ')}`);
+  }
+
+  if (validationErrors.length) {
+    throw new BadRequestError(validationErrors.join('\n'));
+  }
+
+  const updateClause = fieldsToUpdate.join(', ');
+
+  const query = `UPDATE users SET ${updateClause} WHERE id = ?`;
+  const params = [...valuesToUpdate, userId];
+
+  const [updateResult] = await pool.query<ResultSetHeader>(query, params);
+
+  if (updateResult.affectedRows) {
+    const [userDataResult] = await pool.query<[RowDataPacket[], Org[] & RowDataPacket[]]>('CALL getUserData(?)', [userId]);
+
+    const [planData, orgData] = userDataResult;
+
+    const userObect: User = { ...user, ...planData };
+
+    const newToken = createJWT({ ...user });
+    setAuthTokenCookie(newToken, res);
+
+    return res.json({
+      ...userObect,
+      orgs: orgData,
+    });
+  }
+
+  throw new NotFoundError(`User with id ${userId} not found.`);
 };

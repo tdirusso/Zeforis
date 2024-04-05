@@ -1,6 +1,6 @@
 import request from '../lib/request';
 import type { User } from '@shared/types/User';
-import type { RegisterRequest } from '@shared/types/api/User';
+import type { RegisterRequest, UpdateUserRequest } from '@shared/types/api/User';
 
 const getMe = async () => {
   return (await request.get<User>('users/me')).data;
@@ -10,9 +10,8 @@ const register = async (payload: RegisterRequest) => {
   return (await request.post<void>('/users/register', payload)).data;
 };
 
-const updateUser = async (userId: number, payload: unknown) => {
-  const { data } = await request.patch(`users/${userId}`, payload);
-  return data;
+const updateUser = async (userId: number, payload: UpdateUserRequest) => {
+  return (await request.patch<User>(`/users/${userId}`, payload)).data;
 };
 
 const batchUpdatePermission = async (payload: unknown) => {

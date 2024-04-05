@@ -4,3 +4,8 @@ export interface RegisterRequest {
   firstName?: string;
   lastName?: string;
 }
+
+export interface UpdateUserRequest {
+  firstName?: string;
+  lastName?: string;
+};

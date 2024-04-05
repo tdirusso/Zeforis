@@ -22,7 +22,7 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
   const [orgResult] = await connection.query<RowDataPacket[]>('SELECT owner_id FROM orgs WHERE id = ?', [orgId]);
 
   if (!orgResult.length) {
-    throw new NotFoundError(`Org with ID ${orgId} does not exist.`);
+    throw new NotFoundError(`Org with ID ${orgId} was not found.`);
   }
 
   const org = orgResult[0];
