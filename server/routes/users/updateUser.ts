@@ -1,6 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { pool } from '../../database';
-import { createJWT, setAuthTokenCookie } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { UpdateUserRequest } from '../../../shared/types/api/User';
 import { BadRequestError, NotFoundError } from '../../types/Errors';
@@ -22,7 +21,6 @@ type FieldKey = keyof typeof dbFieldsMapping;
 type UserIdRequestParam = { userId?: { userId: string; }; };
 
 export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, res: Response<User>) => {
-  const { user } = req;
   const { userId } = req.params;
   const updateRequestBody = req.body;
 
@@ -64,19 +62,16 @@ export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, r
   const [updateResult] = await pool.query<ResultSetHeader>(query, params);
 
   if (updateResult.affectedRows) {
-    const [userDataResult] = await pool.query<[RowDataPacket[], Org[] & RowDataPacket[]]>('CALL getUserData(?)', [userId]);
+    const [userDataResult] = await pool.query<[User[] & RowDataPacket[], Org[] & RowDataPacket[]]>('CALL getUserData(?)', [userId]);
 
-    const [planData, orgData] = userDataResult;
+    const [userData, orgData] = userDataResult;
 
-    const userObect: User = { ...user, ...planData };
+    const user: User = {
+      ...userData[0],
+      orgs: orgData
+    };
 
-    const newToken = createJWT({ ...user });
-    setAuthTokenCookie(newToken, res);
-
-    return res.json({
-      ...userObect,
-      orgs: orgData,
-    });
+    return res.json(user);
   }
 
   throw new NotFoundError(`User with id ${userId} not found.`);

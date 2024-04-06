@@ -1,17 +1,13 @@
-import { User } from "../../shared/types/User";
+import { Org } from "../../shared/types/Org";
 
 declare global {
   namespace Express {
     interface Request {
       userId: number,
-      user: User,
-      ownedOrg: {
-        name: string,
-        id: number;
-      };
+      org: Org;
+      orgId: number;
       engagementId: number;
       engagementName: string;
-      orgId: number;
     }
   }
 }

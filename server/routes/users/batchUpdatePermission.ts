@@ -15,7 +15,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  const orgId = req.ownedOrg.id;
+  const orgId = req.org.id;
   const updaterUserId = req.userId;
 
   if (userId === updaterUserId) {

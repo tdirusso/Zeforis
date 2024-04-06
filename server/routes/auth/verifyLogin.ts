@@ -28,17 +28,7 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
   const lowercaseEmail = email.toLowerCase();
 
   const [userResult] = await connection.query<RowDataPacket[]>(
-    `SELECT 
-    id, 
-    first_name as firstName, 
-    last_name as lastName, 
-    email, 
-    plan, 
-    stripe_subscription_status as subscriptionStatus,
-    login_code,
-    login_code_expiration
-    FROM users 
-    WHERE email = ?`,
+    `SELECT id, login_code, login_code_expiration FROM users WHERE email = ?`,
     [lowercaseEmail]
   );
 
@@ -64,14 +54,7 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
 
   await connection.query('UPDATE users SET login_code = NULL, login_code_expiration = NULL WHERE id = ?', [user.id]);
 
-  const token = createJWT({
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    plan: user.plan,
-    subscriptionStatus: user.subscriptionStatus
-  });
+  const token = createJWT(user.id);
 
   setAuthTokenCookie(token, res);
 

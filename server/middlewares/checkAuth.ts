@@ -14,11 +14,10 @@ export default async (req: Request, _: Response, next: NextFunction) => {
 
   const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
 
-  const user = decoded.user;
+  const userId = decoded.userId;
 
-  if (user) {
-    req.userId = user.id;
-    req.user = user;
+  if (userId) {
+    req.userId = userId;
     return next();
   }
 

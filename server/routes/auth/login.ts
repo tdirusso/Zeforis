@@ -4,7 +4,6 @@ import slackbot from '../../slackbot';
 import { createJWT, setAuthTokenCookie, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
-import { User } from '../../../shared/types/User';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import type { LoginRequest } from '../../../shared/types/api/Auth';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../types/Errors';
@@ -57,13 +56,9 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
     const [userResult] = await pool.query<RowDataPacket[]>(
       `
         SELECT 
-          id, 
-          first_name as firstName, 
-          last_name as lastName, 
-          email, 
-          plan, 
-          stripe_subscription_status as subscriptionStatus
-          FROM users WHERE email = ? AND EXISTS
+          id
+          FROM users WHERE email = ? 
+          AND EXISTS
           (
             SELECT 1 FROM engagement_users 
             JOIN engagements ON engagements.id = engagement_users.engagement_id
@@ -74,20 +69,11 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
       [googleEmail, orgId, googleEmail]
     );
 
-    if (!userResult[0]) {
+    if (!userResult.length) {
       throw new ForbiddenError('You are not a member of this organization.');
     }
 
-    const user: User = {
-      id: userResult[0].id,
-      firstName: userResult[0].firstName,
-      lastName: userResult[0].lastName,
-      email: userResult[0].email,
-      plan: userResult[0].plan,
-      subscriptionStatus: userResult[0].subscriptionStatus,
-    };
-
-    const token = createJWT(user);
+    const token = createJWT(userResult[0].id);
     setAuthTokenCookie(token, res);
 
     return res.sendStatus(202);
@@ -97,13 +83,9 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
     const [userResult] = await pool.query<RowDataPacket[]>(
       `
         SELECT 
-          id,
-          first_name as firstName, 
-          last_name as lastName, 
-          email, 
-          plan, 
-          stripe_subscription_status as subscriptionStatus
-          FROM users WHERE email = ? AND EXISTS
+          id
+          FROM users WHERE email = ? 
+          AND EXISTS
           (
             SELECT 1 FROM engagement_users 
             JOIN engagements ON engagements.id = engagement_users.engagement_id
@@ -114,10 +96,8 @@ async function handleCustomPageLogin(req: APILoginRequest, res: APILoginResponse
       [lcEmail, orgId, lcEmail]
     );
 
-    const user = userResult[0];
-
-    if (user) {
-      await emailer.sendLoginLinkEmail(user.email);
+    if (userResult.length) {
+      await emailer.sendLoginLinkEmail(userResult[0].email);
       return res.sendStatus(202);
     } else {
       throw new ForbiddenError('You are not a member of this organization.');
@@ -150,21 +130,12 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
     const googleEmail = payload.email.toLowerCase();
 
     const [userResult] = await pool.query<RowDataPacket[]>(
-      'SELECT id, first_name as firstName, last_name as lastName, email, plan, stripe_subscription_status as subscriptionStatus FROM users WHERE email = ?',
+      'SELECT id FROM users WHERE email = ?',
       [googleEmail]
     );
 
     if (userResult.length) {
-      const user: User = {
-        id: userResult[0].id,
-        firstName: userResult[0].firstName,
-        lastName: userResult[0].lastName,
-        email: userResult[0].email,
-        plan: userResult[0].plan,
-        subscriptionStatus: userResult[0].subscriptionStatus,
-      };
-
-      const token = createJWT(user);
+      const token = createJWT(userResult[0].id);
       setAuthTokenCookie(token, res);
 
       return res.sendStatus(202);
@@ -178,15 +149,7 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
         message: `*New User*\n${googleEmail}`
       });
 
-      const user: User = {
-        id: createUserResult[0].insertId,
-        email: googleEmail,
-        firstName: payload.given_name,
-        lastName: payload.family_name,
-        plan: 'free'
-      };
-
-      const token = createJWT(user);
+      const token = createJWT(createUserResult[0].insertId);
       setAuthTokenCookie(token, res);
 
       return res.sendStatus(202);
@@ -195,14 +158,12 @@ async function handleUniversalLogin(req: APILoginRequest, res: APILoginResponse)
     const lcEmail = email!.toLowerCase();
 
     const [userResult] = await pool.query<RowDataPacket[]>(
-      'SELECT id, email FROM users WHERE email = ?',
+      'SELECT email FROM users WHERE email = ?',
       [lcEmail]
     );
 
-    const user = userResult[0];
-
-    if (user) {
-      await emailer.sendLoginLinkEmail(user.email);
+    if (userResult.length) {
+      await emailer.sendLoginLinkEmail(userResult[0].email);
       return res.sendStatus(202);
     } else {
       throw new NotFoundError(`No account was found with email ${lcEmail}.`);

@@ -9,7 +9,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   const userIdParam = Number(userId);
 
-  const orgId = req.ownedOrg.id;
+  const orgId = req.org.id;
   const updaterUserId = req.userId;
 
   if (!userIdParam || !orgId) {

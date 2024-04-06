@@ -11,7 +11,7 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
     orgId
   } = req.params;
 
-  const requestingUser = req.user;
+  const requestingUserId = req.userId;
 
   if (!orgId) {
     throw new BadRequestError('Missing required parameter "orgId".');
@@ -27,7 +27,7 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
 
   const org = orgResult[0];
 
-  if (org.owner_id === requestingUser.id) {
+  if (org.owner_id === requestingUserId) {
     const [engagementsResult] = await connection.query<Engagement[] & RowDataPacket[]>(
       `SELECT id, name, org_id, date_created FROM engagements WHERE org_id = ? ORDER BY name`,
       [orgId]);
@@ -51,7 +51,7 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
       LEFT JOIN engagement_users ON engagements.id = engagement_users.engagement_id
       WHERE org_id = ? AND engagement_users.user_id = ?
       ORDER BY name`,
-      [orgId, requestingUser.id]);
+      [orgId, requestingUserId]);
 
     connection.release();
 

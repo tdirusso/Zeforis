@@ -3,6 +3,8 @@ import { pool, commonQueries } from '../../database';
 import { stripeSubscriptionPriceId } from '../../config';
 import { Request, Response, NextFunction } from 'express';
 import Stripe from 'stripe';
+import { RowDataPacket } from 'mysql2';
+import { NotFoundError } from '../../types/Errors';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
 
@@ -11,17 +13,21 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   } = req.body;
 
   const {
-    ownedOrg,
-    user
+    org,
+    userId
   } = req;
 
-  if (!user || !ownedOrg) {
+  if (!userId || !org) {
     return res.json({
       message: 'Missing user or org data.'
     });
   }
 
-  if (user.plan !== 'free') {
+  const connection = await pool.getConnection();
+
+  const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, org.id);
+
+  if (orgOwnerPlan !== 'free') {
     return res.json({
       message: 'You are already on a paid Zeforis plan.  Please update the subscription instead.'
     });
@@ -34,7 +40,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const orgAdminsCount = await commonQueries.getOrgAdminCount(pool, ownedOrg.id);
+    const orgAdminsCount = await commonQueries.getOrgAdminCount(pool, org.id);
 
     if (numAdmins < orgAdminsCount) {
       return res.json({
@@ -43,6 +49,16 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     }
 
     let customer = null;
+
+    const [userResult] = await pool.query<RowDataPacket[]>(
+      'SELECT first_name AS firstName, last_name AS lastName, email FROM users WHERE id = ?',
+      [userId]);
+
+    if (!userResult.length) {
+      throw new NotFoundError(`User with id ${userId} not found.`);
+    }
+
+    const user = userResult[0];
 
     const customers = await stripe.customers.list({
       email: user.email,
@@ -57,12 +73,12 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         name: `${user.firstName} ${user.lastName}`,
         metadata: {
           'Zeforis User ID': user.id,
-          'Organization ID': ownedOrg.id,
-          'Organization Name': ownedOrg.name
+          'Organization ID': org.id,
+          'Organization Name': org.name
         }
       });
 
-      await pool.query('UPDATE users SET stripe_customerId = ? WHERE id = ?', [newCustomer.id, user.id]);
+      await pool.query('UPDATE users SET stripe_customerId = ? WHERE id = ?', [newCustomer.id, userId]);
 
       customer = newCustomer;
     }

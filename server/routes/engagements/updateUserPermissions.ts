@@ -12,11 +12,17 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     userId
   } = req.params;
 
+  const orgId = req.org.id;
+
   const userIdParam = Number(userId);
 
-  const { user, ownedOrg } = req;
+  const requestingUserId = req.userId;
 
-  if (isAdmin && user.plan === 'free') {
+  const connection = await pool.getConnection();
+
+  const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
+
+  if (isAdmin && orgOwnerPlan === 'free') {
     return res.json({
       message: 'Cannot add more administrators.',
       uiProps: {
@@ -39,7 +45,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  const connection = await pool.getConnection();
   await connection.beginTransaction();
 
   try {
@@ -50,10 +55,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       [newRole, engagementId, userId]
     );
 
-    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, ownedOrg.id);
-
     if (orgOwnerPlan !== 'free') {
-      const { success, message } = await updateStripeSubscription(connection, user.id, ownedOrg.id);
+      const { success, message } = await updateStripeSubscription(connection, requestingUserId, orgId);
 
       if (!success) {
         await connection.rollback();

@@ -18,7 +18,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   } = req.params;
 
   const updaterUserId = req.userId;
-  const orgId = req.ownedOrg.id;
+  const orgId = req.org.id;
 
   const userIdParam = Number(userId);
 

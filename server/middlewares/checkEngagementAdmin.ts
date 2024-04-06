@@ -27,7 +27,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   try {
     const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
 
-    const userId = decoded.user?.id;
+    const userId = decoded.userId;
 
     if (engagementId) {
       const [doesEngagementAdminExistResult] = await pool.query<RowDataPacket[]>(
@@ -44,7 +44,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
       if (doesEngagementAdminExistResult.length) {
         req.userId = userId;
-        req.user = decoded.user;
         req.engagementId = engagementId;
         req.orgId = orgIdForEngagement;
 

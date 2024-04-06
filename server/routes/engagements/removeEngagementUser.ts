@@ -17,11 +17,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     return res.json({ message: 'missing userId param' });
   }
 
-  if (!req.ownedOrg?.id) {
-    return res.json({ message: 'Missing ownedOrg' });
+  if (!req.org?.id) {
+    return res.json({ message: 'Missing org in request object.' });
   }
 
-  const orgId = req.ownedOrg.id;
+  const orgId = req.org.id;
 
   if (updaterUserId === userIdParam) {
     return res.json({ message: 'You cannot remove yourself.' });

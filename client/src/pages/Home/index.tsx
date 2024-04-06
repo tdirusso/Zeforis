@@ -106,7 +106,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   useNotification({ user, openModal, isOrgOwner });
 
   useEffect(() => {
-    if (user) {
+    if (user && !isReadyToRender) {
       getActiveOrgAndEngagement(user);
     }
 

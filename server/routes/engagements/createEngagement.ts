@@ -1,4 +1,4 @@
-import { pool } from '../../database';
+import { commonQueries, pool } from '../../database';
 import { Request, Response, NextFunction } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
@@ -7,9 +7,9 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     name
   } = req.body;
 
-  const { userId, user } = req;
+  const requestingUserId = req.userId;
 
-  const orgId = req.ownedOrg?.id;
+  const orgId = req.org?.id;
 
   if (!name) {
     return res.json({
@@ -23,7 +23,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  if (!user) {
+  if (!requestingUserId) {
     return res.json({
       message: 'Missing user.'
     });
@@ -32,8 +32,9 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   const connection = await pool.getConnection();
 
   try {
+    const orgOwnerPlan = await commonQueries.getOrgOwnerPlan(connection, orgId);
 
-    if (user.plan === 'free') {
+    if (orgOwnerPlan === 'free') {
       const [engagementCountResult] = await connection.query<RowDataPacket[]>(
         'SELECT EXISTS(SELECT id FROM engagements WHERE org_id = ?) as engagementExists',
         [orgId]
@@ -53,7 +54,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     await connection.query(
       'INSERT INTO engagement_users (engagement_id, user_id, role) VALUES (?,?, "admin")',
-      [newEngagementId, userId]
+      [newEngagementId, requestingUserId]
     );
 
     const engagementObject = {

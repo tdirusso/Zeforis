@@ -20,7 +20,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   } = req.body;
 
   const logoFile = req.files?.logoFile;
-  const orgId = req.ownedOrg.id;
+  const orgId = req.org.id;
 
   if (Array.isArray(logoFile)) {
     return res.json({

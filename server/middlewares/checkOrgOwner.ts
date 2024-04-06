@@ -23,18 +23,18 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   try {
     const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
 
-    const userId = decoded.user?.id;
+    const userId = decoded.userId;
 
     let ownerOfOrgResult;
 
     if (orgId) {
       [ownerOfOrgResult] = await pool.query<RowDataPacket[]>(
-        'SELECT id, name FROM orgs WHERE id = ? AND owner_id = ?',
+        'SELECT id, name, brand_color AS brandColor FROM orgs WHERE id = ? AND owner_id = ?',
         [orgId, userId]
       );
     } else {
       [ownerOfOrgResult] = await pool.query<RowDataPacket[]>(
-        `SELECT orgs.id, orgs.name
+        `SELECT orgs.id, orgs.name, orgs.brand_color AS brandColor
          FROM orgs
          JOIN engagements ON orgs.id = engagements.org_id
          WHERE engagements.id = ?
@@ -45,10 +45,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     if (ownerOfOrgResult.length) {
       req.userId = userId;
-      req.user = decoded.user;
-      req.ownedOrg = {
+      req.org = {
         id: ownerOfOrgResult[0].id,
-        name: ownerOfOrgResult[0].name
+        name: ownerOfOrgResult[0].name,
+        brandColor: ownerOfOrgResult[0].brandColor
       };
       return next();
     } else {

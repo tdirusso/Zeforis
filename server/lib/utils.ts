@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import stripe from '../stripe';
 import { commonQueries } from '../database';
-import type { User } from '../../shared/types/User';
 import type { RowDataPacket } from 'mysql2';
 import type { PoolConnection } from 'mysql2/promise';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
@@ -18,9 +17,9 @@ type FrontendFieldMappings = {
   lastName: string;
 };
 
-function createJWT(user: User) {
+function createJWT(userId: number) {
   return jwt.sign(
-    { user },
+    { userId },
     getEnvVariable(EnvVariable.SECRET_KEY),
     { expiresIn: 36000 }
   );

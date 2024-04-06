@@ -47,7 +47,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   } = req.body;
 
   const updaterUserId = req.userId;
-  const orgId = req.ownedOrg.id;
+  const orgId = req.org.id;
 
   if (!engagementId || !orgId) {
     return res.json({
