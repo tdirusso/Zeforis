@@ -2,7 +2,7 @@ import { pool } from '../../database';
 import { createJWT, setAuthTokenCookie, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { VerifyLoginRequest } from '../../../shared/types/api/Auth';
+import { VerifyLoginRequest } from '../../../shared/types/Auth';
 import moment from 'moment';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../../types/Errors';
 import validator from 'email-validator';
@@ -16,11 +16,15 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
   await wait(1500);
 
   if (!email || !loginCode) {
-    throw new BadRequestError('Missing email address or login code.');
+    throw new BadRequestError('Missing required parameter [email].');
+  }
+
+  if (!loginCode) {
+    throw new BadRequestError('Missing login code.');
   }
 
   if (!validator.validate(email)) {
-    throw new BadRequestError('Invalid email address format.');
+    throw new BadRequestError(`Invalid email address format received:  ${email}.`);
   }
 
   const connection = await pool.getConnection();

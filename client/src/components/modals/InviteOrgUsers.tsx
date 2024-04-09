@@ -14,7 +14,7 @@ import { Org } from '@shared/types/Org';
 import { Engagement } from '@shared/types/Engagement';
 import { User } from '@shared/types/User';
 
-const inviteLimit = appLimits.simultaneousEmailInvites;
+const inviteLimit = 20;
 
 type InviteOrgUsersProps = {
   closeModal: () => void,

@@ -7,7 +7,7 @@ import { RowDataPacket } from 'mysql2';
 import { BadRequestError, ErrorMessages, ForbiddenError, NotFoundError, UnauthorizedError } from '../types/Errors';
 import { getAuthToken, getRequestParameter } from '../lib/utils';
 
-export default async (req: Request, res: Response, next: NextFunction) => {
+export default async (req: Request, _: Response, next: NextFunction) => {
   const token = getAuthToken(req);
 
   if (!token) {

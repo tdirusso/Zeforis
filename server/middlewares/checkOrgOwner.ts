@@ -4,42 +4,47 @@ import { Request, Response, NextFunction } from 'express';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 import { JWTToken } from '../types/Token';
 import { RowDataPacket } from 'mysql2';
-import { getAuthToken } from '../lib/utils';
+import { getAuthToken, getRequestParameter } from '../lib/utils';
+import { BadRequestError, ErrorMessages, ForbiddenError, UnauthorizedError } from '../types/Errors';
 
-export default async (req: Request, res: Response, next: NextFunction) => {
+export default async (req: Request, _: Response, next: NextFunction) => {
   const token = getAuthToken(req);
 
   if (!token) {
-    return res.json({ message: 'No authentication token provided.' });
+    throw new UnauthorizedError(ErrorMessages.NoTokenProvided);
   }
 
-  let orgId = req.params.orgId || req.body.orgId || req.query.orgId;
-  let engagementId = req.params.engagementId || req.body.engagementId || req.query.engagementId;
+  const orgId = getRequestParameter('orgId', req);
+  const engagementId = getRequestParameter('engagementId', req);
 
   if (!orgId && !engagementId) {
-    return res.json({ message: 'No ID provided for engagement or org.' });
+    throw new BadRequestError('Missing required parameter "engagementId" or "orgId".');
   }
 
-  try {
-    const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
+  const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
 
-    const userId = decoded.userId;
+  const userId = decoded.userId;
 
+  if (userId) {
     let ownerOfOrgResult;
 
-    if (orgId) {
+    if (engagementId) {
       [ownerOfOrgResult] = await pool.query<RowDataPacket[]>(
-        'SELECT id, name, brand_color AS brandColor FROM orgs WHERE id = ? AND owner_id = ?',
-        [orgId, userId]
+        `SELECT 
+            orgs.id, 
+            orgs.name, 
+            orgs.brand_color AS brandColor,
+            orgs.logo_url AS logo
+           FROM orgs
+           JOIN engagements ON orgs.id = engagements.org_id
+           WHERE engagements.id = ?
+           AND orgs.owner_id = ?`,
+        [engagementId, userId]
       );
     } else {
       [ownerOfOrgResult] = await pool.query<RowDataPacket[]>(
-        `SELECT orgs.id, orgs.name, orgs.brand_color AS brandColor
-         FROM orgs
-         JOIN engagements ON orgs.id = engagements.org_id
-         WHERE engagements.id = ?
-         AND orgs.owner_id = ?`,
-        [engagementId, userId]
+        'SELECT id, name, brand_color AS brandColor, logo_url AS logo FROM orgs WHERE id = ? AND owner_id = ?',
+        [orgId, userId]
       );
     }
 
@@ -48,13 +53,14 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       req.org = {
         id: ownerOfOrgResult[0].id,
         name: ownerOfOrgResult[0].name,
-        brandColor: ownerOfOrgResult[0].brandColor
+        brandColor: ownerOfOrgResult[0].brandColor,
+        logo: ownerOfOrgResult[0].logo
       };
       return next();
     } else {
-      return res.json({ message: 'Only the org owner can perform this operation.' });
+      throw new ForbiddenError(`Forbidden request.  Only the org owner can perform this operation.`);
     }
-  } catch (error) {
-    next(error);
   }
+
+  throw new BadRequestError(ErrorMessages.InvalidTokenBody);
 };

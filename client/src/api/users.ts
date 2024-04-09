@@ -1,6 +1,6 @@
 import request from '../lib/request';
 import type { User } from '@shared/types/User';
-import type { RegisterRequest, UpdateUserRequest } from '@shared/types/api/User';
+import type { RegisterRequest, UpdateUserRequest } from '@shared/types/User';
 
 const getMe = async () => {
   return (await request.get<User>('users/me')).data;

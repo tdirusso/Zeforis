@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
 import { Engagement } from '../../../shared/types/Engagement';
 import { BadRequestError, NotFoundError } from '../../types/Errors';
-import type { GetEngagementsForOrgRequest } from '../../../shared/types/api/Engagement';
+import type { GetEngagementsForOrgRequest } from '../../../shared/types/Engagement';
 
 export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Response<Engagement[]>) => {
 
@@ -29,7 +29,7 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
 
   if (org.owner_id === requestingUserId) {
     const [engagementsResult] = await connection.query<Engagement[] & RowDataPacket[]>(
-      `SELECT id, name, org_id, date_created FROM engagements WHERE org_id = ? ORDER BY name`,
+      `SELECT id, name, org_id as orgId, date_created as dateCreated FROM engagements WHERE org_id = ? ORDER BY name`,
       [orgId]);
 
     const engagements: Engagement[] = engagementsResult.map((engagement) => {
@@ -44,8 +44,8 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
       `SELECT 
         id, 
         name,
-        org_id, 
-        date_created,
+        org_id as orgId, 
+        date_created as dateCreated,
         engagement_users.role
       FROM engagements 
       LEFT JOIN engagement_users ON engagements.id = engagement_users.engagement_id

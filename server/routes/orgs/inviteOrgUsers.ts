@@ -87,8 +87,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     return res.json({ message: `Invalid emails provided for the following users:  ${JSON.stringify(invalidOrMissingEmails)}` });
   }
 
-  if (countNewEmails > appLimits.simultaneousEmailInvites) {
-    return res.json({ message: `New emails to invite cannot exceed ${appLimits.simultaneousEmailInvites} - found ${countNewEmails}.` });
+  if (countNewEmails > 567) {
+    return res.json({ message: `New emails to invite cannot exceed ${567} - found ${countNewEmails}.` });
   }
 
   if (!allEmailsArray.length) {
@@ -198,8 +198,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         return res.json({ message });
       }
     }
-
-    await emailService.sendMultipleEmailsFromTemplate(invitationEmails);
 
     await connection.commit();
 

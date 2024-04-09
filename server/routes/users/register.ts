@@ -7,7 +7,7 @@ import { getMissingFields } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { BadRequestError, ConflictError, UnprocessableError } from '../../types/Errors';
-import type { RegisterRequest } from '../../../shared/types/api/User';
+import type { RegisterRequest } from '../../../shared/types/User';
 
 const authClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
@@ -22,7 +22,7 @@ export default async (req: Request<{}, {}, RegisterRequest>, res: Response<void>
   const missingFields = getMissingFields(['email', 'firstName', 'lastName'], req.body);
 
   if (missingFields.length > 0 && !googleCredential) {
-    throw new BadRequestError(`Missing required parameters: ${missingFields.join(', ')}`);
+    throw new BadRequestError(`Missing required parameters: [${missingFields.join(', ')}]`);
   }
 
   if (email && !validator.validate(email)) {

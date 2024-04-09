@@ -1,7 +1,7 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { pool } from '../../database';
 import { Request, Response } from 'express';
-import { UpdateUserRequest } from '../../../shared/types/api/User';
+import { UpdateUserRequest } from '../../../shared/types/User';
 import { BadRequestError, NotFoundError } from '../../types/Errors';
 import { Org } from '../../../shared/types/Org';
 import { User } from '../../../shared/types/User';
@@ -18,7 +18,7 @@ const dbFieldsMapping = {
 };
 
 type FieldKey = keyof typeof dbFieldsMapping;
-type UserIdRequestParam = { userId?: { userId: string; }; };
+type UserIdRequestParam = { userId?: string; };
 
 export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, res: Response<User>) => {
   const { userId } = req.params;

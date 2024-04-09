@@ -20,3 +20,7 @@ export interface Engagement {
     orgOwnerPlan: string;
   };
 };
+
+export type GetEngagementsForOrgRequest = {
+  orgId: string;
+};

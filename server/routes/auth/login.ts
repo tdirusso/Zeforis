@@ -5,7 +5,7 @@ import { createJWT, setAuthTokenCookie, wait } from '../../lib/utils';
 import { Request, Response } from 'express';
 import { EnvVariable, getEnvVariable } from '../../types/EnvVariable';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
-import type { LoginRequest } from '../../../shared/types/api/Auth';
+import type { LoginRequest } from '../../../shared/types/Auth';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../types/Errors';
 import emailer from '../../email';
 

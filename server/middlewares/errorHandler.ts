@@ -1,32 +1,30 @@
-import { TokenExpiredError } from "jsonwebtoken";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { pool } from '../database';
 import slackbot from '../slackbot';
 import { isDev } from '../config';
 import { NextFunction, Request, Response } from 'express';
-import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, UnauthorizedError, UnprocessableError } from "../types/Errors";
+import { APIError, APIErrorData } from "../types/Errors";
+
+type APIErrorResponse = {
+  message: string,
+  errors?: APIErrorData;
+};
 
 export default async function errorHandler(error: unknown, _: Request, res: Response, __: NextFunction) {
-  if (error instanceof Error) {
-    switch (true) {
-      case error instanceof BadRequestError:
-        return res.status(400).json({ message: error.message });
-      case error instanceof TokenExpiredError:
-        return res.status(401).json({ message: 'Session expired (token expired).' });
-      case error instanceof UnauthorizedError:
-        return res.status(401).json({ message: `${error.message}` });
-      case error instanceof ForbiddenError:
-        return res.status(403).json({ message: `${error.message}` });
-      case error instanceof NotFoundError:
-        return res.status(404).json({ message: error.message });
-      case error instanceof ConflictError:
-        return res.status(409).json({ message: error.message });
-      case error instanceof UnprocessableError:
-        return res.status(422).json({ message: error.message });
-      default:
-        console.error('Application error:', error);
-        await handleServerError(error);
-        break;
+  if (error instanceof APIError) {
+    const errorResponse: APIErrorResponse = { message: error.message };
+    if (error.errors) {
+      errorResponse.errors = error.errors;
     }
+
+    return res.status(error.statusCode).json(errorResponse);
+  } else if (error instanceof JsonWebTokenError) {
+    return res.status(400).json({ message: error.message });
+  } else if (error instanceof TokenExpiredError) {
+    return res.status(401).json({ message: 'Session expired (token expired).' });
+  } else if (error instanceof Error) {
+    console.error('Application error:', error);
+    await handleServerError(error);
   } else {
     console.error('Non-Error object received:', error);
     await handleNonError(error);
@@ -38,6 +36,7 @@ export default async function errorHandler(error: unknown, _: Request, res: Resp
     message: 'Something went wrong...',
   });
 }
+
 
 async function handleServerError(error: Error) {
   try {

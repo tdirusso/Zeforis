@@ -62,6 +62,7 @@ import stripeWebhook from './webhooks/stripe';
 
 import 'express-async-errors';
 import getMe from './routes/users/getMe';
+import createInvitations from './routes/invitations/createInvitations';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -137,6 +138,8 @@ const boot = async () => {
   app.post('/api/users/register', unAuthenicatedUserRateLimit, register);
   app.get('/api/users/me', checkAuth, getMe);
   app.patch('/api/users/:userId', authenicatedUserRateLimit, checkAuth, updateUser);
+
+  app.post('/api/engagements/:engagementId/invitations', checkOrgOwnerMW, createInvitations);
 
   app.get('/api/users/invitation', unAuthenicatedUserRateLimit, getInvitationData);
   app.patch('/api/users/permissions/batch', authenicatedUserRateLimit, checkOrgOwnerMW, batchUpdatePermission);

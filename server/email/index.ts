@@ -4,6 +4,7 @@ import { pool } from '../database';
 import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
+import { PoolConnection } from 'mysql2/promise';
 
 const defaultEmailSender = getEnvVariable(EnvVariable.EMAIL_SENDER_INFO) || 'info@zeforis.com';
 
@@ -44,17 +45,9 @@ class Emailer {
     await sgMail.send({ to, from, subject, text, html });
   }
 
-  async sendEmailFromTemplate({ to, from, templateId, templateData }: EmailFromTemplateParameters) {
-    await sgMail.send({ to, from, templateId, dynamicTemplateData: templateData, hideWarnings: !isDev });
-  }
-
-  async sendMultipleEmailsFromTemplate(emailsArray: sgMail.MailDataRequired | sgMail.MailDataRequired[]) {
-    await sgMail.send(emailsArray);
-  }
-
   async sendLoginLinkEmail(email: string) {
     const loginCode = uuidv4().substring(0, 24);
-    const _15minutesFromNow = moment().add('15', 'minutes');
+    const _15minutesFromNow = moment().add(15, 'minutes');
 
     await pool.query('UPDATE users SET login_code = ?, login_code_expiration = ? WHERE email = ?',
       [loginCode, _15minutesFromNow.toDate(), email]
@@ -72,6 +65,48 @@ class Emailer {
       },
       hideWarnings: true
     });
+  }
+
+  async sendInvitationEmails(engagementId: number, orgName: string, engagementName: string, orgColor: string, orgLogo: string | null, users: { email: string, role: 'admin' | 'member'; }[], connection: PoolConnection) {
+    const invitationEmails = [];
+    const _3daysFromNow = moment().add(3, 'days');
+
+    const insertInvitationValues = users.map(user => {
+      const invitationCode = uuidv4().substring(0, 16);
+      const emailAddress = user.email.toLowerCase();
+      const role = user.role;
+
+      const invitationUrl = `${getEnvVariable(EnvVariable.APP_DOMAIN)}/accept-invitation?engagementId=${engagementId}&email=${emailAddress}&invitationCode=${invitationCode}`;
+
+      invitationEmails.push({
+        to: emailAddress,
+        from: this.senders.info,
+        templateId: this.templates.engagementInvitation,
+        dynamicTemplateData: {
+          invitationUrl,
+          orgName,
+          engagementName,
+          orgColor,
+          orgLogo: orgLogo ? orgLogo : ''
+        },
+        hideWarnings: !isDev
+      });
+
+      return [
+        engagementId,
+        emailAddress,
+        role,
+        invitationCode,
+        _3daysFromNow
+      ];
+    });
+
+    await connection.query(
+      `INSERT INTO invitations (engagement_id, email, role, token, date_expires) 
+        VALUES ?
+        ON DUPLICATE KEY UPDATE role = VALUES(role), token = VALUES(token), date_expires = VALUES(date_expires)`,
+      [insertInvitationValues]
+    );
   }
 }
 

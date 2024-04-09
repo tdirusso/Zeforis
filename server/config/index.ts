@@ -6,7 +6,6 @@ if (isDev) {
 }
 
 const appLimits = {
-  simultaneousEmailInvites: 20,
   freePlanTasks: 200,
   freePlanEngagements: 1
 };
