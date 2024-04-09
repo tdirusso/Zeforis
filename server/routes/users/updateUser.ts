@@ -25,7 +25,7 @@ export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, r
   const updateRequestBody = req.body;
 
   if (Object.keys(updateRequestBody).length === 0) {
-    throw new BadRequestError(`0 update fields provided - available fields: ${Object.keys(dbFieldsMapping).join(', ')}`);
+    throw new BadRequestError(`0 update fields provided - available fields: [${Object.keys(dbFieldsMapping).join(', ')}]`);
   }
 
   const fieldsToUpdate: string[] = [];
@@ -47,11 +47,11 @@ export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, r
   }
 
   if (fieldsToUpdate.length === 0) {
-    throw new BadRequestError(`No valid fields were provided - available fields: ${Object.keys(dbFieldsMapping).join(', ')}`);
+    throw new BadRequestError(`No valid fields were provided - available fields: [${Object.keys(dbFieldsMapping).join(', ')}]`);
   }
 
   if (validationErrors.length) {
-    throw new BadRequestError(validationErrors.join('\n'));
+    throw new BadRequestError('Received field errors.', validationErrors);
   }
 
   const updateClause = fieldsToUpdate.join(', ');

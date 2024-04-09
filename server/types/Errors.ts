@@ -14,7 +14,7 @@ export class APIError extends Error {
   }
 }
 
-function createErrorClass(statusCode: number) {
+function createAPIErrorClass(statusCode: number) {
   return class extends APIError {
     errors?: APIErrorData;
     constructor(message: string, errors?: APIErrorData) {
@@ -23,13 +23,13 @@ function createErrorClass(statusCode: number) {
   };
 }
 
-export const BadRequestError = createErrorClass(400);
-export const NotFoundError = createErrorClass(404);
-export const UnauthorizedError = createErrorClass(401);
-export const ForbiddenError = createErrorClass(403);
-export const UnprocessableError = createErrorClass(422);
-export const ConflictError = createErrorClass(409);
-export const ServerError = createErrorClass(500);
+export const BadRequestError = createAPIErrorClass(400);
+export const NotFoundError = createAPIErrorClass(404);
+export const UnauthorizedError = createAPIErrorClass(401);
+export const ForbiddenError = createAPIErrorClass(403);
+export const UnprocessableError = createAPIErrorClass(422);
+export const ConflictError = createAPIErrorClass(409);
+export const ServerError = createAPIErrorClass(500);
 
 export enum ErrorMessages {
   NoTokenProvided = 'Missing authentication cookie.',

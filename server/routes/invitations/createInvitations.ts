@@ -5,7 +5,7 @@ import { updateStripeSubscription } from '../../lib/utils';
 import { Request, Response, NextFunction } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { CreateInvitationsRequest, CreateInvitationsResponse } from '../../../shared/types/Invitation';
-import { BadRequestError, ForbiddenError, NotFoundError, ServerError } from '../../types/Errors';
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ServerError } from '../../types/Errors';
 
 type EngagementIdRequestParam = { engagementId?: string; };
 
@@ -75,13 +75,27 @@ export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitatio
   });
 
   if (invalidOrMissingFields.length) {
-    throw new BadRequestError(`Received errors for users.`, invalidOrMissingFields);
+    throw new BadRequestError(`Received errors for [users].`, invalidOrMissingFields);
   }
 
   const [engagementResult] = await connection.query<RowDataPacket[]>('SELECT name FROM engagements WHERE id = ?', [engagementId]);
 
   if (!engagementResult.length) {
     throw new NotFoundError(`Engagement with id ${engagementId} not found.`);
+  }
+
+  const [existingEngagementUsersResult] = await connection.query<RowDataPacket[]>(`
+    SELECT users.email 
+    FROM engagement_users
+    LEFT JOIN users ON users.id = engagement_users.user_id
+    WHERE 
+    engagement_id = ? 
+    AND users.email IN (?)`,
+    [engagementId, allEmails]
+  );
+
+  if (existingEngagementUsersResult.length) {
+    throw new ConflictError(`The following users are already members of this engagement:  ${existingEngagementUsersResult.map(user => user.email).join(', ')}`);
   }
 
   await connection.beginTransaction();

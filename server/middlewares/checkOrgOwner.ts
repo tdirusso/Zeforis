@@ -18,7 +18,7 @@ export default async (req: Request, _: Response, next: NextFunction) => {
   const engagementId = getRequestParameter('engagementId', req);
 
   if (!orgId && !engagementId) {
-    throw new BadRequestError('Missing required parameter "engagementId" or "orgId".');
+    throw new BadRequestError('Missing required parameter [engagementId] or [orgId].');
   }
 
   const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;

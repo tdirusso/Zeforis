@@ -10,7 +10,7 @@ import { EnvVariable, getEnvVariable } from '../types/EnvVariable';
 const webhookSecret = getEnvVariable(EnvVariable.STRIPE_WEBHOOK_SECRET);
 
 if (!webhookSecret) {
-  throw new Error('Environment variable missing:  "STRIPE_WEBHOOK_SECRET"');
+  throw new Error(`Environment variable missing:  ${EnvVariable.STRIPE_WEBHOOK_SECRET}`);
 }
 
 export default async (req: Request, res: Response, next: NextFunction) => {

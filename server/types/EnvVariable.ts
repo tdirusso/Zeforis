@@ -27,7 +27,7 @@ export function getEnvVariable(envVar: EnvVariable) {
   const value = process.env[envVar];
 
   if (value === undefined) {
-    throw new Error(`Environment variable missing: "${envVar}"`);
+    throw new Error(`Environment variable missing: ${envVar}`);
   }
 
   return value;

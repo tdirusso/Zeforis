@@ -45,7 +45,7 @@ export default async (req: Request<{}, {}, VerifyLoginRequest>, res: Response) =
 
   if (!user.login_code || user.login_code !== loginCode) {
     connection.release();
-    throw new UnauthorizedError('Invalid login code.');
+    throw new UnauthorizedError('Invalid login code received.');
   }
 
   const now = moment();

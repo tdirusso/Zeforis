@@ -66,7 +66,7 @@ const commonQueries = {
     }
 
     if (!orgOwnerPlan) {
-      throw new BadRequestError('');
+      throw new BadRequestError('Could not find org owner plan');
     }
 
     return orgOwnerPlan;

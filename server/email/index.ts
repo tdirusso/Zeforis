@@ -16,13 +16,6 @@ type EmailParameters = {
   html: string;
 };
 
-type EmailFromTemplateParameters = {
-  to: string,
-  from: string,
-  templateId: string,
-  templateData: {};
-};
-
 class Emailer {
   instance = this;
 
@@ -68,8 +61,8 @@ class Emailer {
   }
 
   async sendInvitationEmails(engagementId: number, orgName: string, engagementName: string, orgColor: string, orgLogo: string | null, users: { email: string, role: 'admin' | 'member'; }[], connection: PoolConnection) {
-    const invitationEmails = [];
-    const _3daysFromNow = moment().add(3, 'days');
+    const invitationEmails: sgMail.MailDataRequired[] = [];
+    const _3daysFromNow = moment().add(3, 'days').toDate();
 
     const insertInvitationValues = users.map(user => {
       const invitationCode = uuidv4().substring(0, 16);
@@ -100,6 +93,8 @@ class Emailer {
         _3daysFromNow
       ];
     });
+
+    await sgMail.send(invitationEmails);
 
     await connection.query(
       `INSERT INTO invitations (engagement_id, email, role, token, date_expires) 

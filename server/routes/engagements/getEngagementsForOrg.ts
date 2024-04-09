@@ -14,7 +14,7 @@ export default async (req: Request<GetEngagementsForOrgRequest, {}, {}>, res: Re
   const requestingUserId = req.userId;
 
   if (!orgId) {
-    throw new BadRequestError('Missing required parameter "orgId".');
+    throw new BadRequestError('Missing required parameter [orgId].');
   }
 
   const connection = await pool.getConnection();

@@ -17,7 +17,7 @@ export default async (req: Request, _: Response, next: NextFunction) => {
   const engagementId = getRequestParameter('engagementId', req);
 
   if (!engagementId) {
-    throw new BadRequestError('Missing required parameter "/:engagementId".');
+    throw new BadRequestError('Missing required parameter /{engagementId}/.');
   }
 
   const decoded: JWTToken = jwt.verify(token, getEnvVariable(EnvVariable.SECRET_KEY)) as JWTToken;
@@ -44,7 +44,7 @@ export default async (req: Request, _: Response, next: NextFunction) => {
     `, [userId, engagementId]);
 
   if (!checkResult.length) {
-    throw new NotFoundError(`Engagement with id ${engagementId} does not exist.`);
+    throw new NotFoundError(`Engagement with id ${engagementId} not found.`);
   }
 
   const {

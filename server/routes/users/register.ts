@@ -26,7 +26,7 @@ export default async (req: Request<{}, {}, RegisterRequest>, res: Response<void>
   }
 
   if (email && !validator.validate(email)) {
-    throw new UnprocessableError('Invalid email format.');
+    throw new UnprocessableError('Invalid email format received.');
   }
 
   if (googleCredential) {
@@ -49,7 +49,7 @@ export default async (req: Request<{}, {}, RegisterRequest>, res: Response<void>
     );
 
     if (userResult.length) {
-      throw new ConflictError(`Email "${googleEmail}" already in use.`);
+      throw new ConflictError(`Email ${googleEmail} already in use.`);
     }
 
     await pool.query(
@@ -70,7 +70,7 @@ export default async (req: Request<{}, {}, RegisterRequest>, res: Response<void>
     const [existsResult] = await pool.query<RowDataPacket[]>('SELECT 1 FROM users WHERE email = ?', [lcEmail]);
 
     if (existsResult.length) {
-      throw new ConflictError(`Email "${email}" is already in use.`);
+      throw new ConflictError(`Email ${email} is already in use.`);
     }
 
     await pool.query<ResultSetHeader>(
