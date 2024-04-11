@@ -1,4 +1,4 @@
-import { Box, Grid, Paper } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import React from "react";
 import { NavLink, Outlet, useOutletContext } from "react-router-dom";
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
@@ -92,8 +92,8 @@ export default function Settings() {
 
 export function SettingsSection() {
   return (
-    <Paper className="settings-container">
+    <Box className="settings-container">
       <Outlet context={useOutletContext()} />
-    </Paper>
+    </Box>
   );
 }

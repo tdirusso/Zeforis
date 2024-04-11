@@ -6,7 +6,7 @@ declare module '@mui/material' {
   }
 }
 
-const lightBoxShadow = 'rgba(33, 33, 52, 0.1) 0px 1px 4px !important';
+const lightBoxShadow = 'var(--shadow-border) !important';
 const darkBoxShadow = 'rgba(5, 5, 5, 0.35) 1px 1px 10px  !important';
 
 const theme: ThemeOptions = {
@@ -51,6 +51,32 @@ const theme: ThemeOptions = {
     }
   },
   components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true
+      },
+      styleOverrides: {
+        root: {
+          '&.MuiButton-sizeMedium': {
+            padding: '3.5px 10px'
+          },
+          '&.btn-default': {
+            borderColor: '#e7e7e7',
+            borderStyle: 'solid',
+            borderWidth: '1px',
+            borderRadius: '6px',
+            color: 'var(--colors-gray-1000)',
+            '& .MuiSvgIcon-root': {
+              opacity: 0.4
+            },
+            '&:hover': {
+              background: 'var(--colors-gray-100)',
+              borderColor: '#e7e7e7'
+            }
+          }
+        }
+      }
+    },
     MuiTouchRipple: {
       styleOverrides: {
         ripple: {
@@ -104,7 +130,7 @@ const theme: ThemeOptions = {
       styleOverrides: {
         root: {
           boxShadow: lightBoxShadow,
-          borderRadius: '8px',
+          borderRadius: '6px',
           padding: '24px'
         }
       }
@@ -159,7 +185,10 @@ const theme: ThemeOptions = {
         root: {
           '& fieldset': {
             borderRadius: '6px',
-            borderColor: '#eeeeee'
+            borderColor: '#e7e7e7'
+          },
+          '& .MuiInputBase-inputSizeSmall': {
+            padding: '11px 12px !important'
           }
         }
       }
@@ -291,7 +320,7 @@ const darkThemeOverrides: ThemeOptions = {
       styleOverrides: {
         root: {
           boxShadow: darkBoxShadow,
-          borderRadius: '8px',
+          borderRadius: '6px',
           padding: '24px'
         }
       }

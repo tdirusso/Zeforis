@@ -1,4 +1,30 @@
 .settings-container {
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .Members {
+    .new-invites-container {
+      .new-invite-row {
+        display: flex;
+        gap: 8px;
+
+        & .MuiFormControlLabel-root,
+        & .MuiTypography-root {
+          flex-basis: 100%;
+          margin: 0;
+
+          & .MuiFormControlLabel-label {
+            margin-right: auto;
+            padding-left: 3px;
+            margin-bottom: 10px;
+          }
+        }
+      }
+    }
+  }
+
   .billing-tab {
     .free-plan-info {
       .MuiAlert-root {

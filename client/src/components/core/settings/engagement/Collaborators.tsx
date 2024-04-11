@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Collapse, FormControlLabel, Paper, TextField, Typography } from "@mui/material";
 import { Divider, Button, Chip, Tooltip, Menu } from "@mui/material";
 import { Link, useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
@@ -11,6 +11,16 @@ import { LoadingButton } from "@mui/lab";
 import { removeEngagementUser } from "../../../../api/engagements";
 import { AppContext } from "src/types/AppContext";
 import { User } from "@shared/types/User";
+import LinkIcon from '@mui/icons-material/Link';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { TransitionGroup } from "react-transition-group";
+import { v4 as uuid } from 'uuid';
+
+type InviteRow = {
+  email: string;
+  role: string;
+  id: string;
+};
 
 export default function Collaborators() {
 
@@ -34,6 +44,19 @@ export default function Collaborators() {
   const [userToRemove, setUserToRemove] = useState<User | null>(null);
   const [isRemovingUser, setRemovingUser] = useState(false);
   const [removeUserMenuAnchor, setRemoveUserMenuAnchor] = useState<Element | null>(null);
+  const [inviteRows, setInviteRows] = useState<InviteRow[]>([{ email: '', role: '', id: uuid() }]);
+
+  const handleAddInviteRow = () => {
+    setInviteRows([...inviteRows, { email: '', role: '', id: uuid() }]);
+  };
+
+  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    const newRows = [...inviteRows];
+    newRows[index][name as keyof InviteRow] = value;
+    setInviteRows(newRows);
+  };
+
 
   const removeUserMenuOpen = Boolean(removeUserMenuAnchor);
 
@@ -91,9 +114,86 @@ export default function Collaborators() {
     }
   };
 
+  const handleRemoveInviteRow = (index: number) => {
+    const newRows = [...inviteRows];
+    newRows.splice(index, 1);
+    setInviteRows(newRows);
+  };
+
   return (
-    <>
-      <Box component="h4">Collaborators in {engagement.name}</Box>
+    <Box className="Members">
+      <Typography variant="h1">Members</Typography>
+      <Typography my={2}>Manage members in {engagement.name}</Typography>
+      <Paper className="new-invites-container">
+        <Box className="flex-sb">
+          <Typography>Invite new members by email address.</Typography>
+          <Button
+            className="btn-default"
+            variant="outlined"
+            startIcon={<LinkIcon style={{ transform: 'rotate(-45deg)' }} />}>
+            Invite link
+          </Button>
+        </Box>
+        <Divider className="my2" />
+
+        <Box className="new-invite-row" pl='3px'>
+          <Typography>Email Address</Typography>
+          <Typography>Role</Typography>
+          <IconButton
+            style={{ visibility: 'hidden' }}
+            className="btn-default">
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+
+        <Box mt={-1}>
+          <TransitionGroup>
+            {inviteRows.map((row, index) => (
+              <Collapse key={row.id} style={{ transitionDuration: '200ms' }}>
+
+                <Box className="new-invite-row" mt={1.5}>
+                  <TextField
+                    autoComplete="off"
+                    placeholder="user@example.com"
+                    size="small"
+                    variant="outlined"
+                    disabled={false}
+                    fullWidth
+                    name="email"
+                    value={row.email}
+                    onChange={(event) => handleInputChange(index, event)}
+                  />
+                  <TextField
+                    size="small"
+                    variant="outlined"
+                    disabled={false}
+                    fullWidth
+                    name="role"
+                    value={row.role}
+                    onChange={(event) => handleInputChange(index, event)}
+                  />
+                  <IconButton
+                    disabled={inviteRows.length === 1}
+                    onClick={() => handleRemoveInviteRow(index)}
+                    className="btn-default">
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Collapse>
+            ))}
+          </TransitionGroup>
+
+          <Box mt={2}>
+            <Button
+              onClick={handleAddInviteRow}
+              className="btn-default"
+              variant="outlined"
+              startIcon={<AddCircleOutlineIcon />}>
+              Add more
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
       <Box mt={3}>
         <Box className="flex-ac" mb='2rem' hidden={!isOrgOwner}>
           <Button
@@ -228,6 +328,6 @@ export default function Collaborators() {
           </LoadingButton>
         </Box>
       </Menu>
-    </>
+    </Box>
   );
 };

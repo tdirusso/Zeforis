@@ -28,6 +28,8 @@
   --colors-gray-800: hsla(var(--colors-gray-800-value), 1);
   --colors-gray-900: hsla(var(--colors-gray-900-value), 1);
   --colors-gray-1000: hsla(var(--colors-gray-1000-value), 1);
+
+  --shadow-border: 0 0 0 1px rgba(0, 0, 0, .08);
 }
 
 html,
@@ -61,6 +63,12 @@ body.dark {
 .flex-ac {
   display: flex !important;
   align-items: center !important;
+}
+
+.flex-sb {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
 .wrap {
