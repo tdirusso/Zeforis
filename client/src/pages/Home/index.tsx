@@ -34,6 +34,7 @@ import { Tag, TagsMap } from "@shared/types/Tag";
 import { User } from "@shared/types/User";
 import { Widget } from "@shared/types/Widget";
 import useUser from "src/hooks/useUser";
+import { Invitation } from "@shared/types/Invitation";
 
 export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }) {
   let activeOrgId = getActiveOrgId();
@@ -48,6 +49,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
   const [folders, setFolders] = useState<Folder[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [widgets, setWidgets] = useState<Widget[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [orgUsers, setOrgUsers] = useState<User[]>([]);
   const [tasksMap, setTasksMap] = useState({});
   const [tagsMap, setTagsMap] = useState({});
@@ -185,6 +187,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
 
         setTasks(engagementData.tasks || []);
         setFolders(engagementData.folders || []);
+        setInvitations(engagementData.invitations || []);
         setTags(engagementData.tags || []);
         setOrgUsers(engagementData.metadata?.orgUsers || []);
         setOrgOwnerPlan(engagementData.metadata?.orgOwnerPlan || '');
@@ -340,6 +343,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
     tags: tags.sort((a, b) => (a.name && b.name) ? a.name.localeCompare(b.name) : 0),
     engagementMembers,
     engagementAdmins,
+    invitations: invitations.sort((a, b) => (a.email && b.email) ? a.email.localeCompare(b.email) : 0),
     orgUsers: orgUsers.sort((a, b) => (a.firstName && b.firstName) ? a.firstName.localeCompare(b.firstName) : 0),
     orgUsersMap,
     tagsMap,
@@ -358,6 +362,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
     setOrgUsers,
     setWidgets,
     setUser,
+    setInvitations,
     openSnackBar,
     openModal,
     openDrawer,
@@ -418,6 +423,7 @@ export default function Home({ setTheme }: { setTheme: (theme: Theme) => void; }
               orgUsersMap={orgUsersMap}
               orgUsers={orgUsers}
               openDrawer={openDrawer}
+              setEngagement={setEngagement}
             />
 
             <Drawers

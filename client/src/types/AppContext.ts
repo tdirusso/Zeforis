@@ -1,6 +1,7 @@
 import { AlertColor, Theme } from "@mui/material";
 import { Engagement } from "@shared/types/Engagement";
 import { Folder, FoldersMap } from "@shared/types/Folder";
+import { Invitation } from "@shared/types/Invitation";
 import { Org, OrgUsersMap } from "@shared/types/Org";
 import { Tag, TagsMap } from "@shared/types/Tag";
 import { Task, TasksMap } from "@shared/types/Task";
@@ -28,6 +29,7 @@ export type AppContext = {
   tasksMap: TasksMap,
   isAdmin: boolean,
   widgets: Widget[],
+  invitations: Invitation[];
   setTheme: (theme: Theme) => void,
   isOrgOwner: boolean,
   orgOwnerPlan: string,
@@ -39,6 +41,7 @@ export type AppContext = {
   setOrgUsers: React.Dispatch<React.SetStateAction<User[]>>,
   setWidgets: React.Dispatch<React.SetStateAction<Widget[]>>,
   setUser: React.Dispatch<React.SetStateAction<User | null>>,
+  setInvitations: React.Dispatch<React.SetStateAction<Invitation[]>>;
   openSnackBar: (message?: string, type?: AlertColor, options?: {}) => void,
   openModal: (modalType: string, props?: CustomObjectParams) => void,
   openDrawer: (drawerType: string, props?: CustomObjectParams) => void,

@@ -19,6 +19,7 @@ import { User } from "@shared/types/User";
 import { Folder } from "@shared/types/Folder";
 import { Tag } from "@shared/types/Tag";
 import { Task } from "@shared/types/Task";
+import InviteLinkModal from "./InviteLinkModal";
 
 type ModalsProps = {
   modalToOpen: string,
@@ -44,6 +45,7 @@ type ModalsProps = {
   orgUsersMap: AppContext['orgUsersMap'];
   orgUsers: AppContext['orgUsers'];
   openDrawer: AppContext['openDrawer'];
+  setEngagement: AppContext['setEngagement'];
 };
 
 export default function Modals(props: ModalsProps) {
@@ -68,7 +70,8 @@ export default function Modals(props: ModalsProps) {
     orgUsersMap,
     orgUsers,
     user,
-    openDrawer
+    openDrawer,
+    setEngagement
   } = props;
 
   return (
@@ -194,6 +197,14 @@ export default function Modals(props: ModalsProps) {
         openSnackBar={openSnackBar}
         engagementId={engagement?.id}
         setFolders={setFolders}
+      />
+
+      <InviteLinkModal
+        isOpen={modalToOpen === 'invite-link'}
+        closeModal={closeModal}
+        openSnackBar={openSnackBar}
+        engagement={engagement}
+        setEngagement={setEngagement}
       />
     </>
   );

@@ -8,7 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { AppContext } from "src/types/AppContext";
-import { getErrorMessage } from "src/lib/utils";
+import { getErrorObject } from "src/lib/utils";
 
 export default function Profile() {
   const [isUpdatingName, setUpdatingName] = useState(false);
@@ -46,7 +46,7 @@ export default function Profile() {
       openSnackBar('Profile updated.', 'success');
     } catch (error: unknown) {
       if (error instanceof Error) {
-        openSnackBar(getErrorMessage(error), 'error');
+        openSnackBar(getErrorObject(error).message, 'error');
         setUpdatingName(false);
       }
     }

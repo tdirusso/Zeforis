@@ -260,7 +260,7 @@ export default function WidgetsTab() {
         <Paper style={{ display: selectedWidget ? 'flex' : 'none' }} className="widget-preview-container">
           <Box flexBasis={'50%'} py={2} px={2}>
             <Box mb={3}>
-              <FormGroup >
+              <FormGroup>
                 <FormControlLabel
                   className="mx0"
                   control={<Switch

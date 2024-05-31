@@ -1,4 +1,4 @@
-import { Engagement } from '@shared/types/Engagement';
+import { Engagement, UpdateEngagementRequest } from '@shared/types/Engagement';
 import request from '../lib/request';
 
 const getEngagementsForOrg = async (orgId: number) => {
@@ -11,10 +11,8 @@ const createEngagement = async (payload: unknown) => {
   return data;
 };
 
-const updateEngagement = async (payload: unknown) => {
-  const { data } = await request.patch(`engagements`, payload);
-
-  return data;
+const updateEngagement = async (engagementId: number, payload: UpdateEngagementRequest) => {
+  return (await request.patch<Engagement>(`engagements/${engagementId}`, payload)).data;
 };
 
 const setActiveEngagementId = (engagementId: number) => {

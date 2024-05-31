@@ -4,15 +4,16 @@ import { pool, commonQueries } from '../../database';
 import { updateStripeSubscription } from '../../lib/utils';
 import { Request, Response, NextFunction } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { CreateInvitationsRequest, CreateInvitationsResponse } from '../../../shared/types/Invitation';
+import { CreateInvitationsRequest, Invitation } from '../../../shared/types/Invitation';
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError, ServerError } from '../../types/Errors';
+import moment from 'moment';
 
-type EngagementIdRequestParam = { engagementId?: string; };
+type EngagementIdRequestParam = { engagementId: string; };
 
 const validRoles = new Set(['admin', 'member']);
 const validRolesString = `[${Array.from(validRoles).join(', ')}]`;
 
-export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitationsRequest>, res: Response<CreateInvitationsResponse>, next: NextFunction) => {
+export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitationsRequest>, res: Response<Invitation[]>, next: NextFunction) => {
   const {
     users = []
   } = req.body;
@@ -47,7 +48,7 @@ export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitatio
   const containsSelf = users.some(user => user.email?.toLowerCase() === requestingUserResult[0].email);
 
   if (containsSelf) {
-    throw new BadRequestError(`Cannot invite self (${requestingUserResult[0].email})`);
+    throw new BadRequestError(`Cannot invite yourself (${requestingUserResult[0].email})`);
   }
 
   const hasAdmins = users.some(user => user.role === 'admin');
@@ -61,6 +62,8 @@ export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitatio
   const invalidOrMissingFields: string[] = [];
   const allEmails: string[] = [];
 
+  const emailSet = new Set();
+
   users.forEach((user, index) => {
     const email = user.email?.toLowerCase();
     const role = user.role;
@@ -69,8 +72,11 @@ export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitatio
       invalidOrMissingFields.push(`Invalid/missing email at index ${index}: ${email}`);
     } else if (!role || !validRoles.has(role)) {
       invalidOrMissingFields.push(`Invalid/missing role at index ${index}:  ${role}.   Valid values are:  ${validRolesString}`);
+    } else if (emailSet.has(email)) {
+      invalidOrMissingFields.push(`Duplicate email at index ${index}: ${email}`);
     } else {
       allEmails.push(email);
+      emailSet.add(email);
     }
   });
 
@@ -134,18 +140,25 @@ export default async (req: Request<EngagementIdRequestParam, {}, CreateInvitatio
 
     connection.release();
 
-    return res.status(201).json({
-      usersInvited: users.map(user => {
+    const now = new Date().toISOString();
+    const _3daysFromNow = moment().add(3, 'days').toISOString();
+
+    return res.status(201).json(
+      users.map(user => {
         return {
           email: user.email.toLowerCase(),
-          status: 'pending'
+          isAccepted: false,
+          engagementId: Number(engagementId),
+          dateCreated: now,
+          dateExpires: _3daysFromNow,
+          role: user.role
         };
       })
-    });
+    );
   } catch (error) {
     await connection.rollback();
-
     connection.release();
+
     next(error);
   }
 };

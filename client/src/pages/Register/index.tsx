@@ -11,7 +11,7 @@ import { Button, Divider, FormControlLabel, Typography, useMediaQuery } from "@m
 import './styles.scss';
 import { isMobile } from "../../lib/constants";
 import validator from 'email-validator';
-import { getErrorMessage } from "src/lib/utils";
+import { getErrorObject } from "src/lib/utils";
 
 type RegisterFormData = {
   firstName: string,
@@ -67,7 +67,7 @@ export default function RegisterPage() {
 
           handleRegisterSuccess();
         } catch (error) {
-          setRegisterError(getErrorMessage(error));
+          setRegisterError(getErrorObject(error).message);
           setLoading(false);
         }
       }, 1000);
@@ -126,7 +126,7 @@ export default function RegisterPage() {
 
         handleRegisterSuccess();
       } catch (error: unknown) {
-        setRegisterError(getErrorMessage(error));
+        setRegisterError(getErrorObject(error).message);
         setLoading(false);
       }
     }, 1000);

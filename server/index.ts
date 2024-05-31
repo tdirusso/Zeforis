@@ -79,7 +79,12 @@ if (isDev) {
   const cors = require('cors');
 
   app.use(cors({
-    origin: ['http://localhost:3000', 'http://192.168.0.164:3000', 'http://localhost:8080', 'http://192.168.1.27:3000'],
+    origin: [
+      // 'http://localhost:3000',
+      // 'http://192.168.0.164:3000',
+      // 'http://localhost:8080',
+      'http://127.0.0.1:3000'
+    ],
     credentials: true
   }));
 }
@@ -151,7 +156,8 @@ const boot = async () => {
   app.patch('/api/engagements/:engagementId/users/:userId/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updateUserPermissions);
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements/:engagementId', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
-  app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
+  // app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
+  app.patch('/api/engagements/:engagementId', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
   app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
   app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);
 
@@ -196,7 +202,12 @@ const boot = async () => {
     return res.sendFile(path.join(__dirname + '/../', 'build-client', 'index.html'), { acceptRanges: false });
   });
 
-  app.listen(port, () => console.log('App is running'));
+
+  if (isDev) {
+    app.listen(Number(port), '127.0.0.1', () => console.log('App is running on 127.0.0.1'));
+  } else {
+    app.listen(Number(port), () => console.log('App is running'));
+  }
 
   process.on('uncaughtException', async (error, origin) => {
     const logData = `Origin: ${origin} - ${error.stack}`;

@@ -33,7 +33,7 @@ export default async (req: Request<UserIdRequestParam, {}, UpdateUserRequest>, r
   const validationErrors: string[] = [];
 
   for (const field in dbFieldsMapping) {
-    if (updateRequestBody[field as FieldKey]) {
+    if (updateRequestBody[field as FieldKey] !== undefined) {
       const fieldMapping = dbFieldsMapping[field as FieldKey];
       const fieldValue = updateRequestBody[field as keyof UpdateUserRequest];
 

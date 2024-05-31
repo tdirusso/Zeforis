@@ -1,3 +1,4 @@
+import { Engagement } from "../../shared/types/Engagement";
 import { Org } from "../../shared/types/Org";
 
 declare global {
@@ -7,7 +8,7 @@ declare global {
       org: Org;
       orgId: number;
       engagementId: number;
-      engagementName: string;
+      engagement: Engagement;
     }
   }
-}
+} 

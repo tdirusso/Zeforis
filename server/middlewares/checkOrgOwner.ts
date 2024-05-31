@@ -34,9 +34,12 @@ export default async (req: Request, _: Response, next: NextFunction) => {
             orgs.id, 
             orgs.name, 
             orgs.brand_color AS brandColor,
-            orgs.logo_url AS logo
+            orgs.logo_url AS logo,
+            engagements.name AS engagementName,
+            engagements.is_invite_link_enabled AS isInviteLinkEnabled,
+            engagements.invite_link_hash AS inviteLinkHash
            FROM orgs
-           JOIN engagements ON orgs.id = engagements.org_id
+           LEFT JOIN engagements ON orgs.id = engagements.org_id
            WHERE engagements.id = ?
            AND orgs.owner_id = ?`,
         [engagementId, userId]
@@ -56,6 +59,16 @@ export default async (req: Request, _: Response, next: NextFunction) => {
         brandColor: ownerOfOrgResult[0].brandColor,
         logo: ownerOfOrgResult[0].logo
       };
+
+      if (engagementId) {
+        req.engagement = {
+          id: Number(engagementId),
+          name: ownerOfOrgResult[0].engagementName,
+          isInviteLinkEnabled: ownerOfOrgResult[0].isInviteLinkEnabled,
+          inviteLinkHash: ownerOfOrgResult[0].inviteLinkHash
+        };
+      }
+
       return next();
     } else {
       throw new ForbiddenError(`Forbidden request.  Only the org owner can perform this operation.`);

@@ -10,16 +10,11 @@
         display: flex;
         gap: 8px;
 
-        & .MuiFormControlLabel-root,
-        & .MuiTypography-root {
+        & .MuiTypography-root,
+        & .MuiInputBase-root {
           flex-basis: 100%;
           margin: 0;
-
-          & .MuiFormControlLabel-label {
-            margin-right: auto;
-            padding-left: 3px;
-            margin-bottom: 10px;
-          }
+          height: 42px;
         }
       }
     }

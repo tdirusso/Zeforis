@@ -6,6 +6,7 @@ import { useOutletContext } from "react-router";
 import { deleteActiveEngagementId, leaveEngagement, updateEngagement } from "../../../../api/engagements";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AppContext } from "src/types/AppContext";
+import { getErrorObject } from "src/lib/utils";
 
 export default function About() {
   const {
@@ -34,25 +35,16 @@ export default function About() {
     setLoading(true);
 
     try {
-      const { success, message } = await updateEngagement({
+      await updateEngagement(engagement.id, {
         name: engagementName,
-        engagementId: engagement.id,
-        orgId: org.id
       });
 
-      if (success) {
-        openSnackBar('Engagement updated.', 'success');
-        setEngagement({ ...engagement, name: engagementName });
-        setLoading(false);
-      } else {
-        openSnackBar(message, 'error');
-        setLoading(false);
-      }
+      setEngagement({ ...engagement, name: engagementName });
+      setLoading(false);
+      openSnackBar('Engagement updated.', 'success');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        openSnackBar(error.message, 'error');
-        setLoading(false);
-      }
+      openSnackBar(getErrorObject(error).message, 'error');
+      setLoading(false);
     }
   };
 

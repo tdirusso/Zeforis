@@ -28,7 +28,9 @@ export default async (req: Request, _: Response, next: NextFunction) => {
     `
     SELECT 
       engagements.org_id AS orgId,
-      engagements.name AS engagementName,
+      engagements.name,
+      engagements.is_invite_link_enabled AS isInviteLinkEnabled,
+      engagements.invite_link_hash AS inviteLinkHash,
       orgs.owner_id AS orgOwnerId,
     CASE 
         WHEN EXISTS (
@@ -51,14 +53,17 @@ export default async (req: Request, _: Response, next: NextFunction) => {
     orgId,
     orgOwnerId,
     engagementUserExists,
-    engagementName
   } = checkResult[0];
 
   if (orgOwnerId === userId || engagementUserExists) {
     req.userId = userId;
-    req.engagementId = Number(engagementId);
-    req.engagementName = engagementName;
     req.orgId = orgId;
+    req.engagement = {
+      id: Number(engagementId),
+      name: checkResult[0].name,
+      inviteLinkHash: checkResult[0].inviteLinkHash,
+      isInviteLinkEnabled: checkResult[0].isInviteLinkEnabled
+    };
     return next();
   }
 

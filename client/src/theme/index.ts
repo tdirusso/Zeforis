@@ -51,6 +51,16 @@ const theme: ThemeOptions = {
     }
   },
   components: {
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderRadius: '6px',
+            borderColor: '#e7e7e7'
+          }
+        }
+      }
+    },
     MuiButtonBase: {
       defaultProps: {
         disableRipple: true
@@ -229,15 +239,15 @@ const theme: ThemeOptions = {
     MuiSwitch: {
       styleOverrides: {
         root: {
-          width: 35,
-          height: 20,
+          width: 40,
+          height: 23,
           padding: 0,
           '& .MuiSwitch-switchBase': {
             padding: 0,
             margin: 2,
             transitionDuration: '300ms',
             '&.Mui-checked': {
-              transform: 'translateX(14px)',
+              transform: 'translateX(17px)',
               color: '#fff',
               '& + .MuiSwitch-track': {
                 backgroundColor: 'var(--colors-primary)',
@@ -262,8 +272,8 @@ const theme: ThemeOptions = {
           },
           '& .MuiSwitch-thumb': {
             boxSizing: 'border-box',
-            width: 16,
-            height: 16,
+            width: 19,
+            height: 19,
           },
           '& .MuiSwitch-track': {
             borderRadius: 26 / 2,

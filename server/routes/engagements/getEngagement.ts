@@ -7,19 +7,21 @@ import { Tag } from '../../../shared/types/Tag';
 import { User } from '../../../shared/types/User';
 import { Widget } from '../../../shared/types/Widget';
 import { Task } from '../../../shared/types/Task';
+import { Invitation } from '../../../shared/types/Invitation';
 
 type EngagementQueryResultType = [
   Folder[] & RowDataPacket[],
   Tag[] & RowDataPacket[],
   User[] & RowDataPacket[],
-  Widget[] & RowDataPacket[]
+  Widget[] & RowDataPacket[],
+  Invitation[] & RowDataPacket[]
 ];
 
 export default async (req: Request, res: Response<Engagement>) => {
 
   const {
     engagementId,
-    engagementName,
+    engagement,
     orgId
   } = req;
 
@@ -27,7 +29,7 @@ export default async (req: Request, res: Response<Engagement>) => {
 
   const [engagementDataResult] = await pool.query<EngagementQueryResultType>('CALL getEngagementData(?,?)', [engagementId, orgId]);
 
-  const [folders, tags, orgUsers, widgets] = engagementDataResult;
+  const [folders, tags, orgUsers, widgets, invitations] = engagementDataResult;
 
   const orgUsersMap = new Map();
 
@@ -111,11 +113,14 @@ export default async (req: Request, res: Response<Engagement>) => {
 
   const engagementData: Engagement = {
     id: engagementId,
-    name: engagementName,
+    name: engagement.name,
+    inviteLinkHash: engagement.inviteLinkHash,
+    isInviteLinkEnabled: engagement.isInviteLinkEnabled,
     folders,
     tasks,
     tags,
     widgets,
+    invitations,
     metadata: {
       orgUsers: [...orgUsersMap.values()],
       orgOwnerPlan

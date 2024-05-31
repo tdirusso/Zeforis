@@ -1,4 +1,4 @@
-import { Box, Collapse, FormControlLabel, Paper, TextField, Typography } from "@mui/material";
+import { Box, Collapse, MenuItem, Paper, Select, SelectChangeEvent, TextField, Typography, useTheme } from "@mui/material";
 import { Divider, Button, Chip, Tooltip, Menu } from "@mui/material";
 import { Link, useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
@@ -15,11 +15,25 @@ import LinkIcon from '@mui/icons-material/Link';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { TransitionGroup } from "react-transition-group";
 import { v4 as uuid } from 'uuid';
+import { validate } from "email-validator";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { getErrorObject } from "src/lib/utils";
+import { createInvitations } from "src/api/invitations";
+import DoneIcon from '@mui/icons-material/Done';
 
 type InviteRow = {
   email: string;
-  role: string;
+  role: 'member' | 'admin';
+  errors: {
+    email?: string,
+    role?: string;
+  };
   id: string;
+};
+
+type InviteError = {
+  message?: string,
+  errors?: [];
 };
 
 export default function Collaborators() {
@@ -36,27 +50,41 @@ export default function Collaborators() {
     isOrgOwner,
     openModal,
     tasks,
-    setTasks
+    setTasks,
+    setInvitations
   } = useOutletContext<AppContext>();
+
+  const theme = useTheme();
 
   const engagementId = engagement.id;
 
   const [userToRemove, setUserToRemove] = useState<User | null>(null);
   const [isRemovingUser, setRemovingUser] = useState(false);
   const [removeUserMenuAnchor, setRemoveUserMenuAnchor] = useState<Element | null>(null);
-  const [inviteRows, setInviteRows] = useState<InviteRow[]>([{ email: '', role: '', id: uuid() }]);
+  const [inviteRows, setInviteRows] = useState<InviteRow[]>([{ email: '', role: 'member', id: uuid(), errors: {} }]);
+  const [isInvitingUsers, setInvitingUsers] = useState(false);
+  const [inviteError, setInviteError] = useState<InviteError>({});
+  const [invitesSent, setInvitesSent] = useState(false);
 
   const handleAddInviteRow = () => {
-    setInviteRows([...inviteRows, { email: '', role: '', id: uuid() }]);
+    setInviteRows([...inviteRows, { email: '', role: 'member', id: uuid(), errors: {} }]);
   };
 
-  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.target;
+  const handleInputChange = (index: number, event: SelectChangeEvent | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target as { name: keyof InviteRow, value: string; }; // Asserting types
     const newRows = [...inviteRows];
-    newRows[index][name as keyof InviteRow] = value;
+
+    if (name === 'role') {
+      if (value === 'admin' || value === 'member') {
+        newRows[index][name as keyof InviteRow] = value;
+      }
+    } else {
+      newRows[index][name] = value;
+    }
+
+    newRows[index].errors[name as keyof InviteRow['errors']] = '';
     setInviteRows(newRows);
   };
-
 
   const removeUserMenuOpen = Boolean(removeUserMenuAnchor);
 
@@ -120,6 +148,67 @@ export default function Collaborators() {
     setInviteRows(newRows);
   };
 
+  const handleInviteUsers = async () => {
+    const newRows = [...inviteRows];
+    const emailSet = new Set();
+
+    newRows.forEach(inviteRow => {
+      const { email } = inviteRow;
+
+      if (!email) {
+        inviteRow.errors.email = 'Please enter an email address';
+      }
+
+      const lowerEmail = email.toLowerCase();
+
+      if (!validate(lowerEmail)) {
+        inviteRow.errors.email = 'Invalid email address format';
+      } else if (emailSet.has(lowerEmail)) {
+        inviteRow.errors.email = 'Duplicate email address';
+      } else if (lowerEmail === user.email) {
+        inviteRow.errors.email = 'Cannot invite yourself';
+      } else {
+        emailSet.add(lowerEmail);
+      }
+    });
+
+    if (hasInviteErrors()) {
+      setInviteRows(newRows);
+      return;
+    }
+
+    setInvitingUsers(true);
+    setInviteError({});
+
+    try {
+      const invitations = await createInvitations(engagementId, {
+        users: inviteRows
+      });
+
+
+      setInvitations(prevInvitations => [...prevInvitations, ...invitations]);
+      setInvitesSent(true);
+      // setTimeout(() => {
+      //   setInvitesSent(true);
+      // }, 2000);
+    } catch (error) {
+      setInviteError(getErrorObject(error));
+      setInvitingUsers(false);
+    }
+  };
+
+
+
+  const hasInviteErrors = () => {
+    return inviteRows.some(inviteRow => Object.values(inviteRow.errors).some(value => value));
+  };
+
+  const handleResetInviteRows = () => {
+    setInviteRows([{ email: '', role: 'member', id: uuid(), errors: {} }]);
+    setInvitingUsers(false);
+    setInvitesSent(false);
+  };
+
   return (
     <Box className="Members">
       <Typography variant="h1">Members</Typography>
@@ -128,6 +217,7 @@ export default function Collaborators() {
         <Box className="flex-sb">
           <Typography>Invite new members by email address.</Typography>
           <Button
+            onClick={() => openModal('invite-link')}
             className="btn-default"
             variant="outlined"
             startIcon={<LinkIcon style={{ transform: 'rotate(-45deg)' }} />}>
@@ -150,30 +240,36 @@ export default function Collaborators() {
           <TransitionGroup>
             {inviteRows.map((row, index) => (
               <Collapse key={row.id} style={{ transitionDuration: '200ms' }}>
-
                 <Box className="new-invite-row" mt={1.5}>
                   <TextField
+                    error={Boolean(row.errors.email)}
+                    helperText={row.errors.email ? row.errors.email : ''}
                     autoComplete="off"
                     placeholder="user@example.com"
                     size="small"
                     variant="outlined"
-                    disabled={false}
+                    disabled={isInvitingUsers}
                     fullWidth
                     name="email"
                     value={row.email}
                     onChange={(event) => handleInputChange(index, event)}
                   />
-                  <TextField
-                    size="small"
-                    variant="outlined"
-                    disabled={false}
-                    fullWidth
+
+                  <Select
+                    disabled={isInvitingUsers}
                     name="role"
+                    size="small"
                     value={row.role}
-                    onChange={(event) => handleInputChange(index, event)}
-                  />
+                    onChange={(event) => handleInputChange(index, event)}>
+                    <MenuItem value="member">Member</MenuItem>
+                    <MenuItem value="admin">Administrator</MenuItem>
+                  </Select>
                   <IconButton
-                    disabled={inviteRows.length === 1}
+                    style={{
+                      alignSelf: 'start',
+                      height: '42px'
+                    }}
+                    disabled={inviteRows.length === 1 || isInvitingUsers}
                     onClick={() => handleRemoveInviteRow(index)}
                     className="btn-default">
                     <CloseIcon fontSize="small" />
@@ -185,6 +281,8 @@ export default function Collaborators() {
 
           <Box mt={2}>
             <Button
+              disabled={isInvitingUsers}
+              size="small"
               onClick={handleAddInviteRow}
               className="btn-default"
               variant="outlined"
@@ -192,8 +290,80 @@ export default function Collaborators() {
               Add more
             </Button>
           </Box>
+
+          <Divider className="my3" />
+          <Box className="flex-sb">
+
+            <Box>
+              <Box hidden={!inviteError.message}>
+                <Box className="flex-ac" gap='14px'>
+                  <ErrorOutlineIcon fontSize="small" color="error" />
+                  <Box>
+                    <Typography color="error">
+                      {inviteError.message}
+                    </Typography>
+                    {
+                      inviteError.errors?.map((error, index) => {
+                        return (
+                          <Typography color="error">
+                            {index + 1}.  {error}
+                          </Typography>
+                        );
+                      })
+                    }
+                  </Box>
+                </Box>
+              </Box>
+
+              <Box hidden={!invitesSent} className='flex-ac' gap='14px'>
+                <Box>
+                  <DoneIcon fontSize="small" color="success" />
+                </Box>
+                <Box>
+                  <Typography color={theme.palette.success.main}>
+                    Invitations sent successfully.
+                  </Typography>
+                  <Typography color={theme.palette.success.main}>
+                    Status can be viewed in "Pending Invitations" below.
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+
+            <Box ml='auto'>
+              {
+                invitesSent ?
+                  <Button
+                    onClick={handleResetInviteRows}
+                    variant="contained">
+                    Send more
+                  </Button> :
+                  <LoadingButton
+                    sx={{
+                      '& .MuiButton-endIcon': {
+                        margin: 0
+                      }
+                    }}
+                    loadingPosition="end"
+                    endIcon={<></>}
+                    loading={isInvitingUsers}
+                    onClick={handleInviteUsers}
+                    variant="contained">
+                    {isInvitingUsers ? <Box mr='25px'>Sending invitations</Box> : 'Invite'}
+                  </LoadingButton>
+              }
+            </Box>
+          </Box>
         </Box>
       </Paper>
+
+
+
+
+
+
+
       <Box mt={3}>
         <Box className="flex-ac" mb='2rem' hidden={!isOrgOwner}>
           <Button

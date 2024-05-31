@@ -41,18 +41,25 @@ function updateTheme(setTheme: (theme: Theme) => void, mode?: string) {
   setTheme(createTheme(newThemeObject as ThemeOptions));
 }
 
-function getErrorMessage(error: unknown) {
+function getErrorObject(error: unknown) {
   if (error instanceof AxiosError) {
-    return error.response?.data.message || 'Something went wrong, please try again.';
+    return {
+      message: error.response?.data.message || 'Something went wrong, please try again.',
+      errors: error.response?.data.errors || []
+    };
   } else if (error instanceof Error) {
-    return error.message || 'Something went wrong, please try again.';
+    return {
+      message: error.message || 'Something went wrong, please try again.'
+    };
   }
 
-  return 'Something went wrong...';
+  return {
+    message: 'Something went wrong...'
+  };
 }
 
 export {
   hexToRgb,
   updateTheme,
-  getErrorMessage
+  getErrorObject
 };
