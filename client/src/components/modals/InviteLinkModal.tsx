@@ -1,15 +1,17 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import { useState } from 'react';
-import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { Box, Checkbox, Collapse, DialogTitle, Divider, FormControlLabel, Switch, TextField, Typography } from '@mui/material';
+import { Box, Collapse, DialogTitle, Divider, FormControlLabel, Switch, TextField, Tooltip, Typography } from '@mui/material';
 import { AppContext } from 'src/types/AppContext';
 import { Engagement } from '@shared/types/Engagement';
 import { updateEngagement } from 'src/api/engagements';
 import { getErrorObject } from 'src/lib/utils';
 import { TransitionGroup } from 'react-transition-group';
+import HelpIcon from '@mui/icons-material/Help';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 type InviteLinkModalProps = {
   closeModal: () => void,
@@ -30,8 +32,9 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
   } = props;
 
   //const []
-  const [isLoading, setLoading] = useState(false);
+  const [isSavingAllowedDomains, setSavingAllowedDomains] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('Copy');
+  const [allowedInviteDomains, setAllowedInviteDomains] = useState(engagement.allowedInviteDomains || '');
 
   const inviteLink = `${process.env.REACT_APP_APP_DOMAIN}/invite/${engagement.inviteLinkHash}`;
 
@@ -43,6 +46,23 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
 
       setEngagement({ ...engagement, ...updatedEngagement });
     } catch (error: unknown) {
+      openSnackBar(getErrorObject(error).message, 'error');
+    }
+  };
+
+  const handleUpdateAllowedInviteDomains = async () => {
+    setSavingAllowedDomains(true);
+
+    try {
+      const updatedEngagement = await updateEngagement(engagement.id, {
+        allowedInviteDomains
+      });
+
+      setEngagement({ ...engagement, ...updatedEngagement });
+      setSavingAllowedDomains(false);
+      openSnackBar('Allowed domains upated.', 'success');
+    } catch (error: unknown) {
+      setSavingAllowedDomains(false);
       openSnackBar(getErrorObject(error).message, 'error');
     }
   };
@@ -60,10 +80,17 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
       open={isOpen}
       onClose={closeModal}
       className='modal'>
-      <DialogTitle>
+      <DialogTitle className='flex-sb'>
         Invite Users to {engagement.name}
+        <IconButton
+          aria-label="close"
+          onClick={closeModal}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
-      <DialogContent style={{ width: '450px' }}>
+
+      <DialogContent style={{ minWidth: '450px' }}>
         <Box>
           <Typography mb={2}>
             Allow users to add themselves to this engagement.
@@ -103,21 +130,44 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
                     value={inviteLink}
                     fullWidth>
                   </TextField>
+                  <Box mt={2}>
+                    <Typography mb={1} className='flex-ac' gap='4px'>
+                      Allowed email domain(s)
+                      <Tooltip title="Enter a list email domains, comma separated.  Only these domains are allowed using the invite link.  No entries will allow all domains.">
+                        <HelpIcon
+                          fontSize='small'
+                          htmlColor='lightgrey'
+                        />
+                      </Tooltip>
+
+                    </Typography>
+                    <TextField
+                      onChange={e => setAllowedInviteDomains(e.target.value)}
+                      value={allowedInviteDomains}
+                      size='small'
+                      fullWidth
+                      placeholder='domain1.com, domain2.com'
+                      variant="outlined"
+                      multiline
+                      inputProps={{
+                        style: {
+                          resize: 'vertical'
+                        }
+                      }}
+                    />
+                    <Box mt={.5}>
+                      <LoadingButton
+                        loading={isSavingAllowedDomains}
+                        onClick={handleUpdateAllowedInviteDomains}
+                        size='small'>
+                        Save
+                      </LoadingButton>
+                    </Box>
+                  </Box>
                 </Box>
               </Collapse> : null
           }
-
         </TransitionGroup>
-
-        <Box mt={3}>
-          <Button
-            size='small'
-            variant='outlined'
-            onClick={closeModal}>
-            Close
-          </Button>
-        </Box>
-
       </DialogContent>
     </Dialog>
   );

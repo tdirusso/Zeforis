@@ -13,6 +13,10 @@ const dbFieldsMapping = {
   'isInviteLinkEnabled': {
     databaseFieldName: 'is_invite_link_enabled',
     databaseFieldType: 'boolean'
+  },
+  'allowedInviteDomains': {
+    databaseFieldName: 'allowed_invite_domains',
+    databaseFieldType: 'string'
   }
 };
 
@@ -22,7 +26,6 @@ export default async (req: Request<{}, {}, UpdateEngagementRequest>, res: Respon
   const updateRequestBody = req.body;
 
   const {
-    engagement,
     engagement: { id: engagementId }
   } = req;
 

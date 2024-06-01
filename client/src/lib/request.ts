@@ -9,7 +9,10 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.response.use(response => response, error => {
-  if (error.response?.status === 401 && error.response?.data?.message?.includes('expired ')) {
+  if (
+    error.response?.status === 401 &&
+    (error.response?.data?.message?.includes('expired ') || error.response?.data?.message?.includes('Missing '))
+  ) {
     alert('Session expired');
     window.location.replace('/login');
     return null;

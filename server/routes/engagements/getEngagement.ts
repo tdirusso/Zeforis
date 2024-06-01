@@ -111,7 +111,7 @@ export default async (req: Request, res: Response<Engagement>) => {
 
   connection.release();
 
-  const engagementData: Engagement = {
+  const engagementObject: Engagement = {
     id: engagementId,
     name: engagement.name,
     inviteLinkHash: engagement.inviteLinkHash,
@@ -127,7 +127,5 @@ export default async (req: Request, res: Response<Engagement>) => {
     }
   };
 
-  return res.json(
-    engagementData
-  );
+  return res.json(engagementObject);
 };

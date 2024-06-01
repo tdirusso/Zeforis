@@ -5,13 +5,14 @@ import { RowDataPacket } from 'mysql2';
 import type { JWTToken } from '../types/Token';
 import { getEnvVariable, EnvVariable } from '../types/EnvVariable';
 import { getAuthToken } from '../lib/utils';
+import { ErrorMessages, UnauthorizedError } from '../types/Errors';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
 
   const token = getAuthToken(req);
 
   if (!token) {
-    return res.json({ message: 'Missing authentication token.' });
+    throw new UnauthorizedError(ErrorMessages.NoTokenProvided);
   }
 
   let { engagementId } = req.body;

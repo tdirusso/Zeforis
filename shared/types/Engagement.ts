@@ -19,6 +19,7 @@ export interface Engagement {
   invitations?: Invitation[];
   isInviteLinkEnabled?: boolean;
   inviteLinkHash?: string;
+  allowedInviteDomains?: string;
   metadata?: {
     orgUsers: User[],
     orgOwnerPlan: string;
@@ -33,4 +34,5 @@ export type GetEngagementsForOrgRequest = {
 export interface UpdateEngagementRequest {
   name?: string;
   isInviteLinkEnabled?: boolean;
+  allowedInviteDomains?: string;
 };
