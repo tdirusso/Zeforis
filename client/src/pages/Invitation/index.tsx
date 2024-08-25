@@ -8,12 +8,12 @@ import Box from '@mui/material/Box';
 import Snackbar from "../../components/core/Snackbar";
 import useSnackbar from "../../hooks/useSnackbar";
 import { getInvitationData } from '../../api/users';
-import zeforisLogo from '../../assets/zeforis-logo.png';
 import { Button, CircularProgress, Divider, useMediaQuery } from "@mui/material";
 import { setActiveOrgId } from "../../api/orgs";
 import { setActiveEngagementId } from "../../api/engagements";
+import zeforisLogo from '../../assets/zeforis-logo.png';
 
-export default function AcceptInvitationPage() {
+export default function InvitationPage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 

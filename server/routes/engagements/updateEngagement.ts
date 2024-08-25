@@ -82,7 +82,8 @@ export default async (req: Request<{}, {}, UpdateEngagementRequest>, res: Respon
     name,
     id,
     is_invite_link_enabled AS isInviteLinkEnabled,
-    invite_link_hash AS inviteLinkHash
+    invite_link_hash AS inviteLinkHash,
+    allowed_invite_domains AS allowedInviteDomains
     FROM engagements
     WHERE id = ?
   `, [engagementId]);
@@ -92,7 +93,8 @@ export default async (req: Request<{}, {}, UpdateEngagementRequest>, res: Respon
       id: engagementResult[0].id,
       name: engagementResult[0].name,
       isInviteLinkEnabled: engagementResult[0].isInviteLinkEnabled,
-      inviteLinkHash: engagementResult[0].inviteLinkHash
+      inviteLinkHash: engagementResult[0].inviteLinkHash,
+      allowedInviteDomains: engagementResult[0].allowedInviteDomains
     });
   }
 

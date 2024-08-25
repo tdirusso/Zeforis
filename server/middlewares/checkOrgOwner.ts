@@ -37,7 +37,8 @@ export default async (req: Request, _: Response, next: NextFunction) => {
             orgs.logo_url AS logo,
             engagements.name AS engagementName,
             engagements.is_invite_link_enabled AS isInviteLinkEnabled,
-            engagements.invite_link_hash AS inviteLinkHash
+            engagements.invite_link_hash AS inviteLinkHash,
+            engagements.allowed_invite_domains AS allowedInviteDomains
            FROM orgs
            LEFT JOIN engagements ON orgs.id = engagements.org_id
            WHERE engagements.id = ?

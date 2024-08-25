@@ -31,19 +31,20 @@ export default async (req: Request, _: Response, next: NextFunction) => {
       engagements.name,
       engagements.is_invite_link_enabled AS isInviteLinkEnabled,
       engagements.invite_link_hash AS inviteLinkHash,
+      engagements.allowed_invite_domains AS allowedInviteDomains,
       orgs.owner_id AS orgOwnerId,
     CASE 
         WHEN EXISTS (
             SELECT 1 
             FROM engagement_users 
-            WHERE engagement_id = 49 AND user_id = ?
+            WHERE engagement_id = ? AND user_id = ?
         ) THEN 1 
         ELSE 0 
     END AS engagementUserExists
     FROM engagements
     LEFT JOIN orgs ON orgs.id = engagements.org_id
-    WHERE engagements.id = ?
-    `, [userId, engagementId]);
+    WHERE engagements.id = ?`,
+    [userId, engagementId, engagementId]);
 
   if (!checkResult.length) {
     throw new NotFoundError(`Engagement with id ${engagementId} not found.`);
@@ -62,7 +63,8 @@ export default async (req: Request, _: Response, next: NextFunction) => {
       id: Number(engagementId),
       name: checkResult[0].name,
       inviteLinkHash: checkResult[0].inviteLinkHash,
-      isInviteLinkEnabled: checkResult[0].isInviteLinkEnabled
+      isInviteLinkEnabled: checkResult[0].isInviteLinkEnabled,
+      allowedInviteDomains: checkResult[0].allowedInviteDomains
     };
     return next();
   }

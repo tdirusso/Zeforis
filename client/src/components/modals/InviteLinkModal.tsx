@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import { LoadingButton } from '@mui/lab';
-import { Box, Collapse, DialogTitle, Divider, FormControlLabel, Switch, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Collapse, DialogTitle, Divider, FormControlLabel, Switch, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import { AppContext } from 'src/types/AppContext';
 import { Engagement } from '@shared/types/Engagement';
 import { updateEngagement } from 'src/api/engagements';
@@ -21,6 +21,11 @@ type InviteLinkModalProps = {
   setEngagement: AppContext['setEngagement'];
 };
 
+function isValidDomain(domain: string) {
+  const domainPattern = /^(?!-)(?:[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]\.){1,126}(?:[a-zA-Z]{2,63})$/;
+  return domainPattern.test(domain);
+}
+
 export default function InviteLinkModal(props: InviteLinkModalProps) {
 
   const {
@@ -31,12 +36,19 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
     setEngagement
   } = props;
 
-  //const []
+  const theme = useTheme();
+
   const [isSavingAllowedDomains, setSavingAllowedDomains] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('Copy');
   const [allowedInviteDomains, setAllowedInviteDomains] = useState(engagement.allowedInviteDomains || '');
 
   const inviteLink = `${process.env.REACT_APP_APP_DOMAIN}/invite/${engagement.inviteLinkHash}`;
+
+  const allowedDomains = allowedInviteDomains.split(',') || [];
+
+  const validDomains = allowedDomains
+    .map(domain => domain.trim())
+    .filter(domain => isValidDomain(domain));
 
   const handleToggleInviteLink = async (_: React.ChangeEvent<HTMLInputElement>, isEnabled: boolean) => {
     try {
@@ -130,7 +142,7 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
                     value={inviteLink}
                     fullWidth>
                   </TextField>
-                  <Box mt={2}>
+                  <Box mt={3}>
                     <Typography mb={1} className='flex-ac' gap='4px'>
                       Allowed email domain(s)
                       <Tooltip title="Enter a list email domains, comma separated.  Only these domains are allowed using the invite link.  No entries will allow all domains.">
@@ -155,14 +167,20 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
                         }
                       }}
                     />
-                    <Box mt={.5}>
-                      <LoadingButton
-                        loading={isSavingAllowedDomains}
-                        onClick={handleUpdateAllowedInviteDomains}
-                        size='small'>
-                        Save
-                      </LoadingButton>
+                    <Box className='flex-sb'>
+                      <Typography variant='caption' style={{ color: theme.palette.grey[500] }}>
+                        {`Allowing:  ${validDomains.length ? validDomains.map(domain => '@' + domain).join(', ') : 'All domains'}`}
+                      </Typography>
+                      <Box mt={.5}>
+                        <LoadingButton
+                          loading={isSavingAllowedDomains}
+                          onClick={handleUpdateAllowedInviteDomains}
+                          size='small'>
+                          Save
+                        </LoadingButton>
+                      </Box>
                     </Box>
+
                   </Box>
                 </Box>
               </Collapse> : null
