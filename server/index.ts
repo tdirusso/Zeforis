@@ -80,16 +80,13 @@ if (isDev) {
 
   app.use(cors({
     origin: [
-      // 'http://localhost:3000',
-      // 'http://192.168.0.164:3000',
-      // 'http://localhost:8080',
       'http://127.0.0.1:3000'
     ],
     credentials: true
   }));
 }
 
-app.use(express.static(path.join(__dirname + '/../', 'build-client')));
+app.use(express.static(path.join(__dirname, 'build-client')));
 app.use(express.urlencoded({
   extended: true,
   verify: (req, _, buf) => {
@@ -198,7 +195,7 @@ const boot = async () => {
   app.use(errorHandlerMW);
 
   app.get('*', forceSSL, (_, res) => {
-    return res.sendFile(path.join(__dirname + '/../', 'build-client', 'index.html'), { acceptRanges: false });
+    return res.sendFile(path.join(__dirname, 'build-client', 'index.html'), { acceptRanges: false });
   });
 
 
