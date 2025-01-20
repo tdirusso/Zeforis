@@ -20,6 +20,7 @@ import { useOutletContext } from "react-router-dom";
 import { importTasks } from "../../../api/tasks";
 import './styles.scss';
 import { AppContext } from "src/types/AppContext";
+import moment from "moment";
 
 const statusesString = statuses.map(({ name }) => name).join(', ');
 const statusesSet = new Set(statuses.map(({ name }) => name.toLowerCase()));
@@ -32,13 +33,14 @@ type ImportRow = {
   tagsArray: string[],
   url: string,
   isKeyTask: string;
+  dateDue?: string;
 };
 
 type ImportData = {
   errors: string[],
   tagsToCreate?: string[],
   foldersToCreate?: Set<string>,
-  importRows?: ImportRow[];
+  importRows: ImportRow[];
 };
 
 type TaskRow = {
@@ -49,6 +51,7 @@ type TaskRow = {
   url: string,
   is_key_task: string,
   tags: string;
+  date_due?: string;
 };
 
 export default function ImportTab() {
@@ -92,7 +95,7 @@ export default function ImportTab() {
       }
 
       if (errors.length) {
-        setImportData({ errors });
+        setImportData({ errors, importRows: [] });
         return;
       }
 
@@ -108,6 +111,7 @@ export default function ImportTab() {
         let url = row.url?.trim();
         let isKeyTask = row.is_key_task?.trim();
         let tagsArray = row.tags ? row.tags.trim().split(',').map(tag => tag.trim()) : [];
+        let dateDue = moment(row.date_due?.trim());
 
         if (!name) {
           errors.push(`Row ${index + 2} has no name value.`);
@@ -145,6 +149,10 @@ export default function ImportTab() {
           }
         }
 
+        if (!dateDue.isValid()) {
+          errors.push(`Row ${index + 2} contains invalid due date: "${row.date_due?.trim()}"`);
+        }
+
         importRows.push({
           name,
           description,
@@ -152,7 +160,8 @@ export default function ImportTab() {
           folder,
           tagsArray,
           url,
-          isKeyTask
+          isKeyTask,
+          dateDue: dateDue.format('MM/DD/YYYY')
         });
       });
 
@@ -296,11 +305,19 @@ export default function ImportTab() {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell component="th" scope="row" style={{ borderBottom: 'none' }}>tags</TableCell>
-                      <TableCell style={{ borderBottom: 'none' }}>
+                      <TableCell component="th" scope="row">tags</TableCell>
+                      <TableCell>
                         A comma separated list of tags to apply to the task.
                         <br></br><br></br>
                         Ex.  tag1,tag2,tag3...
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row" style={{ borderBottom: 'none' }}>date_due</TableCell>
+                      <TableCell style={{ borderBottom: 'none' }}>
+                        The date and time the task is due in MM/DD/YYYY format
+                        <br></br><br></br>
+                        Ex.  10/31/1996
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -361,7 +378,7 @@ export default function ImportTab() {
         <Box component='h4' mt={5}>Import Preview</Box>
         <Box mt={2}>
           {
-            !importData ? <Typography variant="body2">Waiting for file...</Typography>
+            !fileRef.current?.value ? <Typography variant="body2">Waiting for file...</Typography>
               :
               <ImportData importData={importData} />
           }
@@ -372,13 +389,12 @@ export default function ImportTab() {
             size="large"
             onClick={handleImport}
             loading={isLoading}
-            disabled={!(importData && importData.errors.length === 0)}
+            disabled={!(importData.importRows.length > 0 && importData.errors.length === 0)}
             variant="contained">
             Import
           </LoadingButton>
         </Box>
       </Paper>
-
     </Grid>
   );
 };

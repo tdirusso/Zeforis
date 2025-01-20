@@ -78,14 +78,14 @@ export default function ExportTab() {
     });
 
     setCsvData(exportData);
-    setLoading(false);
   };
 
   useEffect(() => {
-    if (csvData) {
+    if (csvData && loading) {
       downloadRef.current?.link.click();
+      setLoading(false);
     }
-  }, [csvData]);
+  }, [csvData, loading]);
 
   return (
     <Grid item xs={12}>

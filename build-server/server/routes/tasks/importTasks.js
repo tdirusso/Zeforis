@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../../database");
 const cache_1 = __importDefault(require("../../cache"));
 const config_1 = require("../../config");
+const moment_1 = __importDefault(require("moment"));
 exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { importRows = [] } = req.body;
     const { engagementId } = req;
@@ -87,7 +88,7 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         }
         const taskInsertVals = [];
         importRows.forEach((row) => {
-            const { name, description = '', status, folder, url = '', isKeyTask = false } = row;
+            const { name, description = '', status, folder, url = '', isKeyTask = false, dateDue } = row;
             if (name && folder) {
                 taskInsertVals.push([
                     name,
@@ -98,11 +99,12 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                     Number(isKeyTask),
                     creatorUserId,
                     creatorUserId,
-                    status === 'Complete' ? 'CURRENT_TIMESTAMP' : null
+                    status === 'Complete' ? 'CURRENT_TIMESTAMP' : null,
+                    dateDue ? (0, moment_1.default)(dateDue).endOf('day').format('YYYY-MM-DD HH:mm:ss') : null
                 ]);
             }
         });
-        const insertResult = yield connection.query(`INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed)
+        const insertResult = yield connection.query(`INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed, date_due)
        VALUES ?`, [taskInsertVals]);
         let insertId = insertResult[0].insertId;
         let taskTagsInsertVals = [];

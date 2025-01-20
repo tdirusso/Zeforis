@@ -3,15 +3,17 @@ import cache from '../../cache';
 import { appLimits } from '../../config';
 import { Request, Response, NextFunction } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import moment from 'moment';
 
 type ImportRow = {
-  name?: string,
+  name: string,
   description?: string,
   status?: string,
-  folder?: string;
+  folder: string;
   url?: string,
   isKeyTask?: boolean;
   tagsArray: string[];
+  dateDue?: string;
 };
 
 type TaskInsertValue = [
@@ -23,7 +25,8 @@ type TaskInsertValue = [
   number,  // isKeyTask
   number,  // creatorUserId
   number,  // updaterUserId
-  string | null // timestamp
+  string | null, // timestamp
+  string | null //dateDue
 ];
 
 export default async (req: Request, res: Response, next: NextFunction) => {
@@ -146,7 +149,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         status,
         folder,
         url = '',
-        isKeyTask = false
+        isKeyTask = false,
+        dateDue
       } = row;
 
       if (name && folder) {
@@ -159,13 +163,14 @@ export default async (req: Request, res: Response, next: NextFunction) => {
           Number(isKeyTask),
           creatorUserId,
           creatorUserId,
-          status === 'Complete' ? 'CURRENT_TIMESTAMP' : null
+          status === 'Complete' ? 'CURRENT_TIMESTAMP' : null,
+          dateDue ? moment(dateDue).endOf('day').format('YYYY-MM-DD HH:mm:ss') : null
         ]);
       }
     });
 
     const insertResult = await connection.query<ResultSetHeader>(
-      `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed)
+      `INSERT INTO tasks (name, description, status, folder_id, link_url, is_key_task, created_by_id, last_updated_by_id, date_completed, date_due)
        VALUES ?`,
       [taskInsertVals]
     );

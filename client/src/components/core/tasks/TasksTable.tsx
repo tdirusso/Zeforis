@@ -873,7 +873,7 @@ export default function TasksTable() {
               </Tooltip>
               <TextField
                 size="small"
-                placeholder='Name ...'
+                placeholder='Name'
                 value={filterName}
                 onChange={e => setSearchParams(prev => {
                   prev.set('filterName', e.target.value);
@@ -920,7 +920,6 @@ export default function TasksTable() {
                       fontSize: 14
                     }
                   }}
-                  size="small"
                   renderOption={(props, option) => <li {...props} key={option.id}>{option.firstName} {option.lastName}</li>}
                   options={membersAndAdmins}
                   getOptionLabel={(option) => {
@@ -939,8 +938,12 @@ export default function TasksTable() {
                   value={filterAssignedTo ? membersAndAdmins.find(user => user.id === filterAssignedTo) : null}
                   renderInput={(params) => (
                     <TextField
+                      style={{
+                        padding: '0 !important'
+                      }}
                       {...params}
-                      placeholder="Assignee ..."
+                      size="small"
+                      placeholder="Assignee"
                       InputProps={{
                         ...params.InputProps,
                       }}

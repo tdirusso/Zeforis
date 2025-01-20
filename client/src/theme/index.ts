@@ -196,9 +196,6 @@ const theme: ThemeOptions = {
           '& fieldset': {
             borderRadius: '6px',
             borderColor: '#e7e7e7'
-          },
-          '& .MuiInputBase-inputSizeSmall': {
-            padding: '11px 12px !important'
           }
         }
       }
