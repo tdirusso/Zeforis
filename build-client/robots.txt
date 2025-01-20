@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /home/*
+
+# Sitemap files
+Sitemap: https://www.zeforis.com/sitemap.xml
+Sitemap: https://blog.zeforis.com/sitemap.xml

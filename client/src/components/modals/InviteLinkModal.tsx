@@ -87,16 +87,23 @@ export default function InviteLinkModal(props: InviteLinkModalProps) {
     }, 750);
   };
 
+  const doCloseModal = () => {
+    closeModal();
+    setTimeout(() => {
+      setAllowedInviteDomains(engagement.allowedInviteDomains || '');
+    }, 300);
+  };
+
   return (
     <Dialog
       open={isOpen}
-      onClose={closeModal}
+      onClose={doCloseModal}
       className='modal'>
       <DialogTitle className='flex-sb'>
         Invite Users to {engagement.name}
         <IconButton
           aria-label="close"
-          onClick={closeModal}
+          onClick={doCloseModal}
         >
           <CloseIcon />
         </IconButton>

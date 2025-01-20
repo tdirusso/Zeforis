@@ -156,7 +156,6 @@ const boot = async () => {
   app.patch('/api/engagements/:engagementId/users/:userId/permissions', authenicatedUserRateLimit, checkOrgOwnerMW, updateUserPermissions);
   app.post('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, createEngagement);
   app.get('/api/engagements/:engagementId', authenicatedUserRateLimit, checkEngagementMemberMW, getEngagement);
-  // app.patch('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
   app.patch('/api/engagements/:engagementId', authenicatedUserRateLimit, checkOrgOwnerMW, updateEngagement);
   app.delete('/api/engagements', authenicatedUserRateLimit, checkOrgOwnerMW, deleteEngagement);
   app.delete('/api/engagements/leave', authenicatedUserRateLimit, checkEngagementMemberMW, leaveEngagement);

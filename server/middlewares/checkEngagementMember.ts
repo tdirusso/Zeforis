@@ -66,6 +66,7 @@ export default async (req: Request, _: Response, next: NextFunction) => {
       isInviteLinkEnabled: checkResult[0].isInviteLinkEnabled,
       allowedInviteDomains: checkResult[0].allowedInviteDomains
     };
+    
     return next();
   }
 

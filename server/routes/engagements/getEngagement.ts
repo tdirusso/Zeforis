@@ -20,8 +20,8 @@ type EngagementQueryResultType = [
 export default async (req: Request, res: Response<Engagement>) => {
 
   const {
-    engagementId,
     engagement,
+    engagement: { id: engagementId },
     orgId
   } = req;
 

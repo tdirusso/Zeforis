@@ -4,10 +4,10 @@ import { RowDataPacket } from 'mysql2';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   const {
-    orgId
-  } = req.body;
+    orgId,
+    engagement: { id: engagementId },
 
-  const { engagementId } = req;
+  } = req.body;
 
   if (!engagementId || !orgId) {
     return res.json({
