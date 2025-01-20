@@ -10,7 +10,7 @@ const verifyLogin = async (payload: VerifyLoginRequest) => {
 };
 
 const logout = async () => {
-  await request.post<void>('logout');
+  await request.delete<void>('logout');
 };
 
 export {
