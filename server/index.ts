@@ -7,7 +7,6 @@ import fileUpload from 'express-fileupload';
 import { initializeDatabase, pool } from './database';
 import emailService from './email';
 import slackbot from './slackbot';
-
 import login from './routes/auth/login';
 import createEngagement from './routes/engagements/createEngagement';
 import createFolder from './routes/folders/createFolder';
@@ -86,7 +85,12 @@ if (isDev) {
   }));
 }
 
-app.use(express.static(path.join(__dirname + '/../', 'build-client')));
+const buildClientPath = path.join(__dirname, '../../build-client');
+
+console.log('DIRNAME', __dirname, 'BUILDPATH', buildClientPath);
+
+app.use(express.static(buildClientPath));
+
 app.use(express.urlencoded({
   extended: true,
   verify: (req, _, buf) => {
@@ -195,7 +199,7 @@ const boot = async () => {
   app.use(errorHandlerMW);
 
   app.get('*', forceSSL, (_, res) => {
-    return res.sendFile(path.join(__dirname + '/../', 'build-client', 'index.html'), { acceptRanges: false });
+    return res.sendFile(path.join(buildClientPath, 'index.html'), { acceptRanges: false });
   });
 
 

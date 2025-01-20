@@ -86,7 +86,9 @@ if (config_1.isDev) {
         credentials: true
     }));
 }
-app.use(express_1.default.static(path_1.default.join(__dirname + '/../', 'build-client')));
+const buildClientPath = path_1.default.join(__dirname, '../../build-client');
+console.log('DIRNAME', __dirname, 'BUILDPATH', buildClientPath);
+app.use(express_1.default.static(buildClientPath));
 app.use(express_1.default.urlencoded({
     extended: true,
     verify: (req, _, buf) => {
@@ -171,7 +173,7 @@ const boot = () => __awaiter(void 0, void 0, void 0, function* () {
     app.post('/api/logs/logFrontendError', logFrontendError_1.default);
     app.use(errorHandler_1.default);
     app.get('*', forceSSL, (_, res) => {
-        return res.sendFile(path_1.default.join(__dirname + '/../', 'build-client', 'index.html'), { acceptRanges: false });
+        return res.sendFile(path_1.default.join(buildClientPath, 'index.html'), { acceptRanges: false });
     });
     if (config_1.isDev) {
         app.listen(Number(port), '127.0.0.1', () => console.log('App is running on 127.0.0.1'));
