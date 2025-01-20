@@ -86,7 +86,7 @@ if (isDev) {
   }));
 }
 
-app.use(express.static(path.join(__dirname, 'build-client')));
+app.use(express.static(path.join(__dirname + '/../', 'build-client')));
 app.use(express.urlencoded({
   extended: true,
   verify: (req, _, buf) => {
@@ -195,7 +195,7 @@ const boot = async () => {
   app.use(errorHandlerMW);
 
   app.get('*', forceSSL, (_, res) => {
-    return res.sendFile(path.join(__dirname, 'build-client', 'index.html'), { acceptRanges: false });
+    return res.sendFile(path.join(__dirname + '/../', 'build-client', 'index.html'), { acceptRanges: false });
   });
 
 
